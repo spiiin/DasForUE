@@ -412,6 +412,12 @@ struct FUEClassAnnotation : das::StructureAnnotation
                     DSLFail(TEXT("Adapter supports int/float/bool/string/double/name properties: ")+ P.Name);
                 P.Type.Kind = FieldType;
                 if (const auto* Adapted = DSLValueAdapter(F.type);
+                    Adapted && Adapted->Script->DeclareProperty(F.type, F, TypeScope, P))
+                {
+                    C.Properties.Add(MoveTemp(P));
+                    continue;
+                }
+                if (const auto* Adapted = DSLValueAdapter(F.type);
                     Adapted && Adapted->Adapter->GetKind() != EDasTypeKind::Enum &&
                     Adapted->Script->ParseDefault(EDasScriptDefaultUse::Property, F.type, F.init, Group, St->module,
                                                   P.Default))
@@ -425,23 +431,6 @@ struct FUEClassAnnotation : das::StructureAnnotation
                 {
                     P.Default = DSLByteDefault(F.init);
                     C.Properties.Add(P);
-                    continue;
-                }
-                if (FieldType == TEXT("class"))
-                {
-                    if (DSLTypedClass(F.type))
-                    {
-                        const FString Inferred = DSLTypedClassPath(F.type);
-                        if (!P.Type.TypePath.IsEmpty() && P.Type.TypePath != Inferred)
-                            DSLFail(TEXT("Conflicting typed class property constraint"));
-                        P.Type.TypePath = Inferred;
-                    }
-                    auto* Base = FindObject<UClass>(nullptr, *P.Type.TypePath);
-                    if (!P.Type.TypePath.StartsWith(TEXT("/Script/")) || !Base ||
-                                                    Base->HasAnyClassFlags(CLASS_Interface))
-                        DSLFail(TEXT("Class property requires ue_class_base with loaded native base"));
-                    P.Default = DSLReferencePropertyDefault(F, true);
-                    C.Properties.Add(MoveTemp(P));
                     continue;
                 }
                 if (DSLContainer(F.type))
@@ -524,31 +513,6 @@ struct FUEClassAnnotation : das::StructureAnnotation
                 {
                     DSLRawEnumProperty(F.init, TypeScope, P.Type, P.Default);
                     C.Properties.Add(P);
-                    continue;
-                }
-                if (DSLTypedReference(F.type))
-                {
-                    P.Type.TypePath = DSLTypedReferencePath(F.type);
-                    if (DSLAuthoredView(F.type))
-                        P.Type.AuthoredId = DSLReferenceDeclaration(F.type).Id;
-                    P.Default = DSLReferencePropertyDefault(F, false);
-                    C.Properties.Add(MoveTemp(P));
-                    continue;
-                }
-                if (FieldType == TEXT("object"))
-                {
-                    if (!F.init || !F.init->rtti_isCall())
-                        DSLFail(TEXT("Object field requires literal ue_object_value(native_class_path) initializer"));
-                    auto* Call = static_cast<das::ExprCall*>(F.init);
-                    if (Call->name != "ue_object_value" || Call->arguments.size() != 1 ||
-                        Call->arguments[0]->__rtti != das::string("ExprConstString"))
-                        DSLFail(TEXT("Object field initializer requires one literal native class path"));
-                    P.Type.TypePath = DSLResolveType(
-                        EDSLTypeKind::Class, DSLText(static_cast<das::ExprConstString*>(Call->arguments[0])->text),
-                        TypeScope);
-                    static_cast<das::ExprConstString*>(Call->arguments[0])->text = DSLUtf8(P.Type.TypePath);
-                    P.Default.Kind = TEXT("null");
-                    C.Properties.Add(MoveTemp(P));
                     continue;
                 }
                 if (FieldType == TEXT("struct"))
@@ -917,7 +881,7 @@ struct FUEClassAnnotation : das::StructureAnnotation
                 das::Structure::FieldDeclaration Handle;
                 Handle.flags = 0;
                 Handle.name = "handle";
-                Handle.type = DSLHandleType(Group, St->module, "UObjectHandle");
+                Handle.type = DSLPropertyType(TEXT("object"), Group, St->module, St->at);
                 Handle.at = St->at;
                 Ref->fields.push_back(Handle);
                 auto Annotations = Group.findAnnotation("ue_object_ref", St->module);
@@ -945,7 +909,7 @@ struct FUEClassAnnotation : das::StructureAnnotation
                 das::Structure::FieldDeclaration Handle;
                 Handle.flags = 0;
                 Handle.name = "handle";
-                Handle.type = DSLHandleType(Group, St->module, "UObjectHandle");
+                Handle.type = DSLPropertyType(TEXT("object"), Group, St->module, St->at);
                 Handle.at = St->at;
                 Ref->fields.push_back(Handle);
                 auto Annotations = Group.findAnnotation("ue_object_ref", St->module);
@@ -1389,8 +1353,7 @@ struct FUEClassAnnotation : das::StructureAnnotation
                     const auto OriginalName = Arg->name;
                     const auto SourceType = DSLCopyType(Arg->type);
                     Arg->name = "__ue_event_raw_object";
-                    Arg->type =
-                        DSLHandleType(Group, St->module, Parameter == TEXT("class")? "UEClassHandle" : "UObjectHandle");
+                    Arg->type = DSLPropertyType(Parameter, Group, St->module, F->at);
                     auto* Local = new das::Variable();
                     Local->at = F->at;
                     Local->name = OriginalName;

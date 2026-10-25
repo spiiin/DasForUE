@@ -1,6 +1,7 @@
 #pragma once
 #include "DasTypeAdapters.h"
 struct FDasDeclaredLiteral;
+struct FDasDeclaredProperty;
 class FJsonValue;
 // Requires the daScript AST headers, included by DasRuntime.cpp with its packing and macro guards.
 
@@ -40,6 +41,12 @@ enum class EDasScriptDefaultUse : uint8
     StructField,
     Parameter
 };
+struct FDasScriptTypeScope
+{
+    FString ModuleId, Folder, Registry;
+    das::ModuleGroup* Group = nullptr;
+    das::Module* Module = nullptr;
+};
 class IDasScriptTypeFacet
 {
 public:
@@ -63,6 +70,11 @@ public:
                                              das::ExpressionPtr Value, const FString&) const
     {
         return Unpack(At, Type, Value);
+    }
+    virtual bool DeclareProperty(const das::TypeDeclPtr&, das::Structure::FieldDeclaration&, const FDasScriptTypeScope&,
+                                 FDasDeclaredProperty&) const
+    {
+        return false;
     }
     virtual bool ParseDefault(EDasScriptDefaultUse, const das::TypeDeclPtr&, das::ExpressionPtr, das::ModuleGroup&,
                               das::Module*, FDasDeclaredLiteral&) const

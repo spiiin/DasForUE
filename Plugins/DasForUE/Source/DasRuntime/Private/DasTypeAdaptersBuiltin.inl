@@ -35,6 +35,9 @@ void RegisterBuiltinTypeAdapters(FDasTypeAdapters& Registry)
                                                                   DasScalarScriptFacet(DasTypeKind(TEXT(#Suffix))));
     DAS_SCALAR_ACCESSOR_KINDS(DAS_REGISTER_SCALAR_ADAPTER)
 #undef DAS_REGISTER_SCALAR_ADAPTER
+    static const FDasObjectClassScriptFacet ObjectScript(false), ClassScript(true);
+    Registry.Register(MakeDasObjectClassAdapter(false), &ObjectScript);
+    Registry.Register(MakeDasObjectClassAdapter(true), &ClassScript);
     static const FDasEnumScriptFacet EnumScript;
     Registry.Register(MakeDasEnumAdapter(), &EnumScript);
     static const FDasSoftReferenceScriptFacet SoftScript;

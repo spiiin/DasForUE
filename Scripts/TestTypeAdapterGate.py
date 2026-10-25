@@ -11,6 +11,14 @@ ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'Plugins',
 
 # Ported type -> (patterns, files allowed to contain them).
 PORTED = {
+    'ReferencePropertyFactory': (
+        [r'\bnew F(?:Object|Class|WeakObject|Interface)Property\b'],
+        {'DasObjectClassAdapters.cpp'},
+    ),
+    'ReferenceDefaults': (
+        [r'\bDSLReferencePropertyDefault\b'],
+        {'DasReferenceDefaultsDSL.inl'},
+    ),
     'EnumStorage': (
         [r'\bGetCppForm\('],
         {'DasEnumAdapter.cpp', 'DasContainerRegistry.cpp'},
@@ -50,6 +58,14 @@ def sources():
 
 
 class TypeAdapterGateTest(unittest.TestCase):
+    def test_reference_dispatch_stays_generic(self):
+        for name in ['DasDSL.inl', 'DasDirectTypes.inl', 'DasNativeGameplayDSL.inl',
+                     'DasRuntimeFramesWidgets.inl', 'DasPropertyTypes.cpp']:
+            path = os.path.join(ROOT, 'DasRuntime', 'Private', name)
+            with open(path, encoding='utf-8') as stream:
+                code = stream.read()
+            self.assertNotRegex(code, r'"(?:UObjectHandle|UEClassHandle)"', name)
+
     def test_ported_types_stay_inside_their_adapters(self):
         offenders = []
         for kind, (patterns, allowed) in PORTED.items():

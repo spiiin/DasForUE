@@ -281,3 +281,38 @@ Method-values и automation покрывают typed values, несовпада�
 
 Транспорт контейнеров и предметные операции над enum tokens используют прежние shared
 runtime helpers. Новые формы enum, числовые диапазоны и defaults параметров не добавлены.
+
+
+## Перенос Object/Class (2026-10-25)
+
+`FDasObjectClassAdapter` регистрируется для двух видов с TypePath: Object и Class.
+Создание FObjectProperty, FWeakObjectProperty, FClassProperty и совместимое существующее
+представление FInterfaceProperty теперь принадлежат адаптеру. Сохранены ограничения:
+weak применим только к конкретному object, class не принимает interface base, direct weak
+containers и containers class references остаются закрыты. Container shape/depth/node
+проверяет общий validator, существование класса и reference-specific ограничения — адаптер.
+Обратное описание сохраняет PropertyClass/MetaClass и WeakReference, не объединяя storage.
+
+`FDasObjectClassScriptFacet` выбирает source view и raw ABI для обоих видов. Strong/weak
+object capability, native/interface casts, authored nullable/stable-ID check и class-base
+check продолжают использовать прежние runtime codecs. Изменены выбор и размещение правил,
+а не обработка GC, Destroy, proxy cancellation или lease lifetime. Source wrappers и raw
+UObjectHandle/UEClassHandle различаются через MatchesScriptType/MatchesCallType.
+
+Declaration/default policy вынесена в `DasReferenceDefaultsDSL.inl`: typed class constraint,
+authored reference ID, legacy ue_object_value, ue_asset_default/ue_class_default и object
+container asset defaults. Field initializer очищается и PendingReferences проверяется тем же
+кодом, что и раньше. Private scope FDasScriptTypeScope хранит прежние ModuleId/Folder/Registry
+и Group/Module; FDSLTypeScope — его alias, чтобы передать declaration facet полный scope.
+
+Existing interface reference representation остаётся совместимой частью Object. Отдельные
+контракты interface dispatch, ImplementsInterface и authored interface definitions остаются
+следующим шагом; этот перенос не добавляет новые interface-возможности.
+
+Foundation проверяет object/class × UObject/Actor/Interface × strong/weak: реальный класс
+FProperty, base constraint, StorageIdentity после описания и отказы для weak class/interface
+и неизвестного base. Существующие weak/GC/lifecycle и method-values/PIE tests проверяют
+время жизни, неверные native/authored типы, параметры/результаты/ref/out и callbacks.
+Native/computed-default suites проверяют сохранённую обработку reference defaults.
+Архитектурный gate запрещает reference property construction вне адаптера и raw ABI names
+в общих builder/conversion/signature участках DSL.

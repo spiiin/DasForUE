@@ -7,18 +7,11 @@ TSharedPtr<FJsonValue> DSLDefaultJsonValue(const das::TypeDeclPtr& T, das::Expre
     if (const auto* Adapted = DSLValueAdapter(T))
         if (auto Value = Adapted->Script->DefaultJson(T, E, Group, Module))
             return Value;
-    if (DSLTypedReference(T) || DSLObjectKey(T))
+    if (DSLObjectKey(T))
     {
-        if ((DSLTypedReference(T) && DSLAuthoredView(T)) ||
-            (DSLObjectKey(T) && !DSLKeyAnnotation(T)->AuthoredId.IsEmpty()))
+        if (!DSLKeyAnnotation(T)->AuthoredId.IsEmpty())
             DSLFail(TEXT("Container asset defaults require native reference types"));
-        auto* Call = E->rtti_isCall() ? static_cast<das::ExprCall*>(E) : nullptr;
-        if (!Call || Call->name != "ue_asset_default" || Call->arguments.size() != 1 ||
-            Call->arguments[0]->__rtti != das::string("ExprConstString"))
-            DSLFail(TEXT("Container assets require ue_asset_default(path)"));
-        auto Object = MakeShared<FJsonObject>();
-        Object->SetStringField(TEXT("asset"), DSLText(static_cast<das::ExprConstString*>(Call->arguments[0])->text));
-        return MakeShared<FJsonValueObject>(Object);
+        return DSLReferenceAssetDefault(E);
     }
     if (DSLContainer(T))
     {

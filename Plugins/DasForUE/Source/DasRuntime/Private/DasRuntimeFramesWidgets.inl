@@ -172,6 +172,10 @@ bool VerifyContract(const das::ProgramPtr& Program, const FString& Entry, const 
         {
             return T && !T->ref && T->baseType == das::Type::tHandle && T->annotation && T->annotation->name == Name;
         };
+        auto ObjectHandle = [](const das::TypeDeclPtr& T)
+        {
+            return T && !T->ref && DSLKindFacet(EDasTypeKind::Object)->MatchesCallType(T);
+        };
         if (!F || !F->exports || !C.InputDirections.IsEmpty() || C.InputClasses.Num() != C.Inputs.Num() ||
             F->arguments.size() != size_t(C.Inputs.Num()))
             return false;
@@ -194,15 +198,14 @@ bool VerifyContract(const das::ProgramPtr& Program, const FString& Entry, const 
         if (I < Count)
         {
             if (C.Inputs[I] != EDasMethodSignature::Object ||
-                C.InputClasses[I] != TEXT("/Script/CoreUObject.Object") ||
-                                          !Handle(F->arguments[I]->type, "UObjectHandle"))
+                C.InputClasses[I] != TEXT("/Script/CoreUObject.Object") || !ObjectHandle(F->arguments[I]->type))
                 return false;
             return F->result && !F->result->ref &&
                    ((C.ReturnKind == EDasMethodSignature::Bool && F->result->isSimpleType(das::Type::tBool)) ||
                     (C.ReturnKind == EDasMethodSignature::Void && F->result->baseType == das::Type::tVoid));
         }
         return HasGeometry && Count == 2 && C.ReturnKind == EDasMethodSignature::Object &&
-               C.ReturnClass == TEXT("/Script/CoreUObject.Object") && Handle(F->result, "UObjectHandle");
+               C.ReturnClass == TEXT("/Script/CoreUObject.Object") && ObjectHandle(F->result);
     }
     if (FocusNotificationContract && C.ReturnKind == EDasMethodSignature::Void && C.Inputs.Num() == 1 &&
         C.Inputs[0] == EDasMethodSignature::Struct && C.InputClasses.Num() == 1 &&
@@ -251,8 +254,6 @@ bool VerifyContract(const das::ProgramPtr& Program, const FString& Entry, const 
             return T->isSimpleType(das::Type::tUInt8);
         if (const auto* Facet = DSLKindFacet(DasTypeKindOf(K)))
             return Facet->MatchesCallType(T);
-        if (K == EDasMethodSignature::Class)
-            return T->baseType == das::Type::tHandle && T->annotation && T->annotation->name == "UEClassHandle";
         if (K == EDasMethodSignature::Delegate)
             return T->isSimpleType(das::Type::tUInt64);
         if (K == EDasMethodSignature::Struct)
@@ -261,8 +262,6 @@ bool VerifyContract(const das::ProgramPtr& Program, const FString& Entry, const 
             for (const auto& Entry : FDasTypeAdapters::Get().Entries())
                 if (&*Entry.Adapter == Adapter && Entry.Script)
                     return Entry.Script->MatchesScriptType(T);
-        if (K == EDasMethodSignature::Object)
-            return T->baseType == das::Type::tHandle && T->annotation && T->annotation->name == "UObjectHandle";
         const auto D = K == EDasMethodSignature::String   ? das::Type::tString
                        : K == EDasMethodSignature::Double ? das::Type::tDouble
                        : K == EDasMethodSignature::Int    ? das::Type::tInt

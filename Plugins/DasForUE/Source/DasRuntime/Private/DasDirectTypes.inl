@@ -370,16 +370,12 @@ das::ExpressionPtr DSLDirectUnpack(const das::LineInfo& At, const das::TypeDeclP
         return V;
     if (DSLAdapted(Type))
         return DSLAdaptedUnpack(At, Type, V);
-    if (DSLTypedClass(Type))
-        return DSLClassUnpack(At, Type, V);
+    if (DSLTypedValue(Type, EDasTypeKind::Object) || DSLTypedValue(Type, EDasTypeKind::Class))
+        return DSLValueAdapter(Type)->Script->Unpack(At, Type, V);
     if (DSLDelegate(Type))
         return DSLDelegateSnapshot(At, Type, V);
     if (!DSLMathPath(Type).IsEmpty())
         return DSLAdaptedHandleUnpack(At, Type, V);
-    if (DSLAuthoredView(Type))
-        return DSLAuthoredUnpack(At, Type, V);
-    if (DSLTypedReference(Type))
-        return DSLNativeReferenceUnpack(At, Type, V);
     if (DSLTypedValue(Type, EDasTypeKind::Enum))
         return DSLValueAdapter(Type)->Script->UnpackForPath(At, Type, V, Path);
     return DSLCall(At, DSLUtf8(TEXT("__ue_unpack_")+ FMD5::HashAnsiString(*DSLSourceValueKey(Type, Path))), {V});
@@ -394,20 +390,12 @@ das::ExpressionPtr DSLDirectPack(const das::LineInfo& At, const das::TypeDeclPtr
     if (DSLAdapted(Type))
         return DSLAdaptedPack(At, Type, V);
 
-    if (DSLTypedClass(Type))
-        return DSLClassPack(At, Type, V);
+    if (DSLTypedValue(Type, EDasTypeKind::Object) || DSLTypedValue(Type, EDasTypeKind::Class))
+        return DSLValueAdapter(Type)->Script->PackTyped(At, Type, V);
     if (DSLDelegate(Type))
         return new das::ExprField(At, V, "__delegate_token");
     if (!DSLMathPath(Type).IsEmpty())
         return DSLAdaptedHandlePack(At, Type, V);
-    if (DSLAuthoredView(Type))
-        return DSLAuthoredPack(At, Type, V);
-    if (DSLTypedObject(Type))
-        return DSLCall(
-            At, "ue_cast_nullable_object",
-            {new das::ExprField(At, V, "handle"), new das::ExprConstString(At, DSLUtf8(DSLTypedReferencePath(Type)))});
-    if (DSLTypedReference(Type))
-        return DSLCall(At, Type->structType->module->name + "::" + Type->structType->name + "_raw", {V});
     if (DSLTypedValue(Type, EDasTypeKind::Enum))
         return DSLValueAdapter(Type)->Script->PackForPath(At, Type, V, Path);
     return DSLCall(At, DSLUtf8(TEXT("__ue_pack_")+ FMD5::HashAnsiString(*DSLSourceValueKey(Type, Path))), {V});

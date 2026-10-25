@@ -311,6 +311,7 @@ struct FDSLTypeCallVisitor : das::Visitor
 };
 #include "DasObjectTypes.inl"
 #include "DasClassTypes.inl"
+#include "DasObjectClassTypesDSL.inl"
 #include "DasSoftTypes.inl"
 #include "DasGameplayTagsDSL.inl"
 das::ExpressionPtr DSLDirectPack(const das::LineInfo&, const das::TypeDeclPtr&, das::ExpressionPtr, const FString&);
@@ -324,13 +325,9 @@ FString DSLTypeName(const das::TypeDeclPtr& T)
         return DasTypeKindName(Entry->Adapter->GetKind());
     if (DSLObjectKey(T))
         return TEXT("object_key");
-    if (DSLTypedClass(T))
-        return TEXT("class");
     if (T->baseType == das::Type::tStructure && T->structType &&
         DSLAnnotation(T->structType->annotations, "ue_delegate"))
         return TEXT("delegate");
-    if (DSLTypedReference(T))
-        return TEXT("object");
     if (T->baseType == das::Type::tStructure && T->structType &&
         (DSLAnnotation(T->structType->annotations, "ue_struct") ||
          DSLAnnotation(T->structType->annotations, "ue_native_struct")))
@@ -356,10 +353,6 @@ FString DSLTypeName(const das::TypeDeclPtr& T)
     case das::Type::tVoid:
         return TEXT("void");
     case das::Type::tHandle:
-        if (T->annotation && T->annotation->name == "UEClassHandle")
-            return TEXT("class");
-        if (T->annotation && T->annotation->name == "UObjectHandle")
-            return TEXT("object");
         if (T->annotation && (DSLAdaptedHandle(T) || T->annotation->name == "UEStructValue"))
             return TEXT("struct");
     default:
@@ -553,6 +546,7 @@ das::ExpressionPtr DSLDelegateFieldWrite(const das::LineInfo&, const das::TypeDe
 #include "DasComputedDefaults.inl"
 #include "DasIdentityDSL.inl"
 #include "DasComponentDefaults.inl"
+#include "DasReferenceDefaultsDSL.inl"
 #include "DasContainerDefaultsDSL.inl"
 bool DSLVirtualMethod(const FDasDeclaredClass& C, const FDasDeclaredMethod& M)
 {

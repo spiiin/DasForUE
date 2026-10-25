@@ -26,9 +26,7 @@ bool Validate(const FDasDeclaredType& T, EDasPropertyUsage Usage, FString& Error
     if (Depth > 16 || ++Nodes > 1024)
         return Fail(TEXT("Property type exceeds depth/node limit"));
     const auto K = T.GetKind();
-    if (T.WeakReference &&
-        (K != EDasTypeKind::Object || (FindObject<UClass>(nullptr, *T.TypePath) &&
-                                       FindObject<UClass>(nullptr, *T.TypePath)->HasAnyClassFlags(CLASS_Interface))))
+    if (T.WeakReference && K != EDasTypeKind::Object)
         return Fail(TEXT("Weak storage requires a concrete object class"));
     if (K == EDasTypeKind::Invalid || K == EDasTypeKind::Void || K == EDasTypeKind::Delegate ||
         K == EDasTypeKind::Event)
@@ -80,15 +78,6 @@ bool Validate(const FDasDeclaredType& T, EDasPropertyUsage Usage, FString& Error
     }
     if (T.Element || T.Key || T.Value)
         return Fail(TEXT("Leaf has container members"));
-    if (K == EDasTypeKind::Object || K == EDasTypeKind::Class)
-    {
-        auto* C = FindObject<UClass>(nullptr, *T.TypePath);
-        if (!C || (K == EDasTypeKind::Class && C->HasAnyClassFlags(CLASS_Interface)))
-            return Fail(TEXT("Missing or incompatible loaded class"));
-        if (Usage == EDasPropertyUsage::Container && !T.TypePath.StartsWith(TEXT("/Script/")))
-            return Fail(TEXT("Container references require native classes"));
-        return true;
-    }
     if (K == EDasTypeKind::Struct)
     {
         auto* S = FindObject<UScriptStruct>(nullptr, *T.TypePath);
@@ -118,7 +107,6 @@ bool Describe(const FProperty* P, FDasDeclaredType& Out, FString& Error, int32 D
         return false;
     }
     Out = {};
-    Out.WeakReference = CastField<FWeakObjectProperty>(P) != nullptr;
     const auto K = DasPropertyKind(P);
     Out.Kind = DasTypeKindName(K);
     if (K == EDasTypeKind::Invalid)
@@ -151,12 +139,8 @@ bool Describe(const FProperty* P, FDasDeclaredType& Out, FString& Error, int32 D
             return Result.GetValue();
     if (auto* Soft = DasSoftCarrierForProperty(P))
         Out.TypePath = Soft->GetPathName();
-    else if (auto* C = CastField<FClassProperty>(P))
-        Out.TypePath = C->MetaClass->GetPathName();
     else if (auto* S = CastField<FStructProperty>(P))
         Out.TypePath = S->Struct->GetPathName();
-    else if (auto* ReferenceClass = DasReferencePropertyClass(P))
-        Out.TypePath = ReferenceClass->GetPathName();
     if (K == EDasTypeKind::Delegate || K == EDasTypeKind::Event)
     {
         Error = TEXT("Delegate signature requires its explicit authoring contract");
@@ -176,32 +160,6 @@ FProperty* Build(FFieldVariant Owner, FName Name, const FDasDeclaredType& T, EDa
     {
         auto* P = new FStructProperty(Owner, Name);
         P->Struct = FindObject<UScriptStruct>(nullptr, *T.TypePath);
-        return P;
-    }
-    case EDasTypeKind::Object:
-    {
-        auto* C = FindObject<UClass>(nullptr, *T.TypePath);
-        if (T.WeakReference)
-        {
-            auto* P = new FWeakObjectProperty(Owner, Name);
-            P->PropertyClass = C;
-            return P;
-        }
-        if (C->HasAnyClassFlags(CLASS_Interface))
-        {
-            auto* P = new FInterfaceProperty(Owner, Name);
-            P->InterfaceClass = C;
-            return P;
-        }
-        auto* P = new FObjectProperty(Owner, Name);
-        P->PropertyClass = C;
-        return P;
-    }
-    case EDasTypeKind::Class:
-    {
-        auto* P = new FClassProperty(Owner, Name);
-        P->PropertyClass = UClass::StaticClass();
-        P->MetaClass = FindObject<UClass>(nullptr, *T.TypePath);
         return P;
     }
     case EDasTypeKind::Array:
@@ -262,12 +220,8 @@ EDasTypeKind DasPropertyKind(const FProperty* P)
         return EDasTypeKind::Map;
     if (const auto* Adapter = FDasTypeAdapters::Get().FindProperty(P); Adapter && !Adapter->GetStruct())
         return Adapter->GetKind();
-    if (CastField<FClassProperty>(P))
-        return EDasTypeKind::Class;
     if (CastField<FSoftObjectProperty>(P))
         return EDasTypeKind::Struct;
-    if (DasReferencePropertyClass(P))
-        return EDasTypeKind::Object;
     if (CastField<FStructProperty>(P))
         return EDasTypeKind::Struct;
     if (CastField<FDelegateProperty>(P))

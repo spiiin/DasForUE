@@ -6,12 +6,7 @@ enum class EDSLTypeKind
     Enum,
     Struct
 };
-struct FDSLTypeScope
-{
-    FString ModuleId, Folder, Registry;
-    das::ModuleGroup* Group = nullptr;
-    das::Module* Module = nullptr;
-};
+using FDSLTypeScope = FDasScriptTypeScope;
 FString DSLTypeKindLabel(EDSLTypeKind Kind)
 {
     return Kind == EDSLTypeKind::Class ? TEXT("class")

@@ -24,7 +24,7 @@ public:
     virtual bool MatchesStructPath(const FString& Path) const { return false; }
     virtual FProperty* GetCarrierProperty(const FString& Path) const { return nullptr; }
     virtual const TCHAR* GetStructFieldDefault() const { return nullptr; }
-    // Identity-bearing kinds (enum now; object/class later) retain their path in the descriptor.
+    // Identity-bearing kinds (enum, object/class) retain their path in the descriptor.
     virtual bool UsesTypeIdentity() const { return false; }
     // An unset result leaves the operation to the generic builder/validator.
     virtual TOptional<bool> ValidateDeclared(const FDasDeclaredType&, EDasPropertyUsage, FString&) const { return {}; }

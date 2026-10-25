@@ -325,7 +325,7 @@ das::ExpressionPtr DSLReferenceValue(const das::LineInfo& At, const das::TypeDec
 }
 bool DSLClassHandle(const das::TypeDeclPtr& T)
 {
-    return T && T->baseType == das::Type::tHandle && T->annotation && T->annotation->name == "UEClassHandle";
+    return DSLKindFacet(EDasTypeKind::Class)->MatchesCallType(T);
 }
 struct FUEClassLoadedFactory : das::CallMacro
 {
@@ -504,10 +504,6 @@ das::TypeDeclPtr DSLPropertyType(const FString& Kind, das::ModuleGroup& G, das::
 {
     if (const auto* Facet = DSLKindFacet(DasTypeKind(Kind)))
         return Facet->MakeView(G, M, At);
-    if (Kind == TEXT("class"))
-        return DSLHandleType(G, M, "UEClassHandle");
-    if (Kind == TEXT("object"))
-        return DSLHandleType(G, M, "UObjectHandle");
     if (Kind == TEXT("struct"))
         return DSLHandleType(G, M, "UEStructValue");
     return new das::TypeDecl(
@@ -525,10 +521,9 @@ das::TypeDeclPtr DSLReflectedValueABI(const das::TypeDeclPtr& T, das::ModuleGrou
 {
     if (DSLTypedValue(T, EDasTypeKind::Enum))
         return DSLKindFacet(EDasTypeKind::Enum)->MakeView(Group, Module, T->at);
-    return DSLHandleType(Group, Module,
-                         DSLTypedClass(T)       ? "UEClassHandle"
-                         : DSLTypedReference(T) ? "UObjectHandle"
-                                                : "UEStructValue");
+    if (DSLTypedValue(T, EDasTypeKind::Object) || DSLTypedValue(T, EDasTypeKind::Class))
+        return DSLValueAdapter(T)->Script->MakeView(Group, Module, T->at);
+    return DSLHandleType(Group, Module, "UEStructValue");
 }
 das::TypeDeclPtr DSLMethodValueType(das::Program*, das::Module*, const FDasDeclaredType&, const das::string&,
                                     const FDSLTypeScope&, const das::LineInfo&);
@@ -758,7 +753,7 @@ das::TypeDeclPtr DSLMethodValueType(das::Program* Program, das::Module* Module, 
         return Type;
     }
     if (Declared.Kind == TEXT("class") && SourceName.empty())
-        return DSLHandleType(*Program->thisModuleGroup, Module, "UEClassHandle");
+        return DSLPropertyType(Declared.Kind, *Program->thisModuleGroup, Module, At);
     if (Declared.Kind == TEXT("array") || Declared.Kind == TEXT("map") || Declared.Kind == TEXT("set"))
     {
         auto* Container = new das::TypeDecl(Declared.Kind == TEXT("array")? das::Type::tArray : das::Type::tTable, At);

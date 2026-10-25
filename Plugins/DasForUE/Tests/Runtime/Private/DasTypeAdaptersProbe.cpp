@@ -4,6 +4,7 @@
 #include "Engine/EngineTypes.h"
 #include "UObject/StrongObjectPtr.h"
 #include "GameFramework/Actor.h"
+#include "UObject/Interface.h"
 #include "UObject/Class.h"
 #include "UObject/UnrealType.h"
 
@@ -25,6 +26,57 @@ bool CheckDasTypeAdapters(FString& Error)
                 Error = TEXT("Struct adapter is not reachable: ")+ Struct->GetPathName();
                 return false;
             }
+            continue;
+        }
+        if (Adapter->GetKind() == EDasTypeKind::Object || Adapter->GetKind() == EDasTypeKind::Class)
+        {
+            const bool Class = Adapter->GetKind() == EDasTypeKind::Class;
+            for (UClass* Base : {UObject::StaticClass(), AActor::StaticClass(), UInterface::StaticClass()})
+                for (bool Weak : {false, true})
+                {
+                    const bool Interface = Base == UInterface::StaticClass();
+                    FDasDeclaredType Type;
+                    Type.Kind = Class ? TEXT("class") : TEXT("object");
+                    Type.TypePath = Base->GetPathName();
+                    Type.WeakReference = Weak;
+                    auto* Property =
+                        CreateDasProperty(FFieldVariant(), TEXT("Reference"), Type, EDasPropertyUsage::Value, Error);
+                    if ((Class && (Weak || Interface)) || (!Class && Weak && Interface))
+                    {
+                        const bool Rejected = !Property && !Error.IsEmpty();
+                        delete Property;
+                        if (!Rejected)
+                        {
+                            Error = TEXT("Reference adapter accepted weak class/interface storage");
+                            return false;
+                        }
+                        continue;
+                    }
+                    FDasDeclaredType RoundTrip;
+                    const bool Good = Property && Registry.Find(Type) == Adapter &&
+                                      Registry.FindProperty(Property) == Adapter &&
+                                      DasPropertyKind(Property) == Type.GetKind() &&
+                                      bool(CastField<FClassProperty>(Property)) == Class &&
+                                      bool(CastField<FWeakObjectProperty>(Property)) == Weak &&
+                                      bool(CastField<FInterfaceProperty>(Property)) == (!Class && Interface) &&
+                                      DescribeDasProperty(Property, RoundTrip, Error) &&
+                                      RoundTrip.StorageIdentity() == Type.StorageIdentity();
+                    delete Property;
+                    if (!Good)
+                    {
+                        Error = TEXT("Reference adapter lost kind, base constraint or strong/weak storage");
+                        return false;
+                    }
+                }
+            FDasDeclaredType Missing;
+            Missing.Kind = Class ? TEXT("class") : TEXT("object");
+            Missing.TypePath = TEXT("/Script/DasRuntime.MissingReferenceAdapterClass");
+            if (ValidateDasPropertyType(Missing, EDasPropertyUsage::Value, Error))
+            {
+                Error = TEXT("Reference adapter accepted an unknown base class");
+                return false;
+            }
+            Error.Reset();
             continue;
         }
         if (Adapter->GetKind() == EDasTypeKind::Enum)
