@@ -74,6 +74,63 @@ void FDasInteropBench::Profile(const FString& Name, int32 Count, TFunctionRef<in
             Row->PhaseNs.Emplace(DasCallPhaseName(static_cast<EDasCallPhase>(I)),
                                  FPlatformTime::ToSeconds64(State.Cycles[I]) * 1e9 / Count);
 }
+void FDasInteropBench::MeasurePair(const FString& Name, const FString& NameA, const FString& NameB,
+                                   const FString& Group, int32 Count, TFunctionRef<int64(bool, int32)> Run,
+                                   int64 Expected)
+{
+    const FString FailureBefore = Failure;
+    auto Check = [&](bool bB, int64 Got)
+    {
+        if (Got != Expected)
+            Fail(FString::Printf(TEXT("%s: checksum %lld, expected %lld"), bB ? *NameB : *NameA, Got, Expected));
+        return Got == Expected;
+    };
+    for (int32 Warm = 0; Warm < 2; ++Warm)
+        for (const bool bB : {false, true})
+        {
+            Run(bB, 0);
+            if (!Check(bB, Run(bB, Count)))
+                return;
+        }
+    FDasInteropRow Row[2] = {{NameA, Group, Count}, {NameB, Group, Count}};
+    FDasInteropPair Pair{Name, NameA, NameB};
+    for (int32 Round = 0; Round < Rounds; ++Round)
+    {
+        double Ns[2] = {};
+        for (const bool bB : {Round % 2 == 1, Round % 2 == 0})
+        {
+            const FString Region = FString::Printf(TEXT("DasInterop/%s/round_%d"), bB ? *NameB : *NameA, Round);
+            TRACE_CPUPROFILER_EVENT_SCOPE_TEXT(*Region);
+            double Start = FPlatformTime::Seconds();
+            const int64 Got = Run(bB, Count);
+            const double FullSeconds = FPlatformTime::Seconds() - Start;
+            Start = FPlatformTime::Seconds();
+            Run(bB, 0);
+            const double ZeroSeconds = FPlatformTime::Seconds() - Start;
+            if (!Check(bB, Got))
+                return;
+            Ns[bB] = (FullSeconds - ZeroSeconds) * 1e9 / Count;
+            Row[bB].SampleNs.Add(Ns[bB]);
+        }
+        if (Ns[0] > 0)
+            Pair.Ratios.Add(Ns[1] / Ns[0]);
+    }
+    if (Failure != FailureBefore)
+        return;
+    for (FDasInteropRow& R : Row)
+    {
+        R.MedianNs = DasInterop::Median(R.SampleNs);
+        R.P95Ns = DasInterop::Percentile(R.SampleNs, .95);
+        Rows.Add(MoveTemp(R));
+    }
+    if (!Pair.Ratios.IsEmpty())
+    {
+        Pair.RatioMedian = DasInterop::Median(Pair.Ratios);
+        Pair.RatioP05 = DasInterop::Percentile(Pair.Ratios, .05);
+        Pair.RatioP95 = DasInterop::Percentile(Pair.Ratios, .95);
+    }
+    Pairs.Add(MoveTemp(Pair));
+}
 void FDasInteropBench::Fail(const FString& Reason)
 {
     bPassed = false;
@@ -161,6 +218,31 @@ bool FDasInteropBench::Finish(FString& Report, FString& Json, const FString& Sco
             Report += FString::Printf(TEXT("PHASE   %-40s %-20s %12.1f\n"), *Row.Name, *Phase.Key, Phase.Value);
     }
     Root->SetArrayField(TEXT("cases"), Cases);
+    // B against A: faster or slower when the whole p5..p95 range of the round ratios is on one side of 1.
+    Root->SetNumberField(TEXT("pair_rounds"), Rounds);
+    TArray<TSharedPtr<FJsonValue>> PairValues;
+    for (const auto& Pair : Pairs)
+    {
+        const TCHAR* Verdict = Pair.RatioP95 < 1   ? TEXT("faster")
+                               : Pair.RatioP05 > 1 ? TEXT("slower")
+                                                   : TEXT("same");
+        auto O = MakeShared<FJsonObject>();
+        O->SetStringField(TEXT("pair"), Pair.Name);
+        O->SetStringField(TEXT("a"), Pair.NameA);
+        O->SetStringField(TEXT("b"), Pair.NameB);
+        O->SetNumberField(TEXT("ratio_median"), Pair.RatioMedian);
+        O->SetNumberField(TEXT("ratio_p05"), Pair.RatioP05);
+        O->SetNumberField(TEXT("ratio_p95"), Pair.RatioP95);
+        O->SetStringField(TEXT("b_against_a"), Verdict);
+        TArray<TSharedPtr<FJsonValue>> RatioValues;
+        for (double V : Pair.Ratios)
+            RatioValues.Add(MakeShared<FJsonValueNumber>(V));
+        O->SetArrayField(TEXT("ratios"), RatioValues);
+        PairValues.Add(MakeShared<FJsonValueObject>(O));
+        Report += FString::Printf(TEXT("INTEROP_AB %-24s ratio=%6.3f [%6.3f..%6.3f] %s\n"), *Pair.Name,
+                                  Pair.RatioMedian, Pair.RatioP05, Pair.RatioP95, Verdict);
+    }
+    Root->SetArrayField(TEXT("pairs"), PairValues);
     FJsonSerializer::Serialize(Root, TJsonWriterFactory<>::Create(&Json));
     Report += TEXT("DAS_INTEROP_PROBE=") + (bPassed ? FString(TEXT("PASS")) : TEXT("FAIL ") + Failure);
     return bPassed;
@@ -258,6 +340,66 @@ void CheckWatchReload(FDasInteropBench& B, FDasRuntimeModule& Runtime, UObject* 
                                     First.Revision, Written.Revision, Same.Revision, Polled.Revision, Deleted.Revision,
                                     *First.Error, *Written.Error));
 }
+// A script compiled once and called many times (C3): RunFile compiles on every call, and the compile time varies
+// more than a short loop costs. Prepare with bUseAot links the program's AOT code.
+struct FPreparedMain
+{
+    FCompiledContext Live;
+    bool bAot = false; // main runs compiled code
+    FString Error;
+    bool Prepare(const FString& Path, bool bUseAot, UObject* Owner)
+    {
+        das::TextWriter Output;
+        auto Access = das::make_smart<FUnrealFileAccess>();
+        Access->addFileSystem(new FUnrealFileSystem(), true, false);
+        Live.Access = Access;
+        const FTCHARToUTF8 File(*Path);
+        das::CodeOfPolicies Policies;
+        Policies.aot = bUseAot;
+        Live.Program = DSLCompile(File.Get(), Live.Access, Output, Live.Modules, Policies);
+        if (!Live.Program || Live.Program->failed())
+        {
+            Error = Errors(Live.Program, Output);
+            return false;
+        }
+        Live.Context = MakeUnique<FUnrealDasContext>(Live.Program->getContextStackSize());
+        Live.Context->Self = Owner;
+        FActiveContextScope Scope(*Live.Context);
+        if (!Live.Program->simulate(*Live.Context, Output))
+        {
+            Error = Errors(Live.Program, Output);
+            return false;
+        }
+        Live.Function = Live.Context->findFunction("main");
+        if (!Live.Function)
+        {
+            Error = TEXT("expected exported main(input:int):int");
+            return false;
+        }
+        bAot = Live.Function->aot;
+        return true;
+    }
+    // main(Input) into Value; false with Error on a script error.
+    bool Run(int32 Input, int64& Value)
+    {
+        auto& C = *Live.Context;
+        C.restart();
+        {
+            TGuardValue<int32> Depth(C.ExecutionDepth, 1);
+            FActiveContextScope Scope(C);
+            vec4f Args[] = {das::cast<int32>::from(Input)};
+            const vec4f Result = C.evalWithCatch(Live.Function, Args);
+            if (const char* Exception = C.getException())
+            {
+                Error = UTF8_TO_TCHAR(Exception);
+                return false;
+            }
+            Value = das::cast<int32>::to(Result);
+        }
+        C.restartHeaps(); // the run's strings: interop_aot.das has no globals that keep them
+        return true;
+    }
+};
 }
 
 void RunDasInteropProbe(FDasInteropBench& B)
@@ -279,7 +421,9 @@ void RunDasInteropProbe(FDasInteropBench& B)
         Runtime.ReleaseObject(F);
     };
     // Per-sample call counts: enough work per sample to stay well above timer resolution.
-    constexpr int32 Direct = 1 << 20, Light = 1 << 14, Heavy = 256, AotCalls = 1 << 22;
+    // AotCalls: iterations of a C3 sample; shorter rounds, more of them (FDasInteropBench::Rounds). Not a power of
+    // two: XOR checksums of I & 7 or of I over 2^k iterations cancel to 0 and would not check the loop ran.
+    constexpr int32 Direct = 1 << 20, Light = 1 << 14, Heavy = 256, AotCalls = (1 << 20) + 7;
 
     // A1. C++ -> C++: the floor for any call into gameplay code.
     B.Measure(
@@ -587,13 +731,27 @@ void RunDasInteropProbe(FDasInteropBench& B)
     const FAotMode AotRefs{TEXT("native_refs"), 9}, AotMath{TEXT("vector_math"), 10};
     const FAotMode AotFloat3{TEXT("float3_math"), 11}, AotNames{TEXT("names_equality"), 12};
     const FAotMode AotArrays{TEXT("object_array"), 13};
+    // Both paths compiled once; main is called again for every sample (FPreparedMain).
+    FPreparedMain Prepared[2];
+    bool bPrepared = true;
+    for (const bool bAot : {false, true})
+        if (!Prepared[bAot].Prepare(Aot, bAot, F) || Prepared[bAot].bAot != bAot)
+        {
+            B.Fail(FString::Printf(TEXT("%s: "), bAot ? TEXT("aot") : TEXT("interpreter")) +
+                   (Prepared[bAot].Error.IsEmpty() ? FString(TEXT("AOT code for interop_aot.das is not linked; run "
+                                                                  "Scripts/TestInteropPerformance.ps1 to generate it"))
+                                                   : Prepared[bAot].Error));
+            bPrepared = false;
+        }
     for (const FAotMode& M : {AotLoop, AotCall, AotField, AotExtern, AotNative, AotValues, AotObjects, AotRefs, AotMath,
                               AotFloat3, AotNames, AotArrays})
     {
+        if (!bPrepared)
+            break;
         int64 Expected = 0;
         for (int32 I = 0; I < AotCalls; ++I)
         {
-            // Mode 5: |rotated forward| 1 + day 29 + 24 characters of "2024-02-29T00:00:00.000Z"; mode 6: the
+            // Mode 3: the state the first call stored (0) plus I. Mode 5: |rotated forward| 1 + day 29 + 24 characters of "2024-02-29T00:00:00.000Z"; mode 6: the
             // owner is valid (1) and casts to AActor (2).
             const int32 Value[] = {I & 7, I + 1, 7 + I, I, 365 + I, 1 + 29 + 24 + I, 3 + I};
             // Mode 9: a vector of length I & 7; modes 10 and 11: of length (I & 7) + 2, times I + 1.
@@ -604,23 +762,20 @@ void RunDasInteropProbe(FDasInteropBench& B)
                         : M.Mode >= 10 ? ((I & 7) + 2) * (I + 1)
                                        : Value[M.Mode];
         }
-        for (bool bAot : {false, true})
+        // A = the interpreter, B = AOT, side by side (the ratio is the comparison; see FDasInteropPair).
+        auto Run = [&](bool bAot, int32 N)
         {
-            const FString Name = FString::Printf(TEXT("%s_%s"), bAot ? TEXT("aot") : TEXT("interpreter"), M.Name);
-            auto Run = [&](int32 N)
+            int64 Value = 0;
+            if (!Prepared[bAot].Run(N * 16 + M.Mode, Value))
             {
-                const auto R = Runtime.RunFile(Aot, N * 16 + M.Mode, bAot, F);
-                if (!R.bSucceeded || R.bUsedAot != bAot)
-                {
-                    B.Fail(Name + (R.bSucceeded ? TEXT(": AOT code for interop_aot.das is not linked; run "
-                                                       "Scripts/TestInteropPerformance.ps1 to generate it")
-                                                : TEXT(": ") + R.Error));
-                    return int64(-1);
-                }
-                return int64(R.Value);
-            };
-            B.MeasureDifference(Name, TEXT("C3 AOT vs interpreter"), AotCalls, Run, [&]() { return Run(0); }, Expected);
-        }
+                B.Fail(FString::Printf(TEXT("%s_%s: %s"), bAot ? TEXT("aot") : TEXT("interpreter"), M.Name,
+                                       *Prepared[bAot].Error));
+                return int64(-1);
+            }
+            return Value;
+        };
+        B.MeasurePair(M.Name, FString(TEXT("interpreter_")) + M.Name, FString(TEXT("aot_")) + M.Name,
+                      TEXT("C3 AOT vs interpreter"), AotCalls, Run, Expected);
     }
     // C4. The parts of a compiled extern call, in a context scope like a script's: the role guard alone, and the
     // bridge (Resolve with the call site's cached entry, then Finish) without the native function.

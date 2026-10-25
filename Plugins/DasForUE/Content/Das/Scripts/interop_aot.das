@@ -32,7 +32,8 @@ def main(input:int):int {
     } elif (mode==2) {
         for (i in range(0,count)) { acc^=ue_get_self_int("health")+i }
     } elif (mode==3) {
-        for (i in range(0,count)) { acc^=ue_state_get_int("interop_missing",i) }
+        // get-or-set: the first call stores 0, every call then reads it back
+        for (i in range(0,count)) { acc^=ue_state_get_int("interop_missing",i)+i }
     } elif (mode==4) {
         for (i in range(0,count)) { acc^=days_in_year(2023)+i }
     } elif (mode==6) {

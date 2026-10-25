@@ -20,4 +20,8 @@ $Result=Get-Content -LiteralPath $Output -Raw|ConvertFrom-Json
 if ($Result.result -ne 'PASS' -or $Result.sample_count -ne $Samples) {throw "Incomplete benchmark results: $($Result.error)"}
 $Result.cases|Select-Object group,case,@{n='ns/call';e={[math]::Round($_.median_ns_per_call,1)}},
     @{n='p95';e={[math]::Round($_.p95_ns_per_call,1)}}|Format-Table -AutoSize
+# AOT against the interpreter: the ratio of each round (B / A), not the absolute times, is the comparison.
+$Result.pairs|Select-Object pair,@{n='aot/interp';e={[math]::Round($_.ratio_median,3)}},
+    @{n='p5';e={[math]::Round($_.ratio_p05,3)}},@{n='p95';e={[math]::Round($_.ratio_p95,3)}},b_against_a|
+    Format-Table -AutoSize
 Write-Output "INTEROP PERFORMANCE editor PASS $Output"

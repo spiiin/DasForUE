@@ -354,6 +354,34 @@ rows of one run only.
   earlier run in a slow state showed `names_equality` 197.7 / 338.7: one run is not enough to compare two paths
   whose difference is small.
 
+  **How C3 compares the paths now (2026-10-25).** Absolute times shift between runs by up to 2x with the state of
+  the machine, so C3 measures the interpreter (A) and AOT (B) side by side (`FDasInteropBench::MeasurePair`): 21
+  rounds, A then B, then B then A, each sample calls `main` of a script compiled once (`FPreparedMain`; `RunFile`
+  recompiled on every call, and the compile time varied more than a short loop costs). The comparison is the ratio
+  B / A of each round: its median and p5..p95 (`INTEROP_AB` lines, `pairs` in the JSON); faster or slower when the
+  whole range is on one side of 1. A sample is 2^20 + 7 iterations (not a power of two: XOR checksums of `I & 7` or
+  `I` over 2^k iterations cancel to 0; that hid a wrong expectation of mode 3). Two runs, AOT / interpreter:
+
+  | Case | Run 1 | Run 2 |
+  | --- | ---: | ---: |
+  | `loop` | 0.140 [0.112..0.170] | 0.140 [0.111..0.175] |
+  | `script_call` | 0.110 [0.087..0.144] | 0.112 [0.082..0.182] |
+  | `native_refs` | 0.523 [0.457..0.579] | 0.464 [0.414..0.548] |
+  | `float3_math` | 0.542 [0.475..0.638] | 0.452 [0.329..0.519] |
+  | `native_values` | 0.725 [0.635..0.802] | 0.710 [0.659..0.773] |
+  | `native_bind` | 0.730 [0.630..0.796] | 0.700 [0.565..0.825] |
+  | `names_equality` | 0.835 [0.788..0.913] | 0.816 [0.715..0.893] |
+  | `vector_math` | 0.861 [0.764..0.956] | 0.828 [0.652..0.974] |
+  | `object_array` | 0.855 [0.785..0.960] | 0.841 [0.706..0.962] |
+  | `native_objects` | 0.961 [0.885..1.006] | 0.910 [0.872..0.949] |
+  | `scalar_extern` | 1.005 [0.934..1.100] | 1.037 [0.950..1.111] |
+  | `self_field_read` | 1.097 [0.995..1.340] | 1.232 [1.031..1.536] |
+
+  Medians agree within about 10% between runs; a verdict can change where the range touches 1 (`native_objects`,
+  `self_field_read`). Compiled script code is 7-9x faster than the interpreter; a call that crosses into Unreal
+  keeps most of its cost (the guards and the work on the other side): a reference parameter saves half, engine
+  values and names 15-30%, a guarded scalar extern and a property of self nothing.
+
 Coverage of the AngelScript binds by the native modules: `Docs/Dev/Architecture/NativeBindsCoverage.md`.
 
 ### Gameplay methods answered by binds (`Reflects`) — 2026-10-24
