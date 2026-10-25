@@ -434,6 +434,31 @@ The object result adds ~80-150 ns over a vector result: the reference conversion
 in the wrapper. The reflected `GetOwner` is cheaper than the reflected `K2_GetActorLocation` (no struct result to
 marshal), so the ratio is lower (~20x).
 
+## Blueprint against daScript — 2026-10-25
+
+The same three workloads as a Blueprint graph (built by the `DasInteropPerformance` commandlet: a function with
+a `ForLoop` macro over 0 .. N - 1, a local accumulator, `KismetMathLibrary` nodes), in C++, and in daScript
+interpreted and AOT (`interop_aot.das`, `blueprint_workloads`), measured side by side
+(`RunDasBlueprintComparison`: 21 rounds, alternating order, the ratio to Blueprint of each round). One editor run,
+ns per iteration (median) and the ratio to Blueprint (median [p5..p95]):
+
+| Workload | Blueprint | C++ | daScript interpreter | daScript AOT |
+| --- | ---: | ---: | ---: | ---: |
+| `int_loop`: sum of `i % 7` | 1132 | 2.2 | 6.9 (0.006 [0.005..0.008]) | 4.0 (0.004 [0.003..0.004]) |
+| `engine_call`: sum of `GetActorLocation().X` | 1606 | 4.2 | 143 (0.089 [0.083..0.106]) | 110 (0.070 [0.064..0.078]) |
+| `vector_math`: sum of the length of `(i % 7, 0, 0) + (2, 0, 0)` | 2372 | 11.0 | 267 (0.112 [0.097..0.138]) | 207 (0.089 [0.078..0.115]) |
+
+In this measurement daScript is about 160x (arithmetic) and 9-11x (engine calls, vector math through
+`ue_foundation`'s guarded externs) faster than Blueprint; AOT gains a further 20-40%. Caveats: the Blueprint runs
+in the editor, whose compiled graphs carry debugging tracepoints and wire traces, and a `ForLoop` iteration is a
+dozen VM instructions (branch, compare, increment, assignments); a packaged game runs the same graph faster, so the
+gap is smaller there (not measured: the graph is built in the editor). The calls into Unreal dominate daScript's
+time in the last two workloads (the guard and the bridge, see the AOT sections above), not the script.
+
+Moving the workloads into `main` of `interop_aot.das` (as modes) made `float3_math` under AOT four times slower
+(217 against 57 ns interpreted) with the same generated code for that mode: the compiler optimizes a very large
+function worse. They are a function of their own.
+
 ## Typed calls from C++ (`TDasFunction`) — 2026-10-24
 
 `TDasFunction<R(A...)>` (`DasScript.h`) calls an exported script function with typed arguments in the owner's

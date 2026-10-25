@@ -1,6 +1,7 @@
 #pragma once
 #include "CoreMinimal.h"
 #include "Templates/Function.h"
+class AActor;
 
 // Call-cost benchmark between C++, Blueprint and daScript (Docs/Dev/Architecture/Performance.md). Informational:
 // each case reports nanoseconds per call (median and p95 over samples) and checks a checksum; no thresholds.
@@ -59,6 +60,12 @@ private:
     int32 OldMode;
     float OldPoll;
 };
+// The same workloads written as a Blueprint graph, in C++, and in daScript (interpreted and AOT; interop_aot.das
+// blueprint_workloads), side by side: Rounds rounds in alternating order, each variant's ratio to Blueprint per round.
+// Workload 0: sum of i % 7; 1: sum of the X of Target's location (an engine call); 2: sum of the length of
+// (i % 7, 0, 0) + (2, 0, 0) (vector math). RunBlueprint(Workload, N) runs the graph (the editor builds it).
+DASRUNTIME_API void RunDasBlueprintComparison(FDasInteropBench& Bench, AActor* Target,
+                                              TFunctionRef<int64(int32 Workload, int32 N)> RunBlueprint);
 // Cases that need no imported assets (editor and packaged game): C++ -> script, script -> C++/UE, script calls,
 // properties, and AOT against the interpreter. The editor commandlet adds the cases that need a DSL class.
 DASRUNTIME_API void RunDasInteropProbe(FDasInteropBench& Bench);

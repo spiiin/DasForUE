@@ -592,7 +592,8 @@ static void resolveTypeInfoAnnotations()
 
 
 inline int32_t main_3305923e8e0446 ( Context * __context__, int32_t __input_rename_at_24_0 );
-inline FVector K2_GetActorLocation_e3603ed86be94129 ( Context * __context__, struct ue_generated::C_Actor_adf65d5b const  & __receiver_rename_at_81_34 );
+inline int32_t blueprint_workloads_eb3f815da8d10c4c ( Context * __context__, int32_t __input_rename_at_103_34 );
+inline FVector K2_GetActorLocation_e3603ed86be94129 ( Context * __context__, struct ue_generated::C_Actor_adf65d5b const  & __receiver_rename_at_81_43 );
 
 void __init_script ( Context * __context__, bool __init_shared )
 {
@@ -866,13 +867,77 @@ inline int32_t main_3305923e8e0446 ( Context * __context__, int32_t __input_rena
     return das_auto_cast<int32_t>::cast(__acc_rename_at_27_3);
 }
 
-inline FVector K2_GetActorLocation_e3603ed86be94129 ( Context * __context__, struct ue_generated::C_Actor_adf65d5b const  &  __receiver_rename_at_81_34 )
+inline int32_t blueprint_workloads_eb3f815da8d10c4c ( Context * __context__, int32_t __input_rename_at_103_34 )
 {
-    return das_auto_cast_ref<FVector>::cast(dasue::aot::Call<7843237298495227699ULL,FVector,const FDasObjectHandle &,const char *,das::Context *>(__receiver_rename_at_81_34.handle,(das_string_cast(((char *) "/Script/Engine.Actor"))),__context__));
+    int32_t __workload_rename_at_104_35 = ((int32_t)(SimPolicy<int32_t>::Mod(__input_rename_at_103_34,4,*__context__,nullptr)));
+    int32_t __count_rename_at_105_36 = ((int32_t)(SimPolicy<int32_t>::Div(__input_rename_at_103_34,4,*__context__,nullptr)));
+    int32_t __acc_rename_at_106_37 = 0;
+    if ( __workload_rename_at_104_35 == 0 )
+    {
+        {
+            bool __need_loop_108 = true;
+            // i: int const
+            das_iterator<range> __i_iterator((range(0,__count_rename_at_105_36)));
+            int32_t __i_rename_at_108_38;
+            __need_loop_108 = __i_iterator.first(__context__,(__i_rename_at_108_38)) && __need_loop_108;
+            for ( ; __need_loop_108 ; __need_loop_108 = __i_iterator.next(__context__,(__i_rename_at_108_38)) )
+            {
+                __acc_rename_at_106_37 += (SimPolicy<int32_t>::Mod(__i_rename_at_108_38,7,*__context__,nullptr));
+            }
+            __i_iterator.close(__context__,(__i_rename_at_108_38));
+        };
+    } else {
+        if ( __workload_rename_at_104_35 == 1 )
+        {
+            FDasObjectHandle __a_rename_at_110_39_ConstRef = ((FDasObjectHandle)dasue::aot::Call<10271152040514954383ULL,FDasObjectHandle,das::Context *>(__context__));
+            FDasObjectHandle const  & __a_rename_at_110_39 = __a_rename_at_110_39_ConstRef;
+;
+            {
+                bool __need_loop_111 = true;
+                // i: int const
+                das_iterator<range> __i_iterator((range(0,__count_rename_at_105_36)));
+                int32_t __i_rename_at_111_40;
+                __need_loop_111 = __i_iterator.first(__context__,(__i_rename_at_111_40)) && __need_loop_111;
+                for ( ; __need_loop_111 ; __need_loop_111 = __i_iterator.next(__context__,(__i_rename_at_111_40)) )
+                {
+                    FVector _temp_make_local_111_46_13; _temp_make_local_111_46_13;
+                    __acc_rename_at_106_37 += int32_t((_temp_make_local_111_46_13 = (dasue::aot::Call<116633212593090415ULL,FVector,const FDasObjectHandle &,das::Context *>(__a_rename_at_110_39,__context__))).X /*x*/);
+                }
+                __i_iterator.close(__context__,(__i_rename_at_111_40));
+            };
+        } else {
+            FVector __step_rename_at_113_41_ConstRef = ((FVector)dasue::aot::Call<4355089008579512058ULL,FVector,double,double,double,das::Context *>(1.00000000000000000e+00,0.00000000000000000e+00,0.00000000000000000e+00,__context__));
+            FVector const  & __step_rename_at_113_41 = __step_rename_at_113_41_ConstRef;
+;
+            {
+                bool __need_loop_114 = true;
+                // i: int const
+                das_iterator<range> __i_iterator((range(0,__count_rename_at_105_36)));
+                int32_t __i_rename_at_114_42;
+                __need_loop_114 = __i_iterator.first(__context__,(__i_rename_at_114_42)) && __need_loop_114;
+                for ( ; __need_loop_114 ; __need_loop_114 = __i_iterator.next(__context__,(__i_rename_at_114_42)) )
+                {
+                    FVector _temp_make_local_114_55_14; _temp_make_local_114_55_14;
+                    __acc_rename_at_106_37 += int32_t(dasue::aot::Call<16429738110919662158ULL,double,const FVector &,das::Context *>(das_arg<FVector>::pass(dasue::aot::CallOp<11005769877631882766ULL,FVector,const FVector &,const FVector &>(das_arg<FVector>::pass((_temp_make_local_114_55_14 = (dasue::aot::Call<4355089008579512058ULL,FVector,double,double,double,das::Context *>(double(SimPolicy<int32_t>::Mod(__i_rename_at_114_42,7,*__context__,nullptr)),0.00000000000000000e+00,0.00000000000000000e+00,__context__)))),das_arg<FVector>::pass((dasue::aot::CallOp<17404226676109900178ULL,FVector,const FVector &,double>(__step_rename_at_113_41,2.00000000000000000e+00))))),__context__));
+                }
+                __i_iterator.close(__context__,(__i_rename_at_114_42));
+            };
+        };
+    };
+    return das_auto_cast<int32_t>::cast(__acc_rename_at_106_37);
+}
+
+inline FVector K2_GetActorLocation_e3603ed86be94129 ( Context * __context__, struct ue_generated::C_Actor_adf65d5b const  &  __receiver_rename_at_81_43 )
+{
+    return das_auto_cast_ref<FVector>::cast(dasue::aot::Call<7843237298495227699ULL,FVector,const FDasObjectHandle &,const char *,das::Context *>(__receiver_rename_at_81_43.handle,(das_string_cast(((char *) "/Script/Engine.Actor"))),__context__));
 }
 static vec4f __wrap_main_3305923e8e0446 ( Context * __context__ ) {
     int32_t arg_input = cast_aot_arg<int32_t>::to(*__context__,__context__->abiArguments()[0]);
     return cast<int32_t>::from(main_3305923e8e0446(__context__, arg_input));
+}
+static vec4f __wrap_blueprint_workloads_eb3f815da8d10c4c ( Context * __context__ ) {
+    int32_t arg_input = cast_aot_arg<int32_t>::to(*__context__,__context__->abiArguments()[0]);
+    return cast<int32_t>::from(blueprint_workloads_eb3f815da8d10c4c(__context__, arg_input));
 }
 static vec4f __wrap_K2_GetActorLocation_e3603ed86be94129 ( Context * __context__ ) {
     struct ue_generated::C_Actor_adf65d5b const  &  arg_receiver = cast_aot_arg<struct ue_generated::C_Actor_adf65d5b const  & >::to(*__context__,__context__->abiArguments()[0]);
@@ -887,6 +952,8 @@ struct AotFunction { uint64_t hash; bool is_cmres; void * fn; vec4f (*wrappedFn)
 static AotFunction functions[] = {
     // main Ci hash=0x3305923e8e0446, K2_GetActorLocation CS<ue_generated::C_Actor_adf65d5b>=0xe3603ed86be94129
     { 0x402d477ec981ab60, false, (void*)&main_3305923e8e0446, &__wrap_main_3305923e8e0446 },
+    // blueprint_workloads Ci hash=0xeb3f815da8d10c4c
+    { 0x7b45664e6921cb8f, false, (void*)&blueprint_workloads_eb3f815da8d10c4c, &__wrap_blueprint_workloads_eb3f815da8d10c4c },
     // K2_GetActorLocation CS<ue_generated::C_Actor_adf65d5b> hash=0xe3603ed86be94129
     { 0xa0b33fefa66285cf, true, (void*)&K2_GetActorLocation_e3603ed86be94129, &__wrap_K2_GetActorLocation_e3603ed86be94129 },
 };

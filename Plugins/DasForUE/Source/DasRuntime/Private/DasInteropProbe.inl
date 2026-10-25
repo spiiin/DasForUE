@@ -341,13 +341,14 @@ void CheckWatchReload(FDasInteropBench& B, FDasRuntimeModule& Runtime, UObject* 
                                     *First.Error, *Written.Error));
 }
 // A script compiled once and called many times (C3): RunFile compiles on every call, and the compile time varies
-// more than a short loop costs. Prepare with bUseAot links the program's AOT code.
+// more than a short loop costs. Prepare with bUseAot links the program's AOT code; Entry is an exported
+// function(input:int):int.
 struct FPreparedMain
 {
     FCompiledContext Live;
     bool bAot = false; // main runs compiled code
     FString Error;
-    bool Prepare(const FString& Path, bool bUseAot, UObject* Owner)
+    bool Prepare(const FString& Path, bool bUseAot, UObject* Owner, const char* Entry = "main")
     {
         das::TextWriter Output;
         auto Access = das::make_smart<FUnrealFileAccess>();
@@ -370,10 +371,10 @@ struct FPreparedMain
             Error = Errors(Live.Program, Output);
             return false;
         }
-        Live.Function = Live.Context->findFunction("main");
+        Live.Function = Live.Context->findFunction(Entry);
         if (!Live.Function)
         {
-            Error = TEXT("expected exported main(input:int):int");
+            Error = FString::Printf(TEXT("expected exported %hs(input:int):int"), Entry);
             return false;
         }
         bAot = Live.Function->aot;
@@ -854,5 +855,114 @@ void RunDasInteropProbe(FDasInteropBench& B)
         if (Errors[0].IsEmpty() || Errors[0] != Errors[1])
             B.Fail(FString::Printf(TEXT("aot_object_error_%d: interpreter '%s', AOT '%s'"), Mode, *Errors[0],
                                    *Errors[1]));
+    }
+}
+
+void RunDasBlueprintComparison(FDasInteropBench& B, AActor* Target, TFunctionRef<int64(int32, int32)> RunBlueprint)
+{
+    using namespace DasInterop;
+    if (!IsInGameThread() || ActiveContext || !Target)
+    {
+        B.Fail(TEXT("Blueprint comparison requires the game thread outside script execution and a target actor"));
+        return;
+    }
+    auto& Runtime = FModuleManager::LoadModuleChecked<FDasRuntimeModule>(TEXT("DasRuntime"));
+    const FString Aot = Runtime.ScriptPath(TEXT("interop_aot.das"));
+    TStrongObjectPtr<UDasObjectFixture> Owner(NewObject<UDasObjectFixture>());
+    Owner->health = 7;
+    const TWeakObjectPtr<AActor> SavedActor = ObjectsActor;
+    ObjectsActor = Target; // interop_actor() in mode 16
+    ON_SCOPE_EXIT
+    {
+        ObjectsActor = SavedActor;
+        Runtime.ReleaseObject(Owner.Get());
+    };
+    FPreparedMain Prepared[2];
+    for (const bool bAot : {false, true})
+        if (!Prepared[bAot].Prepare(Aot, bAot, Owner.Get(), "blueprint_workloads") || Prepared[bAot].bAot != bAot)
+        {
+            B.Fail(FString::Printf(TEXT("blueprint comparison, %s: "), bAot ? TEXT("aot") : TEXT("interpreter")) +
+                   (Prepared[bAot].Error.IsEmpty() ? FString(TEXT("AOT code for interop_aot.das is not linked"))
+                                                   : Prepared[bAot].Error));
+            return;
+        }
+    // The C++ variant is also the reference for the checksum.
+    auto Cpp = [&](int32 Workload, int32 N)
+    {
+        int64 Sum = 0;
+        for (int32 I = 0; I < N; ++I)
+            Sum += Workload == 0   ? I % 7
+                   : Workload == 1 ? int32(Target->GetActorLocation().X)
+                                   : int32((FVector(double(I % 7), 0, 0) + FVector(2, 0, 0)).Size());
+        return Sum;
+    };
+    constexpr int32 Count = 1 << 18;
+    const TCHAR* Workloads[] = {TEXT("int_loop"), TEXT("engine_call"), TEXT("vector_math")};
+    const TCHAR* Variants[] = {TEXT("blueprint"), TEXT("cpp"), TEXT("interpreter"), TEXT("aot")};
+    for (int32 W = 0; W < 3; ++W)
+    {
+        const int64 Expected = Cpp(W, Count);
+        auto Run = [&](int32 V, int32 N) -> int64
+        {
+            if (V == 0)
+                return RunBlueprint(W, N);
+            if (V == 1)
+                return Cpp(W, N);
+            int64 Value = 0;
+            if (!Prepared[V == 3].Run(N * 4 + W, Value))
+            {
+                B.Fail(FString::Printf(TEXT("%s_%s: %s"), Workloads[W], Variants[V], *Prepared[V == 3].Error));
+                return -1;
+            }
+            return Value;
+        };
+        FDasInteropRow Rows[4];
+        FDasInteropPair Pairs[3];
+        bool bGood = true;
+        for (int32 V = 0; V < 4 && bGood; ++V)
+        {
+            Rows[V] = {FString::Printf(TEXT("%s_%s"), Workloads[W], Variants[V]),
+                       TEXT("F Blueprint against daScript"), Count};
+            const int64 Got = Run(V, Count); // warm-up, and the checksum
+            bGood = Got == Expected;
+            if (!bGood)
+                B.Fail(FString::Printf(TEXT("%s: checksum %lld, expected %lld"), *Rows[V].Name, Got, Expected));
+        }
+        for (int32 V = 1; V < 4; ++V)
+            Pairs[V - 1] = {FString::Printf(TEXT("%s_%s_vs_blueprint"), Workloads[W], Variants[V]), Rows[0].Name,
+                            Rows[V].Name};
+        for (int32 Round = 0; Round < B.Rounds && bGood; ++Round)
+        {
+            double Ns[4] = {};
+            for (int32 K = 0; K < 4 && bGood; ++K)
+            {
+                const int32 V = Round % 2 == 0 ? K : 3 - K;
+                const double Start = FPlatformTime::Seconds();
+                const int64 Got = Run(V, Count);
+                Ns[V] = (FPlatformTime::Seconds() - Start) * 1e9 / Count;
+                Rows[V].SampleNs.Add(Ns[V]);
+                bGood = Got == Expected;
+                if (!bGood)
+                    B.Fail(FString::Printf(TEXT("%s: checksum %lld, expected %lld (round %d)"), *Rows[V].Name, Got,
+                                           Expected, Round));
+            }
+            for (int32 V = 1; V < 4 && bGood; ++V)
+                Pairs[V - 1].Ratios.Add(Ns[V] / FMath::Max(Ns[0], 1e-9));
+        }
+        if (!bGood)
+            continue;
+        for (FDasInteropRow& Row : Rows)
+        {
+            Row.MedianNs = Median(Row.SampleNs);
+            Row.P95Ns = Percentile(Row.SampleNs, .95);
+            B.Rows.Add(MoveTemp(Row));
+        }
+        for (FDasInteropPair& Pair : Pairs)
+        {
+            Pair.RatioMedian = Median(Pair.Ratios);
+            Pair.RatioP05 = Percentile(Pair.Ratios, .05);
+            Pair.RatioP95 = Percentile(Pair.Ratios, .95);
+            B.Pairs.Add(MoveTemp(Pair));
+        }
     }
 }

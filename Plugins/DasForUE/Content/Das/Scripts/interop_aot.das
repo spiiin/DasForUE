@@ -95,3 +95,23 @@ def main(input:int):int {
     }
     return acc
 }
+
+// The workloads also written as a Blueprint graph (RunDasBlueprintComparison): input = iterations * 4 +
+// workload; 0 the sum of i % 7, 1 of the X of interop_actor()'s location, 2 of |(i % 7, 0, 0) + (2, 0, 0)|. A
+// function of its own: growing main made the compiler optimize all of its modes worse.
+[export]
+def blueprint_workloads(input:int):int {
+    let workload=input % 4
+    let count=input / 4
+    var acc=0
+    if (workload==0) {
+        for (i in range(0,count)) { acc+=i%7 }
+    } elif (workload==1) {
+        let a=interop_actor()
+        for (i in range(0,count)) { acc+=int(a.get_actor_location().x) }
+    } else {
+        let step=ue_vector(1.0lf,0.0lf,0.0lf)
+        for (i in range(0,count)) { acc+=int(ue_length(ue_vector(double(i%7),0.0lf,0.0lf)+step*2.0lf)) }
+    }
+    return acc
+}
