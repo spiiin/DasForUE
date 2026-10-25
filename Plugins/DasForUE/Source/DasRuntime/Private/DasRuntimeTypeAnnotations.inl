@@ -124,6 +124,7 @@ struct FDSLTextAnnotation : das::ManagedStructureAnnotation<FDasTextValue, false
     virtual bool hasNonTrivialCtor() const override { return false; }
     virtual bool isPod() const override { return true; }
 };
+// Fields are registered with their C++ member names too (addField("x", "X")): generated AOT code reads the member.
 template <class T> struct FMathValueAnnotation : das::ManagedStructureAnnotation<T, false>
 {
     FMathValueAnnotation(const char* Name, das::ModuleLibrary& L, const char* Cpp)
@@ -139,86 +140,86 @@ struct FDSLVector2DAnnotation : FMathValueAnnotation<FVector2D>
 {
     FDSLVector2DAnnotation(das::ModuleLibrary& L) : FMathValueAnnotation("UEVector2D", L, "FVector2D")
     {
-        addField<DAS_BIND_MANAGED_FIELD(X)>("x");
-        addField<DAS_BIND_MANAGED_FIELD(Y)>("y");
+        addField<DAS_BIND_MANAGED_FIELD(X)>("x", "X");
+        addField<DAS_BIND_MANAGED_FIELD(Y)>("y", "Y");
     }
 };
 struct FDSLVectorAnnotation : FMathValueAnnotation<FVector>
 {
     FDSLVectorAnnotation(das::ModuleLibrary& L) : FMathValueAnnotation("UEVector", L, "FVector")
     {
-        addField<DAS_BIND_MANAGED_FIELD(X)>("x");
-        addField<DAS_BIND_MANAGED_FIELD(Y)>("y");
-        addField<DAS_BIND_MANAGED_FIELD(Z)>("z");
+        addField<DAS_BIND_MANAGED_FIELD(X)>("x", "X");
+        addField<DAS_BIND_MANAGED_FIELD(Y)>("y", "Y");
+        addField<DAS_BIND_MANAGED_FIELD(Z)>("z", "Z");
     }
 };
 struct FDSLRotatorAnnotation : FMathValueAnnotation<FRotator>
 {
     FDSLRotatorAnnotation(das::ModuleLibrary& L) : FMathValueAnnotation("UERotator", L, "FRotator")
     {
-        addField<DAS_BIND_MANAGED_FIELD(Pitch)>("pitch");
-        addField<DAS_BIND_MANAGED_FIELD(Yaw)>("yaw");
-        addField<DAS_BIND_MANAGED_FIELD(Roll)>("roll");
+        addField<DAS_BIND_MANAGED_FIELD(Pitch)>("pitch", "Pitch");
+        addField<DAS_BIND_MANAGED_FIELD(Yaw)>("yaw", "Yaw");
+        addField<DAS_BIND_MANAGED_FIELD(Roll)>("roll", "Roll");
     }
 };
 struct FDSLQuatAnnotation : FMathValueAnnotation<FQuat>
 {
     FDSLQuatAnnotation(das::ModuleLibrary& L) : FMathValueAnnotation("UEQuat", L, "FQuat")
     {
-        addField<DAS_BIND_MANAGED_FIELD(X)>("x");
-        addField<DAS_BIND_MANAGED_FIELD(Y)>("y");
-        addField<DAS_BIND_MANAGED_FIELD(Z)>("z");
-        addField<DAS_BIND_MANAGED_FIELD(W)>("w");
+        addField<DAS_BIND_MANAGED_FIELD(X)>("x", "X");
+        addField<DAS_BIND_MANAGED_FIELD(Y)>("y", "Y");
+        addField<DAS_BIND_MANAGED_FIELD(Z)>("z", "Z");
+        addField<DAS_BIND_MANAGED_FIELD(W)>("w", "W");
     }
 };
 struct FDSLLinearColorAnnotation : FMathValueAnnotation<FLinearColor>
 {
     FDSLLinearColorAnnotation(das::ModuleLibrary& L) : FMathValueAnnotation("UELinearColor", L, "FLinearColor")
     {
-        addField<DAS_BIND_MANAGED_FIELD(R)>("r");
-        addField<DAS_BIND_MANAGED_FIELD(G)>("g");
-        addField<DAS_BIND_MANAGED_FIELD(B)>("b");
-        addField<DAS_BIND_MANAGED_FIELD(A)>("a");
+        addField<DAS_BIND_MANAGED_FIELD(R)>("r", "R");
+        addField<DAS_BIND_MANAGED_FIELD(G)>("g", "G");
+        addField<DAS_BIND_MANAGED_FIELD(B)>("b", "B");
+        addField<DAS_BIND_MANAGED_FIELD(A)>("a", "A");
     }
 };
 struct FDSLColorAnnotation : FMathValueAnnotation<FColor>
 {
     FDSLColorAnnotation(das::ModuleLibrary& L) : FMathValueAnnotation("UEColor", L, "FColor")
     {
-        addField<DAS_BIND_MANAGED_FIELD(R)>("r");
-        addField<DAS_BIND_MANAGED_FIELD(G)>("g");
-        addField<DAS_BIND_MANAGED_FIELD(B)>("b");
-        addField<DAS_BIND_MANAGED_FIELD(A)>("a");
+        addField<DAS_BIND_MANAGED_FIELD(R)>("r", "R");
+        addField<DAS_BIND_MANAGED_FIELD(G)>("g", "G");
+        addField<DAS_BIND_MANAGED_FIELD(B)>("b", "B");
+        addField<DAS_BIND_MANAGED_FIELD(A)>("a", "A");
     }
 };
 struct FTraceHitAnnotation : FMathValueAnnotation<FDasTraceHit>
 {
     FTraceHitAnnotation(das::ModuleLibrary& L) : FMathValueAnnotation("UETraceHit", L, "FDasTraceHit")
     {
-        addField<DAS_BIND_MANAGED_FIELD(BlockingHit)>("blocking_hit");
-        addField<DAS_BIND_MANAGED_FIELD(StartPenetrating)>("start_penetrating");
-        addField<DAS_BIND_MANAGED_FIELD(Distance)>("distance");
-        addField<DAS_BIND_MANAGED_FIELD(Time)>("time");
-        addField<DAS_BIND_MANAGED_FIELD(Location)>("location");
-        addField<DAS_BIND_MANAGED_FIELD(ImpactPoint)>("impact_point");
-        addField<DAS_BIND_MANAGED_FIELD(Normal)>("normal");
-        addField<DAS_BIND_MANAGED_FIELD(ImpactNormal)>("impact_normal");
-        addField<DAS_BIND_MANAGED_FIELD(FaceIndex)>("face_index");
-        addField<DAS_BIND_MANAGED_FIELD(TraceStart)>("trace_start");
-        addField<DAS_BIND_MANAGED_FIELD(TraceEnd)>("trace_end");
-        addField<DAS_BIND_MANAGED_FIELD(PenetrationDepth)>("penetration_depth");
-        addField<DAS_BIND_MANAGED_FIELD(Item)>("item");
-        addField<DAS_BIND_MANAGED_FIELD(MyItem)>("my_item");
-        addField<DAS_BIND_MANAGED_FIELD(ElementIndex)>("element_index");
+        addField<DAS_BIND_MANAGED_FIELD(BlockingHit)>("blocking_hit", "BlockingHit");
+        addField<DAS_BIND_MANAGED_FIELD(StartPenetrating)>("start_penetrating", "StartPenetrating");
+        addField<DAS_BIND_MANAGED_FIELD(Distance)>("distance", "Distance");
+        addField<DAS_BIND_MANAGED_FIELD(Time)>("time", "Time");
+        addField<DAS_BIND_MANAGED_FIELD(Location)>("location", "Location");
+        addField<DAS_BIND_MANAGED_FIELD(ImpactPoint)>("impact_point", "ImpactPoint");
+        addField<DAS_BIND_MANAGED_FIELD(Normal)>("normal", "Normal");
+        addField<DAS_BIND_MANAGED_FIELD(ImpactNormal)>("impact_normal", "ImpactNormal");
+        addField<DAS_BIND_MANAGED_FIELD(FaceIndex)>("face_index", "FaceIndex");
+        addField<DAS_BIND_MANAGED_FIELD(TraceStart)>("trace_start", "TraceStart");
+        addField<DAS_BIND_MANAGED_FIELD(TraceEnd)>("trace_end", "TraceEnd");
+        addField<DAS_BIND_MANAGED_FIELD(PenetrationDepth)>("penetration_depth", "PenetrationDepth");
+        addField<DAS_BIND_MANAGED_FIELD(Item)>("item", "Item");
+        addField<DAS_BIND_MANAGED_FIELD(MyItem)>("my_item", "MyItem");
+        addField<DAS_BIND_MANAGED_FIELD(ElementIndex)>("element_index", "ElementIndex");
     }
 };
 struct FOverlapResultAnnotation : FMathValueAnnotation<FDasOverlapResult>
 {
     FOverlapResultAnnotation(das::ModuleLibrary& L) : FMathValueAnnotation("UEOverlapResult", L, "FDasOverlapResult")
     {
-        addField<DAS_BIND_MANAGED_FIELD(BlockingHit)>("blocking_hit");
-        addField<DAS_BIND_MANAGED_FIELD(ItemIndex)>("item_index");
-        addField<DAS_BIND_MANAGED_FIELD(MyItemIndex)>("my_item_index");
+        addField<DAS_BIND_MANAGED_FIELD(BlockingHit)>("blocking_hit", "BlockingHit");
+        addField<DAS_BIND_MANAGED_FIELD(ItemIndex)>("item_index", "ItemIndex");
+        addField<DAS_BIND_MANAGED_FIELD(MyItemIndex)>("my_item_index", "MyItemIndex");
     }
 };
 struct FReflectedValueAnnotation : FMathValueAnnotation<FDasStructValue>

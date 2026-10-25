@@ -429,12 +429,7 @@ template <> struct cast<FDasNavigationEventValue>
     static FDasNavigationEventValue to(vec4f V) { return {cast<uint64_t>::to(V)}; }
 };
 }
-struct FDasInputActionValue
-{
-    double X = 0, Y = 0, Z = 0;
-    int32 Kind = 0;
-};
-MAKE_TYPE_FACTORY(InputActionValue, FDasInputActionValue);
+MAKE_TYPE_FACTORY(InputActionValue, FDasInputActionValue); // DasScriptValues.h
 MAKE_TYPE_FACTORY(UEVector2D, FVector2D);
 MAKE_TYPE_FACTORY(UEVector, FVector);
 MAKE_TYPE_FACTORY(UERotator, FRotator);
@@ -442,29 +437,8 @@ MAKE_TYPE_FACTORY(UEQuat, FQuat);
 MAKE_TYPE_FACTORY(UELinearColor, FLinearColor);
 MAKE_TYPE_FACTORY(UEColor, FColor);
 MAKE_TYPE_FACTORY(UETransform, FTransform);
-// A source-side checked view of a native FHitResult. References are weak handles.
-struct FDasTraceHit
-{
-    uint64 Scope = 0;
-    bool BlockingHit = false, StartPenetrating = false;
-    double Distance = 0, Time = 0;
-    FVector Location = FVector::ZeroVector, ImpactPoint = FVector::ZeroVector, Normal = FVector::ZeroVector,
-            ImpactNormal = FVector::ZeroVector;
-    FVector TraceStart = FVector::ZeroVector, TraceEnd = FVector::ZeroVector;
-    double PenetrationDepth = 0;
-    int32 FaceIndex = -1, Item = -1, MyItem = -1, ElementIndex = 0;
-    FName BoneName, MyBoneName;
-    FDasObjectHandle Actor{}, Component{}, PhysMaterial{}, PhysicsObjectOwner{};
-};
-MAKE_TYPE_FACTORY(UETraceHit, FDasTraceHit);
-struct FDasOverlapResult
-{
-    uint64 Scope = 0;
-    bool BlockingHit = false;
-    int32 ItemIndex = -1, MyItemIndex = -1;
-    FDasObjectHandle Actor{}, Component{}, PhysicsObjectOwner{};
-};
-MAKE_TYPE_FACTORY(UEOverlapResult, FDasOverlapResult);
+MAKE_TYPE_FACTORY(UETraceHit, FDasTraceHit); // DasScriptValues.h
+MAKE_TYPE_FACTORY(UEOverlapResult, FDasOverlapResult); // DasScriptValues.h
 MAKE_TYPE_FACTORY(UCallHandle, FDasCallHandle); // DasScriptValues.h
 
 DEFINE_LOG_CATEGORY_STATIC(LogDasRuntime, Log, All);

@@ -135,6 +135,8 @@ bool RunDasUEAotProbe(FString& Report)
     // A reflected call frame, and the error of a missing function.
     R = Run(10);
     Check(R.bSucceeded && R.bUsedAot && R.Value == 5, TEXT("call_frame_externs"), R.Error);
+    R = Run(12);
+    Check(R.bSucceeded && R.bUsedAot && R.Value == 20123, TEXT("value_fields"), R.Error);
     const auto FrameError = Run(11);
     const auto InterpretedFrameError = Runtime.RunFile(Path, 11, false, Owner.Get());
     Check(!FrameError.bSucceeded && !InterpretedFrameError.bSucceeded && !Message(FrameError.Error).IsEmpty() &&

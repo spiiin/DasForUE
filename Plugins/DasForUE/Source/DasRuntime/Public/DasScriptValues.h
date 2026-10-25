@@ -98,6 +98,33 @@ struct FDasCallHandle
 {
     uint64 Token = 0;
 };
+// Values with fields that scripts read (InputActionValue, UETraceHit, UEOverlapResult).
+struct FDasInputActionValue
+{
+    double X = 0, Y = 0, Z = 0;
+    int32 Kind = 0;
+};
+// A source-side checked view of a native FHitResult. References are weak handles.
+struct FDasTraceHit
+{
+    uint64 Scope = 0;
+    bool BlockingHit = false, StartPenetrating = false;
+    double Distance = 0, Time = 0;
+    FVector Location = FVector::ZeroVector, ImpactPoint = FVector::ZeroVector, Normal = FVector::ZeroVector,
+            ImpactNormal = FVector::ZeroVector;
+    FVector TraceStart = FVector::ZeroVector, TraceEnd = FVector::ZeroVector;
+    double PenetrationDepth = 0;
+    int32 FaceIndex = -1, Item = -1, MyItem = -1, ElementIndex = 0;
+    FName BoneName, MyBoneName;
+    FDasObjectHandle Actor{}, Component{}, PhysMaterial{}, PhysicsObjectOwner{};
+};
+struct FDasOverlapResult
+{
+    uint64 Scope = 0;
+    bool BlockingHit = false;
+    int32 ItemIndex = -1, MyItemIndex = -1;
+    FDasObjectHandle Actor{}, Component{}, PhysicsObjectOwner{};
+};
 // An array as the script holds it (array<T>), in the layout of das::Array (DasRuntime checks it): native binds
 // return arrays of objects in it, the AOT bridge hands generated code a das::TArray.
 struct alignas(8) FDasArrayValue

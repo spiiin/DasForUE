@@ -71,6 +71,13 @@ def main(input:int):int {
         ue_release_call(call)
         return 0
     }
+    if (input==12) {
+        // Fields of values: generated code reads the C++ members (v.X for the script's v.x).
+        let v=ue_vector(1.0lf,2.0lf,3.0lf)
+        let r=ue_rotator(10.0lf,20.0lf,30.0lf)
+        var hit : UETraceHit
+        return int(v.x*100.0lf+v.y*10.0lf+v.z)+int(r.yaw)*1000+int(hit.distance)+hit.face_index
+    }
     if (input==6) {
         // A null handle where an object is required: the extern's own error, the same on both paths.
         return ue_object_valid(ue_cast_object(ue_null_object(),"/Script/CoreUObject.Object")) ? 1 : 0
