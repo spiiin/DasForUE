@@ -36,3 +36,13 @@ Validate through the shared build agent: `actor-host-regression,foundation,nativ
 authored references, spawning and gameplay callbacks in PIE.
 `runtime-isolation` links a minimal ordinary game and checks the actual UHT manifest
 and build response files for test-source leakage. It does not replace packaged tests.
+
+`runtime-isolation-packaged` creates a fresh Blueprint from the project-owned
+`Tests/DasRuntimeIsolation/Content/Das/Scripts/isolation_actor.das`, cooks it and
+runs the archived ordinary Development game. The project never opts into runtime
+fixtures. Its game module checks fixture-class absence, spawning the authored
+actor, BeginPlay/Tick, the delayed callback, its root component and reflected
+Unreal-to-daScript method dispatch. Validation code lives in the test project,
+not in the plugin runtime. Editor builds still include the authoring test tooling.
+Run this suite through the shared build agent; output is `Build/IsolationPackaged`
+and `logs/isolation-packaged.log`. Generated Blueprint assets are ignored by Git.

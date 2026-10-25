@@ -61,3 +61,8 @@ __pycache__/
 /Plugins/DasForUE/Content/Das/Scripts/*_[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]*.das
 /Plugins/DasForUE/Content/Das/Scripts/*_auto_rules.json
 /Tests/DasForUESmoke/Content/Tests/ActorHost/
+
+/Tests/DasRuntimeIsolation/Content/RuntimeIsolation/
+
+/Tests/DasRuntimeIsolation/Build/Windows/FileOpenOrder/
+/Tests/DasRuntimeIsolation/Config/DefaultInput.ini

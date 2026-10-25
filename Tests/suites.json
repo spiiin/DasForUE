@@ -3,6 +3,7 @@
   "suites": [
     { "name": "build", "kind": "build", "log": "combined-editor-build" },
     { "name": "actor-host", "kind": "automation", "test": "DasForUE.Hosts.ActorIsolation", "log": "actor-host-isolation", "minimum": 1 },
+    { "name": "runtime-isolation-packaged", "kind": "script", "script": "TestRuntimeIsolationPackaged.ps1" },
     { "name": "runtime-isolation", "kind": "script", "script": "TestRuntimeIsolation.ps1", "comment": "Build ordinary game without test probes and inspect UHT/build inputs." },
     { "name": "probe-game-build", "kind": "script", "script": "TestProbeGameBuild.ps1", "comment": "Non-editor smoke game links test probes through explicit opt-in." },
     { "name": "script-staging", "kind": "script", "script": "TestScriptStaging.ps1", "requires": ["build"], "comment": "Actual C# selector, dependencies and UBT receipt." },
