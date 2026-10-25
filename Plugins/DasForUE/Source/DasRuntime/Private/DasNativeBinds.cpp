@@ -1,4 +1,5 @@
 #include "DasNativeBindsRegistry.h"
+#include "DasUEAot.h"
 #include "UObject/Class.h"
 #include "UObject/StrProperty.h"
 #include "UObject/TextProperty.h"
@@ -54,6 +55,7 @@ bool DasNativeAotFailed()
 {
     return !DasNativeAotPendingError().IsEmpty();
 }
+bool dasue::aot::ErrorPending = false;
 void DasNativeError(const FString& Message)
 {
     FString* Slot = DasNativeErrorSlot();
@@ -64,6 +66,9 @@ void DasNativeError(const FString& Message)
     }
     if (Slot->IsEmpty())
         *Slot = Message.IsEmpty() ? FString(TEXT("failed")) : Message;
+    // The slot of a compiled call: the bridge reports it after the call (dasue::aot::Finish).
+    if (Slot == &DasNativeAotPendingError())
+        dasue::aot::ErrorPending = true;
 }
 
 uint64& DasNativeRoutedCallCount()

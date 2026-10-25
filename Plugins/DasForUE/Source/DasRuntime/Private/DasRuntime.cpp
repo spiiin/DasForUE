@@ -678,6 +678,7 @@ FDasObjectHandle DasNativeAotHandle(const UObject* Object, UClass* Class, das::C
 }
 void dasue::aot::Finish(uint64_t Key, das::Context* Context)
 {
+    ErrorPending = false;
     FString& Error = DasNativeAotPendingError();
     if (Error.IsEmpty())
         return;
@@ -695,7 +696,8 @@ void* dasue::aot::Resolve(uint64_t Key, das::Context* Context, FCallSite& Site)
 {
     if (!Context)
         throw std::runtime_error("UE AOT call requires a context");
-    if (!IsInGameThread() || !ActiveContext || Context != ActiveContext)
+    // Context != ActiveContext also covers a missing active context; the thread check runs after the cheap one.
+    if (Context != ActiveContext || !IsInGameThread())
         Context->throw_error("UE AOT requires the active game-thread context");
     GuardUEExtern();
     // Game thread only (checked above), so the call site's cache needs no synchronization.

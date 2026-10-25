@@ -777,8 +777,9 @@ void RunDasInteropProbe(FDasInteropBench& B)
         B.MeasurePair(M.Name, FString(TEXT("interpreter_")) + M.Name, FString(TEXT("aot_")) + M.Name,
                       TEXT("C3 AOT vs interpreter"), AotCalls, Run, Expected);
     }
-    // C4. The parts of a compiled extern call, in a context scope like a script's: the role guard alone, and the
-    // bridge (Resolve with the call site's cached entry, then Finish) without the native function.
+    // C4. The parts of a compiled extern call, in a context scope like a script's: the role guard alone, Resolve
+    // (checks, guard, the call site's cached entry), Finish, and the bridge as Call runs it (Resolve, then Finish
+    // only when an error is pending) without the native function.
     {
         FUnrealDasContext Context(16 * 1024);
         Context.Self = F;
@@ -808,9 +809,29 @@ void RunDasInteropProbe(FDasInteropBench& B)
                 for (int32 I = 0; I < N; ++I)
                 {
                     S += dasue::aot::Resolve(Key, &Context, Site) != nullptr;
-                    dasue::aot::Finish(Key, &Context);
+                    if (dasue::aot::ErrorPending)
+                        dasue::aot::Finish(Key, &Context);
                 }
                 return S;
+            },
+            int64(Direct));
+        B.Measure(
+            TEXT("aot_resolve"), TEXT("C4 compiled call parts"), Direct,
+            [&](int32 N)
+            {
+                int64 S = 0;
+                for (int32 I = 0; I < N; ++I)
+                    S += dasue::aot::Resolve(Key, &Context, Site) != nullptr;
+                return S;
+            },
+            int64(Direct));
+        B.Measure(
+            TEXT("aot_finish"), TEXT("C4 compiled call parts"), Direct,
+            [&](int32 N)
+            {
+                for (int32 I = 0; I < N; ++I)
+                    dasue::aot::Finish(Key, &Context);
+                return int64(N);
             },
             int64(Direct));
     }

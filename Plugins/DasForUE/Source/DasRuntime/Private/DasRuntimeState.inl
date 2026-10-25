@@ -340,7 +340,8 @@ void GuardUEExtern()
     if (RestrictedPhysicsContext)
         RestrictedPhysicsContext->throw_error("UE extern is forbidden in isolated physics VM");
     bool bFrozen = false;
-    if (GetDasExecutionRole() != EDasExecutionRole::PhysicsPreSim)
+    const EDasExecutionRole Role = GetDasExecutionRole(); // read once
+    if (Role != EDasExecutionRole::PhysicsPreSim)
     {
         struct FFrozenCache
         {
@@ -364,7 +365,7 @@ void GuardUEExtern()
         else
             bFrozen = IsDasFrozenPhysicsWorld(nullptr);
     }
-    if (GetDasExecutionRole() == EDasExecutionRole::PhysicsPreSim || bFrozen)
+    if (Role == EDasExecutionRole::PhysicsPreSim || bFrozen)
     {
         if (ActiveContext)
             ActiveContext->throw_error("UE extern is forbidden in PhysicsPreSim execution role");

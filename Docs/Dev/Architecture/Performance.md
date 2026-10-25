@@ -382,6 +382,14 @@ rows of one run only.
   keeps most of its cost (the guards and the work on the other side): a reference parameter saves half, engine
   values and names 15-30%, a guarded scalar extern and a property of self nothing.
 
+  **A cheaper bridge (2026-10-25).** Call and CallOp call Finish only when a native bind reported an error into
+  the slot of a compiled call (`dasue::aot::ErrorPending`), the role guard reads the execution role once, and
+  Resolve compares the context before the thread check. The bridge (C4) 44.1 -> 25.5 ns a call: Resolve 21.1 of
+  which the guard 7.0, Finish 2.7 when it runs. AOT / interpreter (one run after, against the two before):
+  `native_refs` 0.52 / 0.46 -> 0.398, `native_values` 0.73 / 0.71 -> 0.608, `native_bind` 0.73 / 0.70 -> 0.621,
+  `vector_math` 0.86 / 0.83 -> 0.696, `object_array` 0.86 / 0.84 -> 0.712, `names_equality` 0.84 / 0.82 -> 0.740,
+  `native_objects` 0.96 / 0.91 -> 0.812; `scalar_extern` stays at 1.0 (its time is the state lookup by name).
+
   **Struct snapshots and AOT (2026-10-25).** Externs that make struct snapshots stay interpreted: the collection in
   the middle of an execution finds live snapshots by walking interpreter frames. Collecting only on the exit of a
   top-level execution would let them compile, so `DAS_STRUCT_STATS` (logged on module shutdown and by

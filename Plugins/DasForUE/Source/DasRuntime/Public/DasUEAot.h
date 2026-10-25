@@ -20,8 +20,10 @@ struct FCallSite
 };
 // Checks thread, role and context (the only guard of a compiled call) and returns the native function.
 DASRUNTIME_API void* Resolve(uint64_t Key, das::Context* Context, FCallSite& Site);
-// After the call: a native bind that reported DasNativeError fails the script call here.
+// After the call: a native bind that reported DasNativeError fails the script call here. Call and CallOp call it
+// only when ErrorPending is set (DasNativeError into the slot of a compiled call), not after every call.
 DASRUNTIME_API void Finish(uint64_t Key, das::Context* Context);
+DASRUNTIME_API extern bool ErrorPending;
 // The active script context: operators are called from generated code with their operands only (CallOp).
 DASRUNTIME_API das::Context* CurrentContext();
 template <class T> struct Type
@@ -255,12 +257,14 @@ template <uint64_t Id, class R, class... A> R Call(A... Args)
     if constexpr (std::is_void_v<R>)
     {
         Fn(std::forward<A>(Args)...);
-        Finish(Id, Context);
+        if (ErrorPending)
+            Finish(Id, Context);
     }
     else
     {
         R Result = FromWire<R>(Fn(std::forward<A>(Args)...));
-        Finish(Id, Context);
+        if (ErrorPending)
+            Finish(Id, Context);
         return Result;
     }
 }
@@ -274,12 +278,14 @@ template <uint64_t Id, class R, class... A> R CallOp(A... Args)
     if constexpr (std::is_void_v<R>)
     {
         Fn(std::forward<A>(Args)..., Context);
-        Finish(Id, Context);
+        if (ErrorPending)
+            Finish(Id, Context);
     }
     else
     {
         R Result = Fn(std::forward<A>(Args)..., Context);
-        Finish(Id, Context);
+        if (ErrorPending)
+            Finish(Id, Context);
         return Result;
     }
 }
