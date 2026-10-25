@@ -6,8 +6,8 @@ require ue_engine
 
 // AOT check of the DasNativeBindsManifest commandlet (DasNativeBinds.h). open_only calls native binds with an AOT
 // ABI (scalars, strings, engine values, time values) and with_objects object methods and helpers: both are
-// compiled for AOT and call them through the guarded bridge. with_closed edits a struct snapshot in a block (an
-// extern with a block argument, which has no ABI): it stays in the interpreter.
+// compiled for AOT and call them through the guarded bridge. with_closed calls an extern of the isolated physics
+// VM (interpreted only): it stays in the interpreter.
 [export]
 def open_only(input:int):int {
     let d = make_date_time(2024, 2, 29)
@@ -70,14 +70,23 @@ def with_arrays(input:int):int {
     return none.valid() ? length(none.get_all_components()) : input
 }
 
+// A function that reaches a struct snapshot collection through a callee (called inside an expression, which
+// daScript's AOT proof would reject): the generator keeps it interpreted instead of failing.
+def make_point():UEStructValue {
+    return ue_struct_default("/Script/CoreUObject.IntPoint", "(X=1,Y=2)")
+}
+[export]
+def with_carrier(input:int):int {
+    if (input < 0) {
+        return ue_struct_get_int(make_point(), "X")
+    }
+    return input
+}
+
 [export]
 def with_closed(input:int):int {
-    var original : UEStructValue
     if (input < 0) {
-        let changed = ue_struct_edit(original) $(var draft : UEStructValue) {
-            draft = original
-        }
-        original = changed
+        return int(ue_physics_input(0))
     }
     return input
 }

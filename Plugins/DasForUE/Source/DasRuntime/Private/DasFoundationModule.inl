@@ -1650,5 +1650,13 @@ public:
                                                  "DSLNamesEqual");
         AddUEExtern<DAS_BIND_FUN(EmitType)>(*this, Library, "ue_emit_type", das::SideEffects::modifyExternal,
                                             "EmitType");
+        // Externs that may collect struct snapshots (needCallerStackFrame) stay closed for AOT: CollectStructValues
+        // finds live tokens by walking interpreter frames, and a compiled caller's locals are not on that stack.
+        functions.foreach(
+            [](const das::FunctionPtr& Fn)
+            {
+                if (Fn->needCallerStackFrame)
+                    Fn->noAot = true;
+            });
     }
 };

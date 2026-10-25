@@ -144,6 +144,8 @@ int32 UDasNativeBindsManifestCommandlet::Main(const FString& Params)
         AotError = TEXT("with_refs is not compiled for AOT");
     else if (bAot && !AotText.Contains(TEXT("with_math")))
         AotError = TEXT("with_math is not compiled for AOT");
+    else if (bAot && AotText.Contains(TEXT("with_carrier")))
+        AotError = TEXT("with_carrier is compiled for AOT, but it can reach a struct snapshot collection");
     else if (bAot && !AotText.Contains(TEXT("with_names")))
         AotError = TEXT("with_names is not compiled for AOT");
     else if (bAot && !AotText.Contains(TEXT("with_classes")))
