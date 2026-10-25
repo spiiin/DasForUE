@@ -1,5 +1,7 @@
 #pragma once
 #include "DasTypeAdapters.h"
+struct FDasDeclaredLiteral;
+class FJsonValue;
 // Requires the daScript AST headers, included by DasRuntime.cpp with its packing and macro guards.
 
 // Where lowering uses the view of an adapted struct. The math structs differ: Vector2D has no
@@ -40,6 +42,33 @@ public:
     virtual das::ExpressionPtr Pack(const das::LineInfo& At, das::ExpressionPtr Value) const = 0;
     virtual das::ExpressionPtr Unpack(const das::LineInfo& At, const das::TypeDeclPtr& Type,
                                       das::ExpressionPtr Handle) const = 0;
+    virtual bool PropertyDefault(const das::TypeDeclPtr&, das::ExpressionPtr, das::ModuleGroup&, das::Module*,
+                                 FDasDeclaredLiteral&) const
+    {
+        return false;
+    }
+    virtual TSharedPtr<FJsonValue> DefaultJson(const das::TypeDeclPtr&, das::ExpressionPtr, das::ModuleGroup&,
+                                               das::Module*) const
+    {
+        return nullptr;
+    }
+    virtual int UpcastDistance(const das::TypeDeclPtr&, const das::TypeDeclPtr&) const { return -1; }
+    virtual das::ExpressionPtr Upcast(const das::LineInfo&, const das::TypeDeclPtr&, const das::TypeDeclPtr&,
+                                      das::ExpressionPtr) const
+    {
+        return nullptr;
+    }
+    virtual FString GetTypePath(const das::TypeDeclPtr&) const { return {}; }
+    virtual das::ExpressionPtr PackTyped(const das::LineInfo& At, const das::TypeDeclPtr& Type,
+                                         das::ExpressionPtr Value) const
+    {
+        return Pack(At, Value);
+    }
+    virtual das::TypeDeclPtr MakeViewForPath(const FString&, das::ModuleGroup& Group, das::Module* Module,
+                                             const das::LineInfo& At) const
+    {
+        return MakeView(Group, Module, At);
+    }
     virtual EDasScriptViewUse GetViewUses() const = 0;
     // View type in the module group, or nullptr when its module is not imported (see GetViewModule).
     virtual das::TypeDeclPtr MakeView(das::ModuleGroup& Group, das::Module* Module, const das::LineInfo& At) const = 0;

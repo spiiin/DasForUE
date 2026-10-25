@@ -188,3 +188,35 @@ handle-типы `ue_foundation`, поэтому фасет узнаёт и handl
 Остались как предметная логика (не решения по типу): разбор конструктора `ue_transform`, свойство `ActorTransform`,
 контракты Enhanced Input, ObjectClass payload Vector2D, текстовые грамматики дефолтов в редакторе. Python-генераторы
 (`CANONICAL_MATH`) — фаза 6.
+
+
+## Перенос soft references (2026-10-25)
+
+Soft object/class references используют один адаптер семейства `FDasSoftReferenceAdapter`.
+В отличие от math-структур их carrier зависит от native base class и создаётся по требованию.
+Реестр хранит неизменный список семейств: точный поиск статических структур остаётся прежним,
+а семейство проверяет путь через реестр реально созданных carriers. Само сходство имени не
+означает принадлежность типу. Создание нового carrier не добавляет элементы в реестр адаптеров
+и не инвалидирует указатели на его записи. Сброс carriers не оставляет в адаптере указателей на них.
+
+Адаптер отвечает за native FSoftObjectProperty/FSoftClassProperty, ограничение класса,
+CPF_UObjectWrapper, листовую политику авторских структур и их пустой default (`None`).
+GetCarrierProperty подключает soft-значения к существующему owned-snapshot transport.
+Пути и wire-формат carriers не изменены.
+
+`FDasSoftReferenceScriptFacet` владеет идентификацией `ue_soft_ref`, получением carrier path,
+pack/unpack, литеральными defaults полей и контейнеров, выбором generated native view и
+преобразованием к родительскому ограничению. Общий DSL вызывает фасет вместо `DSLSoft*`.
+Непустые defaults внутри `ue_struct` по-прежнему запрещены; defaults обычных классов и
+контейнеров по-прежнему проходят проверку literal path и точного типа.
+
+Предметные операции остаются в soft-модуле: проверка asset paths и resolved objects,
+resolve/load, ограничения на преобразования object/class, отмена асинхронных запросов.
+Они используют тот же carrier и существующие проверки времени жизни, без eager loading.
+`DasRuntimeInputSessions.inl` сохраняет доступ к soft property для реализации async load.
+
+Регрессии: foundation проверяет четыре комбинации native base × object/class, создание
+свойства и обратное описание, отказ для незарегистрированных путей и неизменность реестра.
+`TestTypeAdapterGate.py` запрещает возврат soft-предикатов в общий DSL и property builder.
+Существующие soft-reference foundation/PIE tests покрывают defaults, GC, generated native
+views, upcasts, загрузку и отмену запросов; общий automation-набор проверяет соседние типы.

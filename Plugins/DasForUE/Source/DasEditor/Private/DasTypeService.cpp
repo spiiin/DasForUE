@@ -89,8 +89,9 @@ bool TypeFieldDefaultMatches(UUserDefinedStruct* U, const FDasDeclaredProperty& 
 }
 FString TypeFieldDefault(const FDasDeclaredProperty& P)
 {
-    if (DasSoftProperty(P.Type.TypePath))
-        return TEXT("None");
+    if (const auto* Adapter = FDasTypeAdapters::Get().Find(P.Type))
+        if (const TCHAR* Default = Adapter->GetStructFieldDefault())
+            return Default;
     if (P.Type.Kind == TEXT("enum"))
         return P.Default.String;
     if (P.Type.Kind == TEXT("struct") && DasMathAdapter(P.Type.TypePath))

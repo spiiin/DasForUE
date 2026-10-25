@@ -411,33 +411,10 @@ struct FUEClassAnnotation : das::StructureAnnotation
                 if (!F.type || F.type->ref || FieldType.IsEmpty() || FieldType == TEXT("void"))
                     DSLFail(TEXT("Adapter supports int/float/bool/string/double/name properties: ")+ P.Name);
                 P.Type.Kind = FieldType;
-                if (DSLSoft(F.type))
+                if (const auto* Adapted = DSLAdapted(F.type);
+                    Adapted && Adapted->Script->PropertyDefault(F.type, F.init, Group, St->module, P.Default))
                 {
-                    P.Type.Kind = TEXT("struct");
-                    P.Type.TypePath = DSLSoftPath(F.type);
-                    if (F.init)
-                    {
-                        if (F.init->__rtti != das::string("ExprCallMacro"))
-                            DSLFail(TEXT("Soft defaults require ue_soft(type<SoftType>, literal_path)"));
-                        auto* Init = static_cast<das::ExprCallMacro*>(F.init);
-                        if (Init->name != "ue_soft" || Init->arguments.size() != 2 ||
-                            Init->arguments[1]->__rtti != das::string("ExprConstString"))
-                            DSLFail(TEXT("Soft default path must be a string literal"));
-                        if (!Init->arguments[0]->rtti_isTypeDecl())
-                            DSLFail(TEXT("Soft default requires a type argument"));
-                        auto DefaultType = DSLObjectNormalize(
-                            static_cast<das::ExprTypeDecl*>(Init->arguments[0])->typeexpr, Group, St->module);
-                        if (!DSLSoft(DefaultType) || DSLSoftPath(DefaultType) != P.Type.TypePath)
-                            DSLFail(TEXT("Soft default type must match field type"));
-                        auto* Text = static_cast<das::ExprConstString*>(Init->arguments[1]);
-                        FString Issue;
-                        if (!ValidateDasSoftPath(DSLText(Text->text), Issue))
-                            DSLFail(Issue);
-                        auto Object = MakeShared<FJsonObject>();
-                        Object->SetStringField(TEXT("Values"), DSLText(Text->text));
-                        P.Default.Kind = TEXT("string");
-                        FJsonSerializer::Serialize(Object, TJsonWriterFactory<>::Create(&P.Default.String));
-                    }
+                    P.Type.TypePath = DSLAdaptedPath(F.type);
                     C.Properties.Add(P);
                     continue;
                 }

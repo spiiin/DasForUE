@@ -248,12 +248,6 @@ struct FUEStructAnnotation : das::StructureAnnotation
                         DSLFail(DSLText(F.type->structType->name) + TEXT(" struct fields use implicit empty defaults"));
                     P.Type.TypePath = DSLAdaptedPath(F.type);
                 }
-                if (DSLSoft(F.type))
-                {
-                    if (F.init)
-                        DSLFail(TEXT("Authored struct soft fields require implicit null defaults"));
-                    P.Type.TypePath = DSLSoftPath(F.type);
-                }
                 if (DSLDirectEnum(F.type))
                 {
                     const auto* A = DSLAnnotation(F.type->enumType->annotations, "ue_enum");
@@ -341,9 +335,7 @@ struct FUEStructAnnotation : das::StructureAnnotation
                     }
                     if (Value == TEXT("struct"))
                     {
-                        if (DSLSoft(F.type->secondType))
-                            V->TypePath = DSLSoftPath(F.type->secondType);
-                        else if (DSLAdapted(F.type->secondType))
+                        if (DSLAdapted(F.type->secondType))
                             V->TypePath = DSLAdaptedPath(F.type->secondType);
                         else if (!DSLMathPath(F.type->secondType).IsEmpty())
                             V->TypePath = DSLMathPath(F.type->secondType);
@@ -404,8 +396,6 @@ struct FUEStructAnnotation : das::StructureAnnotation
                     }
                     else if (DSLAdapted(F.type->firstType))
                         E->TypePath = DSLAdaptedPath(F.type->firstType);
-                    else if (DSLSoft(F.type->firstType))
-                        E->TypePath = DSLSoftPath(F.type->firstType);
                     else if (!DSLMathPath(F.type->firstType).IsEmpty())
                         E->TypePath = DSLMathPath(F.type->firstType);
                     else if (DSLDirectStruct(F.type->firstType))
@@ -421,7 +411,7 @@ struct FUEStructAnnotation : das::StructureAnnotation
                     P.Type.Kind = TEXT("array");
                     P.Type.Element = E;
                 }
-                if (DSLDirectStruct(F.type) && !DSLSoft(F.type) && !DSLAdapted(F.type))
+                if (DSLDirectStruct(F.type) && !DSLAdapted(F.type))
                 {
                     const auto* Child = DSLAnnotation(F.type->structType->annotations, "ue_struct");
                     const FString Module =

@@ -249,9 +249,8 @@ bool FDasReflectedTypes::Validate(FString& Error, bool AllowUnresolved) const
                         return false;
                     }
                 }
-                if (P.Type.Value->Kind == TEXT("struct") && !DasSoftProperty(P.Type.Value->TypePath) &&
-                                               !DasMathAdapter(P.Type.Value->TypePath) &&
-                                               !DasLeafValueAdapter(P.Type.Value->TypePath))
+                if (P.Type.Value->Kind == TEXT("struct") && !DasLeafValueAdapter(P.Type.Value->TypePath) &&
+                                               !DasMathAdapter(P.Type.Value->TypePath))
                 {
                     const auto* Child = Refs.Find(P.Type.Value->TypePath);
                     if (!Child)
@@ -326,8 +325,7 @@ bool FDasReflectedTypes::Validate(FString& Error, bool AllowUnresolved) const
                         continue;
                     }
                     Ref = P.Type.Element.Get();
-                    if (DasSoftProperty(Ref->TypePath) || DasMathAdapter(Ref->TypePath) ||
-                        DasLeafValueAdapter(Ref->TypePath))
+                    if (DasMathAdapter(Ref->TypePath) || DasLeafValueAdapter(Ref->TypePath))
                     {
                         if (++Leaves > 1024)
                         {
@@ -337,23 +335,12 @@ bool FDasReflectedTypes::Validate(FString& Error, bool AllowUnresolved) const
                         continue;
                     }
                 }
-                if (P.Type.Kind == TEXT("struct") && DasSoftProperty(Ref->TypePath))
-                {
-                    if (!P.Default.Kind.IsEmpty())
-                    {
-                        Error = TEXT("Authored soft fields require implicit null defaults");
-                        return false;
-                    }
-                    if (++Leaves > 1024)
-                        return false;
-                    continue;
-                }
                 if (const auto* Leaf =
                         P.Type.GetKind() == EDasTypeKind::Struct ? DasLeafValueAdapter(Ref->TypePath) : nullptr)
                 {
                     if (!P.Default.Kind.IsEmpty() && Leaf->GetDefaultPolicy() == EDasAdapterDefault::ImplicitEmpty)
                     {
-                        Error = Leaf->GetStruct()->GetName() + TEXT(" struct fields use implicit empty defaults");
+                        Error = Ref->TypePath + TEXT(" struct fields use implicit empty defaults");
                         return false;
                     }
                     if (++Leaves > 1024)

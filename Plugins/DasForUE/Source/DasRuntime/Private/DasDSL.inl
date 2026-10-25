@@ -364,7 +364,7 @@ FString DSLTypeName(const das::TypeDeclPtr& T)
 {
     if (!T)
         return {};
-    if (DSLSoft(T) || DSLAdapted(T))
+    if (DSLAdapted(T))
         return TEXT("struct");
     if (DSLObjectKey(T))
         return TEXT("object_key");
@@ -477,8 +477,6 @@ FDasDeclaredType DSLContainerType(const das::TypeDeclPtr& T, const FString& Fold
     {
         if (DSLAdapted(T->firstType))
             First->TypePath = DSLAdaptedPath(T->firstType);
-        else if (DSLSoft(T->firstType))
-            First->TypePath = DSLSoftPath(T->firstType);
         else if (!DSLMathPath(T->firstType).IsEmpty())
             First->TypePath = DSLMathPath(T->firstType);
         else
@@ -509,8 +507,6 @@ FDasDeclaredType DSLContainerType(const das::TypeDeclPtr& T, const FString& Fold
         {
             if (DSLAdapted(T->secondType))
                 Value->TypePath = DSLAdaptedPath(T->secondType);
-            else if (DSLSoft(T->secondType))
-                Value->TypePath = DSLSoftPath(T->secondType);
             else if (!DSLMathPath(T->secondType).IsEmpty())
                 Value->TypePath = DSLMathPath(T->secondType);
             else

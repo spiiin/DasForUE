@@ -18,6 +18,12 @@ public:
     virtual EDasTypeKind GetKind() const = 0;
     // Struct adapters are found by this struct; kind adapters return nullptr.
     virtual const UScriptStruct* GetStruct() const { return nullptr; }
+    // Dynamic carrier families participate without mutating the registry after startup.
+    virtual bool IsReferenceValue() const { return false; }
+    virtual bool IsStructFamily() const { return false; }
+    virtual bool MatchesStructPath(const FString& Path) const { return false; }
+    virtual FProperty* GetCarrierProperty(const FString& Path) const { return nullptr; }
+    virtual const TCHAR* GetStructFieldDefault() const { return nullptr; }
     // Kind adapters: whether a reflected property has this kind.
     virtual bool MatchesProperty(const FProperty* Property) const { return false; }
 
@@ -70,6 +76,7 @@ private:
     TMap<const UScriptStruct*, int32> ByStruct;
     TMap<FString, int32> ByPath;
     TMap<EDasTypeKind, int32> ByKind;
+    TArray<int32> StructFamilies;
 };
 
 // Leaf value struct (GameplayTag, ...) by path, for authored type validation.

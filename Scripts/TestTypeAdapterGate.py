@@ -11,6 +11,11 @@ ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'Plugins',
 
 # Ported type -> (patterns, files allowed to contain them).
 PORTED = {
+    'SoftReference': (
+        [r'\bDSLSoft', r'\bDasSoftProperty\b', r'\bCreateDasSoftProperty\b'],
+        {'DasSoftReferences.cpp', 'DasSoftReferences.h', 'DasSoftTypes.inl',
+         'DasSoftNativeView.inl', 'DasSoftRuntime.inl', 'DasRuntimeInputSessions.inl'},
+    ),
     'GameplayTag': (
         [r'/Script/GameplayTags\.', r'\bDSLGameplay', r'\bIsDasGameplayTagPath\b', r'\bDasIsGameplayTagType\b'],
         {'DasGameplayTags.cpp', 'DasGameplayTagsDSL.inl', 'DasGameplayTagsRuntime.inl', 'DasGameplayTags.h'},

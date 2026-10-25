@@ -13,9 +13,10 @@ struct FUEReferenceUpcastVisitor : das::Visitor
     }
     static int Distance(const das::TypeDeclPtr& From, const das::TypeDeclPtr& To)
     {
-        if (DSLSoft(From) || DSLSoft(To))
+        if (DSLAdaptedReference(From) || DSLAdaptedReference(To))
         {
-            const int D = DSLSoftUpcastDistance(From, To);
+            const int D =
+                (DSLAdaptedReference(From) ? DSLAdaptedReference(From)->Script->UpcastDistance(From, To) : -1);
             return D > 0 ? D : -1;
         }
         if (!DSLTypedReference(From) || !DSLTypedReference(To) || DSLAuthoredView(To) || DSLTypedInterface(From) ||
@@ -37,9 +38,9 @@ struct FUEReferenceUpcastVisitor : das::Visitor
             return false;
         const auto At = Value->at;
         const auto Source = Value->type;
-        if (DSLSoft(Source))
+        if (DSLAdaptedReference(Source))
         {
-            Value = DSLSoftUpcast(At, Source, Target, Value);
+            Value = DSLAdaptedReference(Source)->Script->Upcast(At, Source, Target, Value);
             Changed = true;
             return true;
         }
@@ -60,7 +61,7 @@ struct FUEReferenceUpcastVisitor : das::Visitor
     }
     virtual das::ExpressionPtr visit(das::ExprCopy* E) override
     {
-        const bool Soft = DSLSoft(E->right->type);
+        const bool Soft = DSLAdaptedReference(E->right->type);
         if (Convert(E->right, E->left->type) && Soft && E->left->rtti_isCall())
         {
             // Failed type inference may have lowered the property LHS to its getter.

@@ -195,8 +195,6 @@ FProperty* Build(FFieldVariant Owner, FName Name, const FDasDeclaredType& T, EDa
     {
     case EDasTypeKind::Struct:
     {
-        if (auto* Soft = DasSoftProperty(T.TypePath))
-            return CreateDasSoftProperty(Owner, Name, Soft);
         auto* P = new FStructProperty(Owner, Name);
         P->Struct = FindObject<UScriptStruct>(nullptr, *T.TypePath);
         return P;

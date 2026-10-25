@@ -1,5 +1,7 @@
 #pragma once
 #include "CoreMinimal.h"
+#include "DasTypeAdapters.h"
+TSharedRef<const IDasTypeAdapter> MakeDasSoftReferenceAdapter();
 #include "UObject/UnrealType.h"
 #include "UObject/SoftObjectPath.h"
 // Soft properties use the shared owned-snapshot ABI, retaining native soft pins.

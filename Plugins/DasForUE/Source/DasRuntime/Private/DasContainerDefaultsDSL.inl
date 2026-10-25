@@ -4,23 +4,9 @@ TSharedPtr<FJsonValue> DSLDefaultJsonValue(const das::TypeDeclPtr& T, das::Expre
 {
     if (!E)
         DSLFail(TEXT("Missing container default value"));
-    if (DSLSoft(T))
-    {
-        if (E->__rtti != das::string("ExprCallMacro"))
-            DSLFail(TEXT("Soft container defaults require ue_soft(type<SoftType>, literal_path)"));
-        auto* Call = static_cast<das::ExprCallMacro*>(E);
-        if (Call->name != "ue_soft" || Call->arguments.size() != 2 || !Call->arguments[0]->rtti_isTypeDecl() ||
-            Call->arguments[1]->__rtti != das::string("ExprConstString"))
-            DSLFail(TEXT("Soft default requires type and literal path"));
-        auto Input = DSLObjectNormalize(static_cast<das::ExprTypeDecl*>(Call->arguments[0])->typeexpr, Group, Module);
-        if (!DSLSoft(Input) || DSLSoftPath(Input) != DSLSoftPath(T))
-            DSLFail(TEXT("Soft default type differs from container element"));
-        const FString Path = DSLText(static_cast<das::ExprConstString*>(Call->arguments[1])->text);
-        FString Error;
-        if (!ValidateDasSoftPath(Path, Error))
-            DSLFail(Error);
-        return MakeShared<FJsonValueString>(Path);
-    }
+    if (const auto* Adapted = DSLAdapted(T))
+        if (auto Value = Adapted->Script->DefaultJson(T, E, Group, Module))
+            return Value;
     if (DSLTypedReference(T) || DSLObjectKey(T))
     {
         if ((DSLTypedReference(T) && DSLAuthoredView(T)) ||

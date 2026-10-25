@@ -3,6 +3,7 @@
 #include "DasReflectedTypes.h"
 #include "DasContainerTypes.h"
 #include "DasSoftReferences.h"
+#include "DasTypeAdapters.h"
 #include "DasAuthoring.h"
 #include "DasPropertyTypes.h"
 #include "DasContainerRegistry.h"
@@ -721,8 +722,9 @@ void ResetDasContainerCarriers()
 }
 UScriptStruct* DasContainerCarrier(const FDasDeclaredType& Type)
 {
-    if (Type.Kind == TEXT("struct") && DasSoftProperty(Type.TypePath))
-        return FindObject<UScriptStruct>(nullptr, *Type.TypePath);
+    if (const auto* Adapter = FDasTypeAdapters::Get().Find(Type))
+        if (Adapter->GetCarrierProperty(Type.TypePath))
+            return FindObject<UScriptStruct>(nullptr, *Type.TypePath);
     FString Error;
     if (!ValidateDasPropertyType(Type, EDasPropertyUsage::Container, Error))
         return nullptr;
@@ -781,8 +783,9 @@ UScriptStruct* DasContainerCarrier(const FDasDeclaredType& Type)
 }
 FProperty* DasContainerProperty(const FString& Path)
 {
-    if (auto* Soft = DasSoftProperty(Path))
-        return Soft;
+    if (const auto* Adapter = FDasTypeAdapters::Get().FindStructPath(Path))
+        if (auto* Property = Adapter->GetCarrierProperty(Path))
+            return Property;
     for (const auto& Entry : StaticCarriers())
         if (Entry.Path == Path)
             return Entry.Values;

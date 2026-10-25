@@ -25,6 +25,11 @@ void FDasTypeAdapters::Register(TSharedRef<const IDasTypeAdapter> Adapter, const
         ByStruct.Add(Struct, Index);
         ByPath.Add(Struct->GetPathName(), Index);
     }
+    else if (Adapter->IsStructFamily())
+    {
+        check(Adapter->GetKind() == EDasTypeKind::Struct);
+        StructFamilies.Add(Index);
+    }
     else
     {
         check(!ByKind.Contains(Adapter->GetKind()));
@@ -42,12 +47,16 @@ const IDasTypeAdapter* FDasTypeAdapters::Find(const FDasDeclaredType& Type) cons
 const IDasTypeAdapter* FDasTypeAdapters::FindStruct(const UScriptStruct* Type) const
 {
     const int32* Index = Type ? ByStruct.Find(Type) : nullptr;
-    return Index ? &*EntryList[*Index].Adapter : nullptr;
+    return Index ? &*EntryList[*Index].Adapter : Type ? FindStructPath(Type->GetPathName()) : nullptr;
 }
 const IDasTypeAdapter* FDasTypeAdapters::FindStructPath(const FString& Path) const
 {
-    const int32* Index = ByPath.Find(Path);
-    return Index ? &*EntryList[*Index].Adapter : nullptr;
+    if (const int32* Index = ByPath.Find(Path))
+        return &*EntryList[*Index].Adapter;
+    for (int32 Index : StructFamilies)
+        if (EntryList[Index].Adapter->MatchesStructPath(Path))
+            return &*EntryList[Index].Adapter;
+    return nullptr;
 }
 const IDasTypeAdapter* FDasTypeAdapters::FindProperty(const FProperty* Property) const
 {

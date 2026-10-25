@@ -27,10 +27,9 @@ bool DSLNativeStruct(const das::TypeDeclPtr& T)
 }
 bool DSLDirectStruct(const das::TypeDeclPtr& T)
 {
-    return DSLAdapted(T) || DSLSoft(T) ||
-           (T && T->baseType == das::Type::tStructure && T->structType &&
-            (DSLAnnotation(T->structType->annotations, "ue_struct") ||
-             DSLAnnotation(T->structType->annotations, "ue_native_struct")));
+    return DSLAdapted(T) || (T && T->baseType == das::Type::tStructure && T->structType &&
+                             (DSLAnnotation(T->structType->annotations, "ue_struct") ||
+                              DSLAnnotation(T->structType->annotations, "ue_native_struct")));
 }
 
 FString DSLValidateNativeStruct(const das::TypeDeclPtr& T)
@@ -112,8 +111,6 @@ FString DSLDirectPath(const das::TypeDeclPtr& T, const FString& Folder, const FS
 {
     if (DSLAdapted(T))
         return DSLAdaptedPath(T);
-    if (DSLSoft(T))
-        return DSLSoftPath(T);
     if (DSLNativeStruct(T))
         return DSLValidateNativeStruct(T);
     if (DSLNativeEnum(T))
@@ -413,8 +410,6 @@ das::ExpressionPtr DSLDirectUnpack(const das::LineInfo& At, const das::TypeDeclP
         return V;
     if (DSLAdapted(Type))
         return DSLAdaptedUnpack(At, Type, V);
-    if (DSLSoft(Type))
-        return DSLSoftUnpack(At, Type, V);
     if (DSLTypedClass(Type))
         return DSLClassUnpack(At, Type, V);
     if (DSLDelegate(Type))
@@ -448,8 +443,6 @@ das::ExpressionPtr DSLDirectPack(const das::LineInfo& At, const das::TypeDeclPtr
         return V;
     if (DSLAdapted(Type))
         return DSLAdaptedPack(At, Type, V);
-    if (DSLSoft(Type))
-        return DSLSoftPack(At, Type, V);
     if (DSLNativeEnum(Type))
         return DSLCall(At, Type->enumType->module->name + "::__ue_pack_native_enum_" + Type->enumType->name, {V});
     if (DSLTypedClass(Type))
@@ -501,7 +494,7 @@ das::FunctionPtr DSLHelper(const das::LineInfo& At, const das::string& Name, con
 void DSLEnsureStructHelpers(const das::TypeDeclPtr& InputType, const FString& Path, das::ModuleGroup& Group,
                             das::Module* Module, das::vector<das::FunctionPtr>& Generated, TSet<FString>& Helpers)
 {
-    if (DSLSoft(InputType) || DSLAdapted(InputType))
+    if (DSLAdapted(InputType))
         return;
     auto Type = DSLCopyType(InputType);
     Type->ref = false;

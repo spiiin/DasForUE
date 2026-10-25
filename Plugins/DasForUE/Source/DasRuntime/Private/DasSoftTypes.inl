@@ -284,3 +284,84 @@ struct FUESoftCallMacro : das::CallMacro
         }
     }
 };
+
+class FDasSoftReferenceScriptFacet final : public IDasScriptTypeFacet
+{
+public:
+    bool PropertyDefault(const das::TypeDeclPtr& Type, das::ExpressionPtr InitExpression, das::ModuleGroup& Group,
+                         das::Module* Module, FDasDeclaredLiteral& Default) const override
+    {
+        if (InitExpression)
+        {
+            if (InitExpression->__rtti != das::string("ExprCallMacro"))
+                DSLFail(TEXT("Soft defaults require ue_soft(type<SoftType>, literal_path)"));
+            auto* Init = static_cast<das::ExprCallMacro*>(InitExpression);
+            if (Init->name != "ue_soft" || Init->arguments.size() != 2 ||
+                Init->arguments[1]->__rtti != das::string("ExprConstString"))
+                DSLFail(TEXT("Soft default path must be a string literal"));
+            if (!Init->arguments[0]->rtti_isTypeDecl())
+                DSLFail(TEXT("Soft default requires a type argument"));
+            auto DefaultType =
+                DSLObjectNormalize(static_cast<das::ExprTypeDecl*>(Init->arguments[0])->typeexpr, Group, Module);
+            if (!DSLSoft(DefaultType) || DSLSoftPath(DefaultType) != DSLSoftPath(Type))
+                DSLFail(TEXT("Soft default type must match field type"));
+            auto* Text = static_cast<das::ExprConstString*>(Init->arguments[1]);
+            FString Issue;
+            if (!ValidateDasSoftPath(DSLText(Text->text), Issue))
+                DSLFail(Issue);
+            auto Object = MakeShared<FJsonObject>();
+            Object->SetStringField(TEXT("Values"), DSLText(Text->text));
+            Default.Kind = TEXT("string");
+            FJsonSerializer::Serialize(Object, TJsonWriterFactory<>::Create(&Default.String));
+        }
+        return true;
+    }
+    TSharedPtr<FJsonValue> DefaultJson(const das::TypeDeclPtr& T, das::ExpressionPtr E, das::ModuleGroup& Group,
+                                       das::Module* Module) const override
+    {
+        if (E->__rtti != das::string("ExprCallMacro"))
+            DSLFail(TEXT("Soft container defaults require ue_soft(type<SoftType>, literal_path)"));
+        auto* Call = static_cast<das::ExprCallMacro*>(E);
+        if (Call->name != "ue_soft" || Call->arguments.size() != 2 || !Call->arguments[0]->rtti_isTypeDecl() ||
+            Call->arguments[1]->__rtti != das::string("ExprConstString"))
+            DSLFail(TEXT("Soft default requires type and literal path"));
+        auto Input = DSLObjectNormalize(static_cast<das::ExprTypeDecl*>(Call->arguments[0])->typeexpr, Group, Module);
+        if (!DSLSoft(Input) || DSLSoftPath(Input) != DSLSoftPath(T))
+            DSLFail(TEXT("Soft default type differs from container element"));
+        const FString Path = DSLText(static_cast<das::ExprConstString*>(Call->arguments[1])->text);
+        FString Error;
+        if (!ValidateDasSoftPath(Path, Error))
+            DSLFail(Error);
+        return MakeShared<FJsonValueString>(Path);
+    }
+    int UpcastDistance(const das::TypeDeclPtr& From, const das::TypeDeclPtr& To) const override
+    {
+        return DSLSoftUpcastDistance(From, To);
+    }
+    das::ExpressionPtr Upcast(const das::LineInfo& At, const das::TypeDeclPtr& From, const das::TypeDeclPtr& To,
+                              das::ExpressionPtr Value) const override
+    {
+        return DSLSoftUpcast(At, From, To, Value);
+    }
+    bool MatchesScriptType(const das::TypeDeclPtr& Type) const override { return DSLSoft(Type); }
+    FString GetTypePath(const das::TypeDeclPtr& Type) const override { return DSLSoftPath(Type); }
+    das::ExpressionPtr Pack(const das::LineInfo& At, das::ExpressionPtr Value) const override
+    {
+        return DSLSoftPack(At, Value->type, Value);
+    }
+    das::ExpressionPtr PackTyped(const das::LineInfo& At, const das::TypeDeclPtr& Type,
+                                 das::ExpressionPtr Value) const override
+    {
+        return DSLSoftPack(At, Type, Value);
+    }
+    das::ExpressionPtr Unpack(const das::LineInfo& At, const das::TypeDeclPtr& Type,
+                              das::ExpressionPtr Value) const override
+    {
+        return DSLSoftUnpack(At, Type, Value);
+    }
+    EDasScriptViewUse GetViewUses() const override { return EDasScriptViewUse::NativeProperty; }
+    das::TypeDeclPtr MakeView(das::ModuleGroup&, das::Module*, const das::LineInfo&) const override { return nullptr; }
+    das::TypeDeclPtr MakeViewForPath(const FString& Path, das::ModuleGroup& Group, das::Module* Module,
+                                     const das::LineInfo& At) const override;
+    const TCHAR* GetViewModule() const override { return TEXT("ue_native_gameplay"); }
+};
