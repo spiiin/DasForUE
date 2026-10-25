@@ -101,6 +101,11 @@ DAS_UE_AOT_TYPE(const FDasTraceHit&, "const FDasTraceHit &")
 DAS_UE_AOT_TYPE(FDasOverlapResult, "FDasOverlapResult")
 DAS_UE_AOT_TYPE(const FDasOverlapResult&, "const FDasOverlapResult &")
 DAS_UE_AOT_TYPE(das::TArray<FDasOverlapResult>&, "TArray<FDasOverlapResult> &")
+// Blocks: generated code passes das_make_block (a das::Block whose body calls the compiled lambda), so the extern
+// invokes it with Context::invoke on both paths.
+using FDasStructEditBlock = das::TBlock<void, FDasStructValue>;
+DAS_UE_AOT_TYPE(const das::TBlock<void>&, "const TBlock<void> &")
+DAS_UE_AOT_TYPE(const FDasStructEditBlock&, "const TBlock<void,FDasStructValue> &")
 // Math values: by const reference, by reference (compound assignments) and as results by value.
 DAS_UE_AOT_TYPE(const FVector&, "const FVector &")
 DAS_UE_AOT_TYPE(FVector&, "FVector &")

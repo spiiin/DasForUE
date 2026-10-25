@@ -194,9 +194,12 @@ Compiled calls check objects, names and texts as the interpreter does and fail w
 location in the script); array results and gameplay calls routed to binds (`Reflects`) are compiled too. A
 script function that calls something without an AOT ABI stays in the interpreter, the rest of the file is still
 compiled. Of
-`ue_foundation`'s own externs, all are compiled except the two that take a block (`ue_struct_edit`,
-`__ue_library_scope`): objects, math values, names, texts, classes, struct snapshots, enums, reflected `UFUNCTION`
-calls through a call frame, traces, UI and input values.
+`ue_foundation`'s own externs, objects, math values, names, texts, classes, enums, reflected `UFUNCTION` calls
+through a call frame, traces, UI and input tokens and externs that take a block (the scope of authored function
+libraries) are compiled. Externs that make struct snapshots and value results (`ue_struct_default`,
+`ue_struct_with_*`, `ue_struct_edit`, geometry, input events, ...) stay interpreted: they may collect snapshots,
+which finds live ones by walking interpreter frames; so does every function that can reach one through other
+functions (the generator logs which). So do the isolated physics VM's externs (`ue_physics_*`).
 
 ## Reload and unloading
 

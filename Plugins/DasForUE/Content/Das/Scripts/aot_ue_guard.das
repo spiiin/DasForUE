@@ -78,6 +78,22 @@ def main(input:int):int {
         var hit : UETraceHit
         return int(v.x*100.0lf+v.y*10.0lf+v.z)+int(r.yaw)*1000+int(hit.distance)+hit.face_index
     }
+    if (input==13) {
+        // An extern that takes a block (the scope of an authored library function) runs the compiled block.
+        var r=1
+        __ue_library_scope(ue_self_object(),false) $() {
+            r+=40
+        }
+        return r
+    }
+    if (input==14) {
+        // An error inside the block: the same on both paths.
+        __ue_library_scope(ue_self_object(),false) $() {
+            let call=ue_begin_static_call("/Script/Engine.KismetMathLibrary","NoSuchFunction","")
+            ue_release_call(call)
+        }
+        return 0
+    }
     if (input==6) {
         // A null handle where an object is required: the extern's own error, the same on both paths.
         return ue_object_valid(ue_cast_object(ue_null_object(),"/Script/CoreUObject.Object")) ? 1 : 0

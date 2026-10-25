@@ -137,6 +137,14 @@ bool RunDasUEAotProbe(FString& Report)
     Check(R.bSucceeded && R.bUsedAot && R.Value == 5, TEXT("call_frame_externs"), R.Error);
     R = Run(12);
     Check(R.bSucceeded && R.bUsedAot && R.Value == 20123, TEXT("value_fields"), R.Error);
+    // A block argument: the compiled block changes a captured variable; an error thrown in the block.
+    R = Run(13);
+    Check(R.bSucceeded && R.bUsedAot && R.Value == 41, TEXT("block_externs"), R.Error);
+    const auto BlockError = Run(14);
+    const auto InterpretedBlockError = Runtime.RunFile(Path, 14, false, Owner.Get());
+    Check(!BlockError.bSucceeded && !InterpretedBlockError.bSucceeded && !Message(BlockError.Error).IsEmpty() &&
+              Message(BlockError.Error) == Message(InterpretedBlockError.Error),
+          TEXT("block_error"), Message(BlockError.Error) + TEXT(" / ") + Message(InterpretedBlockError.Error));
     const auto FrameError = Run(11);
     const auto InterpretedFrameError = Runtime.RunFile(Path, 11, false, Owner.Get());
     Check(!FrameError.bSucceeded && !InterpretedFrameError.bSucceeded && !Message(FrameError.Error).IsEmpty() &&
@@ -222,13 +230,17 @@ bool RunDasUEAotProbe(FString& Report)
     }
     const auto Recovered = Eval(true);
     Check(Recovered.IsEmpty() && Owner->health == 104, TEXT("recovered_without_forbidden_writes"), Recovered);
-    bool Closed = false, Open = false, ObjectOpen = false, FrameOpen = false;
+    bool Closed = false, Open = false, ObjectOpen = false, FrameOpen = false, BlockOpen = false, CollectClosed = false;
     das::Module::require("ue_foundation")
         ->functions.foreach (
             [&](const das::FunctionPtr& Fn)
             {
-                if (Fn->name == "ue_struct_edit") // a block argument has no ABI
+                if (Fn->name == "ue_physics_input") // the isolated physics VM's externs stay interpreted
                     Closed = Fn->noAot;
+                if (Fn->name == "__ue_library_scope") // a block crosses the bridge as a das::Block
+                    BlockOpen = !Fn->noAot;
+                if (Fn->name == "ue_struct_default") // may collect struct snapshots: interpreter frames only
+                    CollectClosed = Fn->noAot;
                 if (Fn->name == "ue_begin_call") // call frame handles cross the bridge as tokens
                     FrameOpen = !Fn->noAot;
                 if (Fn->name == "ue_get_self_int")
@@ -236,7 +248,8 @@ bool RunDasUEAotProbe(FString& Report)
                 if (Fn->name == "ue_self_object")
                     ObjectOpen = !Fn->noAot;
             });
-    Check(Closed && Open && ObjectOpen && FrameOpen, TEXT("unsupported_abi_stays_closed"));
+    Check(Closed && Open && ObjectOpen && FrameOpen && BlockOpen && CollectClosed,
+          TEXT("unsupported_abi_stays_closed"));
     Owner.Reset();
     CollectGarbage(RF_NoFlags);
     const auto Dead = Eval(true);
