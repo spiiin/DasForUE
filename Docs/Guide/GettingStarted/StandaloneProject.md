@@ -92,3 +92,7 @@ An automated check of the template is described in [Testing](../../Dev/Testing.m
 See also: [Install](Install.md) · [Examples](Examples.md) ·
 [Generated bindings](../../Reference/GeneratedBindings.md) ·
 [Modules and type identity](../DSL/ModulesAndTypeIdentity.md)
+
+## Packaged scripts
+
+Plugin fixtures and examples are excluded by default. See [Script staging](ScriptStaging.md) for runtime manifests, explicit example imports and project data files.

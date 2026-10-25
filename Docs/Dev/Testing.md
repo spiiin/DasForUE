@@ -278,3 +278,7 @@ Queue `test-suite ueaot1 ue-aot repo=<repo>-main` through the shared
 build agent. It generates and links the focused UE AOT fixture and runs one
 short strict native-execution/guard check. See [bridge scope and safety
 contract](Plans/UEApiAot.md). This is not full gameplay/GAS AOT acceptance.
+
+## Script staging
+
+The smoke project's Config/DasIncludeTestFixtures.txt explicitly opts into test scripts for packaged regressions. Ordinary projects use the plugin runtime allowlist. Do not copy this marker into release projects. Queue test-suite <unique-id> script-staging repo=<worktree> to validate the actual C# selector. See [Script staging](../Guide/GettingStarted/ScriptStaging.md).
