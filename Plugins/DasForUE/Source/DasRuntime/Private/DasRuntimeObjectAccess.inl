@@ -763,7 +763,7 @@ UClass* CheckedInterface(const char* Path, das::Context* C)
 {
     auto* I = ResolveClass(Path, C);
     if ((!FString(Path).StartsWith(TEXT("/Script/")) && !FString(Path).StartsWith(TEXT("/Game/"))) ||
-          !I->HasAnyClassFlags(CLASS_Interface))
+          !DasInterfaceIdentityMatches(I))
         C->throw_error("expected loaded native UInterface path");
     return I;
 }
@@ -773,7 +773,7 @@ FDasObjectHandle CastInterface(const FDasObjectHandle& Handle, const char* Path,
     if (!Handle.Token)
         return {};
     auto* Object = ResolveObject(Handle, C);
-    if (!Object->GetClass()->ImplementsInterface(Interface))
+    if (!DasImplementsInterface(Object->GetClass(), Interface))
         C->throw_error("object does not implement requested interface");
     return Handle;
 }
@@ -781,21 +781,17 @@ bool ObjectImplementsInterface(const FDasObjectHandle& H, const char* Path, das:
 {
     auto* I = CheckedInterface(Path, C);
     auto* O = TryObject(H, C);
-    return O && O->GetClass()->ImplementsInterface(I);
+    return O && DasImplementsInterface(O->GetClass(), I);
 }
 UFunction* CheckedInterfaceFunction(UObject* O, const char* Path, const char* Name, das::Context* C)
 {
     auto* I = CheckedInterface(Path, C);
-    if (!O->GetClass()->ImplementsInterface(I))
-        C->throw_error("object does not implement requested interface");
     if (!Name || !*Name || FCStringAnsi::Strlen(Name) >= NAME_SIZE)
         C->throw_error("expected bounded interface method name");
-    auto* Declared = I->FindFunctionByName(FName(UTF8_TO_TCHAR(Name)));
-    auto* Actual = O->FindFunction(FName(UTF8_TO_TCHAR(Name)));
-    if (!Declared || !Declared->HasAnyFunctionFlags(FUNC_BlueprintEvent) || !Actual)
-        C->throw_error("reflected interface implementation is unavailable");
-    if (!Actual->IsSignatureCompatibleWith(Declared))
-        C->throw_error("interface dispatch signature mismatch");
+    FString Error;
+    auto* Actual = DasResolveInterfaceFunction(O, I, FName(UTF8_TO_TCHAR(Name)), Error);
+    if (!Actual)
+        C->throw_error(TCHAR_TO_UTF8(*Error));
     return Actual;
 }
 int32 InterfaceCallInt(const FDasObjectHandle& H, const char* Path, const char* Name, int32 Input, das::Context* C);

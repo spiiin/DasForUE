@@ -316,3 +316,34 @@ FProperty, base constraint, StorageIdentity после описания и от�
 Native/computed-default suites проверяют сохранённую обработку reference defaults.
 Архитектурный gate запрещает reference property construction вне адаптера и raw ABI names
 в общих builder/conversion/signature участках DSL.
+
+
+## Interface-контракты (2026-10-25)
+
+Interface references сохраняют Object kind и FInterfaceProperty. Нового value kind или
+второго реестра типов нет. `DasPropertyMatchesContract` использует адаптеры для nominal
+matching параметров/результатов: точный UEnum, PropertyClass/MetaClass, scalar kind и
+зарегистрированный math signature. Byte и Enum8 одного UEnum совместимы как контракт;
+их физическое storage по-прежнему различает property descriptor. Native fixed arrays и
+wide enum underlying отклоняются. Carrier SameType и точный UScriptStruct сохраняют
+существующие правила struct/container ABI. Направления in/out/ref и purity/const остаются
+в interface preflight: это правила метода, а не отдельного типа значения.
+
+`DasInterfaceContracts` предоставляет общие проверки identity, ImplementsInterface и
+разрешение UFunction реализации. Они используются typed interface annotations, preflight,
+runtime cast/membership и dispatch. Эти helpers работают только с уже загруженным UClass.
+Ограничения /Script/ и /Game/ сохраняются на соответствующих входах. Native/обычный
+Blueprint interface не имеет authored ID; UDasAuthoredInterfaceClass требует непустой
+StableId. Generated authored reference обязан совпадать с этим ID.
+
+Interface call frame запоминает StableId отдельно от ключа сигнатуры. Перед ProcessEvent
+проверяются исходная identity, сигнатура объявления, membership и текущая UFunction.
+Изменившийся контракт требует нового frame; формат generated signature key остаётся прежним.
+Время жизни frame ограничено активным вызовом VM, как и раньше: это не долгоживущий handle.
+
+Проверки: foundation покрывает object/class constraints, оба enum storage, scalar contracts,
+fixed/wide rejection и смену/утрату identity. Suite `interface-contracts` запускает существующий
+AuthoredInterface Create/Reopen probe: реальные assets, generated wrappers и reflected calls,
+дополненные проверками общего resolver. Reopen создаёт frame, меняет identity через тестовую native-функцию и проверяет отказ без изменения Score; после восстановления ID новый frame выполняет AddScore. Временный скрипт хранится в Saved, mutation helper — только в test probes. Method-values и automation остаются общей регрессией.
+Физическое хранение/GC interface references и контейнерные правила не менялись. Container
+combinators остаются следующим шагом переноса адаптеров.

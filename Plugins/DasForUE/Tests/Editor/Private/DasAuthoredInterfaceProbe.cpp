@@ -1,4 +1,5 @@
 #include "DasInterfaceService.h"
+#include "DasInterfaceContracts.h"
 #include "DasPureFunctionTestGraph.h"
 #include "DasTypeService.h"
 #include "DasTypeRegistry.h"
@@ -448,6 +449,18 @@ int32 RunDasAuthoredInterfaceProbe(const FString& Id, const FString& Phase)
     if (!Actor)
         return 1;
     Actor->TypeRegistry = ValueRegistry;
+    FString DispatchError;
+    Check(DasResolveInterfaceFunction(Actor, InterfaceBP->GeneratedClass, TEXT("Query"), DispatchError) ==
+                                      Actor->FindFunction(TEXT("Query")),
+                                                          TEXT("shared_authored_interface_dispatch_contract"));
+    Check(!DasResolveInterfaceFunction(Actor, InterfaceBP->GeneratedClass, TEXT("Missing"), DispatchError) &&
+                                       DispatchError.Contains(TEXT("unavailable")),
+                                                              TEXT("shared_interface_missing_method_rejected"));
+    Check(!DasResolveInterfaceFunction(Actor, AActor::StaticClass(), TEXT("Query"), DispatchError),
+                                       TEXT("shared_interface_non_interface_rejected"));
+    const FString SavedInterfaceId = DasInterfaceStableId(InterfaceBP->GeneratedClass);
+    Check(DasInterfaceIdentityMatches(InterfaceBP->GeneratedClass, &SavedInterfaceId),
+          TEXT("shared_authored_interface_saved_identity"));
     RunDasAuthoredInterfaceValues(R, Actor, InterfaceBP->GeneratedClass, Script, Check, true);
     if (Phase == TEXT("Create"))
     {
@@ -545,6 +558,53 @@ int32 RunDasAuthoredInterfaceProbe(const FString& Id, const FString& Phase)
             R.ReleaseObject(Holder);
             Holder->Destroy();
         }
+    }
+    if (Phase == TEXT("Reopen"))
+    {
+        // Keep the frame in one VM scope: handles are intentionally released at scope exit.
+        const FString ProbePath =
+            FPaths::Combine(FPaths::ProjectSavedDir(), TEXT("InterfaceContract_") + Id + TEXT(".das"));
+        const FString InterfacePath = InterfaceBP->GeneratedClass->GetPathName();
+        const FString Source = FString::Printf(TEXT(R"das(options gen2
+require ue_foundation
+[export]
+def main(input:int):int {
+    let pending = ue_begin_interface_call(ue_self_object(), "%s", "AddScore")
+    ue_arg_int(pending, "amount", 3)
+    if (input != 0) {
+        let mutation = ue_begin_static_call("/Script/DasRuntime.DasFunctionLibraryFixture", "ChangeInterfaceIdentityForProbe", "")
+        ue_arg_string(mutation, "Path", "%s")
+        ue_invoke_call(mutation)
+        verify(ue_result_bool(mutation, "ReturnValue"))
+        ue_release_call(mutation)
+    }
+    ue_invoke_call(pending)
+    ue_release_call(pending)
+    return 1
+}
+)das"),
+                                                    *InterfacePath, *InterfacePath);
+        Check(FFileHelper::SaveStringToFile(Source, *ProbePath, FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM),
+              TEXT("write_interface_frame_identity_probe"));
+        auto* Identity = CastChecked<UDasAuthoredInterfaceClass>(InterfaceBP->GeneratedClass);
+        const FString SavedId = Identity->StableId;
+        auto* Score = FindFProperty<FIntProperty>(Actor->GetClass(), TEXT("Score"));
+        const int32 Before = Score->GetPropertyValue_InContainer(Actor);
+        FEditorScriptExecutionGuard Guard;
+        const auto Rejected = R.RunFile(ProbePath, 1, false, Actor);
+        const bool Changed = Identity->StableId != SavedId;
+        Identity->StableId = SavedId;
+        Error = Rejected.Error;
+        Check(Changed && !Rejected.bSucceeded &&
+              Rejected.Error.Contains(TEXT("interface contract changed")) &&
+                                      Score->GetPropertyValue_InContainer(Actor) == Before,
+                                      TEXT("changed_interface_identity_frame_rejected_before_ProcessEvent"));
+        const auto Fresh = R.RunFile(ProbePath, 0, false, Actor);
+        Error = Fresh.Error;
+        Check(Fresh.bSucceeded && Fresh.Value == 1 && Score->GetPropertyValue_InContainer(Actor) == Before + 3,
+              TEXT("restored_interface_identity_fresh_frame_succeeds"));
+        Score->SetPropertyValue_InContainer(Actor, Before);
+        R.ReleaseObject(Actor);
     }
     if (W->IsInitialized())
         W->DestroyWorld(false);

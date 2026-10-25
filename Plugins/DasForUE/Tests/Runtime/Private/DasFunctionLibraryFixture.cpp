@@ -1,3 +1,4 @@
+#include "DasAuthoredInterfaceClass.h"
 #include "DasFunctionLibraryFixture.h"
 #include "Engine/World.h"
 #include "GameFramework/Actor.h"
@@ -34,4 +35,13 @@ TArray<TSubclassOf<AActor>> UDasFunctionLibraryFixture::EchoClassArray(const TAr
 int64 UDasFunctionLibraryFixture::UnsupportedInt64(int64 Value)
 {
     return Value;
+}
+
+bool UDasFunctionLibraryFixture::ChangeInterfaceIdentityForProbe(const FString& Path)
+{
+    auto* Interface = FindObject<UDasAuthoredInterfaceClass>(nullptr, *Path);
+    if (!Interface || !Interface->HasAnyClassFlags(CLASS_Interface))
+        return false;
+    Interface->StableId += TEXT(".ChangedByProbe");
+    return true;
 }

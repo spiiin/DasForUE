@@ -1,3 +1,4 @@
+#include "DasInterfaceContracts.h"
 #include "DasSchema.h"
 #include "UObject/UnrealType.h"
 #include "UObject/ScriptInterface.h"
@@ -25,7 +26,7 @@ UClass* DasReferencePropertyClass(const FProperty* P)
 }
 bool DasReferenceMatches(const UObject* O, const UClass* C)
 {
-    return C && (!O || (C->HasAnyClassFlags(CLASS_Interface) ? O->GetClass()->ImplementsInterface(C) : O->IsA(C)));
+    return C && (!O || (C->HasAnyClassFlags(CLASS_Interface) ? DasImplementsInterface(O->GetClass(), C) : O->IsA(C)));
 }
 UObject* DasReferenceGet(const FProperty* P, const void* M)
 {

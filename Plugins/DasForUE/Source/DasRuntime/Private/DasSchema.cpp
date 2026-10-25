@@ -132,8 +132,9 @@ bool ResolveDasReferenceDefault(bool IsClass, const FString& BasePath, const FSt
             Class && Class->IsChildOf(Base) && !Class->HasAnyClassFlags(CLASS_Deprecated | CLASS_NewerVersionExists);
     }
     else
-        Good &= Out && Out->IsAsset() && !Out->IsA<UClass>() &&
-                (Base->HasAnyClassFlags(CLASS_Interface) ? Out->GetClass()->ImplementsInterface(Base) : Out->IsA(Base));
+        Good &=
+            Out && Out->IsAsset() && !Out->IsA<UClass>() &&
+            (Base->HasAnyClassFlags(CLASS_Interface) ? DasImplementsInterface(Out->GetClass(), Base) : Out->IsA(Base));
     if (!Good)
     {
         Out = nullptr;

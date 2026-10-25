@@ -11,6 +11,10 @@ ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'Plugins',
 
 # Ported type -> (patterns, files allowed to contain them).
 PORTED = {
+    'InterfaceMembership': (
+        [r'->ImplementsInterface\('],
+        {'DasInterfaceContracts.cpp'},
+    ),
     'ReferencePropertyFactory': (
         [r'\bnew F(?:Object|Class|WeakObject|Interface)Property\b'],
         {'DasObjectClassAdapters.cpp'},

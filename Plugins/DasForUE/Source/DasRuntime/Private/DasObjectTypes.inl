@@ -31,12 +31,13 @@ FString DSLTypedReferencePath(const das::TypeDeclPtr& T)
             A = DSLAnnotation(T->structType->annotations, "ue_interface_ref");
         const FString Path = DSLString(A->arguments, "path");
         auto* C = FindObject<UClass>(nullptr, *Path);
-        if (!C || !C->HasAnyClassFlags(CLASS_Interface))
+        if (!DasInterfaceIdentityMatches(C))
             DSLFail(TEXT("Typed interface requires loaded interface"));
         if (A->annotation->name == "ue_interface_ref")
         {
             auto* Authored = Cast<UDasAuthoredInterfaceClass>(C);
-            if (!Authored || Authored->StableId != DSLString(A->arguments, "id"))
+            const FString ExpectedId = DSLString(A->arguments, "id");
+            if (!Authored || !DasInterfaceIdentityMatches(C, &ExpectedId))
                 DSLFail(TEXT("Typed interface stable ID mismatch"));
         }
         return Path;
@@ -206,13 +207,14 @@ struct FUENativeInterfaceAnnotation : das::StructureAnnotation
                 DSLFail(TEXT("Native interface reference requires one UObjectHandle field and path"));
             const FString Path = DSLString(Args, "path");
             auto* Interface = FindObject<UClass>(nullptr, *Path);
-            if (!Interface || !Interface->HasAnyClassFlags(CLASS_Interface))
+            if (!DasInterfaceIdentityMatches(Interface))
                 DSLFail(TEXT("Interface reference requires a loaded interface"));
             if (name == "ue_interface_ref")
             {
                 auto* Authored = Cast<UDasAuthoredInterfaceClass>(Interface);
-                if (!Path.StartsWith(TEXT("/Game/")) || !Authored || DSLString(Args, "id") != Authored->StableId ||
-                                     Authored->StableId.IsEmpty())
+                const FString ExpectedId = DSLString(Args, "id");
+                if (!Path.StartsWith(TEXT("/Game/")) || !Authored ||
+                                     !DasInterfaceIdentityMatches(Interface, &ExpectedId))
                     DSLFail(TEXT("Authored interface reference identity mismatch"));
             }
             else if (!Path.StartsWith(TEXT("/Script/")))

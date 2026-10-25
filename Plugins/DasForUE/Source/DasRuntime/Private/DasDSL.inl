@@ -1172,7 +1172,7 @@ bool DSLValidateOwner(const das::ProgramPtr& Program, const FString& Entry, UObj
                         for (const auto& I : C.Interfaces)
                         {
                             auto* Interface = FindObject<UClass>(nullptr, *I);
-                            if (!Interface || !Self->GetClass()->ImplementsInterface(Interface))
+                            if (!DasImplementsInterface(Self->GetClass(), Interface))
                             {
                                 Error = TEXT("DSL interface differs from owner; apply/reimport Blueprint");
                                 OK = false;

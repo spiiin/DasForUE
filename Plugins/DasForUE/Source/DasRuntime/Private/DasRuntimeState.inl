@@ -149,6 +149,7 @@ struct FMarshalledCall
     TWeakObjectPtr<UClass> RequiredInterface;
     TWeakObjectPtr<UClass> FunctionScopeClass;
     FString InterfaceSignatureKey;
+    FString InterfaceStableId;
     TMap<FString, TSharedPtr<FPendingHash>> PendingHashes;
     TMap<FString, TArray<int32>> HashIndices;
     TFunction<void(void*)> DelegateInvoke;

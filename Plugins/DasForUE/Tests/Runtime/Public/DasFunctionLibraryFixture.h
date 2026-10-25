@@ -8,6 +8,10 @@ class DASRUNTIME_API UDasFunctionLibraryFixture : public UBlueprintFunctionLibra
     GENERATED_BODY()
 public:
     inline static int32 ContextMutations = 0;
+    // Test-only mutation between interface frame creation and invocation.
+    UFUNCTION(BlueprintCallable, Category = "daScript Test")
+    static bool ChangeInterfaceIdentityForProbe(const FString& Path);
+
     UFUNCTION(BlueprintCallable, Category = "daScript Test", meta = (UnsafeDuringActorConstruction = "true"))
     static int32 UnsafeContextProbe() { return ++ContextMutations; }
 

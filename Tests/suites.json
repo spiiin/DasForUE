@@ -32,6 +32,7 @@
     { "name": "gas-cues", "kind": "commandlet", "run": "DasGASCues", "log": "gas-cues-runtime",
       "marker": "DAS_GAS_CUES_RESULT=PASS" },
     { "name": "python", "kind": "python", "log": "combined-python-tests" },
+    { "name": "interface-contracts", "kind": "script", "script": "TestInterfaceContracts.ps1" },
     { "name": "foundation", "kind": "commandlet", "run": "DasSmoke", "log": "combined-editor-foundation",
       "marker": "DAS_FOUNDATION_RESULT=PASS failures=0" },
     { "name": "components-prepare", "kind": "automation", "test": "DasForUE.Components.DynamicPIE",

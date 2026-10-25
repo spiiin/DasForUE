@@ -1,4 +1,7 @@
 #include "DasTypeAdapters.h"
+#include "DasValueKinds.h"
+#include "DasInterfaceContracts.h"
+#include "DasAuthoredInterfaceClass.h"
 #include "DasSoftReferences.h"
 #include "DasDefinedEnum.h"
 #include "Engine/EngineTypes.h"
@@ -53,14 +56,23 @@ bool CheckDasTypeAdapters(FString& Error)
                         continue;
                     }
                     FDasDeclaredType RoundTrip;
-                    const bool Good = Property && Registry.Find(Type) == Adapter &&
-                                      Registry.FindProperty(Property) == Adapter &&
-                                      DasPropertyKind(Property) == Type.GetKind() &&
-                                      bool(CastField<FClassProperty>(Property)) == Class &&
-                                      bool(CastField<FWeakObjectProperty>(Property)) == Weak &&
-                                      bool(CastField<FInterfaceProperty>(Property)) == (!Class && Interface) &&
-                                      DescribeDasProperty(Property, RoundTrip, Error) &&
-                                      RoundTrip.StorageIdentity() == Type.StorageIdentity();
+                    const bool Good =
+                        Property && Registry.Find(Type) == Adapter && Registry.FindProperty(Property) == Adapter &&
+                        DasPropertyKind(Property) == Type.GetKind() &&
+                        bool(CastField<FClassProperty>(Property)) == Class &&
+                        bool(CastField<FWeakObjectProperty>(Property)) == Weak &&
+                        bool(CastField<FInterfaceProperty>(Property)) == (!Class && Interface) &&
+                        DescribeDasProperty(Property, RoundTrip, Error) &&
+                        RoundTrip.StorageIdentity() == Type.StorageIdentity() &&
+                        DasPropertyMatchesContract(Property,
+                                                   Class ? EDasMethodSignature::Class : EDasMethodSignature::Object,
+                                                   Type.TypePath) &&
+                        !DasPropertyMatchesContract(Property,
+                                                    Class ? EDasMethodSignature::Object : EDasMethodSignature::Class,
+                                                    Type.TypePath) &&
+                        !DasPropertyMatchesContract(Property,
+                                                    Class ? EDasMethodSignature::Class : EDasMethodSignature::Object,
+                                                    TEXT("/Wrong.Base"));
                     delete Property;
                     if (!Good)
                     {
@@ -105,7 +117,10 @@ bool CheckDasTypeAdapters(FString& Error)
                         DasPropertyKind(Property) == EDasTypeKind::Enum &&
                         bool(CastField<FEnumProperty>(Property)) == Strong &&
                         DescribeDasProperty(Property, RoundTrip, Error) && RoundTrip.TypePath == Type.TypePath &&
-                        RoundTrip.EnumStorage == (Strong ? EDasEnumStorage::Enum8 : EDasEnumStorage::Byte);
+                        RoundTrip.EnumStorage == (Strong ? EDasEnumStorage::Enum8 : EDasEnumStorage::Byte) &&
+                        DasPropertyMatchesContract(Property, EDasMethodSignature::Enum, Type.TypePath) &&
+                        !DasPropertyMatchesContract(Property, EDasMethodSignature::Byte, Type.TypePath) &&
+                        !DasPropertyMatchesContract(Property, EDasMethodSignature::Enum, TEXT("/Wrong.Enum"));
                     delete Property;
                     if (!Good)
                     {
@@ -176,9 +191,11 @@ bool CheckDasTypeAdapters(FString& Error)
         FDasDeclaredType Declared;
         Declared.Kind = Name;
         FProperty* Property = Adapter->MakeProperty(FFieldVariant(), TEXT("Probe"), Declared, EDasPropertyUsage::Value);
-        const bool Reachable = Registry.Find(Declared) == Adapter && Property &&
-                               Registry.FindProperty(Property) == Adapter &&
-                               DasPropertyKind(Property) == Adapter->GetKind();
+        const bool Reachable =
+            Registry.Find(Declared) == Adapter && Property && Registry.FindProperty(Property) == Adapter &&
+            DasPropertyKind(Property) == Adapter->GetKind() &&
+            (!DasSignatureKind(Adapter->GetKind()).IsSet() ||
+             DasPropertyMatchesContract(Property, DasSignatureKind(Adapter->GetKind()).GetValue(), TEXT("")));
         delete Property;
         if (!Reachable)
         {
@@ -186,5 +203,42 @@ bool CheckDasTypeAdapters(FString& Error)
             return false;
         }
     }
+    // Native fixed arrays and wide enum storage must fail before any class is changed.
+    auto* Fixed = new FIntProperty(FFieldVariant(), TEXT("Fixed"));
+    Fixed->ArrayDim = 2;
+    const bool FixedRejected = !DasPropertyMatchesContract(Fixed, EDasMethodSignature::Int, TEXT(""));
+    delete Fixed;
+    auto* Wide = new FEnumProperty(FFieldVariant(), TEXT("Wide"));
+    Wide->SetEnum(StaticEnum<ESpawnActorCollisionHandlingMethod>());
+    Wide->AddCppProperty(new FIntProperty(Wide, TEXT("UnderlyingType")));
+    const bool WideRejected =
+        !DasPropertyMatchesContract(Wide, EDasMethodSignature::Enum, Wide->GetEnum()->GetPathName());
+    delete Wide;
+    if (!FixedRejected || !WideRejected)
+    {
+        Error = TEXT("Interface contract accepted fixed arrays or wide enums");
+        return false;
+    }
+    TStrongObjectPtr<UDasAuthoredInterfaceClass> Interface(NewObject<UDasAuthoredInterfaceClass>());
+    Interface->ClassFlags |= CLASS_Interface;
+    const FString StableId = TEXT("adapter.Contract");
+    const FString NativeId;
+    if (DasInterfaceIdentityMatches(Interface.Get()))
+    {
+        Error = TEXT("Authored interface accepted an empty identity");
+        return false;
+    }
+    Interface->StableId = StableId;
+    const bool IdentityAccepted = DasInterfaceIdentityMatches(Interface.Get(), &StableId) &&
+                                  !DasInterfaceIdentityMatches(Interface.Get(), &NativeId);
+    Interface->StableId = TEXT("adapter.Replaced");
+    if (!IdentityAccepted || DasInterfaceIdentityMatches(Interface.Get(), &StableId) ||
+        DasInterfaceIdentityMatches(AActor::StaticClass()) ||
+        !DasInterfaceIdentityMatches(UInterface::StaticClass(), &NativeId))
+    {
+        Error = TEXT("Interface contract lost native/authored nominal identity");
+        return false;
+    }
+    Error.Reset();
     return true;
 }

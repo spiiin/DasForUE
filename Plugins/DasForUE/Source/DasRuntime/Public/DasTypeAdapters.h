@@ -84,6 +84,10 @@ private:
     TArray<int32> StructFamilies;
 };
 
+// Nominal call contract: enum storage forms share an identity; object/class bases are exact.
+DASRUNTIME_API bool DasPropertyMatchesContract(const FProperty* Property, EDasMethodSignature Kind,
+                                               const FString& TypePath);
+
 // Leaf value struct (GameplayTag, ...) by path, for authored type validation.
 DASRUNTIME_API const IDasTypeAdapter* DasLeafValueAdapter(const FString& StructPath);
 // Math value struct (Vector, Vector2D, Rotator, Transform) by path.

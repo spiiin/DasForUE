@@ -508,6 +508,7 @@ FDasCallHandle BeginInterfaceCall(const FDasObjectHandle& Target, const char* Pa
     auto& Call = ResolveCall(Handle, C);
     Call.bAuthored = true;
     Call.RequiredInterface = Interface;
+    Call.InterfaceStableId = DasInterfaceStableId(Interface);
     Call.InterfaceSignatureKey = CallSignatureKey(Interface->FindFunctionByName(Call.Function->GetFName()));
     return Handle;
 }
@@ -1055,9 +1056,10 @@ void InvokeCall(const FDasCallHandle& Handle, das::Context* Context)
     {
         auto* Interface = Call.RequiredInterface.Get();
         auto* Declared = Interface ? Interface->FindFunctionByName(Call.Function->GetFName()) : nullptr;
-        if (!Interface || !Object->GetClass()->ImplementsInterface(Interface) || !Declared ||
+        FString Error;
+        if (!DasInterfaceIdentityMatches(Interface, &Call.InterfaceStableId) || !Declared ||
             CallSignatureKey(Declared) != Call.InterfaceSignatureKey ||
-            !Call.Function->IsSignatureCompatibleWith(Declared))
+            DasResolveInterfaceFunction(Object, Interface, Call.Function->GetFName(), Error) != Call.Function.Get())
             Context->throw_error("interface contract changed; create a new interface frame");
     }
     if (!Call.DelegateInvoke &&
