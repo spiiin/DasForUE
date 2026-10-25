@@ -225,6 +225,15 @@ bool RunDasNativeRoutesProbe(UWorld* GameWorld, FString& Report)
          int32(BoundsOrigin.X + BoundsOrigin.Y + BoundsOrigin.Z + BoundsExtent.X + BoundsExtent.Y + BoundsExtent.Z), 1,
          None);
     Case(TEXT("actor_eyes"), 0, 1, None);
+    // Enums (the bind takes and returns their int32 values).
+    Case(TEXT("component_mobility"), 0, 1,
+         [&]
+         {
+             const bool bSet = Child->Mobility == EComponentMobility::Stationary;
+             Child->SetMobility(EComponentMobility::Movable);
+             return bSet;
+         });
+    Case(TEXT("local_role"), int32(Self->GetLocalRole()), 1, None);
 
     // A destroyed receiver or object argument: both paths refuse it with the same message (the files differ only
     // in the option line).

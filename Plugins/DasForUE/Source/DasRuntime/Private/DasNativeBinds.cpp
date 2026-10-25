@@ -1,4 +1,5 @@
 #include "DasNativeBindsRegistry.h"
+#include "UObject/EnumProperty.h"
 #include "DasUEAot.h"
 #include "UObject/Class.h"
 #include "UObject/StrProperty.h"
@@ -285,6 +286,16 @@ bool DasNativeParamOfProperty(const FProperty* P, FDasNativeParam& Out, UClass*&
 }
 bool SameAsProperty(const FDasNativeParam& Bind, const FProperty* P)
 {
+    // An enum: the property is that UENUM (an enum property, or a byte with it).
+    if (Bind.Enum)
+    {
+        const UEnum* Enum = nullptr;
+        if (const auto* EnumProperty = CastField<FEnumProperty>(P))
+            Enum = EnumProperty->GetEnum();
+        else if (const auto* Byte = CastField<FByteProperty>(P))
+            Enum = Byte->Enum;
+        return Enum && P->ArrayDim == 1 && Enum == Bind.Enum();
+    }
     FDasNativeParam Param;
     UClass* ObjectClass = nullptr;
     if (!DasNativeParamOfProperty(P, Param, ObjectClass) || Param.Type != Bind.Type)

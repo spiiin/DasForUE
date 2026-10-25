@@ -4,6 +4,7 @@
 #include "Misc/DateTime.h"
 #include "Misc/Timespan.h"
 #include "Templates/SubclassOf.h"
+#include "UObject/Class.h"
 #include "UObject/Object.h"
 #include <tuple>
 #include <type_traits>
@@ -95,7 +96,8 @@ template <class T> struct TDasNativeType
     static_assert(sizeof(T) == 0,
                   "Unsupported native bind type: use bool, int32, int64, float, double, uint8, FString, FName, "
                   "FText, FDateTime, FTimespan, FVector, FVector2D, FRotator, FQuat, FTransform, FLinearColor, "
-                  "FColor, a pointer to a UObject class, UClass* / TSubclassOf<T> or a TArray<T*> result");
+                  "FColor, a UENUM, a pointer to a UObject class, UClass* / TSubclassOf<T> or a TArray<T*> "
+                  "result");
 };
 #define DAS_NATIVE_TYPE(CppType, Kind)                                                                                 \
     template <> struct TDasNativeType<CppType>                                                                         \
@@ -125,11 +127,32 @@ DAS_NATIVE_TYPE(FColor, Color)
 
 // StaticClass of an object parameter: registration runs before the engine, so classes are resolved later.
 using FDasNativeClassFn = UClass* (*)();
+using FDasNativeEnumFn = UEnum* (*)();
 struct FDasNativeParam
 {
     EDasNativeType Type = EDasNativeType::Void;
     FDasNativeClassFn Class = nullptr; // Object: its class; Class: the base; ObjectArray: the element class
     bool bRef = false;                 // a T& parameter: the script passes a variable the function may change
+    FDasNativeEnumFn Enum = nullptr;   // a UENUM (Int32 in scripts, its value): the enum, for Reflects
+};
+// A UENUM (enum class E, a namespaced E::Type, or TEnumAsByte<E>) crosses as its int32 value.
+template <class T, class = void> struct TDasNativeEnum
+{
+    static constexpr bool Value = false;
+};
+template <class T> struct TDasNativeEnum<T, std::enable_if_t<std::is_enum_v<T>>>
+{
+    static constexpr bool Value = true;
+    using Type = T;
+    static int32 ToInt(const T& V) { return static_cast<int32>(V); }
+    static UEnum* Of() { return StaticEnum<T>(); }
+};
+template <class E> struct TDasNativeEnum<TEnumAsByte<E>>
+{
+    static constexpr bool Value = true;
+    using Type = E;
+    static int32 ToInt(const TEnumAsByte<E>& V) { return static_cast<int32>(V.GetValue()); }
+    static UEnum* Of() { return StaticEnum<E>(); }
 };
 // A T& parameter that is not const.
 template <class T>
@@ -172,6 +195,11 @@ template <class T> FDasNativeParam DasNativeParamOf()
         static_assert(std::is_base_of_v<UObject, C>, "Native bind pointers must point to UObject classes");
         static_assert(!TDasNativeIsRef<T>, "Object parameters cannot be references");
         return {EDasNativeType::Object, &C::StaticClass};
+    }
+    else if constexpr (TDasNativeEnum<D>::Value)
+    {
+        static_assert(!TDasNativeIsRef<T>, "Enum parameters cannot be references");
+        return {EDasNativeType::Int32, nullptr, false, &TDasNativeEnum<D>::Of};
     }
     else
     {
@@ -222,7 +250,7 @@ struct FDasNativeAbiNone
 {
 };
 // Arg: a parameter, RefArg: a T& parameter (copied in and written back with FromCpp), Result: the result.
-template <class T> struct TDasNativeAbi
+template <class T, class = void> struct TDasNativeAbi
 {
     static constexpr bool Supported = false;
     using Arg = FDasNativeAbiNone;
@@ -330,6 +358,16 @@ template <class T> struct TDasNativeAbi<TArray<T*>>
         return DasNativeAotObjects(reinterpret_cast<UObject* const*>(Value.GetData()), Value.Num(),
                                    std::remove_cv_t<T>::StaticClass(), Context);
     }
+};
+// A UENUM as its int32 value.
+template <class T> struct TDasNativeAbi<T, std::enable_if_t<TDasNativeEnum<T>::Value>>
+{
+    static constexpr bool Supported = true;
+    using Arg = int32;
+    using RefArg = FDasNativeAbiNone;
+    using Result = int32;
+    static T ToCpp(int32 Value) { return T(static_cast<typename TDasNativeEnum<T>::Type>(Value)); }
+    static int32 FromCpp(const T& Value, das::Context*) { return TDasNativeEnum<T>::ToInt(Value); }
 };
 template <> struct TDasNativeAbi<FDateTime>
 {
@@ -513,6 +551,8 @@ private:
             return D(*static_cast<UClass**>(P));
         else if constexpr (std::is_pointer_v<D>)
             return static_cast<D>(*static_cast<UObject**>(P));
+        else if constexpr (TDasNativeEnum<D>::Value) // the slot holds the int32 value
+            return D(static_cast<typename TDasNativeEnum<D>::Type>(*static_cast<int32*>(P)));
         else
             return *static_cast<D*>(P);
     }
@@ -531,6 +571,8 @@ private:
             for (const auto* Value : Values)
                 Objects.Add(const_cast<UObject*>(static_cast<const UObject*>(Value)));
         }
+        else if constexpr (TDasNativeEnum<std::decay_t<R>>::Value)
+            *static_cast<int32*>(Out) = TDasNativeEnum<std::decay_t<R>>::ToInt(Call());
         else
             *static_cast<std::decay_t<R>*>(Out) = Call();
     }

@@ -53,6 +53,8 @@ DAS_ENGINE_FN(GetActorBounds,
               A.GetActorBounds(bOnlyColliding, Origin, Extent, bChildActors))
 DAS_ENGINE_FN(GetActorEyesViewPoint, (const AActor& A, FVector& Location, FRotator& Rotation),
               A.GetActorEyesViewPoint(Location, Rotation))
+// Enums pass as their int32 values (gameplay calls convert the script's native enums).
+DAS_ENGINE_FN(GetLocalRole, (const AActor& A), A.GetLocalRole())
 // Actor: state.
 DAS_ENGINE_FN(IsHidden, (const AActor& A), A.IsHidden())
 DAS_ENGINE_FN(SetActorHiddenInGame, (AActor & A, bool bHidden), A.SetActorHiddenInGame(bHidden))
@@ -127,6 +129,7 @@ DAS_ENGINE_FN(GetSocketRotation, (const USceneComponent& C, FName Socket), C.Get
 DAS_ENGINE_FN(DoesSocketExist, (const USceneComponent& C, FName Socket), C.DoesSocketExist(Socket))
 DAS_ENGINE_FN(GetComponentVelocity, (const USceneComponent& C), C.GetComponentVelocity())
 DAS_ENGINE_FN(SetComponentVelocity, (USceneComponent & C, const FVector& V), void(C.ComponentVelocity = V))
+DAS_ENGINE_FN(SetMobility, (USceneComponent & C, EComponentMobility::Type Mobility), C.SetMobility(Mobility))
 // SceneComponent: attachment and visibility.
 DAS_ENGINE_FN(GetAttachParent, (const USceneComponent& C), C.GetAttachParent())
 DAS_ENGINE_FN(GetAttachSocketName, (const USceneComponent& C), C.GetAttachSocketName())
@@ -262,6 +265,7 @@ DAS_NATIVE_BINDS(UEEngine, "ue_engine")
     Actor.Method<GetActorUpVector>(TEXT("get_actor_up_vector")).Reflects(TEXT("GetActorUpVector"));
     Actor.Method<GetActorBounds>(TEXT("get_actor_bounds")).Reflects(TEXT("GetActorBounds"));
     Actor.Method<GetActorEyesViewPoint>(TEXT("get_actor_eyes_view_point")).Reflects(TEXT("GetActorEyesViewPoint"));
+    Actor.Method<GetLocalRole>(TEXT("get_local_role")).Reflects(TEXT("GetLocalRole"));
     // NonNullArgs (null is an error here), while the UFUNCTIONs return 0 for null: these do not reflect them.
     Actor.Method<GetDistanceTo>(TEXT("get_distance_to"), EDasBind::NonNullArgs);
     Actor.Method<GetSquaredDistanceTo>(TEXT("get_squared_distance_to"), EDasBind::NonNullArgs);
@@ -325,6 +329,7 @@ DAS_NATIVE_BINDS(UEEngine, "ue_engine")
     Scene.Method<GetComponentRotation>(TEXT("get_component_rotation")).Reflects(TEXT("K2_GetComponentRotation"));
     Scene.Method<GetComponentTransform>(TEXT("get_component_transform")).Reflects(TEXT("K2_GetComponentToWorld"));
     Scene.Method<SetWorldLocation>(TEXT("set_world_location"));
+    Scene.Method<SetMobility>(TEXT("set_mobility")).Reflects(TEXT("SetMobility"));
     Scene.Method<SetWorldRotation>(TEXT("set_world_rotation"));
     Scene.Method<GetRelativeLocation>(TEXT("get_relative_location"));
     Scene.Method<SetRelativeLocation>(TEXT("set_relative_location"));

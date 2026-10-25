@@ -952,7 +952,8 @@ das::ExpressionPtr DSLMethodArgumentDefault(bool Native, const FDasDeclaredParam
 FString DasNativeRoutePolicy(const UFunction* Function, const UClass* Receiver);
 FString DasNativeRouteTypes(const FDasNativeRoute& Route, const das::ModuleLibrary& Lib,
                             const das::vector<das::TypeDeclPtr>& Types,
-                            TFunctionRef<FString(const das::TypeDeclPtr&)> ObjectPath);
+                            TFunctionRef<FString(const das::TypeDeclPtr&)> ObjectPath,
+                            TFunctionRef<FString(const das::TypeDeclPtr&)> EnumPath);
 // A native gameplay method that a native bind reflects (DasNativeBinds.h, Reflects) calls that bind: the wrapper has
 // the method's name, parameters and defaults and calls the bind's route (SimNode_DasNativeRoute) with the
 // receiver's handle and class path; object arguments pass their handles, an object result becomes the method's
@@ -991,8 +992,18 @@ bool DSLEmitRoutedMethod(das::Program* Program, das::Module* Module, const das::
     {
         return DSLTypedObject(T) ? DSLTypedReferencePath(T) : FString();
     };
+    // A native enum (ue_native_enum, values as in Unreal) passes to the bind as its int32 value.
+    auto EnumPath = [](const das::TypeDeclPtr& T)
+    {
+        if (!DSLNativeEnum(T))
+            return FString();
+        return DSLString(DSLAnnotation(T->enumType->annotations, "ue_native_enum")->arguments, "path");
+    };
+    for (int32 Index = 0; Why.IsEmpty() && Index < Method.Parameters.Num(); ++Index)
+        if (Method.Parameters[Index].Direction != TEXT("in") && !EnumPath(Types[size_t(Index) + 1]).IsEmpty())
+            Why = TEXT("an enum output parameter");
     if (Why.IsEmpty())
-        Why = DasNativeRouteTypes(Route, *Program->thisModuleGroup, Types, ObjectPath);
+        Why = DasNativeRouteTypes(Route, *Program->thisModuleGroup, Types, ObjectPath, EnumPath);
     if (!Why.IsEmpty())
     {
         UE_LOG(LogDasRuntime, Verbose, TEXT("%s.%s keeps the reflected call: %s"), *ClassPath, *DSLText(Name), *Why);
@@ -1049,6 +1060,8 @@ bool DSLEmitRoutedMethod(das::Program* Program, das::Module* Module, const das::
         }
         else if (!ObjectPath(Arg->type).IsEmpty())
             Value = new das::ExprField(At, Value, "handle");
+        else if (!EnumPath(Arg->type).IsEmpty())
+            Value = DSLCall(At, "int", {Value});
         Arguments.push_back(Value);
     }
     auto* Call = DSLCall(At, DSLUtf8(Route.Function->RouteName), {});
@@ -1056,6 +1069,18 @@ bool DSLEmitRoutedMethod(das::Program* Program, das::Module* Module, const das::
     das::ExpressionPtr Result = Call;
     if (!ObjectPath(Fn->result).IsEmpty())
         Result = DSLNativeReferenceUnpack(At, Fn->result, Call);
+    else if (!EnumPath(Fn->result).IsEmpty())
+    {
+        // The bind's int32 value as the script enum (the same values as in Unreal).
+        auto Type = DSLCopyType(Fn->result);
+        Type->ref = false;
+        Type->constant = false;
+        auto* Cast = new das::ExprCast(At, Call, Type);
+        Cast->reinterpret = true;
+        auto* Unsafe = new das::ExprUnsafe(At);
+        Unsafe->body = Cast;
+        Result = Unsafe;
+    }
     if (Fn->result->baseType == das::Type::tVoid)
         Block->list.push_back(Call);
     else if (OutCopies.empty())

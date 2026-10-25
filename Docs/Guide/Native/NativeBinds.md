@@ -180,7 +180,10 @@ an event, static, network or editor-only function, and has the same result and p
 output parameter as a `T&` parameter of the bind (`GetActorBounds(bool, FVector& Origin, FVector& Extent, bool)`)
 and an input one as a value; the bind is not `NonNullArgs` (reflection passes `nullptr`); one bind per `UFUNCTION`.
 A mismatch makes the module unavailable with the reason. An output argument behaves as on reflection: it starts
-from the default value and gets the result only when the call succeeds.
+from the default value and gets the result only when the call succeeds. A `UENUM` parameter or result (`enum class
+E`, `E::Type`, `TEnumAsByte<E>`) is its `int32` value in the bind (`set_mobility(int)` from a script); a gameplay
+call passes the script's native enum (`c.SetMobility(EComponentMobility.Movable)`) and gets one back
+(`a.GetLocalRole()`). Enums cannot be references, so an enum output parameter keeps the reflected call.
 
 The gameplay call stays on reflection when the `UFUNCTION` requires authority or is unsafe in construction
 scripts (the reflected call checks these), when its script types differ from the bind's (an object must be the

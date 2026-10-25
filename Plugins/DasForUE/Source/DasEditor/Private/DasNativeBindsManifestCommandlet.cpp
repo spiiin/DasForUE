@@ -97,6 +97,8 @@ int32 UDasNativeBindsManifestCommandlet::Main(const FString& Params)
           TPair<const TCHAR*, const TCHAR*>(TEXT("USceneComponent.get_attach_parent"), TEXT("routed")),
           TPair<const TCHAR*, const TCHAR*>(TEXT("AActor.get_actor_bounds"), TEXT("routed")),
           TPair<const TCHAR*, const TCHAR*>(TEXT("AActor.get_actor_eyes_view_point"), TEXT("routed")),
+          TPair<const TCHAR*, const TCHAR*>(TEXT("AActor.get_local_role"), TEXT("routed")),
+          TPair<const TCHAR*, const TCHAR*>(TEXT("USceneComponent.set_mobility"), TEXT("routed")),
           TPair<const TCHAR*, const TCHAR*>(TEXT("AActor.set_replicates"), TEXT("requires authority"))})
         if (const FString* Got = Routes.Find(Expected.Key); !Got || *Got != Expected.Value)
         {

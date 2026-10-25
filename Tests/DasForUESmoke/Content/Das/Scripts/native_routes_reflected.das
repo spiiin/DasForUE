@@ -151,6 +151,17 @@ def actor_eyes(input:int):int {
     a.GetActorEyesViewPoint(location, rotation)
     return near(location, ue_vector(100.0lf, 200.0lf, 300.0lf)) && abs(rotation.yaw - 90.0lf) < 0.001lf ? 0 : 1
 }
+// Enums (the bind takes and returns their int32 values): a native enum argument and result.
+[export]
+def component_mobility(input:int):int {
+    let c = ue_ref(type<SceneComponentRef>, smoke_routes_child())
+    c.SetMobility(EComponentMobility.Stationary)
+    return 0
+}
+[export]
+def local_role(input:int):int {
+    return int(self_actor().GetLocalRole())
+}
 // An expired object argument: both paths refuse it with the same message.
 [export]
 def destroyed_argument(input:int):int {

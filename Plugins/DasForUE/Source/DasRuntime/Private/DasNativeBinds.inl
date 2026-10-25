@@ -780,7 +780,8 @@ FString DasNativeRoutePolicy(const UFunction* Function, const UClass* Receiver)
 // for any other type), which must be the bind's class.
 FString DasNativeRouteTypes(const FDasNativeRoute& Route, const das::ModuleLibrary& Lib,
                             const das::vector<das::TypeDeclPtr>& Types,
-                            TFunctionRef<FString(const das::TypeDeclPtr&)> ObjectPath)
+                            TFunctionRef<FString(const das::TypeDeclPtr&)> ObjectPath,
+                            TFunctionRef<FString(const das::TypeDeclPtr&)> EnumPath)
 {
     const FDasNativeFunctionDesc& F = *Route.Function;
     if (F.RouteName.IsEmpty())
@@ -792,6 +793,9 @@ FString DasNativeRouteTypes(const FDasNativeRoute& Route, const das::ModuleLibra
     {
         if (P.Type == EDasNativeType::Object)
             return R.Class && ObjectPath(Script) == R.Class->GetPathName();
+        // An enum of the bind (its int32 value) matches the script's native enum of the same UENUM.
+        if (P.Enum)
+            return P.Enum() && EnumPath(Script) == P.Enum()->GetPathName();
         const auto Bind = DasNativeTypeDecl(P, R, Lib, bArgument);
         return Script->isSameType(*Bind, das::RefMatters::no, das::ConstMatters::no, das::TemporaryMatters::no);
     };
