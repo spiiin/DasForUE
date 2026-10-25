@@ -32,6 +32,72 @@ struct FDasTextValue
 {
     uint64 Token = 0;
 };
+// Tokens of the context's tables: enum values, constraints, hit results, struct snapshots, UI values (event
+// replies, widget animations, paint contexts, geometry, input events) and reflected call frames (UCallHandle).
+struct FDasEnumValue
+{
+    uint64 Token = 0;
+};
+struct FDasConstraintHandle
+{
+    uint64 Token = 0;
+};
+struct FDasHitResultValue
+{
+    uint64 Token = 0;
+};
+struct FDasStructValue
+{
+    uint64 Token = 0;
+};
+struct FDasEventReplyValue
+{
+    uint64 Token = 0;
+};
+struct FDasWidgetAnimationValue
+{
+    uint64 Token = 0;
+};
+struct FDasPaintValue
+{
+    uint64 Token = 0;
+};
+struct FDasGeometryValue
+{
+    uint64 Token = 0;
+};
+struct FDasInputEventValue
+{
+    uint64 Token = 0;
+};
+struct FDasKeyEventValue
+{
+    uint64 Token = 0;
+};
+struct FDasAnalogInputEventValue
+{
+    uint64 Token = 0;
+};
+struct FDasCharacterEventValue
+{
+    uint64 Token = 0;
+};
+struct FDasPointerEventValue
+{
+    uint64 Token = 0;
+};
+struct FDasFocusEventValue
+{
+    uint64 Token = 0;
+};
+struct FDasNavigationEventValue
+{
+    uint64 Token = 0;
+};
+struct FDasCallHandle
+{
+    uint64 Token = 0;
+};
 // An array as the script holds it (array<T>), in the layout of das::Array (DasRuntime checks it): native binds
 // return arrays of objects in it, the AOT bridge hands generated code a das::TArray.
 struct alignas(8) FDasArrayValue

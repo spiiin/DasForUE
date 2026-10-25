@@ -569,7 +569,7 @@ __ue_widget_unhandled	@ue_foundation::__ue_widget_unhandled C_c	ue_foundation::U
 __ue_widget_unlock	@ue_foundation::__ue_widget_unlock CIH<ue_foundation::UEEventReply> C_c	ue_foundation::UEEventReply	4
 __ue_widget_visible	@ue_foundation::__ue_widget_visible CIH<ue_foundation::UObjectHandle> C_c	bool const	4
 ue_actor_destroy_handle	@ue_foundation::ue_actor_destroy_handle CIH<ue_foundation::UObjectHandle> C_c	bool const	4
-ue_add	@ue_foundation::ue_add Ci Ci	int const	4
+ue_add	@ue_foundation::ue_add Ci Ci C_c	int const	4
 ue_arg_array	@ue_foundation::ue_arg_array CIH<ue_foundation::UCallHandle> CIs Ci C_c	void	4
 ue_arg_bool	@ue_foundation::ue_arg_bool CIH<ue_foundation::UCallHandle> CIs Cb C_c	void	4
 ue_arg_byte	@ue_foundation::ue_arg_byte CIH<ue_foundation::UCallHandle> CIs Ci C_c	void	4
@@ -605,7 +605,7 @@ ue_cast_nullable_object	@ue_foundation::ue_cast_nullable_object CIH<ue_foundatio
 ue_cast_object	@ue_foundation::ue_cast_object CIH<ue_foundation::UObjectHandle> CIs C_c	ue_foundation::UObjectHandle	4
 ue_clamp_length	@ue_foundation::ue_clamp_length CIH<ue_foundation::UEVector2D> Cd C_c	ue_foundation::UEVector2D	4
 ue_clamp_length	@ue_foundation::ue_clamp_length CIH<ue_foundation::UEVector> Cd C_c	ue_foundation::UEVector	4
-ue_class_null	@ue_foundation::ue_class_null	ue_foundation::UEClassHandle	4
+ue_class_null	@ue_foundation::ue_class_null C_c	ue_foundation::UEClassHandle	4
 ue_class_path	@ue_foundation::ue_class_path CH<ue_foundation::UEClassHandle> C_c	string const	4
 ue_class_valid	@ue_foundation::ue_class_valid CH<ue_foundation::UEClassHandle> C_c	bool const	4
 ue_color	@ue_foundation::ue_color Ci Ci Ci Ci C_c	ue_foundation::UEColor	4

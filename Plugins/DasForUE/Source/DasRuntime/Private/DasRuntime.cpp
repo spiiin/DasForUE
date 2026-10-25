@@ -218,11 +218,7 @@ template <> struct ext_ret_to_carrier<FDasPhysicsBodyToken, uint64_t>
 };
 }
 // No fields are exposed to scripts: this is a context-local capability, never a pointer.
-struct FDasEnumValue
-{
-    uint64 Token = 0;
-};
-MAKE_TYPE_FACTORY(UEEnumValue, FDasEnumValue);
+MAKE_TYPE_FACTORY(UEEnumValue, FDasEnumValue); // DasScriptValues.h
 namespace das
 {
 template <> struct cast<FDasEnumValue>
@@ -312,11 +308,7 @@ template <> struct ext_ret_to_carrier<FDasClassHandle, uint64_t>
 };
 }
 
-struct FDasConstraintHandle
-{
-    uint64 Token = 0;
-};
-MAKE_TYPE_FACTORY(UEConstraintHandle, FDasConstraintHandle);
+MAKE_TYPE_FACTORY(UEConstraintHandle, FDasConstraintHandle); // DasScriptValues.h
 namespace das
 {
 template <> struct cast<FDasConstraintHandle>
@@ -325,11 +317,7 @@ template <> struct cast<FDasConstraintHandle>
     static FDasConstraintHandle to(vec4f V) { return {cast<uint64_t>::to(V)}; }
 };
 }
-struct FDasHitResultValue
-{
-    uint64 Token = 0;
-};
-MAKE_TYPE_FACTORY(UEHitResult, FDasHitResultValue);
+MAKE_TYPE_FACTORY(UEHitResult, FDasHitResultValue); // DasScriptValues.h
 namespace das
 {
 template <> struct cast<FDasHitResultValue>
@@ -340,11 +328,7 @@ template <> struct cast<FDasHitResultValue>
 
 
 }
-struct FDasStructValue
-{
-    uint64 Token = 0;
-};
-MAKE_TYPE_FACTORY(UEStructValue, FDasStructValue);
+MAKE_TYPE_FACTORY(UEStructValue, FDasStructValue); // DasScriptValues.h
 namespace das
 {
 template <> struct cast<FDasStructValue>
@@ -354,16 +338,8 @@ template <> struct cast<FDasStructValue>
 };
 }
 // Owned numeric snapshot, not the unreflected native layout and not a context token.
-struct FDasEventReplyValue
-{
-    uint64 Token = 0;
-};
-MAKE_TYPE_FACTORY(UEEventReply, FDasEventReplyValue);
-struct FDasWidgetAnimationValue
-{
-    uint64 Token = 0;
-};
-MAKE_TYPE_FACTORY(UEWidgetAnimationHandle, FDasWidgetAnimationValue);
+MAKE_TYPE_FACTORY(UEEventReply, FDasEventReplyValue); // DasScriptValues.h
+MAKE_TYPE_FACTORY(UEWidgetAnimationHandle, FDasWidgetAnimationValue); // DasScriptValues.h
 namespace das
 {
 template <> struct cast<FDasWidgetAnimationValue>
@@ -372,11 +348,7 @@ template <> struct cast<FDasWidgetAnimationValue>
     static FDasWidgetAnimationValue to(vec4f V) { return {cast<uint64_t>::to(V)}; }
 };
 }
-struct FDasPaintValue
-{
-    uint64 Token = 0;
-};
-MAKE_TYPE_FACTORY(UEPaintContext, FDasPaintValue);
+MAKE_TYPE_FACTORY(UEPaintContext, FDasPaintValue); // DasScriptValues.h
 namespace das
 {
 template <> struct cast<FDasPaintValue>
@@ -385,11 +357,7 @@ template <> struct cast<FDasPaintValue>
     static FDasPaintValue to(vec4f V) { return {cast<uint64_t>::to(V)}; }
 };
 }
-struct FDasGeometryValue
-{
-    uint64 Token = 0;
-};
-MAKE_TYPE_FACTORY(UEGeometry, FDasGeometryValue);
+MAKE_TYPE_FACTORY(UEGeometry, FDasGeometryValue); // DasScriptValues.h
 namespace das
 {
 template <> struct cast<FDasGeometryValue>
@@ -398,11 +366,7 @@ template <> struct cast<FDasGeometryValue>
     static FDasGeometryValue to(vec4f V) { return {cast<uint64_t>::to(V)}; }
 };
 }
-struct FDasInputEventValue
-{
-    uint64 Token = 0;
-};
-MAKE_TYPE_FACTORY(UEInputEvent, FDasInputEventValue);
+MAKE_TYPE_FACTORY(UEInputEvent, FDasInputEventValue); // DasScriptValues.h
 namespace das
 {
 template <> struct cast<FDasInputEventValue>
@@ -411,11 +375,7 @@ template <> struct cast<FDasInputEventValue>
     static FDasInputEventValue to(vec4f V) { return {cast<uint64_t>::to(V)}; }
 };
 }
-struct FDasKeyEventValue
-{
-    uint64 Token = 0;
-};
-MAKE_TYPE_FACTORY(UEKeyEvent, FDasKeyEventValue);
+MAKE_TYPE_FACTORY(UEKeyEvent, FDasKeyEventValue); // DasScriptValues.h
 namespace das
 {
 template <> struct cast<FDasKeyEventValue>
@@ -424,11 +384,7 @@ template <> struct cast<FDasKeyEventValue>
     static FDasKeyEventValue to(vec4f V) { return {cast<uint64_t>::to(V)}; }
 };
 }
-struct FDasAnalogInputEventValue
-{
-    uint64 Token = 0;
-};
-MAKE_TYPE_FACTORY(UEAnalogInputEvent, FDasAnalogInputEventValue);
+MAKE_TYPE_FACTORY(UEAnalogInputEvent, FDasAnalogInputEventValue); // DasScriptValues.h
 namespace das
 {
 template <> struct cast<FDasAnalogInputEventValue>
@@ -437,11 +393,7 @@ template <> struct cast<FDasAnalogInputEventValue>
     static FDasAnalogInputEventValue to(vec4f V) { return {cast<uint64_t>::to(V)}; }
 };
 }
-struct FDasCharacterEventValue
-{
-    uint64 Token = 0;
-};
-MAKE_TYPE_FACTORY(UECharacterEvent, FDasCharacterEventValue);
+MAKE_TYPE_FACTORY(UECharacterEvent, FDasCharacterEventValue); // DasScriptValues.h
 namespace das
 {
 template <> struct cast<FDasCharacterEventValue>
@@ -450,11 +402,7 @@ template <> struct cast<FDasCharacterEventValue>
     static FDasCharacterEventValue to(vec4f V) { return {cast<uint64_t>::to(V)}; }
 };
 }
-struct FDasPointerEventValue
-{
-    uint64 Token = 0;
-};
-MAKE_TYPE_FACTORY(UEPointerEvent, FDasPointerEventValue);
+MAKE_TYPE_FACTORY(UEPointerEvent, FDasPointerEventValue); // DasScriptValues.h
 namespace das
 {
 template <> struct cast<FDasPointerEventValue>
@@ -463,11 +411,7 @@ template <> struct cast<FDasPointerEventValue>
     static FDasPointerEventValue to(vec4f V) { return {cast<uint64_t>::to(V)}; }
 };
 }
-struct FDasFocusEventValue
-{
-    uint64 Token = 0;
-};
-MAKE_TYPE_FACTORY(UEFocusEvent, FDasFocusEventValue);
+MAKE_TYPE_FACTORY(UEFocusEvent, FDasFocusEventValue); // DasScriptValues.h
 namespace das
 {
 template <> struct cast<FDasFocusEventValue>
@@ -476,11 +420,7 @@ template <> struct cast<FDasFocusEventValue>
     static FDasFocusEventValue to(vec4f V) { return {cast<uint64_t>::to(V)}; }
 };
 }
-struct FDasNavigationEventValue
-{
-    uint64 Token = 0;
-};
-MAKE_TYPE_FACTORY(UENavigationEvent, FDasNavigationEventValue);
+MAKE_TYPE_FACTORY(UENavigationEvent, FDasNavigationEventValue); // DasScriptValues.h
 namespace das
 {
 template <> struct cast<FDasNavigationEventValue>
@@ -525,11 +465,7 @@ struct FDasOverlapResult
     FDasObjectHandle Actor{}, Component{}, PhysicsObjectOwner{};
 };
 MAKE_TYPE_FACTORY(UEOverlapResult, FDasOverlapResult);
-struct FDasCallHandle
-{
-    uint64 Token = 0;
-};
-MAKE_TYPE_FACTORY(UCallHandle, FDasCallHandle);
+MAKE_TYPE_FACTORY(UCallHandle, FDasCallHandle); // DasScriptValues.h
 
 DEFINE_LOG_CATEGORY_STATIC(LogDasRuntime, Log, All);
 

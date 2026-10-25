@@ -56,6 +56,21 @@ def main(input:int):int {
         if (ue_text_to_string(ue_text_invariant("hello"))=="hello") { r+=4 }
         return r
     }
+    if (input==10) {
+        // A reflected UFUNCTION call through a call frame (UCallHandle) is compiled.
+        let call=ue_begin_static_call("/Script/Engine.KismetMathLibrary","Abs_Int","")
+        ue_arg_int(call,"a",-5)
+        ue_invoke_call(call)
+        let r=ue_result_int(call,"returnvalue")
+        ue_release_call(call)
+        return r
+    }
+    if (input==11) {
+        // A missing UFUNCTION: the extern's own error, the same on both paths.
+        let call=ue_begin_static_call("/Script/Engine.KismetMathLibrary","NoSuchFunction","")
+        ue_release_call(call)
+        return 0
+    }
     if (input==6) {
         // A null handle where an object is required: the extern's own error, the same on both paths.
         return ue_object_valid(ue_cast_object(ue_null_object(),"/Script/CoreUObject.Object")) ? 1 : 0

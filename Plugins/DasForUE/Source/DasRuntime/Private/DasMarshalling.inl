@@ -1138,7 +1138,8 @@ char* GetCallEnum(const FDasCallHandle& Handle, const char* Path, const char* Ty
     return Context->allocateString(Utf8.Get(), Utf8.Length(), nullptr);
 }
 
-FDasClassHandle NullClass()
+// The context is unused: an AOT-eligible extern takes exactly one (DasUEAot.h).
+FDasClassHandle NullClass(das::Context*)
 {
     return {};
 }

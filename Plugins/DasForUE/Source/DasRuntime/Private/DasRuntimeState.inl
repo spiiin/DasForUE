@@ -434,7 +434,8 @@ void SetStateInt(const char* Name, int32 Value, das::Context* Context)
     ActiveContext->PersistentInts.Add(UTF8_TO_TCHAR(Name), Value);
 }
 
-int32 NativeAdd(int32 A, int32 B)
+// The context is unused: an AOT-eligible extern takes exactly one (DasUEAot.h).
+int32 NativeAdd(int32 A, int32 B, das::Context*)
 {
     return A + B;
 }

@@ -132,6 +132,14 @@ bool RunDasUEAotProbe(FString& Report)
     // Names and texts (their tokens cross the bridge).
     R = Run(9);
     Check(R.bSucceeded && R.bUsedAot && R.Value == 7, TEXT("name_text_externs"), R.Error);
+    // A reflected call frame, and the error of a missing function.
+    R = Run(10);
+    Check(R.bSucceeded && R.bUsedAot && R.Value == 5, TEXT("call_frame_externs"), R.Error);
+    const auto FrameError = Run(11);
+    const auto InterpretedFrameError = Runtime.RunFile(Path, 11, false, Owner.Get());
+    Check(!FrameError.bSucceeded && !InterpretedFrameError.bSucceeded && !Message(FrameError.Error).IsEmpty() &&
+              Message(FrameError.Error) == Message(InterpretedFrameError.Error),
+          TEXT("call_frame_error"), Message(FrameError.Error) + TEXT(" / ") + Message(InterpretedFrameError.Error));
     R = Run(1);
     Check(!R.bSucceeded && !R.Error.IsEmpty(), TEXT("missing_property_refused"), R.Error);
     R = Run(2);
@@ -212,19 +220,21 @@ bool RunDasUEAotProbe(FString& Report)
     }
     const auto Recovered = Eval(true);
     Check(Recovered.IsEmpty() && Owner->health == 104, TEXT("recovered_without_forbidden_writes"), Recovered);
-    bool Closed = false, Open = false, ObjectOpen = false;
+    bool Closed = false, Open = false, ObjectOpen = false, FrameOpen = false;
     das::Module::require("ue_foundation")
         ->functions.foreach (
             [&](const das::FunctionPtr& Fn)
             {
-                if (Fn->name == "ue_begin_call") // a call frame handle has no ABI
+                if (Fn->name == "ue_struct_edit") // a block argument has no ABI
                     Closed = Fn->noAot;
+                if (Fn->name == "ue_begin_call") // call frame handles cross the bridge as tokens
+                    FrameOpen = !Fn->noAot;
                 if (Fn->name == "ue_get_self_int")
                     Open = !Fn->noAot;
                 if (Fn->name == "ue_self_object")
                     ObjectOpen = !Fn->noAot;
             });
-    Check(Closed && Open && ObjectOpen, TEXT("unsupported_abi_stays_closed"));
+    Check(Closed && Open && ObjectOpen && FrameOpen, TEXT("unsupported_abi_stays_closed"));
     Owner.Reset();
     CollectGarbage(RF_NoFlags);
     const auto Dead = Eval(true);
