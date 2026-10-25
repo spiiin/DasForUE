@@ -1,6 +1,6 @@
 #include "DasDSLService.h"
 #include "DasRuntime.h"
-#include "DasProbeActor.h"
+#include "DasActor.h"
 #include "Modules/ModuleManager.h"
 #include "Engine/Blueprint.h"
 #include "Engine/BlueprintGeneratedClass.h"
@@ -69,11 +69,11 @@ UBlueprint* NewScopeBP(const FString& Base, const TCHAR* Name, UClass* Parent)
     FAssetRegistryModule::AssetCreated(BP);
     return BP;
 }
-ADasProbeActor* ScopeActor(UWorld* World, FName Name)
+ADasActor* ScopeActor(UWorld* World, FName Name)
 {
     if (World && World->PersistentLevel)
         for (auto& Entry : World->PersistentLevel->Actors)
-            if (auto* A = Cast<ADasProbeActor>(Entry.Get()))
+            if (auto* A = Cast<ADasActor>(Entry.Get()))
                 if (A->GetFName() == Name)
                     return A;
     return nullptr;
@@ -120,7 +120,7 @@ int32 RunDasRenameScopeProbe(const FString& Params)
         SetScopeValues(Child->GeneratedClass->GetDefaultObject(), 23, 34);
         Grand = NewScopeBP(Base, TEXT("BP_Grand"), Child->GeneratedClass);
         SetScopeValues(Grand->GeneratedClass->GetDefaultObject(), 45, 56);
-        External = NewScopeBP(Base, TEXT("BP_External"), ADasProbeActor::StaticClass());
+        External = NewScopeBP(Base, TEXT("BP_External"), ADasActor::StaticClass());
         FEdGraphPinType Type;
         Type.PinCategory = UEdGraphSchema_K2::PC_Object;
         Type.PinSubCategoryObject = Parent->GeneratedClass;
@@ -147,11 +147,11 @@ int32 RunDasRenameScopeProbe(const FString& Params)
         FAssetRegistryModule::AssetCreated(World);
         FActorSpawnParameters Spawn;
         Spawn.Name = TEXT("ParentActor");
-        SetScopeValues(World->SpawnActor<ADasProbeActor>(Parent->GeneratedClass, FTransform::Identity, Spawn), 77, 88);
+        SetScopeValues(World->SpawnActor<ADasActor>(Parent->GeneratedClass, FTransform::Identity, Spawn), 77, 88);
         Spawn.Name = TEXT("ChildActor");
-        SetScopeValues(World->SpawnActor<ADasProbeActor>(Child->GeneratedClass, FTransform::Identity, Spawn), 99, 100);
+        SetScopeValues(World->SpawnActor<ADasActor>(Child->GeneratedClass, FTransform::Identity, Spawn), 99, 100);
         Spawn.Name = TEXT("GrandActor");
-        SetScopeValues(World->SpawnActor<ADasProbeActor>(Grand->GeneratedClass, FTransform::Identity, Spawn), 111, 112);
+        SetScopeValues(World->SpawnActor<ADasActor>(Grand->GeneratedClass, FTransform::Identity, Spawn), 111, 112);
         Check(SaveScopeAsset(Parent) && SaveScopeAsset(Child) && SaveScopeAsset(Grand) && SaveScopeAsset(External) &&
                   SaveScopeAsset(World),
               TEXT("save_original_scope_assets"));

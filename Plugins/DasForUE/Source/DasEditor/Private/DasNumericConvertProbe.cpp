@@ -1,6 +1,6 @@
 #include "DasDSLService.h"
 #include "DasRuntime.h"
-#include "DasProbeActor.h"
+#include "DasActor.h"
 #include "Modules/ModuleManager.h"
 #include "Engine/Blueprint.h"
 #include "Engine/BlueprintGeneratedClass.h"
@@ -68,11 +68,11 @@ UBlueprint* ConvertWidenBP(const FString& Base, const TCHAR* Name)
 {
     return LoadObject<UBlueprint>(nullptr, *(Base + Name + TEXT(".")+ Name));
 }
-ADasProbeActor* ConvertWidenActor(UWorld* World, FName Name)
+ADasActor* ConvertWidenActor(UWorld* World, FName Name)
 {
     if (World && World->PersistentLevel)
         for (auto& Entry : World->PersistentLevel->Actors)
-            if (auto* A = Cast<ADasProbeActor>(Entry.Get()))
+            if (auto* A = Cast<ADasActor>(Entry.Get()))
                 if (A->GetFName() == Name)
                     return A;
     return nullptr;
@@ -159,7 +159,7 @@ void ConvertGraphs(UBlueprint* BP)
     FBlueprintEditorUtils::MarkBlueprintAsStructurallyModified(BP);
     FKismetEditorUtilities::CompileBlueprint(BP);
 }
-int32 ConvertGraphRead(ADasProbeActor* Actor)
+int32 ConvertGraphRead(ADasActor* Actor)
 {
     auto* F = Actor->FindFunction(TEXT("ReadByGraph"));
     FStructOnScope P(F);
@@ -182,7 +182,7 @@ void DasCreateNumericGraphFixture(UBlueprint* B)
 {
     ConvertGraphs(B);
 }
-int32 DasReadNumericGraphFixture(ADasProbeActor* A)
+int32 DasReadNumericGraphFixture(ADasActor* A)
 {
     return ConvertGraphRead(A);
 }
@@ -302,10 +302,10 @@ int32 RunDasNumericConvertProbe(const FString& Params)
         FAssetRegistryModule::AssetCreated(World);
         FActorSpawnParameters Spawn;
         Spawn.Name = TEXT("ParentActor");
-        SetConvertWidenValues(World->SpawnActor<ADasProbeActor>(Parent->GeneratedClass, FTransform::Identity, Spawn),
+        SetConvertWidenValues(World->SpawnActor<ADasActor>(Parent->GeneratedClass, FTransform::Identity, Spawn),
                               MIN_int32, 0.1f);
         Spawn.Name = TEXT("ChildActor");
-        SetConvertWidenValues(World->SpawnActor<ADasProbeActor>(Child->GeneratedClass, FTransform::Identity, Spawn),
+        SetConvertWidenValues(World->SpawnActor<ADasActor>(Child->GeneratedClass, FTransform::Identity, Spawn),
                               MAX_int32, -13.25f);
         Check(ConvertSaveWidenAsset(Parent) && ConvertSaveWidenAsset(Child) && ConvertSaveWidenAsset(World),
               TEXT("save_original_numeric_scope"));

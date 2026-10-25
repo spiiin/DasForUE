@@ -9,7 +9,7 @@ struct SpawnLifeRef { handle:UObjectHandle }
 [ue_class(module_id="spawndriver",Blueprintable)]
 class SpawnDriver {
     @ue_property=(EditAnywhere,BlueprintReadWrite)
-    @ue_class_base="/Script/DasRuntime.DasProbeActor"
+    @ue_class_base="/Script/DasRuntime.DasActor"
     SpawnClass:UEClassHandle
     @ue_property=(EditAnywhere,BlueprintReadWrite)
     Spawned:SpawnTargetRef

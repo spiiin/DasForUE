@@ -2,7 +2,7 @@
 #include "DasBlueprintService.h"
 #include "DasAuthoring.h"
 #include "DasRuntime.h"
-#include "DasProbeActor.h"
+#include "DasActor.h"
 #include "Engine/Blueprint.h"
 #include "Engine/World.h"
 #include "Engine/Level.h"
@@ -30,11 +30,11 @@ int32 StructuralScore(UObject* O)
     auto* P = O ? FindFProperty<FIntProperty>(O->GetClass(), TEXT("Score")) : nullptr;
     return P ? P->GetPropertyValue_InContainer(O) : -1;
 }
-ADasProbeActor* StructuralActor(UWorld* W, FName N)
+ADasActor* StructuralActor(UWorld* W, FName N)
 {
     if (W && W->PersistentLevel)
         for (auto& E : W->PersistentLevel->Actors)
-            if (auto* A = Cast<ADasProbeActor>(E.Get()))
+            if (auto* A = Cast<ADasActor>(E.Get()))
                 if (A->GetFName() == N)
                     return A;
     return nullptr;

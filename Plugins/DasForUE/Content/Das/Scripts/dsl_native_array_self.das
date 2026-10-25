@@ -1,4 +1,5 @@
 options gen2
+require ue_probe_actor
 module dsl_native_array_self public
 require ue_native_engine_values public
 require ue_native_self_refs public
@@ -9,7 +10,7 @@ enum NativeMobility {
     Movable=2
 }
 [ue_class(module_id="nativearrays",Blueprintable)]
-class NativeArraySelf : Actor {
+class NativeArraySelf : ProbeActor {
     [ue_function(BlueprintCallable)]
     def EnumKeys():bool {
         if (self.DasNativeArrayEnumKeys[SpawnCollision.AlwaysSpawn]!=321) { return false }

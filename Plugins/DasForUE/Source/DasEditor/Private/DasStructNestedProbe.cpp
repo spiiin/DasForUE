@@ -1,4 +1,4 @@
-#include "DasProbeActor.h"
+#include "DasActor.h"
 #include "DasTypeService.h"
 #include "DasTypeRegistry.h"
 #include "DasRuntime.h"
@@ -24,7 +24,7 @@ bool SaveNestedType(UObject* O)
                                                                           FPackageName::GetAssetPackageExtension()),
                                  A);
 }
-void* NestedInner(ADasProbeActor* A, const TCHAR* Side, UScriptStruct*& Type)
+void* NestedInner(ADasActor* A, const TCHAR* Side, UScriptStruct*& Type)
 {
     auto* Bundle = FindFProperty<FStructProperty>(A->GetClass(), TEXT("Bundle"));
     if (!Bundle)
@@ -89,7 +89,7 @@ bool BuildDasNestedWrapper(const FString& Base, UScriptStruct* Inner, FString& S
     return Envelope->Status == UDSS_UpToDate && Bundle->Status == UDSS_UpToDate && SaveNestedType(Envelope) &&
            SaveNestedType(Bundle);
 }
-void SeedDasNestedProbe(ADasProbeActor* A)
+void SeedDasNestedProbe(ADasActor* A)
 {
     auto* B = FindFProperty<FStructProperty>(A->GetClass(), TEXT("Bundle"));
     void* Root = B->ContainerPtrToValuePtr<void>(A);
@@ -129,7 +129,7 @@ void SeedDasNestedProbe(ADasProbeActor* A)
         }
     }
 }
-bool CheckDasNestedProbe(ADasProbeActor* A, bool After)
+bool CheckDasNestedProbe(ADasActor* A, bool After)
 {
     if (!FindFProperty<FStructProperty>(A->GetClass(), TEXT("Bundle")))
         return true;
@@ -152,7 +152,7 @@ bool CheckDasNestedProbe(ADasProbeActor* A, bool After)
             Pass &= !Enabled || Enabled->GetPropertyValue_InContainer(Memory);
         }
         UScriptStruct* CDOType = nullptr;
-        void* CDO = NestedInner(CastChecked<ADasProbeActor>(A->GetClass()->GetDefaultObject()), *Pair.Key, CDOType);
+        void* CDO = NestedInner(CastChecked<ADasActor>(A->GetClass()->GetDefaultObject()), *Pair.Key, CDOType);
         const void* CV = P->ContainerPtrToValuePtr<void>(CDO);
         Pass &=
             (P->IsInteger() ? double(P->GetSignedIntPropertyValue(CV)) : P->GetFloatingPointPropertyValue(CV)) == 15;
@@ -198,7 +198,7 @@ bool CheckDasNestedProbe(ADasProbeActor* A, bool After)
         auto* Empty = CastFieldChecked<FArrayProperty>(FindDasStructField(B->Struct, TEXT("Empty")));
         Pass &= FScriptArrayHelper(Empty, Empty->ContainerPtrToValuePtr<void>(Root)).Num() == 0;
     }
-    auto* CDO = CastChecked<ADasProbeActor>(A->GetClass()->GetDefaultObject());
+    auto* CDO = CastChecked<ADasActor>(A->GetClass()->GetDefaultObject());
     Pass &= B->Struct->CompareScriptStruct(B->ContainerPtrToValuePtr<void>(CDO),
                                            CastChecked<UUserDefinedStruct>(B->Struct)->GetDefaultInstance(), 0);
     UE_LOG(LogTemp, Display,
@@ -234,7 +234,7 @@ bool CheckDasNestedDefaultGuard(const FString& Script, UDasTypeRegistry* Registr
     return Pass;
 }
 
-bool CheckDasArrayAccess(const FString& Script, ADasProbeActor* A, FDasRuntimeModule& R)
+bool CheckDasArrayAccess(const FString& Script, ADasActor* A, FDasRuntimeModule& R)
 {
     auto* Bundle = FindFProperty<FStructProperty>(A->GetClass(), TEXT("Bundle"));
     if (!Bundle || !FindDasStructField(Bundle->Struct, TEXT("Items")))

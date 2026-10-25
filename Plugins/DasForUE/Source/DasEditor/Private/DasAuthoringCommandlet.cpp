@@ -4,7 +4,7 @@
 #include "Modules/ModuleManager.h"
 #include "DasBlueprintService.h"
 #include "DasDSLService.h"
-#include "DasProbeActor.h"
+#include "DasActor.h"
 #include "Editor.h"
 #include "Engine/Blueprint.h"
 #include "Engine/BlueprintGeneratedClass.h"
@@ -50,9 +50,9 @@ int32 Execute(UObject* Object, FName Name = TEXT("Evaluate"))
     Object->ProcessEvent(Method, Frame.GetStructMemory());
     return Result->GetPropertyValue_InContainer(Frame.GetStructMemory());
 }
-ADasProbeActor* Find(UWorld* World)
+ADasActor* Find(UWorld* World)
 {
-    for (TActorIterator<ADasProbeActor> It(World); It; ++It)
+    for (TActorIterator<ADasActor> It(World); It; ++It)
         if (It->GetFName() == TEXT("AuthoringCounter"))
             return *It;
     return nullptr;
@@ -113,7 +113,7 @@ int32 UDasAuthoringCommandlet::Main(const FString& Params)
         {
             UPackage* Package = CreatePackage(*AuthoringAssetPath);
             BP = FKismetEditorUtilities::CreateBlueprint(
-                ADasProbeActor::StaticClass(), Package,
+                ADasActor::StaticClass(), Package,
                 TEXT("BP_AuthoringCounter"), BPTYPE_Normal, UBlueprint::StaticClass(),
                      UBlueprintGeneratedClass::StaticClass(), TEXT("DasAuthoringProbe"));
             Applied = BP && FDasBlueprintService::ApplyAuthoring(BP, First, AuthoringProbeClassId, Error);
@@ -136,7 +136,7 @@ int32 UDasAuthoringCommandlet::Main(const FString& Params)
     FActorSpawnParameters Spawn;
     Spawn.Name = TEXT("AuthoringCounter");
     Spawn.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-    auto* Actor = World->SpawnActor<ADasProbeActor>(BP->GeneratedClass, FTransform::Identity, Spawn);
+    auto* Actor = World->SpawnActor<ADasActor>(BP->GeneratedClass, FTransform::Identity, Spawn);
     Check(Actor != nullptr, TEXT("spawn_authored_actor"));
     if (!Actor)
         return 1;

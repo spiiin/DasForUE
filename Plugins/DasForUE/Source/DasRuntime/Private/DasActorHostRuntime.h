@@ -9,7 +9,7 @@
 #include "UObject/Stack.h"
 #include "UObject/Script.h"
 #include "UObject/UnrealType.h"
-class ADasProbeActor;
+class ADasActor;
 // Shows a script error of a running game world in the PIE Message Log and on screen (DasScriptErrors.cpp).
 void DasReportScriptError(const UObject& Owner, const FString& Error);
 // Shared implementation; native hosts retain their real Unreal inheritance.
@@ -55,7 +55,7 @@ struct FDasActorHostRuntime
         // PIE duplication restores the CDO native root before restoring the SCS root.
         // Keeping the fallback below the SCS root would then create a reverse edge/cycle.
         if (Previous && Previous->CreationMethod == EComponentCreationMethod::Native &&
-            Previous->GetFName() == TEXT("ProbeRoot"))
+            (Previous->GetFName() == TEXT("DasRoot") || Previous->GetFName() == TEXT("ProbeRoot")))
             Previous->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
         else if (Previous)
             Previous->AttachToComponent(Scene, FAttachmentTransformRules::KeepWorldTransform);
@@ -65,7 +65,7 @@ struct FDasActorHostRuntime
         if (A.IsActorBeingDestroyed() || A.LifecycleScript.IsEmpty())
         {
             // Pawn/Character still need their native tick without any DAS callbacks.
-            if constexpr (std::is_same_v<T, ADasProbeActor>)
+            if constexpr (std::is_same_v<T, ADasActor>)
                 A.SetActorTickEnabled(false);
             return;
         }

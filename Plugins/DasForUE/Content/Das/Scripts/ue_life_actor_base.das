@@ -1,4 +1,5 @@
 options gen2
+require ue_probe_actor
 module ue_life_actor_base public
 require ue_dsl public
 require ue_scene_components public
@@ -6,7 +7,7 @@ require ue_scene_components public
 struct ChildBehaviorRef { handle:UObjectHandle }
 
 [ue_class(module_id="lifefamily",Blueprintable)]
-class BaseLifeActor : Actor {
+class BaseLifeActor : ProbeActor {
     @ue_property=(BlueprintReadWrite)
     BaseSignals:int=0
     @ue_component

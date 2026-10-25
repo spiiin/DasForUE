@@ -1,6 +1,6 @@
 #include "DasActorHostRuntime.h"
 #include "DasTypeRegistry.h"
-#include "DasProbeActor.h"
+#include "DasActor.h"
 #include "DasRuntime.h"
 #include "DasScriptComponent.h"
 #include "Components/SceneComponent.h"
@@ -11,41 +11,41 @@
 #include "UObject/Script.h"
 #include "UObject/UnrealType.h"
 
-ADasProbeActor::ADasProbeActor()
+ADasActor::ADasActor()
 {
     PrimaryActorTick.bCanEverTick = true;
-    RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("ProbeRoot"));
+    RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("DasRoot"));
 }
 
-void ADasProbeActor::OnConstruction(const FTransform& Transform)
+void ADasActor::OnConstruction(const FTransform& Transform)
 {
     Super::OnConstruction(Transform);
     FDasActorHostRuntime::OnConstruction(*this, Transform);
 }
-void ADasProbeActor::PostInitializeComponents()
+void ADasActor::PostInitializeComponents()
 {
     Super::PostInitializeComponents();
     // Loaded/cooked actors restore the SCS root without repeating construction.
     ApplyDasSceneRoot();
 }
-void ADasProbeActor::ApplyDasSceneRoot()
+void ADasActor::ApplyDasSceneRoot()
 {
     FDasActorHostRuntime::ApplyDasSceneRoot(*this);
 }
 
-int32 ADasProbeActor::ExecuteDas(const FString& ScriptFile, int32 Input)
+int32 ADasActor::ExecuteDas(const FString& ScriptFile, int32 Input)
 {
     auto& Runtime = FModuleManager::LoadModuleChecked<FDasRuntimeModule>(TEXT("DasRuntime"));
     const auto Result = Runtime.RunPersistent(Runtime.ScriptPath(ScriptFile), Input, TWeakObjectPtr<UObject>(this));
     if (!Result.bSucceeded)
     {
-        UE_LOG(LogTemp, Error, TEXT("daScript probe: %s"), *Result.Error);
+        UE_LOG(LogTemp, Error, TEXT("daScript actor: %s"), *Result.Error);
         return MIN_int32;
     }
     return Result.Value;
 }
 
-int32 ADasProbeActor::ExecuteDasNamed(const FString& ScriptFile, const FString& EntryPoint, int32 Input)
+int32 ADasActor::ExecuteDasNamed(const FString& ScriptFile, const FString& EntryPoint, int32 Input)
 {
     auto& Runtime = FModuleManager::LoadModuleChecked<FDasRuntimeModule>(TEXT("DasRuntime"));
     const auto Result = Runtime.RunNamedPersistent(Runtime.ScriptPath(ScriptFile), EntryPoint, Input, this);
@@ -59,62 +59,61 @@ int32 ADasProbeActor::ExecuteDasNamed(const FString& ScriptFile, const FString& 
     return Result.Value;
 }
 
-float ADasProbeActor::ExecuteDasFloat(const FString& File, const FString& Entry, float Input)
+float ADasActor::ExecuteDasFloat(const FString& File, const FString& Entry, float Input)
 {
     auto& R = FModuleManager::LoadModuleChecked<FDasRuntimeModule>(TEXT("DasRuntime"));
     const auto V = R.RunNamedFloatPersistent(R.ScriptPath(File), Entry, Input, this);
     RecordLifecycleResult(V);
     return V.FloatValue;
 }
-bool ADasProbeActor::ExecuteDasBool(const FString& File, const FString& Entry, bool Input)
+bool ADasActor::ExecuteDasBool(const FString& File, const FString& Entry, bool Input)
 {
     auto& R = FModuleManager::LoadModuleChecked<FDasRuntimeModule>(TEXT("DasRuntime"));
     const auto V = R.RunNamedBoolPersistent(R.ScriptPath(File), Entry, Input, this);
     RecordLifecycleResult(V);
     return V.BoolValue;
 }
-void ADasProbeActor::ExecuteDasVoid(const FString& File, const FString& Entry)
+void ADasActor::ExecuteDasVoid(const FString& File, const FString& Entry)
 {
     auto& R = FModuleManager::LoadModuleChecked<FDasRuntimeModule>(TEXT("DasRuntime"));
     RecordLifecycleResult(R.RunNamedVoidPersistent(R.ScriptPath(File), Entry, this));
 }
 
-FDasScalarValue ADasProbeActor::ExecuteDasFrame(const FString& File, const FString& Entry,
-                                                const TArray<FDasScalarValue>& Args, int32 Kind,
-                                                const FString& ResultClass)
+FDasScalarValue ADasActor::ExecuteDasFrame(const FString& File, const FString& Entry,
+                                           const TArray<FDasScalarValue>& Args, int32 Kind, const FString& ResultClass)
 {
     return FDasActorHostRuntime::ExecuteDasFrame(*this, File, Entry, Args, Kind, ResultClass);
 }
-FDasScalarValue ADasProbeActor::ExecuteDasFrameOutputs(const FString& File, const FString& Entry,
-                                                       const TArray<FDasScalarValue>& Args, int32 Kind,
-                                                       const FString& ResultClass, TArray<FDasScalarValue>& Outputs)
+FDasScalarValue ADasActor::ExecuteDasFrameOutputs(const FString& File, const FString& Entry,
+                                                  const TArray<FDasScalarValue>& Args, int32 Kind,
+                                                  const FString& ResultClass, TArray<FDasScalarValue>& Outputs)
 {
     return FDasActorHostRuntime::ExecuteDasFrameOutputs(*this, File, Entry, Args, Kind, ResultClass, Outputs);
 }
-void ADasProbeActor::RecordLifecycleResult(const FDasExecutionResult& Result)
+void ADasActor::RecordLifecycleResult(const FDasExecutionResult& Result)
 {
     FDasActorHostRuntime::RecordLifecycleResult(*this, Result);
 }
 
-void ADasProbeActor::BeginPlay()
+void ADasActor::BeginPlay()
 {
     Super::BeginPlay();
     FDasActorHostRuntime::BeginPlay(*this);
 }
 
-void ADasProbeActor::Tick(float DeltaSeconds)
+void ADasActor::Tick(float DeltaSeconds)
 {
     Super::Tick(DeltaSeconds);
     FDasActorHostRuntime::Tick(*this, DeltaSeconds);
 }
 
-void ADasProbeActor::EndPlay(const EEndPlayReason::Type Reason)
+void ADasActor::EndPlay(const EEndPlayReason::Type Reason)
 {
     FDasActorHostRuntime::EndPlay(*this, Reason);
     Super::EndPlay(Reason);
 }
 
-void ADasProbeActor::Destroyed()
+void ADasActor::Destroyed()
 {
     // Super routes EndPlay; its callback must run before the context is released.
     Super::Destroyed();
@@ -124,16 +123,16 @@ void ADasProbeActor::Destroyed()
 
 // Const graph adapters share dispatch/session and diagnostic handling with ordinary
 // calls. Source contracts are validated before these internal entry points are used.
-FDasScalarValue ADasProbeActor::ExecuteDasConstFrame(const FString& File, const FString& Entry,
-                                                     const TArray<FDasScalarValue>& Args, int32 Kind,
-                                                     const FString& ResultClass) const
+FDasScalarValue ADasActor::ExecuteDasConstFrame(const FString& File, const FString& Entry,
+                                                const TArray<FDasScalarValue>& Args, int32 Kind,
+                                                const FString& ResultClass) const
 {
-    return const_cast<ADasProbeActor*>(this)->ExecuteDasFrame(File, Entry, Args, Kind, ResultClass);
+    return const_cast<ADasActor*>(this)->ExecuteDasFrame(File, Entry, Args, Kind, ResultClass);
 }
-FDasScalarValue ADasProbeActor::ExecuteDasConstFrameOutputs(const FString& File, const FString& Entry,
-                                                            const TArray<FDasScalarValue>& Args, int32 Kind,
-                                                            const FString& ResultClass,
-                                                            TArray<FDasScalarValue>& Outputs) const
+FDasScalarValue ADasActor::ExecuteDasConstFrameOutputs(const FString& File, const FString& Entry,
+                                                       const TArray<FDasScalarValue>& Args, int32 Kind,
+                                                       const FString& ResultClass,
+                                                       TArray<FDasScalarValue>& Outputs) const
 {
-    return const_cast<ADasProbeActor*>(this)->ExecuteDasFrameOutputs(File, Entry, Args, Kind, ResultClass, Outputs);
+    return const_cast<ADasActor*>(this)->ExecuteDasFrameOutputs(File, Entry, Args, Kind, ResultClass, Outputs);
 }

@@ -1,4 +1,5 @@
 #include "DasMethodValuesCommandlet.h"
+#include "DasProbeActor.h"
 #include "DasContainerTypes.h"
 #include "DasMethodValuesProbe.h"
 #include "DasTypeService.h"
@@ -114,7 +115,7 @@ int32 UDasMethodValuesCommandlet::Main(const FString& Params)
         if (!Echo ||
             Echo->ReturnType.AuthoredId != TEXT("methodvalues.ValueTarget") ||
                                                 Echo->Parameters[0].Type.AuthoredId != Echo->ReturnType.AuthoredId ||
-                                                Echo->ReturnType.TypePath != TEXT("/Script/DasRuntime.DasProbeActor"))
+                                                Echo->ReturnType.TypePath != ADasActor::StaticClass()->GetPathName())
             return 1;
         UE_LOG(LogTemp, Display, TEXT("PASS authored_signature_identity_roundtrip_and_host_storage"));
         // A valid call preflight and a wrong enum with the same numeric values must differ.
@@ -672,8 +673,8 @@ int32 UDasMethodValuesCommandlet::Main(const FString& Params)
             AuthoredArray->Type.Element->AuthoredId != TEXT("methodvalues.ValueTarget"))
             return 1;
         UE_LOG(LogTemp, Display, TEXT("PASS authored_array_element_identity_model"));
-        CastChecked<ADasProbeActor>(Target->GeneratedClass->GetDefaultObject())->TypeRegistry = Registry;
-        CastChecked<ADasProbeActor>(Driver->GeneratedClass->GetDefaultObject())->TypeRegistry = Registry;
+        CastChecked<ADasActor>(Target->GeneratedClass->GetDefaultObject())->TypeRegistry = Registry;
+        CastChecked<ADasActor>(Driver->GeneratedClass->GetDefaultObject())->TypeRegistry = Registry;
         for (auto* Type : Types)
             if (!Save(Type))
                 return 1;
@@ -684,10 +685,10 @@ int32 UDasMethodValuesCommandlet::Main(const FString& Params)
         Map->GetOutermost()->SetPackageFlags(PKG_ContainsMap);
         FActorSpawnParameters Spawn;
         Spawn.Name = TEXT("MethodValueTarget");
-        auto* T = Map->SpawnActor<ADasProbeActor>(Target->GeneratedClass, FTransform::Identity, Spawn);
+        auto* T = Map->SpawnActor<ADasActor>(Target->GeneratedClass, FTransform::Identity, Spawn);
         Spawn.Name = TEXT("MethodValueDriver");
-        auto* D = Map->SpawnActor<ADasProbeActor>(Driver->GeneratedClass, FTransform::Identity, Spawn);
-        D->Peer = T;
+        auto* D = Map->SpawnActor<ADasActor>(Driver->GeneratedClass, FTransform::Identity, Spawn);
+        CastChecked<ADasProbeActor>(D)->Peer = T;
         if (!Save(Map))
             return 1;
         Map->DestroyWorld(false);

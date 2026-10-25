@@ -1,7 +1,7 @@
 #include "DasComputedDefaultsProbe.h"
 #include "DasContainerDefaultsProbe.h"
 #include "DasDefaultValueProbe.h"
-#include "DasProbeActor.h"
+#include "DasActor.h"
 #include "DasScriptComponent.h"
 #include "Engine/World.h"
 #include "Engine/Level.h"
@@ -10,12 +10,12 @@
 #include "UObject/StructOnScope.h"
 bool RunDasComputedDefaultsProbe(UWorld* World, FString& Report)
 {
-    ADasProbeActor* A = nullptr;
-    ADasProbeActor* M = nullptr;
+    ADasActor* A = nullptr;
+    ADasActor* M = nullptr;
     if (!World || !World->PersistentLevel)
         return false;
     for (const auto& Actor : World->PersistentLevel->Actors)
-        if (auto* P = Cast<ADasProbeActor>(Actor))
+        if (auto* P = Cast<ADasActor>(Actor))
         {
             if (P->Tags.Contains(TEXT("ComputedDefault")))
                 A = P;
@@ -71,16 +71,16 @@ bool RunDasComputedDefaultsProbe(UWorld* World, FString& Report)
     }
     else
         Check(false, TEXT("missing_runtime_function"));
-    ADasProbeActor* Sibling = nullptr;
+    ADasActor* Sibling = nullptr;
     for (const auto& Actor : World->PersistentLevel->Actors)
-        if (auto* P = Cast<ADasProbeActor>(Actor))
+        if (auto* P = Cast<ADasActor>(Actor))
             if (P->Tags.Contains(TEXT("ComputedSibling")))
                 Sibling = P;
     Check(Sibling && Int(Sibling, TEXT("Score")) == 40 && Int(Sibling, TEXT("Derived")) == 41,
                                                               TEXT("sibling_source_defaults_are_isolated"));
-    ADasProbeActor* Child = nullptr;
+    ADasActor* Child = nullptr;
     for (const auto& Actor : World->PersistentLevel->Actors)
-        if (auto* P = Cast<ADasProbeActor>(Actor))
+        if (auto* P = Cast<ADasActor>(Actor))
             if (P->Tags.Contains(TEXT("ComputedChild")))
                 Child = P;
     Check(Child && Int(Child, TEXT("Score")) == 85 && Int(Child, TEXT("Derived")) == 87,
@@ -109,7 +109,7 @@ bool RunDasComputedDefaultsProbe(UWorld* World, FString& Report)
         else
             Check(false, TEXT("component_function_missing"));
     }
-    auto* Fresh = World->SpawnActor<ADasProbeActor>(A->GetClass());
+    auto* Fresh = World->SpawnActor<ADasActor>(A->GetClass());
     Check(Fresh && ComputedContainers(Fresh) &&
           ComputedArrayLast(Fresh, TEXT("Numbers")) == 8 && ComputedArrayLast(Fresh, TEXT("ManualNumbers")) == 777 &&
                                                                               Int(Fresh, TEXT("Score")) == 40 &&

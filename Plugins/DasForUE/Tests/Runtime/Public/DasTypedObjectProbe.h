@@ -1,13 +1,13 @@
 #pragma once
 #include "DasRuntime.h"
-#include "DasProbeActor.h"
+#include "DasActor.h"
 #include "Curves/CurveFloat.h"
 #include "Engine/World.h"
 #include "UObject/StrongObjectPtr.h"
 #include "UObject/StructOnScope.h"
 #include "UObject/Script.h"
 #include "UObject/UnrealType.h"
-inline bool RunDasTypedObjectValues(FDasRuntimeModule& R, ADasProbeActor* Actor, AActor* Target, const FString& Script,
+inline bool RunDasTypedObjectValues(FDasRuntimeModule& R, ADasActor* Actor, AActor* Target, const FString& Script,
                                     TFunctionRef<void(bool, const TCHAR*)> Check, bool Editor)
 {
     bool Pass = true;
@@ -19,7 +19,7 @@ inline bool RunDasTypedObjectValues(FDasRuntimeModule& R, ADasProbeActor* Actor,
     const FString Path = R.ScriptPath(Script), ActorPath = TEXT("/Script/Engine.Actor"),
                                                                 ObjectPath = TEXT("/Script/CoreUObject.Object");
     TStrongObjectPtr<UWorld> WorldPin(Actor->GetWorld());
-    TStrongObjectPtr<ADasProbeActor> OwnerPin(Actor);
+    TStrongObjectPtr<ADasActor> OwnerPin(Actor);
     auto* Field = FindFProperty<FObjectProperty>(Actor->GetClass(), TEXT("Target"));
     auto* Held = FindFProperty<FObjectProperty>(Actor->GetClass(), TEXT("Held"));
     Expect(Field && Field->PropertyClass == AActor::StaticClass() && Held &&
@@ -87,7 +87,7 @@ inline bool RunDasTypedObjectValues(FDasRuntimeModule& R, ADasProbeActor* Actor,
     auto ClearHeld = Run(TEXT("ClearHeld"), {}, EDasMethodSignature::Void);
     CollectGarbage(RF_NoFlags);
     Expect(ClearHeld.bSucceeded && !Weak.IsValid(), TEXT("typed_object_VM_handles_do_not_root_object"));
-    auto* Temporary = Actor->GetWorld()->SpawnActor<ADasProbeActor>();
+    auto* Temporary = Actor->GetWorld()->SpawnActor<ADasActor>();
     auto Remember = Run(TEXT("Remember"), {Argument(Temporary, ActorPath)}, EDasMethodSignature::Void);
     Temporary->Destroy();
     auto Recall = Run(TEXT("Recall"), {}, EDasMethodSignature::Object, ActorPath);

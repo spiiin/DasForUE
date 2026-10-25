@@ -1549,7 +1549,12 @@ bool FDasAuthoringModule::ToActorSchema(const FString& ClassId, FDasClassSchema&
                  ? TEXT("ActorComponent")
                  : C->NativeParent == TEXT("/Script/Engine.Pawn")
                        ? TEXT("Pawn")
-                       : C->NativeParent == TEXT("/Script/Engine.Character")? TEXT("Character"): TEXT("Actor");
+                       : C->NativeParent == TEXT("/Script/Engine.Character")
+                             ? TEXT("Character")
+#if DAS_WITH_TEST_PROBES
+                             : C->NativeParent == TEXT("/Script/DasRuntime.DasProbeActor") ? TEXT("DasProbeActor")
+#endif
+                                                                                           : TEXT("Actor");
     Result.Interfaces = C->Interfaces;
     Result.Metadata = C->Metadata;
     TArray<const FDasDeclaredMethod*> Methods;

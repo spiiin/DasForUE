@@ -1,7 +1,7 @@
 #include "DasDSLService.h"
 #include "DasInterfaceService.h"
 #include "DasRuntime.h"
-#include "DasProbeActor.h"
+#include "DasActor.h"
 #include "Editor.h"
 #include "Engine/Blueprint.h"
 #include "Engine/BlueprintGeneratedClass.h"
@@ -52,9 +52,9 @@ public:
             UE_LOG(LogTemp, Display, TEXT("DAS_CLASS_CALLBACKS_RESULT=%s"), State->Passed ? TEXT("PASS"): TEXT("FAIL"));
             return true;
         }
-        ADasProbeActor* Owner = nullptr;
+        ADasActor* Owner = nullptr;
         if (W)
-            for (TActorIterator<ADasProbeActor> I(W); I; ++I)
+            for (TActorIterator<ADasActor> I(W); I; ++I)
                 if (I->GetFName() == TEXT("ClassCallbacks"))
                     Owner = *I;
         if (!Owner || ClassCount(Owner, TEXT("Repeats")) < 3 || ClassCount(Owner, TEXT("MixedNext")) < 1)
@@ -137,7 +137,7 @@ bool FDasClassCallbacksPIE::RunTest(const FString&)
         return false;
     FActorSpawnParameters Spawn;
     Spawn.Name = TEXT("ClassCallbacks");
-    if (!World->SpawnActor<ADasProbeActor>(BP->GeneratedClass, FTransform::Identity, Spawn))
+    if (!World->SpawnActor<ADasActor>(BP->GeneratedClass, FTransform::Identity, Spawn))
         return false;
     ADD_LATENT_AUTOMATION_COMMAND(FStartPIECommand(false));
     ADD_LATENT_AUTOMATION_COMMAND(FClassCallbackCommand(State, this));

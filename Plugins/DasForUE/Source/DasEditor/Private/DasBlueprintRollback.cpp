@@ -1,7 +1,7 @@
 #include "DasBlueprintRollback.h"
 #include "DasContainerTypes.h"
 #include "DasNumericGraphMigration.h"
-#include "DasProbeActor.h"
+#include "DasActor.h"
 #include "DasPropertyValues.h"
 #include "DasSoftReferences.h"
 #include "Engine/Blueprint.h"
@@ -410,7 +410,7 @@ bool FDasBlueprintRollback::Prepare(UBlueprint* Root, const FDasClassSchema& Sch
                 Image.Values.Add(MoveTemp(Value));
                 Image.Texts.Add(MoveTemp(Text));
             }
-            if (auto* A = Cast<ADasProbeActor>(O))
+            if (auto* A = Cast<ADasActor>(O))
                 Image.Archive = A->RetiredDasValues;
             S.Objects.Add(MoveTemp(Image));
             Remember(O);
@@ -570,7 +570,7 @@ bool FDasBlueprintRollback::Restore(FString& Error)
         for (int32 N = 0; N < S.Fields.Num(); ++N)
             OK &= I.Texts[N].IsSet() ? RollbackText(I.Object.Get(), S.Fields[N].Name, *I.Texts[N])
                                      : RollbackValue(I.Object.Get(), S.Fields[N].Name, I.Values[N]);
-        if (auto* A = Cast<ADasProbeActor>(I.Object.Get()))
+        if (auto* A = Cast<ADasActor>(I.Object.Get()))
             A->RetiredDasValues = I.Archive;
     }
     for (auto& I : S.Blueprints)

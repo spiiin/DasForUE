@@ -2,7 +2,7 @@
 #include "DasAuthoring.h"
 #include "DasDSLService.h"
 #include "DasRuntime.h"
-#include "DasProbeActor.h"
+#include "DasActor.h"
 #include "Engine/Blueprint.h"
 #include "Engine/World.h"
 #include "Engine/Engine.h"
@@ -183,8 +183,8 @@ int32 UDasInheritedHandlersCommandlet::Main(const FString&)
     };
     World->InitializeActorsForPlay(FURL());
     FEditorScriptExecutionGuard Allow;
-    auto* A = World->SpawnActor<ADasProbeActor>(LeafBP->GeneratedClass);
-    TStrongObjectPtr<ADasProbeActor> Keep(A);
+    auto* A = World->SpawnActor<ADasActor>(LeafBP->GeneratedClass);
+    TStrongObjectPtr<ADasActor> Keep(A);
     auto Value = [&](const TCHAR* N)
     {
         return FindFProperty<FIntProperty>(A->GetClass(), N)->GetPropertyValue_InContainer(A);

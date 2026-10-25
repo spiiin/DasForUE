@@ -1,7 +1,8 @@
 options gen2
+require ue_probe_actor
 require ue_dsl
 
-[ue_class(module_id="mathevents",Blueprintable)]
+[ue_class(module_id="mathevents",Blueprintable,parent="/Script/DasRuntime.DasProbeActor")]
 class MathEventActor {
     @ue_property=(EditAnywhere,BlueprintReadWrite)
     Position:UEVector=ue_vector(0.0lf,0.0lf,0.0lf)

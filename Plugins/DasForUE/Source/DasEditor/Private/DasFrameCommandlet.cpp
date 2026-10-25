@@ -11,7 +11,7 @@
 #include "EdGraph/EdGraph.h"
 #include "Kismet2/BlueprintEditorUtils.h"
 #include "StructUtils/InstancedStruct.h"
-#include "DasProbeActor.h"
+#include "DasActor.h"
 #include "Editor.h"
 #include "Engine/Blueprint.h"
 #include "Engine/BlueprintGeneratedClass.h"
@@ -158,7 +158,7 @@ int32 UDasFrameCommandlet::Main(const FString& Params)
     }
     TStrongObjectPtr<UWorld> World(UWorld::CreateWorld(EWorldType::Editor, false));
     FActorSpawnParameters Spawn;
-    auto* Actor = World->SpawnActor<ADasProbeActor>(BP->GeneratedClass, FTransform::Identity, Spawn);
+    auto* Actor = World->SpawnActor<ADasActor>(BP->GeneratedClass, FTransform::Identity, Spawn);
     Check(Actor != nullptr, TEXT("spawn_saved_frame_class"));
     if (!Actor)
         return 1;
@@ -192,7 +192,7 @@ int32 UDasFrameCommandlet::Main(const FString& Params)
                                             ->SetPropertyValue_InContainer(Payload->ContainerPtrToValuePtr<void>(Actor),
                                                                            TEXT("Override 世界"));
             const FName ActorName = Actor->GetFName();
-            auto* Untouched = World->SpawnActor<ADasProbeActor>(BP->GeneratedClass, FTransform::Identity, Spawn);
+            auto* Untouched = World->SpawnActor<ADasActor>(BP->GeneratedClass, FTransform::Identity, Spawn);
             const FName UntouchedName = Untouched->GetFName();
             auto* Variable = BP->NewVariables.FindByPredicate([](const auto& V) { return V.VarName == TEXT("Score"); });
             const FGuid Guid = Variable->VarGuid;
@@ -238,7 +238,7 @@ int32 UDasFrameCommandlet::Main(const FString& Params)
                 UE_LOG(LogTemp, Error, TEXT("Rename: %s"), *Error);
             Actor = nullptr;
             Untouched = nullptr;
-            for (TActorIterator<ADasProbeActor> It(World.Get()); It; ++It)
+            for (TActorIterator<ADasActor> It(World.Get()); It; ++It)
             {
                 if (It->GetFName() == ActorName)
                     Actor = *It;
@@ -331,7 +331,7 @@ int32 UDasFrameCommandlet::Main(const FString& Params)
                                                     TEXT("migration_defaults_persist_across_reopen"));
         if (Phase == TEXT("Create"))
         {
-            auto* Untouched = World->SpawnActor<ADasProbeActor>(BP->GeneratedClass, FTransform::Identity, Spawn);
+            auto* Untouched = World->SpawnActor<ADasActor>(BP->GeneratedClass, FTransform::Identity, Spawn);
             auto* Property = FindFProperty<FStructProperty>(Actor->GetClass(), TEXT("Payload"));
             FindFProperty<FIntProperty>(
                 Property->Struct,
@@ -353,7 +353,7 @@ int32 UDasFrameCommandlet::Main(const FString& Params)
                 UE_LOG(LogTemp, Error, TEXT("Migration: %s"), *Error);
             Check(CountOf(Actor) == 77 && CountOf(Untouched) == 10 && ScoreOf(Actor) == 5 && ScoreOf(Untouched) == 5,
                   TEXT("migration_preserves_overridden_and_unmodified_existing_instances"));
-            auto* Fresh = World->SpawnActor<ADasProbeActor>(BP->GeneratedClass, FTransform::Identity, Spawn);
+            auto* Fresh = World->SpawnActor<ADasActor>(BP->GeneratedClass, FTransform::Identity, Spawn);
             Check(CountOf(Fresh) == 11 && ScoreOf(Fresh) == 8, TEXT("new_instances_use_migrated_defaults"));
             Check(FFileHelper::SaveStringToFile(Changed.Replace(
                 TEXT("Count=11"), TEXT("Unknown=11")), *Path, FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM) &&
@@ -374,7 +374,7 @@ int32 UDasFrameCommandlet::Main(const FString& Params)
             FBlueprintCompilationManager::FlushCompilationQueueAndReinstance();
             Actor = nullptr;
             Untouched = nullptr;
-            for (TActorIterator<ADasProbeActor> It(World.Get()); It; ++It)
+            for (TActorIterator<ADasActor> It(World.Get()); It; ++It)
             {
                 if (It->GetFName() == ActorName)
                     Actor = *It;
@@ -440,11 +440,11 @@ int32 UDasFrameCommandlet::Main(const FString& Params)
                 Extra.StableId = ClassId + TEXT(".AddedProbe");
                 Extra.IntDefault = 5;
                 Schema.Fields.Add(Extra);
-                TStrongObjectPtr<ADasProbeActor> HeldActor(Actor);
+                TStrongObjectPtr<ADasActor> HeldActor(Actor);
                 Check(FDasBlueprintService::Apply(BP, Schema, Error), TEXT("struct_field_reinstance_add_variable"));
                 // Locate the replacement actor in the same world after Blueprint compilation.
                 Actor = nullptr;
-                for (TActorIterator<ADasProbeActor> It(World.Get()); It; ++It)
+                for (TActorIterator<ADasActor> It(World.Get()); It; ++It)
                     if (It->GetClass() == BP->GeneratedClass)
                     {
                         Actor = *It;
@@ -556,7 +556,7 @@ int32 UDasFrameCommandlet::Main(const FString& Params)
     {
         auto* F = Actor->FindFunction(TEXT("ActorIdentity"));
         Check(F && F->NumParms == 2, TEXT("object_signature_survives_save"));
-        auto* Target = World->SpawnActor<ADasProbeActor>(ADasProbeActor::StaticClass(), FTransform::Identity, Spawn);
+        auto* Target = World->SpawnActor<ADasActor>(ADasActor::StaticClass(), FTransform::Identity, Spawn);
         if (F && Target)
         {
             FStructOnScope Memory(F);

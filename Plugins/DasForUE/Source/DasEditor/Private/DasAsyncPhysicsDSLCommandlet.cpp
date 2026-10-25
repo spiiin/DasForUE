@@ -2,7 +2,7 @@
 #include "DasDSLService.h"
 #include "DasRuntime.h"
 #include "DasAuthoring.h"
-#include "DasProbeActor.h"
+#include "DasActor.h"
 #include "DasScriptComponent.h"
 #include "DasAsyncPhysicsBridge.h"
 #include "Components/BoxComponent.h"
@@ -112,8 +112,8 @@ int32 UDasAsyncPhysicsDSLCommandlet::Main(const FString& Params)
             World->DestroyWorld(false);
         }
     };
-    auto* Actor = World->SpawnActor<ADasProbeActor>(BP->GeneratedClass);
-    TStrongObjectPtr<ADasProbeActor> Keep(Actor);
+    auto* Actor = World->SpawnActor<ADasActor>(BP->GeneratedClass);
+    TStrongObjectPtr<ADasActor> Keep(Actor);
     auto* BodyProp = FindFProperty<FObjectPropertyBase>(Actor->GetClass(), TEXT("Body"));
     auto* Body = BodyProp ? Cast<UBoxComponent>(BodyProp->GetObjectPropertyValue_InContainer(Actor)) : nullptr;
     auto Bridges = [&]()
@@ -201,7 +201,7 @@ int32 UDasAsyncPhysicsDSLCommandlet::Main(const FString& Params)
                                             TEXT("failed_BeginPlay_fixture_import"));
     if (FailedBP)
     {
-        auto* Failed = World->SpawnActor<ADasProbeActor>(FailedBP->GeneratedClass);
+        auto* Failed = World->SpawnActor<ADasActor>(FailedBP->GeneratedClass);
         if (!Failed->HasActorBegunPlay())
             Failed->DispatchBeginPlay();
         Step(3);
@@ -250,7 +250,7 @@ int32 UDasAsyncPhysicsDSLCommandlet::Main(const FString& Params)
         UE_LOG(LogTemp, Display, TEXT("Child import failure: %s"), *Error);
     if (ChildBP)
     {
-        auto* Child = World->SpawnActor<ADasProbeActor>(ChildBP->GeneratedClass);
+        auto* Child = World->SpawnActor<ADasActor>(ChildBP->GeneratedClass);
         auto* Count = FindFProperty<FIntProperty>(Child->GetClass(), TEXT("Initializes"));
         Step(5);
         TArray<UDasAsyncPhysicsBridge*> ChildBridges;

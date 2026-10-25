@@ -1,7 +1,7 @@
 #include "DasDSLService.h"
 #include "DasRuntime.h"
 #include "Internationalization/Text.h"
-#include "DasProbeActor.h"
+#include "DasActor.h"
 #include "Modules/ModuleManager.h"
 #include "Engine/Blueprint.h"
 #include "Engine/BlueprintGeneratedClass.h"
@@ -118,11 +118,11 @@ UBlueprint* ArchiveBP(const FString& Base, const TCHAR* Name)
 {
     return LoadObject<UBlueprint>(nullptr, *(Base + Name + TEXT(".")+ Name));
 }
-ADasProbeActor* ArchivedActor(UWorld* W, FName Name)
+ADasActor* ArchivedActor(UWorld* W, FName Name)
 {
     if (W && W->PersistentLevel)
         for (auto& E : W->PersistentLevel->Actors)
-            if (auto* A = Cast<ADasProbeActor>(E.Get()))
+            if (auto* A = Cast<ADasActor>(E.Get()))
                 if (A->GetFName() == Name)
                     return A;
     return nullptr;
@@ -187,7 +187,7 @@ int32 RunDasArchiveProbe(const FString& Params)
         FAssetRegistryModule::AssetCreated(World);
         FActorSpawnParameters Spawn;
         Spawn.Name = TEXT("ParentActor");
-        auto* Actor = World->SpawnActor<ADasProbeActor>(Parent->GeneratedClass, FTransform::Identity, Spawn);
+        auto* Actor = World->SpawnActor<ADasActor>(Parent->GeneratedClass, FTransform::Identity, Spawn);
         ArchiveValues(Actor, 77, 88);
         FindFProperty<FStrProperty>(Actor->GetClass(),
                                     TEXT("Text"))->SetPropertyValue_InContainer(Actor, TEXT("Actor Привет 世界"));
@@ -202,7 +202,7 @@ int32 RunDasArchiveProbe(const FString& Params)
         Parent->GetOutermost()->GetMetaData().SetValue(Parent, TEXT("DasArchiveTestGuid"),
                                                                     *Variable->VarGuid.ToString(EGuidFormats::Digits));
         Spawn.Name = TEXT("ChildActor");
-        ArchiveValues(World->SpawnActor<ADasProbeActor>(Child->GeneratedClass, FTransform::Identity, Spawn), 99, 100);
+        ArchiveValues(World->SpawnActor<ADasActor>(Child->GeneratedClass, FTransform::Identity, Spawn), 99, 100);
         Check(SaveArchiveAsset(Parent) && SaveArchiveAsset(Child) && SaveArchiveAsset(World),
               TEXT("save_original_archive_scope"));
     }
@@ -295,10 +295,10 @@ int32 RunDasArchiveProbe(const FString& Params)
                 TEXT("Score")) && Score && Score->IntValue == 77 && Text &&
                 Text->StringValue == TEXT("Actor Привет 世界") && Payload && Payload->StructValue.IsValid(),
                                           TEXT("retired_scalar_struct_and_string_values_persist"));
-            Check(Cast<ADasProbeActor>(Parent->GeneratedClass->GetDefaultObject())
+            Check(Cast<ADasActor>(Parent->GeneratedClass->GetDefaultObject())
                       ->RetiredDasValues.FindChecked(
                           RetiredKey(TEXT("Score"))).IntValue == 5 &&
-                          Cast<ADasProbeActor>(Child->GeneratedClass->GetDefaultObject())
+                          Cast<ADasActor>(Child->GeneratedClass->GetDefaultObject())
                               ->RetiredDasValues.FindChecked(
                                   RetiredKey(TEXT("Score"))).IntValue == 23 &&
                                   Other->RetiredDasValues.FindChecked(
@@ -308,7 +308,7 @@ int32 RunDasArchiveProbe(const FString& Params)
             {
                 FActorSpawnParameters Spawn;
                 Spawn.Name = TEXT("FreshRetired");
-                auto* Fresh = World->SpawnActor<ADasProbeActor>(Child->GeneratedClass, FTransform::Identity, Spawn);
+                auto* Fresh = World->SpawnActor<ADasActor>(Child->GeneratedClass, FTransform::Identity, Spawn);
                 const auto* Archived = Fresh->RetiredDasValues.Find(RetiredKey(TEXT("Score")));
                 Check(Archived && Archived->IntValue == 23, TEXT("spawn_while_retired_inherits_archive_default"));
             }

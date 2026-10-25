@@ -2,6 +2,7 @@
   "comment": "Regression suites for Scripts/RunDasTests.ps1. Suites run in this order; 'requires' pulls in prerequisites unless -NoDependencies is given (then their probe files from an earlier run are used).",
   "suites": [
     { "name": "build", "kind": "build", "log": "combined-editor-build" },
+    { "name": "actor-host", "kind": "automation", "test": "DasForUE.Hosts.ActorIsolation", "log": "actor-host-isolation", "minimum": 1 },
     { "name": "runtime-isolation", "kind": "script", "script": "TestRuntimeIsolation.ps1", "comment": "Build ordinary game without test probes and inspect UHT/build inputs." },
     { "name": "probe-game-build", "kind": "script", "script": "TestProbeGameBuild.ps1", "comment": "Non-editor smoke game links test probes through explicit opt-in." },
     { "name": "script-staging", "kind": "script", "script": "TestScriptStaging.ps1", "requires": ["build"], "comment": "Actual C# selector, dependencies and UBT receipt." },
@@ -38,6 +39,10 @@
     { "name": "method-values", "kind": "phases", "run": "DasMethodValues", "log": "combined-method-values",
       "marker": "DAS_METHOD_VALUES_RESULT=PASS", "phases": ["Create", "Reopen"],
       "probe": "combined-method-values-probe-id.txt" },
+    { "name": "actor-host-regression", "kind": "automation",
+      "test": "DasForUE.Hosts.ActorIsolation+DasForUE.Actors.SpawnPIE+DasForUE.Gameplay.RuntimePIE+DasForUE.MethodValues.PIE",
+      "log": "actor-host-regression", "minimum": 4, "requires": ["method-values"],
+      "probeArgs": { "DasMethodValuesProbeId": "method-values" } },
     { "name": "automation", "kind": "automation", "test": "DasForUE", "log": "combined-all-automation", "minimum": 37,
       "requires": ["components-prepare", "method-values"], "probeArgs": { "DasMethodValuesProbeId": "method-values" } },
     { "name": "automation-quick", "kind": "automation", "log": "quick-automation", "minimum": 36,

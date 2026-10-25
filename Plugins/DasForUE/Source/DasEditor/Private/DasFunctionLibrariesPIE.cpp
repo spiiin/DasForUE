@@ -1,5 +1,5 @@
 #include "DasDSLService.h"
-#include "DasProbeActor.h"
+#include "DasActor.h"
 #include "DasScriptComponent.h"
 #include "DasRuntime.h"
 #include "Editor.h"
@@ -36,9 +36,9 @@ public:
             Test->TestTrue(TEXT("EndPIE releases library frames"), !W && R.PersistentContextCount() == 0);
             return true;
         }
-        ADasProbeActor* Actor = nullptr;
+        ADasActor* Actor = nullptr;
         if (W)
-            for (TActorIterator<ADasProbeActor> It(W); It; ++It)
+            for (TActorIterator<ADasActor> It(W); It; ++It)
                 if (It->GetFName() == TEXT("LibraryProbe"))
                     Actor = *It;
         if (!Actor || !W->HasBegunPlay())
@@ -71,7 +71,7 @@ public:
         Test->TestTrue(TEXT("library context is PIE owner's world"),
                             ActualWorld.bSucceeded && ActualWorld.Value == int32(W->GetUniqueID()));
         TStrongObjectPtr<UWorld> OtherWorld(UWorld::CreateWorld(EWorldType::Game, false));
-        auto* OtherActor = OtherWorld->SpawnActor<ADasProbeActor>(S->BP->GeneratedClass);
+        auto* OtherActor = OtherWorld->SpawnActor<ADasActor>(S->BP->GeneratedClass);
         auto OtherResult = R.RunNamedPersistent(R.ScriptPath(TEXT("dsl_function_libraries.das")),
                                                              TEXT("ue_LibraryProbe_WorldId"), 0, OtherActor);
         Test->TestTrue(TEXT("library context follows owner in a different game world"),
@@ -122,7 +122,7 @@ bool FDasFunctionLibrariesPIE::RunTest(const FString&)
     auto* W = FAutomationEditorCommonUtils::CreateNewMap();
     FActorSpawnParameters P;
     P.Name = TEXT("LibraryProbe");
-    if (!W->SpawnActor<ADasProbeActor>(BP->GeneratedClass, FTransform::Identity, P))
+    if (!W->SpawnActor<ADasActor>(BP->GeneratedClass, FTransform::Identity, P))
         return false;
     ADD_LATENT_AUTOMATION_COMMAND(FStartPIECommand(false));
     FAutomationTestFramework::Get().EnqueueLatentCommand(MakeShared<FLibraryCommand>(S, this));

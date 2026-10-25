@@ -1,7 +1,7 @@
 #include "DasCookedCallsCommandlet.h"
 #include "DasDSLService.h"
 #include "DasAuthoring.h"
-#include "DasProbeActor.h"
+#include "DasActor.h"
 #include "DasClassMethodsProbe.h"
 #include "DasInitializerProbe.h"
 #include "DasScriptComponent.h"
@@ -47,7 +47,7 @@ int32 UDasCookedCallsCommandlet::Main(const FString& Params)
         if (!BP)
             return 1;
         auto* World = UWorld::CreateWorld(EWorldType::Editor, false);
-        auto* Actor = World->SpawnActor<ADasProbeActor>(BP->GeneratedClass);
+        auto* Actor = World->SpawnActor<ADasActor>(BP->GeneratedClass);
         FString Report;
         bool Good = RunDasClassMethodsProbe(Actor, Report);
         auto* Life = Actor ? FindFProperty<FObjectProperty>(Actor->GetClass(), TEXT("Life")) : nullptr;
@@ -144,7 +144,7 @@ int32 UDasCookedCallsCommandlet::Main(const FString& Params)
     // A body-only reload must replace the VM without replaying successful Initialize.
     {
         TStrongObjectPtr<UWorld> ReloadWorld(UWorld::CreateWorld(EWorldType::Game, false));
-        auto* A = ReloadWorld->SpawnActor<ADasProbeActor>(Target->GeneratedClass);
+        auto* A = ReloadWorld->SpawnActor<ADasActor>(Target->GeneratedClass);
         auto* Life = FindFProperty<FObjectProperty>(A->GetClass(), TEXT("Life"));
         auto* C = Life ? Life->GetObjectPropertyValue_InContainer(A) : nullptr;
         auto& R = FModuleManager::LoadModuleChecked<FDasRuntimeModule>(TEXT("DasRuntime"));
@@ -216,7 +216,7 @@ int32 UDasCookedCallsCommandlet::Main(const FString& Params)
     {
         FActorSpawnParameters P;
         P.Name = Name;
-        auto* Actor = World->SpawnActor<ADasProbeActor>(BP->GeneratedClass, FTransform::Identity, P);
+        auto* Actor = World->SpawnActor<ADasActor>(BP->GeneratedClass, FTransform::Identity, P);
         if (Actor)
             Actor->Tags.Add(Name);
         return Actor;

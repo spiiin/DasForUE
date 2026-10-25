@@ -1,6 +1,6 @@
 #include "DasDSLService.h"
 #include "DasRuntime.h"
-#include "DasProbeActor.h"
+#include "DasActor.h"
 #include "Engine/Blueprint.h"
 #include "Engine/World.h"
 #include "Engine/Level.h"
@@ -18,11 +18,11 @@
 void DasFailRenameForTesting(int32 Stage);
 namespace
 {
-ADasProbeActor* ObjectFieldActor(UWorld* W, FName N)
+ADasActor* ObjectFieldActor(UWorld* W, FName N)
 {
     if (W && W->PersistentLevel)
         for (auto& E : W->PersistentLevel->Actors)
-            if (auto* A = Cast<ADasProbeActor>(E.Get()))
+            if (auto* A = Cast<ADasActor>(E.Get()))
                 if (A->GetFName() == N)
                     return A;
     return nullptr;
@@ -102,9 +102,9 @@ int32 RunDasObjectFieldsProbe(const FString& Params)
         FAssetRegistryModule::AssetCreated(World);
         FActorSpawnParameters Spawn;
         Spawn.Name = TEXT("ObjectA");
-        auto* A = World->SpawnActor<ADasProbeActor>(BP->GeneratedClass, FTransform::Identity, Spawn);
+        auto* A = World->SpawnActor<ADasActor>(BP->GeneratedClass, FTransform::Identity, Spawn);
         Spawn.Name = TEXT("ObjectB");
-        auto* B = World->SpawnActor<ADasProbeActor>(BP->GeneratedClass, FTransform::Identity, Spawn);
+        auto* B = World->SpawnActor<ADasActor>(BP->GeneratedClass, FTransform::Identity, Spawn);
         AssignObjectField(A, TEXT("Target"), B);
         AssignObjectField(B, TEXT("Target"), A);
         AssignObjectField(A, TEXT("Component"), B->GetRootComponent());

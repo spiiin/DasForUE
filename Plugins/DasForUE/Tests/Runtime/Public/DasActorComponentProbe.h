@@ -1,6 +1,7 @@
 #pragma once
-#include "DasRuntime.h"
 #include "DasProbeActor.h"
+#include "DasRuntime.h"
+#include "DasActor.h"
 #include "DasScriptComponent.h"
 #include "DasFrameLibrary.h"
 #include "Engine/World.h"
@@ -33,7 +34,7 @@ inline bool RunDasActorComponentProbe(UClass* Class, FString& Report)
     Second->InitializeActorsForPlay(FURL());
     auto Spawn = [&](UWorld* World)
     {
-        auto* A = World->SpawnActor<ADasProbeActor>(Class);
+        auto* A = World->SpawnActor<ADasActor>(Class);
         A->PostInitializeComponents();
         A->DispatchBeginPlay();
         return A;
@@ -167,7 +168,7 @@ inline bool RunDasActorComponentProbe(UClass* Class, FString& Report)
     Check(R.PersistentContextCount(First.Get()) == 2 && R.PersistentContextCount(Second.Get()) == 2 &&
               R.SubscriptionCount(CA) == 1 && R.SubscriptionCount(CB) == 1,
           TEXT("actor_component_contexts_worlds_and_bindings_isolated"));
-    A->EmitDasSignal(7);
+    CastChecked<ADasProbeActor>(A)->EmitDasSignal(7);
     Check(DasComponentInt(CA, TEXT("SignalTotal")) == 7 &&
                           DasComponentInt(CB, TEXT("SignalTotal")) == 0, TEXT("component_receives_only_owner_signal"));
     CA->TickComponent(0.25f, LEVELTICK_All, &CA->PrimaryComponentTick);
@@ -181,7 +182,7 @@ inline bool RunDasActorComponentProbe(UClass* Class, FString& Report)
     TStrongObjectPtr<UDasScriptComponent> KeepRemoved(CA);
     CA->DestroyComponent();
     const int32 EndedCounter = DasComponentInt(CA, TEXT("SignalTotal"));
-    A->EmitDasSignal(9);
+    CastChecked<ADasProbeActor>(A)->EmitDasSignal(9);
     Check(DasComponentInt(CA, TEXT("EndCount")) == 1 &&
                           DasComponentInt(CA, TEXT("SignalTotal")) == EndedCounter && R.SubscriptionCount(CA) == 0 &&
                                           R.PersistentContextCount(First.Get()) == 1,

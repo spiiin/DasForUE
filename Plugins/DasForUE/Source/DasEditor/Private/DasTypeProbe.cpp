@@ -1,5 +1,5 @@
 #include "DasTypeService.h"
-#include "DasProbeActor.h"
+#include "DasActor.h"
 #include "Engine/Blueprint.h"
 #include "Engine/BlueprintGeneratedClass.h"
 #include "Kismet2/BlueprintEditorUtils.h"
@@ -65,7 +65,7 @@ int32 RunDasTypeProbe(const FString& Params)
     if (!Blueprint)
     {
         Blueprint =
-            FKismetEditorUtilities::CreateBlueprint(ADasProbeActor::StaticClass(), CreatePackage(*BlueprintPackage),
+            FKismetEditorUtilities::CreateBlueprint(ADasActor::StaticClass(), CreatePackage(*BlueprintPackage),
                                                     TEXT("BP_Types"), BPTYPE_Normal, UBlueprint::StaticClass(),
                                                          UBlueprintGeneratedClass::StaticClass(), TEXT("DasTypeProbe"));
         FEdGraphPinType EnumPin;

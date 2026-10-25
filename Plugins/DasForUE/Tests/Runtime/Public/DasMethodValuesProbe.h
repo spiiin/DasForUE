@@ -1,6 +1,6 @@
 #pragma once
 #include "DasRuntime.h"
-#include "DasProbeActor.h"
+#include "DasActor.h"
 #include "Curves/CurveFloat.h"
 #include "Engine/World.h"
 #include "Engine/EngineBaseTypes.h"
@@ -13,8 +13,8 @@ inline bool RunDasMethodValuesProbe(UClass* DriverClass, UClass* TargetClass, FS
 {
     TStrongObjectPtr<UWorld> World(UWorld::CreateWorld(EWorldType::Game, false));
     World->InitializeActorsForPlay(FURL());
-    auto* Driver = World->SpawnActor<ADasProbeActor>(DriverClass);
-    auto* Target = World->SpawnActor<ADasProbeActor>(TargetClass);
+    auto* Driver = World->SpawnActor<ADasActor>(DriverClass);
+    auto* Target = World->SpawnActor<ADasActor>(TargetClass);
     if (!Driver || !Target)
         return false;
     struct FArguments

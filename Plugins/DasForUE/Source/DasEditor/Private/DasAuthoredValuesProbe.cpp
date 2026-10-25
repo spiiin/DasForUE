@@ -2,7 +2,7 @@
 #include "DasAuthoring.h"
 #include "DasDSLService.h"
 #include "DasRuntime.h"
-#include "DasProbeActor.h"
+#include "DasActor.h"
 #include "Engine/Blueprint.h"
 #include "Engine/World.h"
 #include "Engine/Level.h"
@@ -31,11 +31,11 @@ bool SaveAuthoredAsset(UObject* O)
     A.SaveFlags = SAVE_NoError;
     return UPackage::SavePackage(O->GetOutermost(), O, *F, A);
 }
-ADasProbeActor* AuthoredActor(UWorld* W)
+ADasActor* AuthoredActor(UWorld* W)
 {
     if (W && W->PersistentLevel)
         for (auto& V : W->PersistentLevel->Actors)
-            if (auto* A = Cast<ADasProbeActor>(V.Get()))
+            if (auto* A = Cast<ADasActor>(V.Get()))
                 if (A->GetFName() == TEXT("TypedActor"))
                     return A;
     return nullptr;
@@ -105,7 +105,7 @@ int32 RunDasAuthoredValuesProbe(const FString& Params)
         W->GetOutermost()->SetPackageFlags(PKG_ContainsMap);
         FActorSpawnParameters P;
         P.Name = TEXT("TypedActor");
-        W->SpawnActor<ADasProbeActor>(BP->GeneratedClass, FTransform::Identity, P);
+        W->SpawnActor<ADasActor>(BP->GeneratedClass, FTransform::Identity, P);
     }
     else
     {

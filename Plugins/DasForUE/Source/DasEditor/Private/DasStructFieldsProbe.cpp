@@ -1,7 +1,7 @@
 #include "DasTypeService.h"
 #include "DasTypeRegistry.h"
 #include "DasRuntime.h"
-#include "DasProbeActor.h"
+#include "DasActor.h"
 #include "StructUtils/UserDefinedStruct.h"
 #include "Kismet2/StructureEditorUtils.h"
 #include "UserDefinedStructure/UserDefinedStructEditorData.h"
@@ -25,8 +25,8 @@
 #include "Misc/Parse.h"
 bool RunDasStructNumericProbe(const FString&, UDasTypeRegistry*, UBlueprint*, UWorld*, bool, FDasRuntimeModule&);
 #include "Editor.h"
-bool CheckDasNestedProbe(ADasProbeActor*, bool);
-bool CheckDasArrayAccess(const FString&, ADasProbeActor*, FDasRuntimeModule&);
+bool CheckDasNestedProbe(ADasActor*, bool);
+bool CheckDasArrayAccess(const FString&, ADasActor*, FDasRuntimeModule&);
 bool CheckDasNestedDefaultGuard(const FString&, UDasTypeRegistry*, UBlueprint*);
 void DasFailStructMigrationForTesting(int32);
 namespace
@@ -126,12 +126,12 @@ bool RunDasStructFieldProbe(const FString& Script, UDasTypeRegistry* Registry, U
             UE_LOG(LogTemp, Display, TEXT("Struct detail: %s"), *Error);
     };
     auto* Type = CastChecked<UUserDefinedStruct>(Registry->Resolve(TEXT("direct.Settings"), false, Error));
-    ADasProbeActor* Actor = nullptr;
+    ADasActor* Actor = nullptr;
     auto Refresh = [&]()
     {
         for (auto& V : World->PersistentLevel->Actors)
             if (V && V->GetFName() == TEXT("TypedActor"))
-                Actor = Cast<ADasProbeActor>(V.Get());
+                Actor = Cast<ADasActor>(V.Get());
     };
     Refresh();
     if (!Actor)

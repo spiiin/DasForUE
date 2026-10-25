@@ -1,9 +1,10 @@
 options gen2
+require ue_probe_actor
 require ue_dsl
 require ue_object_types
 [ue_multicast]
 struct ChangedSignal {signature:function<(left:int;right:float):void>}
-[ue_class(module_id="eventchecks",Blueprintable)]
+[ue_class(module_id="eventchecks",Blueprintable,parent="/Script/DasRuntime.DasProbeActor")]
 class EventActor {
  @ue_property=(BlueprintReadWrite)
  Total:int=0

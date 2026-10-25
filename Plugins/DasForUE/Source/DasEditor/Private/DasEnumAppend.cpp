@@ -7,7 +7,7 @@
 #include "Serialization/JsonSerializer.h"
 #include "Misc/FileHelper.h"
 #include "DasBlueprintRollback.h"
-#include "DasProbeActor.h"
+#include "DasActor.h"
 #include "K2Node_SwitchEnum.h"
 #include "K2Node_Select.h"
 #include "K2Node_EnumLiteral.h"
@@ -681,7 +681,7 @@ static bool MigrateEnums(const FString& Script, const FString& RegistryPath, FSt
             return false;
         }
         GraphRoot = *RepairBPs.CreateConstIterator();
-        if (!GraphRoot->GeneratedClass->IsChildOf(ADasProbeActor::StaticClass()) ||
+        if (!GraphRoot->GeneratedClass->IsChildOf(ADasActor::StaticClass()) ||
             GraphRoot->GetOutermost()->GetMetaData().GetValue(GraphRoot, TEXT("DasDSLSource")) != Script)
         {
             Error = TEXT("Enum node repair requires the imported DSL Actor root");
@@ -818,7 +818,7 @@ static bool MigrateEnums(const FString& Script, const FString& RegistryPath, FSt
                                                                     : nullptr});
                 }
         }
-        for (TObjectIterator<ADasProbeActor> It; It; ++It)
+        for (TObjectIterator<ADasActor> It; It; ++It)
             for (const auto& Pair : It->RetiredDasValues)
             {
                 const auto& V = Pair.Value;

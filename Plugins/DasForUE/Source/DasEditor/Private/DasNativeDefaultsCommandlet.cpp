@@ -6,7 +6,7 @@
 #include "DasAuthoring.h"
 #include "DasReflectedTypes.h"
 #include "DasRuntime.h"
-#include "DasProbeActor.h"
+#include "DasActor.h"
 #include "DasScriptComponent.h"
 #include "Engine/Blueprint.h"
 #include "Engine/World.h"
@@ -99,8 +99,8 @@ int32 UDasNativeDefaultsCommandlet::Main(const FString& Params)
     UBlueprint* Child = nullptr;
     UBlueprint* ComputedChild = nullptr;
     UWorld* W = nullptr;
-    ADasProbeActor* A = nullptr;
-    ADasProbeActor* Manual = nullptr;
+    ADasActor* A = nullptr;
+    ADasActor* Manual = nullptr;
     ON_SCOPE_EXIT
     {
         if (W)
@@ -154,8 +154,8 @@ int32 UDasNativeDefaultsCommandlet::Main(const FString& Params)
             return 1;
         W->SetFlags(RF_Public | RF_Standalone);
         W->GetOutermost()->SetPackageFlags(PKG_ContainsMap);
-        A = W->SpawnActor<ADasProbeActor>(BP->GeneratedClass);
-        Manual = W->SpawnActor<ADasProbeActor>(BP->GeneratedClass);
+        A = W->SpawnActor<ADasActor>(BP->GeneratedClass);
+        Manual = W->SpawnActor<ADasActor>(BP->GeneratedClass);
         if (!A || !Manual)
             return 1;
         A->Tags.Add(TEXT("NativeDefault"));
@@ -247,16 +247,11 @@ int32 UDasNativeDefaultsCommandlet::Main(const FString& Params)
                    TEXT("component_runtime_native_owner")))
             return 1;
         R.ReleaseObject(Component);
-        auto* ChildActor = W->SpawnActor<ADasProbeActor>(Child->GeneratedClass);
+        auto* ChildActor = W->SpawnActor<ADasActor>(Child->GeneratedClass);
         ChildActor->Tags.Add(TEXT("NativeChild"));
-        auto* ComputedActor = W->SpawnActor<ADasProbeActor>(ComputedChild->GeneratedClass);
+        auto* ComputedActor = W->SpawnActor<ADasActor>(ComputedChild->GeneratedClass);
         ComputedActor->Tags.Add(TEXT("NativeComputedChild"));
         {
-            const bool Previous = SetDasNativeArraySelfProbeEnabled(true);
-            ON_SCOPE_EXIT
-            {
-                SetDasNativeArraySelfProbeEnabled(Previous);
-            };
             UBlueprint* ArrayBP = nullptr;
             if (!Check(FDasDSLService::Apply(TEXT("dsl_native_array_self.das"),
                                                   Root + TEXT("/BP_NativeArrays"),
@@ -264,7 +259,7 @@ int32 UDasNativeDefaultsCommandlet::Main(const FString& Params)
                                                               ArrayBP->NewVariables.IsEmpty(),
                                                       TEXT("native_value_array_import_no_authored_fields")))
                 return 1;
-            auto* ArrayActor = W->SpawnActor<ADasProbeActor>(ArrayBP->GeneratedClass);
+            auto* ArrayActor = W->SpawnActor<ADasActor>(ArrayBP->GeneratedClass);
             if (!ArrayActor)
                 return 1;
             ArrayActor->Tags.Add(TEXT("NativeValueArrays"));
@@ -329,7 +324,7 @@ int32 UDasNativeDefaultsCommandlet::Main(const FString& Params)
             W->InitWorld();
         W->UpdateWorldComponents(true, false);
         for (const auto& Actor : W->PersistentLevel->Actors)
-            if (auto* P = Cast<ADasProbeActor>(Actor))
+            if (auto* P = Cast<ADasActor>(Actor))
             {
                 if (P->Tags.Contains(TEXT("NativeDefault")))
                     A = P;
@@ -345,7 +340,7 @@ int32 UDasNativeDefaultsCommandlet::Main(const FString& Params)
             if (IsValid(Actor))
                 R.ReleaseObject(Actor);
         FKismetEditorUtilities::CompileBlueprint(BP);
-        auto* Fresh = W->SpawnActor<ADasProbeActor>(BP->GeneratedClass);
+        auto* Fresh = W->SpawnActor<ADasActor>(BP->GeneratedClass);
         if (!Check(Fresh && Life(Fresh) == 30 && NativeRoot(Fresh)->GetRelativeScale3D() == FVector(99, 4, 5) &&
                        NativeRead(Fresh) == 7,
                    TEXT("native_defaults_survive_Blueprint_recompile")))
@@ -355,7 +350,7 @@ int32 UDasNativeDefaultsCommandlet::Main(const FString& Params)
         A = nullptr;
         Manual = nullptr;
         for (const auto& Actor : W->PersistentLevel->Actors)
-            if (auto* P = Cast<ADasProbeActor>(Actor))
+            if (auto* P = Cast<ADasActor>(Actor))
             {
                 if (P->Tags.Contains(TEXT("NativeDefault")))
                     A = P;

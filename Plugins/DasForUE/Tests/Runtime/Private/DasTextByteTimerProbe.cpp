@@ -3,6 +3,7 @@
 #include "DasTypeRegistry.h"
 #include "DasCallFrame.h"
 #include "UObject/GarbageCollection.h"
+#include "DasActor.h"
 #include "DasProbeActor.h"
 #include "Engine/World.h"
 #include "GameFramework/DamageType.h"
@@ -27,7 +28,7 @@ void LogCallbackReadiness(UObject* Owner, const TCHAR* Label, std::initializer_l
     FString Values;
     for (const auto* Field : Fields)
         Values += FString::Printf(TEXT(" %s=%d"), Field, TimerInt(Owner, Field));
-    auto* Host = Cast<ADasProbeActor>(Owner);
+    auto* Host = Cast<ADasActor>(Owner);
     UE_LOG(LogTemp, Display,
            TEXT("Callback readiness %s: owner=%s ready=%d timers=%d%s error=%s"), Label, *GetNameSafe(Owner),
                 TimerBool(Owner, TEXT("Ready")),
@@ -129,13 +130,13 @@ bool RunDasTextByteTimerProbe(ADasStaticLibraryProbe* Carrier, FString& Report)
                             TimerInt(A, TEXT("NameRuns")) == 3 &&
                                      TimerInt(A, TEXT("ArrayNext")) == 3,
                                               TEXT("all_primitive_timer_arrays_repeat_next_tick_owned_copy"));
-    if (auto* Host = Cast<ADasProbeActor>(A))
+    if (auto* Host = Cast<ADasActor>(A))
     {
-        Host->OnDasCallbackActor.Broadcast(A);
+        CastChecked<ADasProbeActor>(Host)->OnDasCallbackActor.Broadcast(A);
         Check(TimerInt(A, TEXT("NativeObjectEvents")) == 1, TEXT("typed_native_actor_event_receiver"));
         FVector4 Record(1.25, 2., 3., 4.);
-        Host->OnDasCallbackEnumRef.Broadcast(EDasCallbackMode::Active);
-        Host->OnDasCallbackRecordRef.Broadcast(Record);
+        CastChecked<ADasProbeActor>(Host)->OnDasCallbackEnumRef.Broadcast(EDasCallbackMode::Active);
+        CastChecked<ADasProbeActor>(Host)->OnDasCallbackRecordRef.Broadcast(Record);
         Check(Record.X == 1.25, TEXT("native_const_ref_struct_source_unchanged"));
     }
     Check(TimerInt(
@@ -155,7 +156,7 @@ bool RunDasTextByteTimerProbe(ADasStaticLibraryProbe* Carrier, FString& Report)
                                                               TEXT("text_byte_timer_localization_history_retained"));
     Check(TimerBool(A, TEXT("InvalidRejected")) && TimerInt(A, TEXT("PausedCalls")) == 1 && R.ScriptTimerCount(A) == 0,
                                                             TEXT("text_byte_timer_replace_reject_pause_cancel"));
-    if (auto* Host = Cast<ADasProbeActor>(A))
+    if (auto* Host = Cast<ADasActor>(A))
         Check(Host->LastDasError.IsEmpty(), TEXT("text_byte_timer_no_runtime_error"));
     auto* Arm = A->FindFunction(TEXT("ArmPending"));
     if (Arm)
@@ -166,11 +167,11 @@ bool RunDasTextByteTimerProbe(ADasStaticLibraryProbe* Carrier, FString& Report)
     Check(R.ScriptTimerCount(A) == 0, TEXT("text_byte_timer_release_clears_pending_snapshots"));
     Check(R.SubscriptionCount(A) == 0, TEXT("registered_value_event_release_detaches_listeners"));
     const int32 BeforeEvents = TimerInt(A, TEXT("ValueEvents"));
-    if (auto* Host = Cast<ADasProbeActor>(A))
+    if (auto* Host = Cast<ADasActor>(A))
     {
         FVector4 Record(1.25, 2., 3., 4.);
-        Host->OnDasCallbackEnumRef.Broadcast(EDasCallbackMode::Idle);
-        Host->OnDasCallbackRecordRef.Broadcast(Record);
+        CastChecked<ADasProbeActor>(Host)->OnDasCallbackEnumRef.Broadcast(EDasCallbackMode::Idle);
+        CastChecked<ADasProbeActor>(Host)->OnDasCallbackRecordRef.Broadcast(Record);
     }
     Check(TimerInt(A, TEXT("ValueEvents")) == BeforeEvents &&
                    TimerInt(A, TEXT("Errors")) == 0,
@@ -221,14 +222,14 @@ bool RunDasTextByteTimerProbe(ADasStaticLibraryProbe* Carrier, FString& Report)
     Check(Container && TimerBool(Container, TEXT("Ready")) &&
                                  TimerInt(Container, TEXT("Errors")) == 0,
                                           TEXT("container_callbacks_enum_struct_math_arrays_maps_sets_owned_delivery"));
-    if (auto* Host = Cast<ADasProbeActor>(Container))
+    if (auto* Host = Cast<ADasActor>(Container))
     {
         TArray<AActor*> NativeActors{Container};
-        Host->OnDasCallbackActors.Broadcast(NativeActors);
+        CastChecked<ADasProbeActor>(Host)->OnDasCallbackActors.Broadcast(NativeActors);
         Check(NativeActors.Num() == 1 && NativeActors[0] == Container &&
               TimerInt(Container, TEXT("NativeEvents")) == 1, TEXT("native_object_array_callback_const_ref_copy"));
     }
-    if (auto* Host = Cast<ADasProbeActor>(Container))
+    if (auto* Host = Cast<ADasActor>(Container))
     {
         Host->OnTakeAnyDamage.Broadcast(Host, 12.5f, GetDefault<UDamageType>(), nullptr, Host);
         Check(TimerInt(Host, TEXT("NativeDamageCalls")) == 1 &&
@@ -375,7 +376,7 @@ bool CheckDasTextByteTimerCleanup(UWorld* World)
                                               TimerInt(Owner, TEXT("Errors")),
                                                        TimerInt(Owner, TEXT("CancelledObjectRuns")),
                                                                 R.ScriptTimerCount(Owner),
-                                                                *CastChecked<ADasProbeActor>(Owner)->LastDasError);
+                                                                *CastChecked<ADasActor>(Owner)->LastDasError);
                     Owner->SetActorTickEnabled(false);
                     R.ReleaseObject(Owner);
                     Owner->Destroy();

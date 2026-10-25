@@ -5,7 +5,7 @@
 #include "DasBlueprintRollback.h"
 #include "DasComponentDefaults.h"
 #include "DasContainerTypes.h"
-#include "DasProbeActor.h"
+#include "DasActor.h"
 #include "DasScriptComponent.h"
 #include "DasRuntime.h"
 #include "Engine/Blueprint.h"

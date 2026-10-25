@@ -2,6 +2,7 @@
 #include "DasAuthoring.h"
 #include "DasDSLService.h"
 #include "DasRuntime.h"
+#include "DasActor.h"
 #include "DasProbeActor.h"
 #include "DasScriptComponent.h"
 #include "Engine/Blueprint.h"
@@ -115,8 +116,8 @@ int32 UDasEventChecksCommandlet::Main(const FString& Params)
         World->DestroyWorld(false);
     };
     World->InitializeActorsForPlay(FURL());
-    auto* Actor = World->SpawnActor<ADasProbeActor>(BP->GeneratedClass);
-    TStrongObjectPtr<ADasProbeActor> Keep(Actor);
+    auto* Actor = World->SpawnActor<ADasActor>(BP->GeneratedClass);
+    TStrongObjectPtr<ADasActor> Keep(Actor);
     FEditorScriptExecutionGuard AllowScript;
     auto Value = [&]()
     {
@@ -129,8 +130,8 @@ int32 UDasEventChecksCommandlet::Main(const FString& Params)
     const auto First = R.RunLifecycle(Path, EDasCallback::Tick, Actor, .01f);
     Check(First.bSucceeded && R.SubscriptionCount(Actor) == 3, TEXT("declarations_register_managed_subscriptions"),
                                                                     First.Error);
-    Actor->OnDasSignal.Broadcast(7);
-    Actor->OnDasFloatSignal.Broadcast(2.0f);
+    CastChecked<ADasProbeActor>(Actor)->OnDasSignal.Broadcast(7);
+    CastChecked<ADasProbeActor>(Actor)->OnDasFloatSignal.Broadcast(2.0f);
     Pump();
     Check(Value() == 9, TEXT("native_int_and_float_callbacks_execute"), Actor->LastDasError);
     Actor->ProcessEvent(Actor->FindFunctionChecked(TEXT("Fire")), nullptr);
@@ -138,20 +139,20 @@ int32 UDasEventChecksCommandlet::Main(const FString& Params)
     Check(Value() == 14, TEXT("authored_multicast_tuple_callback_executes"), Actor->LastDasError);
     Write(Source.Replace(TEXT("// RELOAD_MARKER"), TEXT("// changed\n")) + TEXT("\n"));
     const auto Reload = R.RunLifecycle(Path, EDasCallback::Tick, Actor, .01f);
-    Actor->OnDasSignal.Broadcast(1);
+    CastChecked<ADasProbeActor>(Actor)->OnDasSignal.Broadcast(1);
     Pump();
     Check(Reload.bSucceeded && Reload.ReloadError.IsEmpty() && Reload.Revision > First.Revision &&
               R.SubscriptionCount(Actor) == 3 && Value() == 15,
           TEXT("reload_rebinds_without_duplicate_events"), Reload.Error + Reload.ReloadError);
     Write(Source.Replace(TEXT("def OnSignal(value:int)"), TEXT("def OnSignal(value:float)")));
     const auto Rejected = R.RunLifecycle(Path, EDasCallback::Tick, Actor, .01f);
-    Actor->OnDasSignal.Broadcast(1);
+    CastChecked<ADasProbeActor>(Actor)->OnDasSignal.Broadcast(1);
     Pump();
     Check(Rejected.bSucceeded && !Rejected.ReloadError.IsEmpty() && Rejected.Revision == Reload.Revision &&
               Value() == 16,
           TEXT("bad_event_reload_preserves_working_handlers"), Rejected.ReloadError);
     R.ReleaseObject(Actor);
-    Actor->OnDasSignal.Broadcast(100);
+    CastChecked<ADasProbeActor>(Actor)->OnDasSignal.Broadcast(100);
     Pump();
     Check(R.SubscriptionCount(Actor) == 0 && Value() == 16, TEXT("release_removes_managed_event_handlers"));
     Write(Owner.Replace(TEXT("class Listener {"), TEXT("class Listener {def Tick(delta:float):void{}\n")));
@@ -209,8 +210,8 @@ int32 UDasEventChecksCommandlet::Main(const FString& Params)
                                            TEXT("Apply_dynamic_event_contracts"), Error);
     if (!DynamicBP || !DynamicBP->GeneratedClass)
         return 1;
-    auto* Listener = World->SpawnActor<ADasProbeActor>(DynamicBP->GeneratedClass);
-    TStrongObjectPtr<ADasProbeActor> KeepListener(Listener);
+    auto* Listener = World->SpawnActor<ADasActor>(DynamicBP->GeneratedClass);
+    TStrongObjectPtr<ADasActor> KeepListener(Listener);
     auto* Scene = Cast<USceneComponent>(FindFProperty<FObjectPropertyBase>(
         Listener->GetClass(), TEXT("Scene"))->GetObjectPropertyValue_InContainer(Listener));
     if (!Scene)
@@ -232,9 +233,10 @@ int32 UDasEventChecksCommandlet::Main(const FString& Params)
     Enabled = true;
     Listener->ProcessEvent(Listener->FindFunctionChecked(TEXT("Start")), &Enabled);
     Listener->ProcessEvent(Listener->FindFunctionChecked(TEXT("Start")), &Enabled);
-    Check(R.SubscriptionCount(Listener) == 3 && Listener->OnDasSignal.GetAllObjects().Num() == 1,
+    Check(R.SubscriptionCount(Listener) == 3 &&
+              CastChecked<ADasProbeActor>(Listener)->OnDasSignal.GetAllObjects().Num() == 1,
           TEXT("dynamic_add_is_idempotent"), Listener->LastDasError);
-    Listener->OnDasSignal.Broadcast(7);
+    CastChecked<ADasProbeActor>(Listener)->OnDasSignal.Broadcast(7);
     Invoke(TEXT("Fire"));
     Scene->OnComponentActivated.Broadcast(Scene, true);
     Check(Total() == 112, TEXT("dynamic_native_authored_tuple_component_delivery"), Listener->LastDasError);
@@ -243,7 +245,7 @@ int32 UDasEventChecksCommandlet::Main(const FString& Params)
     Invoke(TEXT("StartOther"));
     Invoke(TEXT("Stop"));
     Invoke(TEXT("Stop"));
-    Listener->OnDasSignal.Broadcast(2);
+    CastChecked<ADasProbeActor>(Listener)->OnDasSignal.Broadcast(2);
     Invoke(TEXT("Fire"));
     Scene->OnComponentActivated.Broadcast(Scene, true);
     Check(R.SubscriptionCount(Listener) == 1 && Total() == 135,
@@ -251,28 +253,29 @@ int32 UDasEventChecksCommandlet::Main(const FString& Params)
     Listener->ProcessEvent(Listener->FindFunctionChecked(TEXT("Start")), &Enabled);
     Write(Dynamic.Replace(TEXT("def OnSignal(value:int)"), TEXT("def OnSignal(value:float)")));
     const auto DynamicRejected = R.RunLifecycle(Path, EDasCallback::Tick, Listener, .01f);
-    Listener->OnDasSignal.Broadcast(1);
+    CastChecked<ADasProbeActor>(Listener)->OnDasSignal.Broadcast(1);
     Check(DynamicRejected.bSucceeded && !DynamicRejected.ReloadError.IsEmpty() &&
               DynamicRejected.Revision == DynamicFirst.Revision && R.SubscriptionCount(Listener) == 4 && Total() == 146,
           TEXT("dynamic_rejected_reload_preserves_bindings"), DynamicRejected.ReloadError);
     Write(Dynamic.Replace(TEXT("// DYNAMIC_RELOAD_MARKER"), TEXT("// accepted replacement")));
     const auto DynamicReload = R.RunLifecycle(Path, EDasCallback::Tick, Listener, .01f);
-    Listener->OnDasSignal.Broadcast(20);
+    CastChecked<ADasProbeActor>(Listener)->OnDasSignal.Broadcast(20);
     Check(DynamicReload.bSucceeded && DynamicReload.ReloadError.IsEmpty() &&
               DynamicReload.Revision > DynamicFirst.Revision && R.SubscriptionCount(Listener) == 0 && Total() == 146 &&
-              Listener->OnDasSignal.GetAllObjects().IsEmpty(),
+              CastChecked<ADasProbeActor>(Listener)->OnDasSignal.GetAllObjects().IsEmpty(),
           TEXT("dynamic_successful_reload_revokes_old_bindings"), DynamicReload.Error + DynamicReload.ReloadError);
     Listener->ProcessEvent(Listener->FindFunctionChecked(TEXT("Start")), &Enabled);
-    Listener->OnDasSignal.Broadcast(1);
+    CastChecked<ADasProbeActor>(Listener)->OnDasSignal.Broadcast(1);
     Check(R.SubscriptionCount(Listener) == 3 && Total() == 147, TEXT("dynamic_can_rebind_after_reload"),
                                                                      Listener->LastDasError);
     const auto Ended = R.RunLifecycle(Path, EDasCallback::EndPlay, Listener);
     Check(Ended.bSucceeded && R.SubscriptionCount(Listener) == 0,
           TEXT("dynamic_EndPlay_allows_idempotent_removal_after_teardown"), Ended.Error);
     R.ReleaseObject(Listener);
-    Listener->OnDasSignal.Broadcast(50);
+    CastChecked<ADasProbeActor>(Listener)->OnDasSignal.Broadcast(50);
     Scene->OnComponentActivated.Broadcast(Scene, true);
-    Check(R.SubscriptionCount(Listener) == 0 && Total() == 147 && Listener->OnDasSignal.GetAllObjects().IsEmpty(),
+    Check(R.SubscriptionCount(Listener) == 0 && Total() == 147 &&
+              CastChecked<ADasProbeActor>(Listener)->OnDasSignal.GetAllObjects().IsEmpty(),
           TEXT("dynamic_release_detaches_all_sources"));
     const auto Restart = R.RunLifecycle(Path, EDasCallback::Tick, Listener, .01f);
     Listener->ProcessEvent(Listener->FindFunctionChecked(TEXT("Start")), &Enabled);

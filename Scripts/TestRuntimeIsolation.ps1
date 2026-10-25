@@ -11,6 +11,14 @@ $Root=Split-Path $Project
 $Manifests=@(Get-ChildItem (Join-Path $Root 'Intermediate/Build') -Filter '*.uhtmanifest' -Recurse)
 if(!$Manifests){throw 'Missing UHT manifest for isolation target'}
 foreach($Manifest in $Manifests){
+    $Runtime=(Get-Content $Manifest.FullName -Raw | ConvertFrom-Json).Modules | Where-Object Name -eq 'DasRuntime'
+    $Headers=@($Runtime.PublicHeaders)+@($Runtime.PrivateHeaders)
+    if(!($Headers | Where-Object { [IO.Path]::GetFileName($_) -eq 'DasActor.h' })){
+        throw 'Production actor host is missing from the game reflection manifest'
+    }
+    if($Headers | Where-Object { [IO.Path]::GetFileName($_) -eq 'DasProbeActor.h' }){
+        throw 'Test actor host leaked into the game reflection manifest'
+    }
     if((Get-Content $Manifest.FullName -Raw) -match 'Tests[\\/]+Runtime[\\/]'){
         throw "Test reflection leaked into production UHT manifest: $($Manifest.FullName)"
     }

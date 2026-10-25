@@ -1,10 +1,11 @@
 options gen2
+require ue_probe_actor
 require ue_scene_components
 [ue_native_object(path="/Script/Engine.ActorComponent")]
 struct EventComponentRef {handle:UObjectHandle}
 [ue_multicast]
 struct DynamicChanged {signature:function<(left:int;right:float):void>}
-[ue_class(module_id="dynamicevents",Blueprintable)]
+[ue_class(module_id="dynamicevents",Blueprintable,parent="/Script/DasRuntime.DasProbeActor")]
 class DynamicActor {
  components=ue_components(){var Scene:SceneComponentRef}
  @ue_property=(BlueprintReadWrite)

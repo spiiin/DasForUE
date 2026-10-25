@@ -1,5 +1,5 @@
 #include "DasExtendedDefaultsProbe.h"
-#include "DasProbeActor.h"
+#include "DasActor.h"
 #include "DasRuntime.h"
 #include "Modules/ModuleManager.h"
 #include "Components/StaticMeshComponent.h"
@@ -40,7 +40,7 @@ bool RunDasExtendedDefaultsProbe(UClass* Class, UWorld* World, FString& Report)
                                                                    : FTransform::Identity;
     };
     auto* CDO = Class->GetDefaultObject();
-    auto* A = World->SpawnActor<ADasProbeActor>(Class);
+    auto* A = World->SpawnActor<ADasActor>(Class);
     if (!A)
         return false;
     Check(Int(CDO, TEXT("CDOPoints")) == 31 && Int(A, TEXT("CDOPoints")) == 31,

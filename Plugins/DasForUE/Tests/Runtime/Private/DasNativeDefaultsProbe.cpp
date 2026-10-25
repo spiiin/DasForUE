@@ -1,5 +1,6 @@
 #include "DasNativeDefaultsProbe.h"
 #include "DasNativeDefaults.h"
+#include "DasActor.h"
 #include "DasProbeActor.h"
 #include "DasScriptComponent.h"
 #include "Engine/World.h"
@@ -9,30 +10,16 @@
 #include "UObject/UnrealType.h"
 #include "UObject/StructOnScope.h"
 #include "Misc/ScopeExit.h"
-namespace
-{
-bool NativeArraySelfProbeEnabled = false;
-}
-bool SetDasNativeArraySelfProbeEnabled(bool Enabled)
-{
-    const bool Previous = NativeArraySelfProbeEnabled;
-    NativeArraySelfProbeEnabled = Enabled;
-    return Previous;
-}
-bool IsDasNativeArraySelfProbeEnabled()
-{
-    return NativeArraySelfProbeEnabled;
-}
 bool RunDasNativeDefaultsProbe(UWorld* World, FString& Report)
 {
     if (!World || !World->PersistentLevel)
         return false;
-    ADasProbeActor* A = nullptr;
-    ADasProbeActor* Manual = nullptr;
-    ADasProbeActor* Child = nullptr;
-    ADasProbeActor* Computed = nullptr;
+    ADasActor* A = nullptr;
+    ADasActor* Manual = nullptr;
+    ADasActor* Child = nullptr;
+    ADasActor* Computed = nullptr;
     for (const auto& Actor : World->PersistentLevel->Actors)
-        if (auto* P = Cast<ADasProbeActor>(Actor))
+        if (auto* P = Cast<ADasActor>(Actor))
         {
             if (P->Tags.Contains(TEXT("NativeDefault")))
                 A = P;
@@ -113,7 +100,7 @@ bool RunDasNativeDefaultsProbe(UWorld* World, FString& Report)
         }
         Check(Valid && A->LastDasError.IsEmpty(), TEXT("native_self_component_reference"));
     }
-    auto ObjectCall = [&](ADasProbeActor* Actor, const TCHAR* Name, UObject* Value, UObject*& Result)
+    auto ObjectCall = [&](ADasActor* Actor, const TCHAR* Name, UObject* Value, UObject*& Result)
     {
         auto* F = Actor->FindFunction(Name);
         if (!F)
@@ -318,8 +305,8 @@ bool RunDasNativeDefaultsProbe(UWorld* World, FString& Report)
                 Inner->SetPropertyValue(Array.GetRawPtr(I), (*Values)[I]);
         }
         Object->ProcessEvent(Function, Args.GetStructMemory());
-        const FString LastError = Cast<ADasProbeActor>(Object) ? CastChecked<ADasProbeActor>(Object)->LastDasError
-                                                               : CastChecked<UDasScriptComponent>(Object)->LastDasError;
+        const FString LastError = Cast<ADasActor>(Object) ? CastChecked<ADasActor>(Object)->LastDasError
+                                                          : CastChecked<UDasScriptComponent>(Object)->LastDasError;
         if (!LastError.IsEmpty())
             return false;
         auto* Return = Function->GetReturnProperty();
@@ -420,11 +407,6 @@ bool RunDasNativeDefaultsProbe(UWorld* World, FString& Report)
         Component->ComponentTags = SavedTags;
     }
     {
-        const bool Previous = SetDasNativeArraySelfProbeEnabled(true);
-        ON_SCOPE_EXIT
-        {
-            SetDasNativeArraySelfProbeEnabled(Previous);
-        };
         ADasProbeActor* Arrays = nullptr;
         for (const auto& Candidate : World->PersistentLevel->Actors)
             if (auto* P = Cast<ADasProbeActor>(Candidate); P && P->Tags.Contains(TEXT("NativeValueArrays")))
@@ -580,7 +562,7 @@ bool RunDasNativeDefaultsProbe(UWorld* World, FString& Report)
                   TEXT("native_struct_array_storage_matches"));
         }
     }
-    auto* Fresh = World->SpawnActor<ADasProbeActor>(A->GetClass());
+    auto* Fresh = World->SpawnActor<ADasActor>(A->GetClass());
     Check(Fresh && Life(Fresh) == 30 && Scale(Fresh) == FVector(99, 4, 5) && Read(Fresh) == 7 &&
               Fresh->LastDasError.IsEmpty(),
           TEXT("fresh_spawn"));

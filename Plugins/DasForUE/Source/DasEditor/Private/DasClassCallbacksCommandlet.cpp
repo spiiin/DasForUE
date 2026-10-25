@@ -1,7 +1,7 @@
 #include "DasClassCallbacksCommandlet.h"
 #include "DasDSLService.h"
 #include "DasInterfaceService.h"
-#include "DasProbeActor.h"
+#include "DasActor.h"
 #include "Engine/Blueprint.h"
 #include "Engine/World.h"
 #include "Misc/PackageName.h"
@@ -65,7 +65,7 @@ int32 UDasClassCallbacksCommandlet::Main(const FString& Params)
     World->GetOutermost()->SetPackageFlags(PKG_ContainsMap);
     FActorSpawnParameters Spawn;
     Spawn.Name = TEXT("ClassCallbacks");
-    auto* Actor = World->SpawnActor<ADasProbeActor>(BP->GeneratedClass, FTransform::Identity, Spawn);
+    auto* Actor = World->SpawnActor<ADasActor>(BP->GeneratedClass, FTransform::Identity, Spawn);
     const bool Good = Actor && Save(World);
     World->DestroyWorld(false);
     if (!Good)

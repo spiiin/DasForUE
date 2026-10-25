@@ -19,6 +19,7 @@
   "/Script/DasRuntime.DasNestedObjectSnapshot",
   "/Script/DasRuntime.DasObjectFixture",
   "/Script/DasRuntime.DasObjectSnapshot",
+  "/Script/DasRuntime.DasProbeActor",
   "/Script/DasRuntime.DasProbeInterface",
   "/Script/DasRuntime.DasReferenceFixture",
   "/Script/DasRuntime.DasSnapshotReadOwner",

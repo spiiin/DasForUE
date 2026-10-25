@@ -1,5 +1,5 @@
 #include "DasStaticLibraryProbe.h"
-#include "DasProbeActor.h"
+#include "DasActor.h"
 #include "DasScriptComponent.h"
 #include "DasRuntime.h"
 #include "Engine/World.h"
@@ -24,8 +24,8 @@ bool RunDasInstanceDefaultsProbe(ADasStaticLibraryProbe* Carrier, FString& Repor
         return false;
     }
     auto& Runtime = FModuleManager::LoadModuleChecked<FDasRuntimeModule>(TEXT("DasRuntime"));
-    auto* Actor = World->SpawnActor<ADasProbeActor>(Carrier->DefaultActorClass);
-    auto* Child = World->SpawnActor<ADasProbeActor>(Carrier->DefaultChildClass);
+    auto* Actor = World->SpawnActor<ADasActor>(Carrier->DefaultActorClass);
+    auto* Child = World->SpawnActor<ADasActor>(Carrier->DefaultChildClass);
     UDasScriptComponent* Component =
         Actor ? NewObject<UDasScriptComponent>(Actor, Carrier->DefaultComponentClass) : nullptr;
     ON_SCOPE_EXIT

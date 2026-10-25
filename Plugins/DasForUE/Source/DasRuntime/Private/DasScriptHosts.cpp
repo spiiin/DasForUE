@@ -1,62 +1,48 @@
 #include "DasScriptHosts.h"
 #include "DasPawn.h"
 #include "DasCharacter.h"
+#include "DasActor.h"
+#if DAS_WITH_TEST_PROBES
 #include "DasProbeActor.h"
+#endif
 #include "DasScriptComponent.h"
 #include "DasSaveGame.h"
 #include "DasDataAssets.h"
 #include "UObject/UnrealType.h"
 bool DasActorNativeParent(const FString& P)
 {
+#if DAS_WITH_TEST_PROBES
+    if (P == TEXT("/Script/DasRuntime.DasProbeActor"))
+        return true;
+#endif
     return P == TEXT("/Script/Engine.Actor") || P == TEXT("/Script/Engine.Pawn") ||
                                                           P == TEXT("/Script/Engine.Character");
 }
 UClass* DasNativeScriptHost(const FString& P)
 {
-    return P ==
-           TEXT("Actor") ||
-               P ==
-                   TEXT("/Script/Engine.Actor")
-                       ? ADasProbeActor::StaticClass()
-                       : P ==
-                             TEXT("Pawn") ||
-                                 P ==
-                                     TEXT("/Script/Engine.Pawn")
-                                         ? ADasPawn::StaticClass()
-                                         : P ==
-                                               TEXT("Character") ||
-                                                   P ==
-                                                       TEXT("/Script/Engine.Character")
-                                                           ? ADasCharacter::
-                                                                 StaticClass()
-                                                           : P ==
-                                                                 TEXT("ActorComponent") ||
-                                                                     P ==
-                                                                         TEXT("/Script/Engine.ActorComponent")
-                                                                             ? UDasScriptComponent::StaticClass()
-                                                                             : P ==
-                                                                                   TEXT("SaveGame") ||
-                                                                                       P ==
-                                                                                           TEXT("/Script/Engine.SaveGame")
-                                                                                               ? UDasSaveGame::
-                                                                                                     StaticClass()
-                                                                                               : P ==
-                                                                                                     TEXT("DataAsset") ||
-                                                                                                         P ==
-                                                                                                             TEXT("/Script/Engine.DataAsset")
-                                                                                                                 ? UDasDataAsset::
-                                                                                                                       StaticClass()
-                                                                                                                 : P ==
-                                                                                                                       TEXT("PrimaryDataAsset") ||
-                                                                                                                           P ==
-                                                                                                                               TEXT("/Script/Engine.PrimaryDataAsset")
-                                                                                                                                   ? UDasPrimaryDataAsset::
-                                                                                                                                         StaticClass()
-                                                                                                                                   : nullptr;
+#if DAS_WITH_TEST_PROBES
+    if (P == TEXT("DasProbeActor") || P == TEXT("/Script/DasRuntime.DasProbeActor"))
+        return ADasProbeActor::StaticClass();
+#endif
+    if (P == TEXT("Actor") || P == TEXT("/Script/Engine.Actor"))
+        return ADasActor::StaticClass();
+    if (P == TEXT("Pawn") || P == TEXT("/Script/Engine.Pawn"))
+        return ADasPawn::StaticClass();
+    if (P == TEXT("Character") || P == TEXT("/Script/Engine.Character"))
+        return ADasCharacter::StaticClass();
+    if (P == TEXT("ActorComponent") || P == TEXT("/Script/Engine.ActorComponent"))
+        return UDasScriptComponent::StaticClass();
+    if (P == TEXT("SaveGame") || P == TEXT("/Script/Engine.SaveGame"))
+        return UDasSaveGame::StaticClass();
+    if (P == TEXT("DataAsset") || P == TEXT("/Script/Engine.DataAsset"))
+        return UDasDataAsset::StaticClass();
+    if (P == TEXT("PrimaryDataAsset") || P == TEXT("/Script/Engine.PrimaryDataAsset"))
+        return UDasPrimaryDataAsset::StaticClass();
+    return nullptr;
 }
 bool DasActorHostClass(const UClass* C)
 {
-    return C && (C->IsChildOf(ADasProbeActor::StaticClass()) || C->IsChildOf(ADasPawn::StaticClass()) ||
+    return C && (C->IsChildOf(ADasActor::StaticClass()) || C->IsChildOf(ADasPawn::StaticClass()) ||
                  C->IsChildOf(ADasCharacter::StaticClass()));
 }
 FString* DasHostString(UObject* O, FName N)

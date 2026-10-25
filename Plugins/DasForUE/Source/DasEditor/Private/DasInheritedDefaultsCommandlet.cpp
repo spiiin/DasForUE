@@ -3,7 +3,7 @@
 #include "DasDefaultsMigration.h"
 #include "DasRuntime.h"
 #include "DasAuthoring.h"
-#include "DasProbeActor.h"
+#include "DasActor.h"
 #include "DasScriptComponent.h"
 #include "Engine/Blueprint.h"
 #include "Engine/BlueprintGeneratedClass.h"
@@ -97,8 +97,8 @@ int32 UDasInheritedDefaultsCommandlet::Main(const FString& Params)
     UBlueprint* Leaf = nullptr;
     UBlueprint* Ordinary = nullptr;
     UWorld* W = nullptr;
-    ADasProbeActor* A = nullptr;
-    ADasProbeActor* M = nullptr;
+    ADasActor* A = nullptr;
+    ADasActor* M = nullptr;
     ON_SCOPE_EXIT
     {
         if (W && W->IsInitialized())
@@ -160,8 +160,8 @@ int32 UDasInheritedDefaultsCommandlet::Main(const FString& Params)
             return 1;
         W->SetFlags(RF_Public | RF_Standalone);
         W->GetOutermost()->SetPackageFlags(PKG_ContainsMap);
-        A = W->SpawnActor<ADasProbeActor>(Child->GeneratedClass);
-        M = W->SpawnActor<ADasProbeActor>(Child->GeneratedClass);
+        A = W->SpawnActor<ADasActor>(Child->GeneratedClass);
+        M = W->SpawnActor<ADasActor>(Child->GeneratedClass);
         if (!A || !M)
             return 1;
         A->Tags.Add(TEXT("InheritedDefault"));
@@ -307,7 +307,7 @@ int32 UDasInheritedDefaultsCommandlet::Main(const FString& Params)
             W->InitWorld();
         W->UpdateWorldComponents(true, false);
         for (const auto& Actor : W->PersistentLevel->Actors)
-            if (auto* P = Cast<ADasProbeActor>(Actor))
+            if (auto* P = Cast<ADasActor>(Actor))
             {
                 if (P->Tags.Contains(TEXT("InheritedDefault")))
                     A = P;
@@ -359,7 +359,7 @@ int32 UDasInheritedDefaultsCommandlet::Main(const FString& Params)
         FKismetEditorUtilities::CompileBlueprint(Base);
         FKismetEditorUtilities::CompileBlueprint(Child);
         FKismetEditorUtilities::CompileBlueprint(Leaf);
-        auto* Fresh = W->SpawnActor<ADasProbeActor>(Child->GeneratedClass);
+        auto* Fresh = W->SpawnActor<ADasActor>(Child->GeneratedClass);
         if (!Check(Fresh &&
                    InheritedInt(Fresh, TEXT("Score")) == 25 &&
                                 InheritedInt(Fresh, TEXT("Manual")) == 77 &&
@@ -429,7 +429,7 @@ int32 UDasInheritedDefaultsCommandlet::Main(const FString& Params)
     }
     if (Phase == TEXT("Create"))
     {
-        auto* PlacedLeaf = W->SpawnActor<ADasProbeActor>(Leaf->GeneratedClass);
+        auto* PlacedLeaf = W->SpawnActor<ADasActor>(Leaf->GeneratedClass);
         if (!PlacedLeaf)
             return 1;
         PlacedLeaf->Tags.Add(TEXT("InheritedLeaf"));

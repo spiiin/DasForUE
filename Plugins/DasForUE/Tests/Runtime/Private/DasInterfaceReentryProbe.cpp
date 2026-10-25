@@ -1,6 +1,6 @@
 #include "DasStaticLibraryProbe.h"
 #include "DasRuntime.h"
-#include "DasProbeActor.h"
+#include "DasActor.h"
 #include "DasScriptComponent.h"
 #include "Engine/World.h"
 #include "UObject/StrongObjectPtr.h"

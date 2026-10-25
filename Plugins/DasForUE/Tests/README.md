@@ -12,15 +12,27 @@ sources. This avoids exporting VM internals just to make a separate test DLL.
 The directory belongs to DasRuntime only when selected, so test reflection remains
 in `/Script/DasRuntime`. There is no production dependency on a test module.
 
-`ADasProbeActor` is the actual DSL actor host and remains in production despite its
-historical name (including its legacy regression fields; splitting that host is a
-separate class-hierarchy change). Production generated bindings and native registries exclude fixture types.
+`ADasActor` is the production DSL actor host. `ADasProbeActor` derives from it here
+and contains regression-only delegates, container storage and `Peer`. Actor DSL
+declarations resolve to `ADasActor` in every build, including Editor. Fixtures opt
+in explicitly with `ProbeActor` from `ue_probe_actor` or
+`parent="/Script/DasRuntime.DasProbeActor"`. The latter parent is rejected when the
+test extension is absent. The legacy `ue_subscribe_int` and `ue_emit_signal`
+fixture helpers are registered only with the test extension; runtime code uses
+the general object/delegate APIs.
+
+Old assets whose native parent was `ADasProbeActor` must be recreated from their DSL sources
+with the clean host before shipping. Reimport does not migrate native parents,
+and no compatibility redirect is installed.
+Production generated bindings and native registries exclude fixture types.
 `GenerateRuntimeBindings.py` derives them from the same reflection IR using the explicit
 `ReflectedTypes.json` test inventory. Production staging selects `Content/Das/Runtime`
 variants; smoke/editor targets retain the full test catalog in `Content/Das/Scripts`.
 Editor builds still include the probes: separating editor test tooling is a separate
 boundary from excluding tests from game runtime builds.
 
-Validate through the shared build agent: `foundation,ue-aot,runtime-isolation`.
+Validate through the shared build agent: `actor-host-regression,foundation,native-defaults,runtime-isolation`.
+`actor-host-regression` prepares method-value assets, then checks clean/test host selection,
+authored references, spawning and gameplay callbacks in PIE.
 `runtime-isolation` links a minimal ordinary game and checks the actual UHT manifest
 and build response files for test-source leakage. It does not replace packaged tests.

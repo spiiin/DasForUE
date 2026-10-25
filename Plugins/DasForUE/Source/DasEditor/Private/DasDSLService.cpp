@@ -22,7 +22,7 @@
 #include "DasBlueprintService.h"
 #include "DasRuntime.h"
 #include "DasAsyncPhysicsVM.h"
-#include "DasProbeActor.h"
+#include "DasActor.h"
 #include "DasScriptComponent.h"
 #include "DasPropertyValues.h"
 #include "Engine/Blueprint.h"
@@ -2042,7 +2042,7 @@ namespace
 // Retired values of any actor host (Actor, Pawn, Character); null for other objects.
 TMap<FString, FDasScalarValue>* RetiredValues(UObject* O)
 {
-    if (auto* A = Cast<ADasProbeActor>(O))
+    if (auto* A = Cast<ADasActor>(O))
         return &A->RetiredDasValues;
     if (auto* P = Cast<ADasPawn>(O))
         return &P->RetiredDasValues;

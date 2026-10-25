@@ -1,6 +1,5 @@
 options gen2
 require ue_gameplay_refs
-require ue_probe_actor
 
 [ue_class(module_id="gameplaydemo",Blueprintable)]
 class GameplayBehavior : ActorComponent {
@@ -19,7 +18,7 @@ class GameplayBehavior : ActorComponent {
         let owner = ue_owner(type<GameplayActorRef>)
         owner.Score += amount
     }
-    [ue_event(source=owner,source_type=ProbeActorRef,name="OnDasSignal")]
+    [ue_event(source=owner,source_type=GameplayActorRef,name="OnDasSignal")]
     def OnSignal(value:int):void {
         self.SignalCount += 1
         let owner = ue_owner(type<GameplayActorRef>)

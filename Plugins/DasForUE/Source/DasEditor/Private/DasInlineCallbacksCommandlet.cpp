@@ -2,7 +2,7 @@
 #include "DasAuthoring.h"
 #include "DasDSLService.h"
 #include "DasRuntime.h"
-#include "DasProbeActor.h"
+#include "DasActor.h"
 #include "Engine/Engine.h"
 #include "Engine/Blueprint.h"
 #include "Misc/Paths.h"
@@ -130,8 +130,8 @@ int32 UDasInlineCallbacksCommandlet::Main(const FString& Params)
         World->DestroyWorld(false);
     };
     World->InitializeActorsForPlay(FURL());
-    auto* Actor = World->SpawnActor<ADasProbeActor>(BP->GeneratedClass);
-    TStrongObjectPtr<ADasProbeActor> Keep(Actor);
+    auto* Actor = World->SpawnActor<ADasActor>(BP->GeneratedClass);
+    TStrongObjectPtr<ADasActor> Keep(Actor);
     auto* Component = NewObject<UEnhancedInputComponent>(Actor);
     Actor->InputComponent = Component;
     Component->RegisterComponent();

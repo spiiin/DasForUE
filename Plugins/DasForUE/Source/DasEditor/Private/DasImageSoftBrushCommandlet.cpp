@@ -1,6 +1,6 @@
 #include "DasImageSoftBrushCommandlet.h"
 #include "DasRuntime.h"
-#include "DasProbeActor.h"
+#include "DasActor.h"
 #include "DasScriptUserWidget.h"
 #include "Blueprint/WidgetTree.h"
 #include "Components/Image.h"
@@ -134,7 +134,7 @@ int32 UDasImageSoftBrushCommandlet::Main(const FString& Params)
         GEngine->DestroyWorldContext(World.Get());
         World->DestroyWorld(false);
     };
-    auto* Actor = World->SpawnActor<ADasProbeActor>();
+    auto* Actor = World->SpawnActor<ADasActor>();
     TStrongObjectPtr<UDasScriptUserWidget> Widget(NewObject<UDasScriptUserWidget>(World.Get()));
     Widget->Initialize();
     if (!Widget->WidgetTree)

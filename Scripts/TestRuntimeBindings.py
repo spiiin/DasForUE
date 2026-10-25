@@ -37,7 +37,7 @@ class RuntimeBindingsTests(unittest.TestCase):
         source = ROOT/'Plugins/DasForUE/Source/DasRuntime'
         offenders = []
         for file in source.rglob('*'):
-            if not file.is_file() or file.name == 'DasProbeActor.cpp': continue
+            if not file.is_file(): continue
             if (file.name.endswith(('Probe.cpp', 'Tests.cpp', 'Tests.inl'))
                     or 'Fixture' in file.name
                     or file.name in ('SmokeAot.cpp', 'UEGuardAot.cpp', 'DasGASPlaygroundValidation.cpp')):

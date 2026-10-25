@@ -2,7 +2,7 @@
 #include "DasRuntime.h"
 #include "DasAuthoring.h"
 #include "DasFoundationManifest.h"
-#include "DasProbeActor.h"
+#include "DasActor.h"
 #include "Engine/Engine.h"
 #include "Engine/World.h"
 #include "Engine/CollisionProfile.h"
@@ -97,7 +97,7 @@ int32 UDasEnumNamesCommandlet::Main(const FString& Params)
         World->DestroyWorld(false);
     };
     World->InitializeActorsForPlay(FURL());
-    auto* Actor = World->SpawnActor<ADasProbeActor>();
+    auto* Actor = World->SpawnActor<ADasActor>();
     auto* Box = NewObject<UBoxComponent>(Actor);
     Actor->AddInstanceComponent(Box);
     Box->RegisterComponent();

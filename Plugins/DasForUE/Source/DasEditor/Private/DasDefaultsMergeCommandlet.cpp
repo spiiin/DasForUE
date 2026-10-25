@@ -2,7 +2,7 @@
 #include "DasDefaultsMigration.h"
 #include "DasDSLService.h"
 #include "DasRuntime.h"
-#include "DasProbeActor.h"
+#include "DasActor.h"
 #include "Engine/Blueprint.h"
 #include "Engine/BlueprintGeneratedClass.h"
 #include "Engine/SimpleConstructionScript.h"
@@ -48,7 +48,7 @@ UObject* Template(UBlueprint* BP, const TCHAR* Name)
             return N->ComponentTemplate.Get();
     return nullptr;
 }
-int32 Call(ADasProbeActor* A)
+int32 Call(ADasActor* A)
 {
     auto* F = A->FindFunction(TEXT("Read"));
     FStructOnScope Frame(F);
@@ -103,8 +103,8 @@ int32 UDasDefaultsMergeCommandlet::Main(const FString& Params)
     UBlueprint* BP = nullptr;
     UBlueprint* Child = nullptr;
     UWorld* W = nullptr;
-    ADasProbeActor* A = nullptr;
-    ADasProbeActor* M = nullptr;
+    ADasActor* A = nullptr;
+    ADasActor* M = nullptr;
     ON_SCOPE_EXIT
     {
         if (W && W->IsInitialized())
@@ -177,8 +177,8 @@ int32 UDasDefaultsMergeCommandlet::Main(const FString& Params)
             return 1;
         W->SetFlags(RF_Public | RF_Standalone);
         W->GetOutermost()->SetPackageFlags(PKG_ContainsMap);
-        A = W->SpawnActor<ADasProbeActor>(BP->GeneratedClass);
-        M = W->SpawnActor<ADasProbeActor>(BP->GeneratedClass);
+        A = W->SpawnActor<ADasActor>(BP->GeneratedClass);
+        M = W->SpawnActor<ADasActor>(BP->GeneratedClass);
         if (!A || !M)
             return 1;
         A->Tags.Add(TEXT("MergeInherited"));
@@ -233,7 +233,7 @@ int32 UDasDefaultsMergeCommandlet::Main(const FString& Params)
 #endif
         {
             auto* Game = UWorld::CreateWorld(EWorldType::Game, false);
-            auto* Playing = Game->SpawnActor<ADasProbeActor>(BP->GeneratedClass);
+            auto* Playing = Game->SpawnActor<ADasActor>(BP->GeneratedClass);
             if (Playing)
                 SetInt(Playing, TEXT("Auto"), 5);
             // Game-world instances keep their values; the merge covers the class and editor instances.
@@ -263,7 +263,7 @@ int32 UDasDefaultsMergeCommandlet::Main(const FString& Params)
             W->InitWorld();
         W->UpdateWorldComponents(true, false);
         for (const auto& Actor : W->PersistentLevel->Actors)
-            if (auto* P = Cast<ADasProbeActor>(Actor))
+            if (auto* P = Cast<ADasActor>(Actor))
             {
                 if (P->Tags.Contains(TEXT("MergeInherited")))
                     A = P;
@@ -356,7 +356,7 @@ int32 UDasDefaultsMergeCommandlet::Main(const FString& Params)
                                                                                                                         .IsEmpty(),
                                                                                                                 TEXT("reflected_call_after_reload")))
         return 1;
-    auto* Fresh = W->SpawnActor<ADasProbeActor>(BP->GeneratedClass);
+    auto* Fresh = W->SpawnActor<ADasActor>(BP->GeneratedClass);
     if (!Fresh || !Check(Int(Fresh, TEXT("Auto")) == 20 &&
                              Int(Fresh, TEXT("Manual")) == 77 &&
                                  Int(Ref(Fresh, TEXT("OtherWorker")), TEXT("Bonus")) == 52, TEXT("fresh_spawn")))
@@ -386,7 +386,7 @@ int32 UDasDefaultsMergeCommandlet::Main(const FString& Params)
         R.ReleaseObject(M);
         FKismetEditorUtilities::CompileBlueprint(BP);
         FKismetEditorUtilities::CompileBlueprint(Child);
-        auto* CheckActor = W->SpawnActor<ADasProbeActor>(BP->GeneratedClass);
+        auto* CheckActor = W->SpawnActor<ADasActor>(BP->GeneratedClass);
         if (!Check(CheckActor && Int(BP->GeneratedClass->GetDefaultObject(), TEXT("Manual")) == 77 &&
                                      Int(BP->GeneratedClass->GetDefaultObject(), TEXT("Auto")) == 20 &&
                                          Int(Child->GeneratedClass->GetDefaultObject(), TEXT("Manual")) == 55 &&

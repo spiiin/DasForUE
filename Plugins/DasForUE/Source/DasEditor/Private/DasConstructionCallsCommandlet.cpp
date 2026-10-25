@@ -1,6 +1,6 @@
 #include "DasConstructionCallsCommandlet.h"
 #include "DasDSLService.h"
-#include "DasProbeActor.h"
+#include "DasActor.h"
 #include "DasScriptComponent.h"
 #include "DasRuntime.h"
 #include "Engine/Blueprint.h"
@@ -116,7 +116,7 @@ int32 UDasConstructionCallsCommandlet::Main(const FString& Params)
         {
             World->DestroyWorld(false);
         };
-        auto* Actor = World->SpawnActor<ADasProbeActor>(BP->GeneratedClass);
+        auto* Actor = World->SpawnActor<ADasActor>(BP->GeneratedClass);
         if (!Actor || !Actor->LastDasError.IsEmpty() || Int(Actor, TEXT("Result")) != 27)
         {
             UE_LOG(LogTemp, Error,
@@ -136,7 +136,7 @@ int32 UDasConstructionCallsCommandlet::Main(const FString& Params)
             UE_LOG(LogTemp, Error, TEXT("Construction calls assertion failed at line %d"), __LINE__);
             return 1;
         }
-        auto* Peer = World->SpawnActor<ADasProbeActor>(PeerBP->GeneratedClass);
+        auto* Peer = World->SpawnActor<ADasActor>(PeerBP->GeneratedClass);
         if (!Peer)
         {
             UE_LOG(LogTemp, Error, TEXT("Construction calls assertion failed at line %d"), __LINE__);

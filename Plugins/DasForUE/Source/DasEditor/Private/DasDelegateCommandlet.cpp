@@ -1,6 +1,7 @@
 #include "DasDelegateCommandlet.h"
 #include "DasPureFunctionTestGraph.h"
 #include "DasDSLService.h"
+#include "DasActor.h"
 #include "DasProbeActor.h"
 #include "DasScriptComponent.h"
 #include "DasComponentConstructionProbe.h"
@@ -119,7 +120,7 @@ int32 UDasDelegateCommandlet::Main(const FString& Params)
     {
         World->DestroyWorld(false);
     };
-    auto* Actor = World->SpawnActor<ADasProbeActor>(BP->GeneratedClass);
+    auto* Actor = World->SpawnActor<ADasActor>(BP->GeneratedClass);
     if (!Actor)
         return 1;
     TStrongObjectPtr<UBlueprint> ListenerBP(MakeDelegateListenerBlueprint());
@@ -203,7 +204,7 @@ int32 UDasDelegateCommandlet::Main(const FString& Params)
     if (!SingleBP || !SingleBP->GeneratedClass)
         return 1;
     TStrongObjectPtr<UBlueprint> KeepSingle(SingleBP);
-    auto* SingleActor = World->SpawnActor<ADasProbeActor>(SingleBP->GeneratedClass);
+    auto* SingleActor = World->SpawnActor<ADasActor>(SingleBP->GeneratedClass);
     auto* Callback = FindFProperty<FDelegateProperty>(SingleActor->GetClass(), TEXT("Callback"));
     if (!Callback || !Callback->HasAnyPropertyFlags(CPF_BlueprintVisible))
         return 1;
@@ -256,7 +257,7 @@ int32 UDasDelegateCommandlet::Main(const FString& Params)
         UE_LOG(LogTemp, Error, TEXT("Delegate method accessor failed: %s %d"), *Methods.Error, Methods.Value);
         return 1;
     }
-    auto* Peer = World->SpawnActor<ADasProbeActor>(SingleBP->GeneratedClass);
+    auto* Peer = World->SpawnActor<ADasActor>(SingleBP->GeneratedClass);
     if (!Peer)
         return 1;
     auto* Execute = Peer->FindFunction(TEXT("ExecuteCallback"));
@@ -298,7 +299,7 @@ int32 UDasDelegateCommandlet::Main(const FString& Params)
     SingleActor->Destroy();
     UE_LOG(LogTemp, Display, TEXT("PASS single_delegate_field_reflection_bind_copy_clear_foreign_accessor_%s"), *Phase);
     int32 ArrayResult = 0;
-    auto* ArrayOwner = World->SpawnActor<ADasProbeActor>(SingleBP->GeneratedClass);
+    auto* ArrayOwner = World->SpawnActor<ADasActor>(SingleBP->GeneratedClass);
     if (!ArrayOwner)
         return 1;
     auto* ArrayFn = ArrayOwner->FindFunction(TEXT("ProbeRefArray"));
@@ -340,7 +341,7 @@ int32 UDasDelegateCommandlet::Main(const FString& Params)
     if (!ChildBP || !ChildBP->GeneratedClass || ChildBP->NewVariables.Num() != 1 ||
         !Cast<UBlueprint>(ChildBP->ParentClass->ClassGeneratedBy))
         return 1;
-    auto* Child = World->SpawnActor<ADasProbeActor>(ChildBP->GeneratedClass);
+    auto* Child = World->SpawnActor<ADasActor>(ChildBP->GeneratedClass);
     if (!Child)
         return 1;
     auto* Probe = Child->FindFunction(TEXT("Probe"));
@@ -400,7 +401,7 @@ int32 UDasDelegateCommandlet::Main(const FString& Params)
         LifeBP = LoadObject<UBlueprint>(nullptr, *(LifePackage + TEXT(".BP_ChildLifeActor")));
     if (!LifeBP || !LifeBP->GeneratedClass)
         return 1;
-    auto* Life = World->SpawnActor<ADasProbeActor>(LifeBP->GeneratedClass);
+    auto* Life = World->SpawnActor<ADasActor>(LifeBP->GeneratedClass);
     if (!Life)
         return 1;
     auto IntField = [](UObject* Object, const TCHAR* Name)
@@ -437,7 +438,7 @@ int32 UDasDelegateCommandlet::Main(const FString& Params)
         UE_LOG(LogTemp, Error, TEXT("Tick-only import: %s"), *Error);
         return 1;
     }
-    auto* TickOnly = World->SpawnActor<ADasProbeActor>(TickOnlyBP->GeneratedClass);
+    auto* TickOnly = World->SpawnActor<ADasActor>(TickOnlyBP->GeneratedClass);
     if (!TickOnly)
         return 1;
     const auto TickOnlyResult =
@@ -447,7 +448,7 @@ int32 UDasDelegateCommandlet::Main(const FString& Params)
         UE_LOG(LogTemp, Error, TEXT("Tick-only chain: %s"), *TickOnlyResult.Error);
         return 1;
     }
-    TickOnly->EmitDasSignal(3);
+    CastChecked<ADasProbeActor>(TickOnly)->EmitDasSignal(3);
     if (IntField(TickOnly, TEXT("BaseSignals")) != 3)
     {
         UE_LOG(LogTemp, Error, TEXT("Inherited event-only initialization failed"));
@@ -457,7 +458,7 @@ int32 UDasDelegateCommandlet::Main(const FString& Params)
                                                                       EDasCallback::EndPlay, TickOnly, 0.f, 0);
     if (!EventOnlyEnd.bSucceeded || Runtime.SubscriptionCount(TickOnly) != 0)
         return 1;
-    TickOnly->EmitDasSignal(5);
+    CastChecked<ADasProbeActor>(TickOnly)->EmitDasSignal(5);
     if (IntField(TickOnly, TEXT("BaseSignals")) != 3)
         return 1;
     UE_LOG(LogTemp, Display, TEXT("PASS inherited_event_without_parent_BeginPlay_EndPlay_cleanup_%s"), *Phase);
@@ -485,12 +486,12 @@ int32 UDasDelegateCommandlet::Main(const FString& Params)
         HelperBP = LoadObject<UBlueprint>(nullptr, *(HelperPackage + TEXT(".BP_GrandCounter")));
     if (!HelperBP || !HelperBP->GeneratedClass)
         return 1;
-    auto* HelperActor = World->SpawnActor<ADasProbeActor>(HelperBP->GeneratedClass);
+    auto* HelperActor = World->SpawnActor<ADasActor>(HelperBP->GeneratedClass);
     if (!HelperActor)
         return 1;
     // A fresh editor-world instance executes construction after SCS, and reruns use edited values.
     TStrongObjectPtr<UWorld> ConstructionWorld(UWorld::CreateWorld(EWorldType::Editor, false));
-    auto* Constructed = ConstructionWorld->SpawnActor<ADasProbeActor>(HelperBP->GeneratedClass);
+    auto* Constructed = ConstructionWorld->SpawnActor<ADasActor>(HelperBP->GeneratedClass);
     if (!Constructed || !Constructed->LastDasError.IsEmpty() ||
         IntField(Constructed, TEXT("ConstructionValue")) != 23 ||
                  IntField(Constructed, TEXT("ConstructionTrace")) != 12)
@@ -527,7 +528,7 @@ int32 UDasDelegateCommandlet::Main(const FString& Params)
         UE_LOG(LogTemp, Error, TEXT("Construction failure fixture import: %s"), *Error);
         return 1;
     }
-    auto* FailedConstruction = ConstructionWorld->SpawnActor<ADasProbeActor>(FailureBP->GeneratedClass);
+    auto* FailedConstruction = ConstructionWorld->SpawnActor<ADasActor>(FailureBP->GeneratedClass);
     if (!FailedConstruction ||
         !FailedConstruction->LastDasError.Contains(TEXT("managed callbacks are forbidden during ConstructionScript")) ||
                                                    IntField(FailedConstruction, TEXT("ConstructionTrace")) != 1)
@@ -591,7 +592,7 @@ int32 UDasDelegateCommandlet::Main(const FString& Params)
         return 1;
     }
     UE_LOG(LogTemp, Display, TEXT("PASS omitted_component_hook_override_%s\n%s"), *Phase, *ComponentReport);
-    auto* LifeConstruction = ConstructionWorld->SpawnActor<ADasProbeActor>(LifeBP->GeneratedClass);
+    auto* LifeConstruction = ConstructionWorld->SpawnActor<ADasActor>(LifeBP->GeneratedClass);
     auto ComponentField = [](UObject* O, const TCHAR* N)
     {
         auto* P = O ? FindFProperty<FObjectProperty>(O->GetClass(), N) : nullptr;
@@ -604,7 +605,7 @@ int32 UDasDelegateCommandlet::Main(const FString& Params)
                                                 !LifeConstruction->LastDasError.IsEmpty())
         return 1;
     // Native instance components survive reconstruction, so their own Details edits are retained.
-    auto* NativeOwner = ConstructionWorld->SpawnActor<ADasProbeActor>();
+    auto* NativeOwner = ConstructionWorld->SpawnActor<ADasActor>();
     auto* NativeComponent = NewObject<UDasScriptComponent>(NativeOwner, StandaloneBP->GeneratedClass,
                                                            TEXT("OwnedNativeConstruction"), RF_Transactional);
     NativeOwner->AddInstanceComponent(NativeComponent);
@@ -675,7 +676,7 @@ int32 UDasDelegateCommandlet::Main(const FString& Params)
         PureBP = LoadObject<UBlueprint>(nullptr, *(PurePackage + TEXT(".BP_PureConsumer")));
     if (!PureBP)
         return 1;
-    auto* PureActor = World->SpawnActor<ADasProbeActor>(PureBP->GeneratedClass);
+    auto* PureActor = World->SpawnActor<ADasActor>(PureBP->GeneratedClass);
     if (!PureActor)
         return 1;
     auto* PureFn = PureActor->FindFunction(TEXT("EvaluatePure"));

@@ -1,8 +1,9 @@
 options gen2
+require ue_probe_actor
 options gc
 require ue_dsl
 
-[ue_class(module_id="arrayevents",Blueprintable)]
+[ue_class(module_id="arrayevents",Blueprintable,parent="/Script/DasRuntime.DasProbeActor")]
 class ArrayEventActor {
     @ue_property=(EditAnywhere,BlueprintReadWrite)
     Label:UENameValue=ue_name_value("None")

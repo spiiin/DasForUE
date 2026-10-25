@@ -1,5 +1,5 @@
 #include "DasDSLService.h"
-#include "DasProbeActor.h"
+#include "DasActor.h"
 #include "DasScriptComponent.h"
 #include "DasRuntime.h"
 #include "Editor.h"
@@ -49,9 +49,9 @@ public:
             Test->TestTrue(TEXT("PIE ended and sessions released"), !W && R.PersistentContextCount() == 0);
             return true;
         }
-        ADasProbeActor* Actor = nullptr;
+        ADasActor* Actor = nullptr;
         if (W)
-            for (TActorIterator<ADasProbeActor> I(W); I; ++I)
+            for (TActorIterator<ADasActor> I(W); I; ++I)
                 if (I->GetFName() == TEXT("DynamicOwner"))
                     Actor = *I;
         if (!Actor || !W->HasBegunPlay())
@@ -158,7 +158,7 @@ bool FDasDynamicComponentPIE::RunTest(const FString&)
     auto* W = FAutomationEditorCommonUtils::CreateNewMap();
     FActorSpawnParameters P;
     P.Name = TEXT("DynamicOwner");
-    auto* Actor = W->SpawnActor<ADasProbeActor>(Owner->GeneratedClass, FTransform::Identity, P);
+    auto* Actor = W->SpawnActor<ADasActor>(Owner->GeneratedClass, FTransform::Identity, P);
     auto* Field = FindFProperty<FClassProperty>(Owner->GeneratedClass, TEXT("ComponentClass"));
     if (!Actor || !Field)
     {
@@ -241,7 +241,7 @@ bool FDasClassPropertyReload::RunTest(const FString&)
     auto* W = FAutomationEditorCommonUtils::CreateNewMap();
     FActorSpawnParameters P;
     P.Name = TEXT("DynamicOwner");
-    auto* Actor = W->SpawnActor<ADasProbeActor>(Owner->GeneratedClass, FTransform::Identity, P);
+    auto* Actor = W->SpawnActor<ADasActor>(Owner->GeneratedClass, FTransform::Identity, P);
     if (!TestTrue(TEXT("spawn copies saved class default"),
                        Actor && Field->GetObjectPropertyValue_InContainer(Actor) == Component->GeneratedClass))
         return false;

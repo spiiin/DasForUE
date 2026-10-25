@@ -1,5 +1,5 @@
 #include "DasRuntime.h"
-#include "DasProbeActor.h"
+#include "DasActor.h"
 #include "Engine/Blueprint.h"
 #include "EngineUtils.h"
 #include "Editor.h"
@@ -39,10 +39,10 @@ public:
             return true;
         }
         auto* World = GEditor->PlayWorld.Get();
-        ADasProbeActor* Driver = nullptr;
-        ADasProbeActor* Target = nullptr;
+        ADasActor* Driver = nullptr;
+        ADasActor* Target = nullptr;
         if (World)
-            for (TActorIterator<ADasProbeActor> It(World); It; ++It)
+            for (TActorIterator<ADasActor> It(World); It; ++It)
             {
                 if (It->GetFName() == TEXT("MethodValueDriver"))
                     Driver = *It;
@@ -96,9 +96,9 @@ bool FDasMethodValuesPIETest::RunTest(const FString&)
     auto* World = FAutomationEditorCommonUtils::CreateNewMap();
     FActorSpawnParameters Spawn;
     Spawn.Name = TEXT("MethodValueTarget");
-    World->SpawnActor<ADasProbeActor>(State->Target->GeneratedClass, FTransform::Identity, Spawn);
+    World->SpawnActor<ADasActor>(State->Target->GeneratedClass, FTransform::Identity, Spawn);
     Spawn.Name = TEXT("MethodValueDriver");
-    World->SpawnActor<ADasProbeActor>(State->Driver->GeneratedClass, FTransform::Identity, Spawn);
+    World->SpawnActor<ADasActor>(State->Driver->GeneratedClass, FTransform::Identity, Spawn);
     ADD_LATENT_AUTOMATION_COMMAND(FStartPIECommand(false));
     FAutomationTestFramework::Get().EnqueueLatentCommand(MakeShared<FMethodValuesPIECommand>(State, this));
     return true;

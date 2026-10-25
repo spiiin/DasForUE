@@ -5,6 +5,7 @@
 #include "DasStaticLibraryProbe.h"
 #include "DasDSLService.h"
 #include "DasPureFunctionTestGraph.h"
+#include "DasActor.h"
 #include "DasProbeActor.h"
 #include "DasComponentConstructionProbe.h"
 #include "DasRuntime.h"
@@ -30,9 +31,9 @@ struct FGameplayPIEState
     TStrongObjectPtr<UBlueprint> Blueprint, SingleBlueprint, InheritedBlueprint, LifeBlueprint, HelperBlueprint,
         ConstructionBlueprint, PureBlueprint, LibraryBlueprint, LibraryConsumerBlueprint, ValuesBlueprint,
         WorldConsumerBlueprint, DefaultConsumerBlueprint;
-    TWeakObjectPtr<ADasProbeActor> First, Second;
+    TWeakObjectPtr<ADasActor> First, Second;
     TWeakObjectPtr<ADasStaticLibraryProbe> LibraryCarrier;
-    TStrongObjectPtr<ADasProbeActor> DestroyedOwner;
+    TStrongObjectPtr<ADasActor> DestroyedOwner;
     int32 DestroyedPulses = 0;
     bool Passed = true;
 };
@@ -83,7 +84,7 @@ public:
             return true;
         }
         if (World && !State->First.IsValid())
-            for (TActorIterator<ADasProbeActor> It(World); It; ++It)
+            for (TActorIterator<ADasActor> It(World); It; ++It)
             {
                 if (It->GetFName() == TEXT("GameplayFirst"))
                     State->First = *It;
@@ -110,8 +111,8 @@ public:
                 End();
                 return false;
             }
-            ADasProbeActor* Single = nullptr;
-            for (TActorIterator<ADasProbeActor> It(World); It; ++It)
+            ADasActor* Single = nullptr;
+            for (TActorIterator<ADasActor> It(World); It; ++It)
                 if (It->GetFName() == TEXT("SingleDelegateOwner"))
                     Single = *It;
             Check(Single != nullptr, TEXT("single_delegate_actor_duplicated_into_PIE"));
@@ -151,8 +152,8 @@ public:
                 if (auto* Fn = Single->FindFunction(TEXT("ProbeRefArray")))
                     Single->ProcessEvent(Fn, &ArrayRef);
                 Check(ArrayRef == 1, TEXT("delegate_array_ref_out_in_PIE"));
-                ADasProbeActor* Inherited = nullptr;
-                for (TActorIterator<ADasProbeActor> It(World); It; ++It)
+                ADasActor* Inherited = nullptr;
+                for (TActorIterator<ADasActor> It(World); It; ++It)
                     if (It->GetFName() == TEXT("InheritedOwner"))
                         Inherited = *It;
                 struct FInheritanceArgs
@@ -170,8 +171,8 @@ public:
                 Single->Destroy();
                 Check(R.SubscriptionCount(Single) == 0, TEXT("single_delegate_owner_destroy_cleanup"));
             }
-            ADasProbeActor* Life = nullptr;
-            for (TActorIterator<ADasProbeActor> It(World); It; ++It)
+            ADasActor* Life = nullptr;
+            for (TActorIterator<ADasActor> It(World); It; ++It)
                 if (It->GetFName() == TEXT("LifeOwner"))
                     Life = *It;
             Check(Life != nullptr, TEXT("inherited_lifecycle_actor_in_PIE"));
@@ -182,7 +183,7 @@ public:
                 TStrongObjectPtr<UActorComponent> Behavior(
                     BehaviorField ? Cast<UActorComponent>(BehaviorField->GetObjectPropertyValue_InContainer(Life))
                                   : nullptr);
-                TStrongObjectPtr<ADasProbeActor> KeepLife(Life);
+                TStrongObjectPtr<ADasActor> KeepLife(Life);
                 Check(Life->GetRootComponent() && Life->GetRootComponent()->bHiddenInGame,
                       TEXT("inherited_native_template_override"));
                 Check(ProbeInt(Behavior.Get(), TEXT("ConstructionValue")) == 113 &&
@@ -226,7 +227,7 @@ public:
                                ProbeInt(ExtraBehavior.Get(), TEXT("BaseBegins")) == 1 &&
                                         ProbeInt(ExtraBehavior.Get(), TEXT("ChildBegins")) == 1,
                                                  TEXT("derived_authored_component_defaults_and_lifecycle"));
-                Life->EmitDasSignal(4);
+                CastChecked<ADasProbeActor>(Life)->EmitDasSignal(4);
                 Check(ProbeInt(
                     Life, TEXT("BaseSignals")) == 4 &&
                     ProbeInt(Life, TEXT("ChildSignals")) == 40 &&
@@ -237,7 +238,7 @@ public:
                                                    ProbeInt(
                                                        ExtraBehavior.Get(), TEXT("ChildSignals")) == 40,
                                                        TEXT("inherited_and_owned_actor_component_event_subscriptions"));
-                Life->EmitDasSignal(1);
+                CastChecked<ADasProbeActor>(Life)->EmitDasSignal(1);
                 Check(ProbeInt(Life, TEXT("BaseSignals")) == 5 &&
                                ProbeInt(Life, TEXT("ChildSignals")) == 50,
                                         TEXT("inherited_event_delivered_once_per_handler"));
@@ -292,8 +293,8 @@ public:
             UE_LOG(LogTemp, Display, TEXT("%s"), *ConstructionReport);
             if (StandaloneOwner)
                 StandaloneOwner->Destroy();
-            ADasProbeActor* LibraryCaller = nullptr;
-            for (TActorIterator<ADasProbeActor> It(World); It; ++It)
+            ADasActor* LibraryCaller = nullptr;
+            for (TActorIterator<ADasActor> It(World); It; ++It)
                 if (It->ActorHasTag(TEXT("LibraryConsumer")))
                     LibraryCaller = *It;
             int32 LibrarySum = 0;
@@ -303,8 +304,8 @@ public:
             Check(LibraryCaller && LibrarySum == 12, TEXT("static_library_Blueprint_consumer"));
             if (LibraryCaller)
                 LibraryCaller->Destroy();
-            ADasProbeActor* DefaultCaller = nullptr;
-            for (TActorIterator<ADasProbeActor> It(World); It; ++It)
+            ADasActor* DefaultCaller = nullptr;
+            for (TActorIterator<ADasActor> It(World); It; ++It)
                 if (It->ActorHasTag(TEXT("DefaultLibraryConsumer")))
                     DefaultCaller = *It;
             int32 DefaultSum = 0;
@@ -314,8 +315,8 @@ public:
             Check(DefaultCaller && DefaultSum == 5, TEXT("library_Blueprint_omitted_arguments_use_defaults"));
             if (DefaultCaller)
                 DefaultCaller->Destroy();
-            ADasProbeActor* WorldCaller = nullptr;
-            for (TActorIterator<ADasProbeActor> It(World); It; ++It)
+            ADasActor* WorldCaller = nullptr;
+            for (TActorIterator<ADasActor> It(World); It; ++It)
                 if (It->ActorHasTag(TEXT("WorldLibraryConsumer")))
                     WorldCaller = *It;
             double WorldTime = -1;
@@ -353,8 +354,8 @@ public:
                   TEXT("playable_character_in_game"));
             UE_LOG(LogTemp, Display, TEXT("%s"), *PlayableReport);
             State->LibraryCarrier = LibraryCarrier;
-            ADasProbeActor* PureOwner = nullptr;
-            for (TActorIterator<ADasProbeActor> It(World); It; ++It)
+            ADasActor* PureOwner = nullptr;
+            for (TActorIterator<ADasActor> It(World); It; ++It)
                 if (It->ActorHasTag(TEXT("PureOwner")))
                     PureOwner = *It;
             int32 PureResult = 0;
@@ -367,8 +368,8 @@ public:
                                           TEXT("pure_Blueprint_data_node_override_Super_in_PIE"));
             if (PureOwner)
                 PureOwner->Destroy();
-            ADasProbeActor* HelperOwner = nullptr;
-            for (TActorIterator<ADasProbeActor> It(World); It; ++It)
+            ADasActor* HelperOwner = nullptr;
+            for (TActorIterator<ADasActor> It(World); It; ++It)
                 if (It->GetFName() == TEXT("HelperOwner"))
                     HelperOwner = *It;
             struct FHelperPIEArgs
@@ -395,11 +396,11 @@ public:
                                                                          TEXT("latent_and_async_completion_once"));
             Check(ProbeInt(A, TEXT("CancelledCalls")) == 0, TEXT("cancelled_next_tick_and_latent_do_not_dispatch"));
             Check(ProbeBool(A, TEXT("SceneOK")), TEXT("scene_create_attach_transform_detach_destroy"));
-            A->EmitDasFloatSignal(2.5f);
-            A->EmitDasVoidSignal();
-            A->EmitDasStringSignal(TEXT("PIE 世界"));
-            A->EmitDasArrayIntSignal(TArray<int32>{11, 12});
-            A->EmitDasVector2DRefSignal(FVector2D(9, 10));
+            CastChecked<ADasProbeActor>(A)->EmitDasFloatSignal(2.5f);
+            CastChecked<ADasProbeActor>(A)->EmitDasVoidSignal();
+            CastChecked<ADasProbeActor>(A)->EmitDasStringSignal(TEXT("PIE 世界"));
+            CastChecked<ADasProbeActor>(A)->EmitDasArrayIntSignal(TArray<int32>{11, 12});
+            CastChecked<ADasProbeActor>(A)->EmitDasVector2DRefSignal(FVector2D(9, 10));
             auto* FP = FindFProperty<FFloatProperty>(A->GetClass(), TEXT("Floats"));
             auto* TP = FindFProperty<FStrProperty>(A->GetClass(), TEXT("Text"));
             auto* VP = FindFProperty<FStructProperty>(A->GetClass(), TEXT("Position"));
@@ -480,7 +481,7 @@ bool FDasGameplayRuntimePIETest::RunTest(const FString&)
         FActorSpawnParameters Spawn;
         Spawn.Name = Name;
         if (!TestNotNull(TEXT("Spawn probe actor"),
-                              World->SpawnActor<ADasProbeActor>(BP->GeneratedClass, FTransform::Identity, Spawn)))
+                              World->SpawnActor<ADasActor>(BP->GeneratedClass, FTransform::Identity, Spawn)))
             return false;
     }
     if (!TestTrue(TEXT("Create single delegate DSL actor"),
@@ -495,7 +496,7 @@ bool FDasGameplayRuntimePIETest::RunTest(const FString&)
     FActorSpawnParameters SingleSpawn;
     SingleSpawn.Name = TEXT("SingleDelegateOwner");
     if (!TestNotNull(TEXT("Spawn single delegate owner"),
-                          World->SpawnActor<ADasProbeActor>(BP->GeneratedClass, FTransform::Identity, SingleSpawn)))
+                          World->SpawnActor<ADasActor>(BP->GeneratedClass, FTransform::Identity, SingleSpawn)))
         return false;
     if (!TestTrue(TEXT("Create authored child"),
                        FDasDSLService::Apply(TEXT("dsl_inheritance_child.das"),
@@ -508,7 +509,7 @@ bool FDasGameplayRuntimePIETest::RunTest(const FString&)
     State->InheritedBlueprint.Reset(BP);
     FActorSpawnParameters InheritSpawn;
     InheritSpawn.Name = TEXT("InheritedOwner");
-    if (!World->SpawnActor<ADasProbeActor>(BP->GeneratedClass, FTransform::Identity, InheritSpawn))
+    if (!World->SpawnActor<ADasActor>(BP->GeneratedClass, FTransform::Identity, InheritSpawn))
         return false;
     if (!TestTrue(TEXT("Create inherited lifecycle actor"),
                        FDasDSLService::Apply(TEXT("dsl_life_actor_child.das"),
@@ -540,7 +541,7 @@ bool FDasGameplayRuntimePIETest::RunTest(const FString&)
         return false;
     FActorSpawnParameters LifeSpawn;
     LifeSpawn.Name = TEXT("LifeOwner");
-    if (!World->SpawnActor<ADasProbeActor>(BP->GeneratedClass, FTransform::Identity, LifeSpawn))
+    if (!World->SpawnActor<ADasActor>(BP->GeneratedClass, FTransform::Identity, LifeSpawn))
         return false;
     if (!TestTrue(TEXT("Create grandchild helper actor"),
                        FDasDSLService::Apply(TEXT("dsl_inheritance_grandchild.das"),
@@ -553,7 +554,7 @@ bool FDasGameplayRuntimePIETest::RunTest(const FString&)
     State->HelperBlueprint.Reset(BP);
     FActorSpawnParameters HelperSpawn;
     HelperSpawn.Name = TEXT("HelperOwner");
-    if (!World->SpawnActor<ADasProbeActor>(BP->GeneratedClass, FTransform::Identity, HelperSpawn))
+    if (!World->SpawnActor<ADasActor>(BP->GeneratedClass, FTransform::Identity, HelperSpawn))
         return false;
     UBlueprint* LibraryBP = nullptr;
     if (!FDasDSLService::Apply(TEXT("dsl_math_library.das"),
@@ -604,7 +605,7 @@ bool FDasGameplayRuntimePIETest::RunTest(const FString&)
         return false;
     }
     State->DefaultConsumerBlueprint.Reset(DefaultConsumer);
-    auto* DefaultCaller = World->SpawnActor<ADasProbeActor>(DefaultConsumer->GeneratedClass);
+    auto* DefaultCaller = World->SpawnActor<ADasActor>(DefaultConsumer->GeneratedClass);
     if (!DefaultCaller)
         return false;
     DefaultCaller->Tags.Add(TEXT("DefaultLibraryConsumer"));
@@ -616,7 +617,7 @@ bool FDasGameplayRuntimePIETest::RunTest(const FString&)
         return false;
     }
     State->WorldConsumerBlueprint.Reset(WorldConsumer);
-    auto* WorldCaller = World->SpawnActor<ADasProbeActor>(WorldConsumer->GeneratedClass);
+    auto* WorldCaller = World->SpawnActor<ADasActor>(WorldConsumer->GeneratedClass);
     if (!WorldCaller)
         return false;
     WorldCaller->Tags.Add(TEXT("WorldLibraryConsumer"));
@@ -629,7 +630,7 @@ bool FDasGameplayRuntimePIETest::RunTest(const FString&)
         return false;
     }
     State->LibraryConsumerBlueprint.Reset(LibraryConsumer);
-    auto* LibraryCaller = World->SpawnActor<ADasProbeActor>(LibraryConsumer->GeneratedClass);
+    auto* LibraryCaller = World->SpawnActor<ADasActor>(LibraryConsumer->GeneratedClass);
     if (!LibraryCaller)
         return false;
     LibraryCaller->Tags.Add(TEXT("LibraryConsumer"));
@@ -641,7 +642,7 @@ bool FDasGameplayRuntimePIETest::RunTest(const FString&)
         return false;
     }
     State->PureBlueprint.Reset(PureBP);
-    auto* PureActor = World->SpawnActor<ADasProbeActor>(PureBP->GeneratedClass);
+    auto* PureActor = World->SpawnActor<ADasActor>(PureBP->GeneratedClass);
     if (!PureActor)
         return false;
     PureActor->Tags.Add(TEXT("PureOwner"));

@@ -4,7 +4,7 @@
 #include "DasTypeRegistry.h"
 #include "DasDSLService.h"
 #include "DasAuthoredInterfaceProbe.h"
-#include "DasProbeActor.h"
+#include "DasActor.h"
 #include "DasProbeInterface.h"
 #include "UObject/Script.h"
 #include "DasAuthoring.h"
@@ -238,7 +238,7 @@ int32 RunDasAuthoredInterfaceProbe(const FString& Id, const FString& Phase)
         W->GetOutermost()->SetPackageFlags(PKG_ContainsMap);
         FActorSpawnParameters Spawn;
         Spawn.Name = TEXT("TypedActor");
-        auto* RegistryActor = W->SpawnActor<ADasProbeActor>(ActorBP->GeneratedClass, FTransform::Identity, Spawn);
+        auto* RegistryActor = W->SpawnActor<ADasActor>(ActorBP->GeneratedClass, FTransform::Identity, Spawn);
         RegistryActor->TypeRegistry = ValueRegistry;
         auto* WrapperBP =
             CreateAuthoredWrapperReceiver(InterfaceBP->GeneratedClass, Base + TEXT("/BP_WrapperReceiver"), Error);
@@ -345,7 +345,7 @@ int32 RunDasAuthoredInterfaceProbe(const FString& Id, const FString& Phase)
                         TEXT("repeated_implements_native_Blueprint_membership"));
         if (Multi)
         {
-            auto* Instance = W->SpawnActor<ADasProbeActor>(Multi->GeneratedClass);
+            auto* Instance = W->SpawnActor<ADasActor>(Multi->GeneratedClass);
             FEditorScriptExecutionGuard Guard;
             const TSet<int32> Values = {3, 7};
             const TSet<int32> Echo =
@@ -441,10 +441,10 @@ int32 RunDasAuthoredInterfaceProbe(const FString& Id, const FString& Phase)
                                                                                      TEXT("ResetCounter")))
                 ++EventNodes;
     Check(EventNodes == 5, TEXT("interface_void_methods_use_real_Event_Graph_nodes"));
-    ADasProbeActor* Actor = nullptr;
+    ADasActor* Actor = nullptr;
     for (const auto& A : W->PersistentLevel->Actors)
         if (A && A->GetFName() == TEXT("TypedActor"))
-            Actor = Cast<ADasProbeActor>(A.Get());
+            Actor = Cast<ADasActor>(A.Get());
     if (!Actor)
         return 1;
     Actor->TypeRegistry = ValueRegistry;
@@ -517,7 +517,7 @@ int32 RunDasAuthoredInterfaceProbe(const FString& Id, const FString& Phase)
                                     TEXT("authored_interface_reference_holder_Blueprint_applies"));
         if (HolderBP)
         {
-            auto* Holder = W->SpawnActor<ADasProbeActor>(HolderBP->GeneratedClass);
+            auto* Holder = W->SpawnActor<ADasActor>(HolderBP->GeneratedClass);
             auto* Field = FindFProperty<FInterfaceProperty>(Holder->GetClass(), TEXT("Target"));
             Check(Field && Field->InterfaceClass == InterfaceBP->GeneratedClass,
                   TEXT("authored_interface_reference_field_exact_type"));

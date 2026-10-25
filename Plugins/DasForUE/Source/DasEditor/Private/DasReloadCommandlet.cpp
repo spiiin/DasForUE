@@ -1,5 +1,6 @@
 #include "DasReloadCommandlet.h"
 #include "DasTypeService.h"
+#include "DasActor.h"
 #include "DasProbeActor.h"
 #include "DasRuntime.h"
 #include "DasBlueprintService.h"
@@ -105,9 +106,9 @@ bool Save(UObject* Object, bool bMap = false)
     Args.SaveFlags = SAVE_NoError;
     return UPackage::SavePackage(Package, Object, *Filename, Args);
 }
-ADasProbeActor* Find(UWorld* World, FName Name)
+ADasActor* Find(UWorld* World, FName Name)
 {
-    for (TActorIterator<ADasProbeActor> It(World); It; ++It)
+    for (TActorIterator<ADasActor> It(World); It; ++It)
         if (It->GetFName() == Name)
             return *It;
     return nullptr;
@@ -180,23 +181,23 @@ int32 UDasReloadCommandlet::Main(const FString& Params)
         // Loading an asset does not register its components or update their world transforms.
         World->UpdateWorldComponents(true, false);
     }
-    ADasProbeActor* Actor = nullptr;
-    ADasProbeActor* Holder = nullptr;
+    ADasActor* Actor = nullptr;
+    ADasActor* Holder = nullptr;
     if (!bReopen)
     {
         FActorSpawnParameters Spawn;
         Spawn.Name = TEXT("ProbeInstance");
-        Actor = World->SpawnActor<ADasProbeActor>(Child->GeneratedClass, FTransform(FVector(11, 22, 33)), Spawn);
+        Actor = World->SpawnActor<ADasActor>(Child->GeneratedClass, FTransform(FVector(11, 22, 33)), Spawn);
         Spawn.Name = TEXT("ReferenceHolder");
-        Holder = World->SpawnActor<ADasProbeActor>(ADasProbeActor::StaticClass(), FTransform::Identity, Spawn);
+        Holder = World->SpawnActor<ADasActor>(ADasProbeActor::StaticClass(), FTransform::Identity, Spawn);
         if (!Actor || !Holder)
         {
             Context.SetCurrentWorld(PreviousWorld);
             return 1;
         }
         SetFloat(Actor, TEXT("speed"), 37.f);
-        Holder->Peer = Actor;
-        Actor->Peer = Holder;
+        CastChecked<ADasProbeActor>(Holder)->Peer = Actor;
+        CastChecked<ADasProbeActor>(Actor)->Peer = Holder;
         Expect(Evaluate(Actor) == 41, TEXT("v1_reflected_script_method"));
         Expect(Float(Parent->GeneratedClass->GetDefaultObject(), TEXT("speed")) == 10.f, TEXT("parent_default_v1"));
         Expect(Float(Child->GeneratedClass->GetDefaultObject(), TEXT("speed")) == 20.f,
@@ -228,7 +229,9 @@ int32 UDasReloadCommandlet::Main(const FString& Params)
     Expect(Actor && Int(Actor, TEXT("health")) == 100, TEXT("new_property_default"));
     Expect(Float(Parent->GeneratedClass->GetDefaultObject(), TEXT("speed")) == 10.f, TEXT("parent_default_preserved"));
     Expect(Float(Child->GeneratedClass->GetDefaultObject(), TEXT("speed")) == 20.f, TEXT("child_default_preserved"));
-    Expect(Actor && Holder && Holder->Peer == Actor && Actor->Peer == Holder, TEXT("bidirectional_references"));
+    Expect(Actor && Holder && CastChecked<ADasProbeActor>(Holder)->Peer == Actor &&
+               CastChecked<ADasProbeActor>(Actor)->Peer == Holder,
+           TEXT("bidirectional_references"));
     Expect(Actor && Actor->GetActorLocation().Equals(FVector(11, 22, 33)), TEXT("transform_preserved"));
     Expect(Actor && Evaluate(Actor) == 42, TEXT("v2_reflected_script_method"));
     if (Actor)
@@ -348,8 +351,8 @@ public:
         Check(Actor && Float(Actor, TEXT("speed")) == 73.f, TEXT("PIE_override_preserved"));
         Check(EditorActor && Float(EditorActor, TEXT("speed")) == 37.f, TEXT("editor_override_isolated"));
         Check(Actor && Int(Actor, TEXT("health")) == 100 && Evaluate(Actor) == 42, TEXT("PIE_new_field_and_method"));
-        Check(Actor && Holder && EditorActor && Holder->Peer == Actor && Actor->Peer == Holder &&
-                  Actor->GetWorld() != EditorActor->GetWorld(),
+        Check(Actor && Holder && EditorActor && CastChecked<ADasProbeActor>(Holder)->Peer == Actor &&
+                  CastChecked<ADasProbeActor>(Actor)->Peer == Holder && Actor->GetWorld() != EditorActor->GetWorld(),
               TEXT("PIE_references_stay_in_world"));
         Check(Actor && Actor->GetActorLocation().Equals(FVector(11, 22, 33)), TEXT("PIE_transform"));
         CollectGarbage(RF_NoFlags);
@@ -397,7 +400,7 @@ public:
         IFileManager::Get().Delete(*LogicPath);
         FActorSpawnParameters DestroySpawn;
         auto* Doomed =
-            PlayWorld->SpawnActor<ADasProbeActor>(State->Child->GeneratedClass, FTransform::Identity, DestroySpawn);
+            PlayWorld->SpawnActor<ADasActor>(State->Child->GeneratedClass, FTransform::Identity, DestroySpawn);
         TWeakObjectPtr<UObject> DestroyedSelf(Doomed);
         Check(Doomed && Doomed->ExecuteDas(TEXT("persistent_counter.das"), 1) == 1, TEXT("doomed_actor_has_context"));
         const int32 BeforeDestroy = PersistentRuntime.PersistentContextCount(PlayWorld);
@@ -437,15 +440,14 @@ bool FDasPIEReloadTest::RunTest(const FString& Parameters)
     SetFloat(State->Child->GeneratedClass->GetDefaultObject(), TEXT("speed"), 20.f);
     FActorSpawnParameters Spawn;
     Spawn.Name = TEXT("ProbeInstance");
-    auto* Actor =
-        World->SpawnActor<ADasProbeActor>(State->Child->GeneratedClass, FTransform(FVector(11, 22, 33)), Spawn);
+    auto* Actor = World->SpawnActor<ADasActor>(State->Child->GeneratedClass, FTransform(FVector(11, 22, 33)), Spawn);
     Spawn.Name = TEXT("ReferenceHolder");
-    auto* Holder = World->SpawnActor<ADasProbeActor>(ADasProbeActor::StaticClass(), FTransform::Identity, Spawn);
+    auto* Holder = World->SpawnActor<ADasActor>(ADasProbeActor::StaticClass(), FTransform::Identity, Spawn);
     if (!TestTrue(TEXT("Editor actors"), Actor && Holder))
         return false;
     SetFloat(Actor, TEXT("speed"), 37.f);
-    Holder->Peer = Actor;
-    Actor->Peer = Holder;
+    CastChecked<ADasProbeActor>(Holder)->Peer = Actor;
+    CastChecked<ADasProbeActor>(Actor)->Peer = Holder;
     ADD_LATENT_AUTOMATION_COMMAND(FStartPIECommand(false));
     FAutomationTestFramework::Get().EnqueueLatentCommand(MakeShared<FDasPIEReloadCommand>(State, this));
     return true;
@@ -511,7 +513,7 @@ public:
             Started = FPlatformTime::Seconds();
             return false;
         }
-        auto Call = [&](ADasProbeActor* Actor, int32 Input)
+        auto Call = [&](ADasActor* Actor, int32 Input)
         {
             return Runtime.RunPersistent(State->Path, Input, Actor);
         };
@@ -605,7 +607,7 @@ bool FDasLifecyclePIETest::RunTest(const FString& Parameters)
     {
         FActorSpawnParameters Spawn;
         Spawn.Name = Name;
-        auto* Actor = World->SpawnActor<ADasProbeActor>(State->Blueprint->GeneratedClass, FTransform::Identity, Spawn);
+        auto* Actor = World->SpawnActor<ADasActor>(State->Blueprint->GeneratedClass, FTransform::Identity, Spawn);
         if (!TestNotNull(TEXT("Lifecycle actor"), Actor))
             return false;
         Actor->LifecycleScript = State->Path;
@@ -668,43 +670,48 @@ public:
             Started = FPlatformTime::Seconds();
             return false;
         }
-        auto Call = [&](ADasProbeActor* Actor)
+        auto Call = [&](ADasActor* Actor)
         {
             return Runtime.RunPersistent(State->Path, 0, Actor);
         };
         Check(Runtime.SubscriptionCount(First) == 1 && Runtime.SubscriptionCount(Second) == 1,
               TEXT("BeginPlay_installs_two_peer_bindings"));
-        Source->EmitDasSignal(3);
+        CastChecked<ADasProbeActor>(Source)->EmitDasSignal(3);
         Check(Call(First).Value == 3 && Call(Second).Value == 3, TEXT("one_source_delivers_to_two_independent_actors"));
         auto* EditorSource = Find(GEditor->GetEditorWorldContext().World(), TEXT("SignalSource"));
-        Check(EditorSource && !EditorSource->OnDasSignal.IsBound() && First->Peer == Source && Second->Peer == Source,
+        Check(EditorSource && !CastChecked<ADasProbeActor>(EditorSource)->OnDasSignal.IsBound() &&
+                  CastChecked<ADasProbeActor>(First)->Peer == Source &&
+                  CastChecked<ADasProbeActor>(Second)->Peer == Source,
               TEXT("PIE_sources_are_remapped_and_isolated_from_editor"));
         const FString V2 = State->Source.Replace(TEXT("+ value)"), TEXT("+ value * 10)"));
         Check(FFileHelper::SaveStringToFile(V2, *State->Path, FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM),
               TEXT("write_delegate_reload"));
         Call(First);
         Call(Second);
-        Source->EmitDasSignal(2);
-        Check(Call(First).Value == 23 && Call(Second).Value == 23 && Source->OnDasSignal.GetAllObjects().Num() == 2,
+        CastChecked<ADasProbeActor>(Source)->EmitDasSignal(2);
+        Check(Call(First).Value == 23 && Call(Second).Value == 23 &&
+                  CastChecked<ADasProbeActor>(Source)->OnDasSignal.GetAllObjects().Num() == 2,
               TEXT("reload_replaces_handlers_without_duplicate_delivery"));
         Check(FFileHelper::SaveStringToFile(TEXT("invalid script"), *State->Path),
                                             TEXT("write_invalid_delegate_candidate"));
         const auto Fallback = Call(First);
-        Source->EmitDasSignal(1);
+        CastChecked<ADasProbeActor>(Source)->EmitDasSignal(1);
         Check(!Fallback.ReloadError.IsEmpty() && Call(First).Value == 33 && Call(Second).Value == 33,
               TEXT("failed_reload_preserves_both_bindings"));
-        Check(First->Destroy() && Source->OnDasSignal.GetAllObjects().Num() == 1 && Runtime.SubscriptionCount() == 1,
+        Check(First->Destroy() && CastChecked<ADasProbeActor>(Source)->OnDasSignal.GetAllObjects().Num() == 1 &&
+                  Runtime.SubscriptionCount() == 1,
               TEXT("Destroy_removes_only_destroyed_owner_subscription"));
-        Source->EmitDasSignal(1);
+        CastChecked<ADasProbeActor>(Source)->EmitDasSignal(1);
         Check(Call(Second).Value == 43, TEXT("remaining_listener_still_receives"));
         // A self subscription recursively emits once. The bridge queues this instead of re-entering the VM.
         const FString Nested = TEXT("options gen2\nrequire ue_foundation\n[export]\ndef bind_events() { ue_subscribe_int(\"self\", \"OnDasSignal\", \"on_signal\") }\n[export]\ndef on_signal(value:int) { ue_state_set_int(\"total\", ue_state_get_int(\"total\", 0) + value); if (value == 1) { ue_emit_signal(2) } }\n[export]\ndef main(input:int):int { return ue_state_get_int(\"total\", 0) }\n");
         Check(FFileHelper::SaveStringToFile(Nested, *State->Path, FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM),
               TEXT("write_nested_event_fixture"));
         Call(Second);
-        Check(!Source->OnDasSignal.IsBound() && Second->OnDasSignal.GetAllObjects().Num() == 1,
+        Check(!CastChecked<ADasProbeActor>(Source)->OnDasSignal.IsBound() &&
+                  CastChecked<ADasProbeActor>(Second)->OnDasSignal.GetAllObjects().Num() == 1,
               TEXT("reload_can_change_subscription_source"));
-        Second->EmitDasSignal(1);
+        CastChecked<ADasProbeActor>(Second)->EmitDasSignal(1);
         Check(Call(Second).Value == 46 && Second->LastDasError.IsEmpty(),
               TEXT("nested_events_are_queued_without_VM_reentry"));
         const FString DestroyDuringCall =
@@ -716,7 +723,7 @@ public:
         Check(Call(Source).Value == 42, TEXT("source_context_ready_for_reentrant_destroy"));
         TStrongObjectPtr<UDasDelegateDestroyer> Destroyer(NewObject<UDasDelegateDestroyer>());
         Destroyer->Target = Source;
-        Source->OnDasSignal.AddDynamic(Destroyer.Get(), &UDasDelegateDestroyer::OnSignal);
+        CastChecked<ADasProbeActor>(Source)->OnDasSignal.AddDynamic(Destroyer.Get(), &UDasDelegateDestroyer::OnSignal);
         const auto LastCall = Call(Source);
         Check(LastCall.bSucceeded && LastCall.Value == 42 && Destroyer->Calls == 1 && Source->IsActorBeingDestroyed() &&
                   Runtime.SubscriptionCount() == 1 && Runtime.PersistentContextCount(World) == 1,
@@ -751,16 +758,16 @@ bool FDasDelegatePIETest::RunTest(const FString& Parameters)
         return false;
     FActorSpawnParameters Spawn;
     Spawn.Name = TEXT("SignalSource");
-    auto* Source = World->SpawnActor<ADasProbeActor>(ADasProbeActor::StaticClass(), FTransform::Identity, Spawn);
+    auto* Source = World->SpawnActor<ADasActor>(ADasProbeActor::StaticClass(), FTransform::Identity, Spawn);
     if (!TestNotNull(TEXT("Event source"), Source))
         return false;
     for (const TCHAR* Name : {TEXT("SignalFirst"), TEXT("SignalSecond")})
     {
         Spawn.Name = Name;
-        auto* Actor = World->SpawnActor<ADasProbeActor>(ADasProbeActor::StaticClass(), FTransform::Identity, Spawn);
+        auto* Actor = World->SpawnActor<ADasActor>(ADasProbeActor::StaticClass(), FTransform::Identity, Spawn);
         if (!TestNotNull(TEXT("Event listener"), Actor))
             return false;
-        Actor->Peer = Source;
+        CastChecked<ADasProbeActor>(Actor)->Peer = Source;
         Actor->LifecycleScript = State->Path;
     }
     ADD_LATENT_AUTOMATION_COMMAND(FStartPIECommand(false));
@@ -957,12 +964,12 @@ bool FDasObjectsPIETest::RunTest(const FString& Parameters)
         return false;
     FActorSpawnParameters Spawn;
     Spawn.Name = TEXT("ObjectSource");
-    auto* Source = World->SpawnActor<ADasProbeActor>(BP->GeneratedClass, FTransform::Identity, Spawn);
+    auto* Source = World->SpawnActor<ADasActor>(BP->GeneratedClass, FTransform::Identity, Spawn);
     Spawn.Name = TEXT("ObjectListener");
-    auto* Listener = World->SpawnActor<ADasProbeActor>(ADasProbeActor::StaticClass(), FTransform::Identity, Spawn);
+    auto* Listener = World->SpawnActor<ADasActor>(ADasProbeActor::StaticClass(), FTransform::Identity, Spawn);
     if (!TestTrue(TEXT("Objects actors"), Source && Listener))
         return false;
-    Listener->Peer = Source;
+    CastChecked<ADasProbeActor>(Listener)->Peer = Source;
     Listener->LifecycleScript = State->Path;
     ADD_LATENT_AUTOMATION_COMMAND(FStartPIECommand(false));
     FAutomationTestFramework::Get().EnqueueLatentCommand(MakeShared<FDasObjectsPIECommand>(State, this));
@@ -1084,7 +1091,9 @@ public:
                                                               TEXT("new_field_and_body_preserve_override"));
         Check(EditorActor && Int(EditorActor, TEXT("Score")) == 33 && Int(EditorActor, TEXT("Bonus")) == 5,
                                                                           TEXT("editor_world_override_isolated"));
-        Check(Actor && Holder && Holder->Peer == Actor && Actor->Peer == Holder, TEXT("references_preserved"));
+        Check(Actor && Holder && CastChecked<ADasProbeActor>(Holder)->Peer == Actor &&
+                  CastChecked<ADasProbeActor>(Actor)->Peer == Holder,
+              TEXT("references_preserved"));
         Check(Actor && Call().Value == 187, TEXT("new_declaration_runtime_accepted"));
         // A new default during PIE updates the class and the editor world; the running actor keeps its value.
         Check(Write(S->Source2.Replace(TEXT("Score : int = 10"), TEXT("Score : int = 999"))),
@@ -1128,6 +1137,9 @@ bool FDasDSLPIETest::RunTest(const FString& Parameters)
                                        !FFileHelper::LoadFileToString(S->Source2,
                                                                       *Runtime.ScriptPath(TEXT("dsl_counter_v2.das"))))
         return false;
+    // This regression adds native Peer references; the public Counter examples keep the clean host.
+    S->Source1.ReplaceInline(TEXT("/Script/Engine.Actor"), TEXT("/Script/DasRuntime.DasProbeActor"));
+    S->Source2.ReplaceInline(TEXT("/Script/Engine.Actor"), TEXT("/Script/DasRuntime.DasProbeActor"));
     if (!FFileHelper::SaveStringToFile(S->Source1, *S->ScriptPath, FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM))
         return false;
     UWorld* World = FAutomationEditorCommonUtils::CreateNewMap();
@@ -1148,17 +1160,17 @@ bool FDasDSLPIETest::RunTest(const FString& Parameters)
     IConsoleManager::Get().ProcessUserConsoleInput(*(TEXT("Das.DSL.Reimport ")+ Package), *GLog, World);
     FActorSpawnParameters Spawn;
     Spawn.Name = TEXT("DSLActor");
-    auto* Actor = World->SpawnActor<ADasProbeActor>(BP->GeneratedClass, FTransform::Identity, Spawn);
+    auto* Actor = World->SpawnActor<ADasActor>(BP->GeneratedClass, FTransform::Identity, Spawn);
     Spawn.Name = TEXT("DSLHolder");
-    auto* Holder = World->SpawnActor<ADasProbeActor>(ADasProbeActor::StaticClass(), FTransform::Identity, Spawn);
+    auto* Holder = World->SpawnActor<ADasActor>(ADasProbeActor::StaticClass(), FTransform::Identity, Spawn);
     if (!Actor || !Holder)
     {
         IFileManager::Get().Delete(*S->ScriptPath);
         return false;
     }
     FindFProperty<FIntProperty>(Actor->GetClass(), TEXT("Score"))->SetPropertyValue_InContainer(Actor, 33);
-    Holder->Peer = Actor;
-    Actor->Peer = Holder;
+    CastChecked<ADasProbeActor>(Holder)->Peer = Actor;
+    CastChecked<ADasProbeActor>(Actor)->Peer = Holder;
     // PIE duplicates the editor override; later writes exercise world isolation.
     ADD_LATENT_AUTOMATION_COMMAND(FStartPIECommand(false));
     FAutomationTestFramework::Get().EnqueueLatentCommand(MakeShared<FDasDSLPIECommand>(S, this));
@@ -1353,7 +1365,7 @@ bool FDasScalarPIETest::RunTest(const FString& Parameters)
     }
     FActorSpawnParameters Spawn;
     Spawn.Name = TEXT("ScalarActor");
-    auto* Actor = World->SpawnActor<ADasProbeActor>(BP->GeneratedClass, FTransform::Identity, Spawn);
+    auto* Actor = World->SpawnActor<ADasActor>(BP->GeneratedClass, FTransform::Identity, Spawn);
     if (!TestNotNull(TEXT("Spawn scalar actor"), Actor))
         return false;
     ADD_LATENT_AUTOMATION_COMMAND(FStartPIECommand(false));
@@ -1546,7 +1558,7 @@ bool FDasFramePIETest::RunTest(const FString& Parameters)
     FActorSpawnParameters Spawn;
     Spawn.Name = TEXT("FrameActor");
     if (!TestNotNull(TEXT("Spawn frame actor"),
-                          World->SpawnActor<ADasProbeActor>(BP->GeneratedClass, FTransform::Identity, Spawn)))
+                          World->SpawnActor<ADasActor>(BP->GeneratedClass, FTransform::Identity, Spawn)))
         return false;
     ADD_LATENT_AUTOMATION_COMMAND(FStartPIECommand(false));
     FAutomationTestFramework::Get().EnqueueLatentCommand(MakeShared<FDasFramePIECommand>(BP, this));
@@ -1725,7 +1737,7 @@ bool FDasTextPIETest::RunTest(const FString& Parameters)
     FActorSpawnParameters Spawn;
     Spawn.Name = TEXT("TextActor");
     if (!TestNotNull(TEXT("Spawn text actor"),
-                          World->SpawnActor<ADasProbeActor>(BP->GeneratedClass, FTransform::Identity, Spawn)))
+                          World->SpawnActor<ADasActor>(BP->GeneratedClass, FTransform::Identity, Spawn)))
         return false;
     ADD_LATENT_AUTOMATION_COMMAND(FStartPIECommand(false));
     FAutomationTestFramework::Get().EnqueueLatentCommand(MakeShared<FDasTextPIECommand>(BP, this));
@@ -1884,9 +1896,9 @@ bool FDasObjectFramePIETest::RunTest(const FString& Parameters)
     }
     FActorSpawnParameters Spawn;
     Spawn.Name = TEXT("ObjectReceiver");
-    auto* Receiver = World->SpawnActor<ADasProbeActor>(BP->GeneratedClass, FTransform::Identity, Spawn);
+    auto* Receiver = World->SpawnActor<ADasActor>(BP->GeneratedClass, FTransform::Identity, Spawn);
     Spawn.Name = TEXT("ObjectTarget");
-    auto* Target = World->SpawnActor<ADasProbeActor>(BP->GeneratedClass, FTransform::Identity, Spawn);
+    auto* Target = World->SpawnActor<ADasActor>(BP->GeneratedClass, FTransform::Identity, Spawn);
     if (!TestTrue(TEXT("Spawn object actors"), Receiver && Target))
     {
         IFileManager::Get().Delete(*Path);
@@ -2070,7 +2082,7 @@ bool FDasMathPIETest::RunTest(const FString& Parameters)
     FActorSpawnParameters Spawn;
     Spawn.Name = TEXT("MathActor");
     if (!TestNotNull(TEXT("Spawn math actor"),
-                          World->SpawnActor<ADasProbeActor>(BP->GeneratedClass, FTransform::Identity, Spawn)))
+                          World->SpawnActor<ADasActor>(BP->GeneratedClass, FTransform::Identity, Spawn)))
         return false;
     ADD_LATENT_AUTOMATION_COMMAND(FStartPIECommand(false));
     FAutomationTestFramework::Get().EnqueueLatentCommand(MakeShared<FDasMathPIECommand>(BP, this));
@@ -2198,7 +2210,7 @@ bool FDasReflectedPIETest::RunTest(const FString& Parameters)
     FActorSpawnParameters Spawn;
     Spawn.Name = TEXT("StructActor");
     if (!TestNotNull(TEXT("Spawn reflected actor"),
-                          World->SpawnActor<ADasProbeActor>(BP->GeneratedClass, FTransform::Identity, Spawn)))
+                          World->SpawnActor<ADasActor>(BP->GeneratedClass, FTransform::Identity, Spawn)))
         return false;
     ADD_LATENT_AUTOMATION_COMMAND(FStartPIECommand(false));
     FAutomationTestFramework::Get().EnqueueLatentCommand(MakeShared<FDasReflectedPIECommand>(BP, this));
@@ -2322,7 +2334,7 @@ bool FDasStructEnumPIETest::RunTest(const FString& Parameters)
     FActorSpawnParameters Spawn;
     Spawn.Name = TEXT("EnumStructActor");
     if (!TestNotNull(TEXT("Spawn enum struct actor"),
-                          World->SpawnActor<ADasProbeActor>(BP->GeneratedClass, FTransform::Identity, Spawn)))
+                          World->SpawnActor<ADasActor>(BP->GeneratedClass, FTransform::Identity, Spawn)))
         return false;
     ADD_LATENT_AUTOMATION_COMMAND(FStartPIECommand(false));
     FAutomationTestFramework::Get().EnqueueLatentCommand(MakeShared<FDasStructEnumPIECommand>(BP, this));
@@ -2458,7 +2470,7 @@ bool FDasStructFieldsPIETest::RunTest(const FString& Parameters)
     FActorSpawnParameters Spawn;
     Spawn.Name = TEXT("StructFieldsActor");
     if (!TestNotNull(TEXT("Spawn struct fields actor"),
-                          World->SpawnActor<ADasProbeActor>(BP->GeneratedClass, FTransform::Identity, Spawn)))
+                          World->SpawnActor<ADasActor>(BP->GeneratedClass, FTransform::Identity, Spawn)))
         return false;
     ADD_LATENT_AUTOMATION_COMMAND(FStartPIECommand(false));
     FAutomationTestFramework::Get().EnqueueLatentCommand(MakeShared<FDasStructFieldsPIECommand>(BP, this));
@@ -2535,7 +2547,7 @@ public:
                 UClass* Before = BP->GeneratedClass;
                 Check(FDasDSLService::Reimport(BP.Get(), Error) && BP->GeneratedClass == Before,
                       TEXT("struct_fields_body_reimport_keeps_class"));
-                auto* Untouched = World->SpawnActor<ADasProbeActor>(BP->GeneratedClass, FTransform::Identity);
+                auto* Untouched = World->SpawnActor<ADasActor>(BP->GeneratedClass, FTransform::Identity);
                 const FName UntouchedName = Untouched->GetFName();
                 const FString MigratedSource = Source.Replace(TEXT("Count=10"), TEXT("Count=11"));
                 Check(FFileHelper::SaveStringToFile(MigratedSource, *Path,
@@ -2553,7 +2565,7 @@ public:
                           Count->GetPropertyValue_InContainer(
                               P->ContainerPtrToValuePtr<void>(BP->GeneratedClass->GetDefaultObject())) == 11,
                       TEXT("PIE_existing_values_preserved_new_CDO"));
-                auto* Fresh = World->SpawnActor<ADasProbeActor>(BP->GeneratedClass, FTransform::Identity);
+                auto* Fresh = World->SpawnActor<ADasActor>(BP->GeneratedClass, FTransform::Identity);
                 Check(Fresh && Count->GetPropertyValue_InContainer(P->ContainerPtrToValuePtr<void>(Fresh)) == 11,
                       TEXT("PIE_new_actor_uses_migrated_default"));
                 const auto AfterMigration = Runtime.RunNamedFramePersistent(Path, TEXT("ue_StructFields_Add"), {Amount},
@@ -2587,7 +2599,7 @@ public:
                                   P->ContainerPtrToValuePtr<void>(BP->GeneratedClass->GetDefaultObject())) == 11,
                           TEXT("PIE_struct_override_and_CDO_preserved"));
                     Untouched = nullptr;
-                    for (TActorIterator<ADasProbeActor> It(World); It; ++It)
+                    for (TActorIterator<ADasActor> It(World); It; ++It)
                         if (It->GetFName() == UntouchedName)
                             Untouched = *It;
                     Check(Untouched && Count &&
@@ -2635,7 +2647,7 @@ bool FDasDefaultMigrationPIETest::RunTest(const FString& Parameters)
     FActorSpawnParameters Spawn;
     Spawn.Name = TEXT("StructFieldsActor");
     if (!TestNotNull(TEXT("Spawn struct fields actor"),
-                          World->SpawnActor<ADasProbeActor>(BP->GeneratedClass, FTransform::Identity, Spawn)))
+                          World->SpawnActor<ADasActor>(BP->GeneratedClass, FTransform::Identity, Spawn)))
         return false;
     ADD_LATENT_AUTOMATION_COMMAND(FStartPIECommand(false));
     FAutomationTestFramework::Get().EnqueueLatentCommand(
@@ -2732,7 +2744,7 @@ public:
                 Check(AfterCall.bSucceeded && AfterCall.Value == 171, TEXT("PIE_updated_self_method_after_reinstance"));
                 if (!AfterCall.bSucceeded)
                     Test->AddInfo(AfterCall.Error);
-                auto* Fresh = World->SpawnActor<ADasProbeActor>(BP->GeneratedClass, FTransform::Identity);
+                auto* Fresh = World->SpawnActor<ADasActor>(BP->GeneratedClass, FTransform::Identity);
                 Check(Fresh && Score && Score->GetPropertyValue_InContainer(Fresh) == 5 && Count &&
                           Count->GetPropertyValue_InContainer(Payload->ContainerPtrToValuePtr<void>(Fresh)) == 10,
                       TEXT("PIE_new_actor_defaults_after_rename"));
@@ -2779,9 +2791,9 @@ bool FDasFieldRenamePIETest::RunTest(const FString& Parameters)
     }
     FActorSpawnParameters Spawn;
     Spawn.Name = TEXT("RenameActor");
-    auto* Actor = World->SpawnActor<ADasProbeActor>(BP->GeneratedClass, FTransform::Identity, Spawn);
+    auto* Actor = World->SpawnActor<ADasActor>(BP->GeneratedClass, FTransform::Identity, Spawn);
     Spawn.Name = TEXT("RenameUntouched");
-    auto* Untouched = World->SpawnActor<ADasProbeActor>(BP->GeneratedClass, FTransform::Identity, Spawn);
+    auto* Untouched = World->SpawnActor<ADasActor>(BP->GeneratedClass, FTransform::Identity, Spawn);
     if (!TestTrue(TEXT("Spawn rename actors"), Actor && Untouched))
     {
         IFileManager::Get().Delete(*Path);
@@ -2881,7 +2893,7 @@ public:
                 Check(AfterCall.bSucceeded && AfterCall.Value == 171, TEXT("PIE_updated_self_method_after_reinstance"));
                 if (!AfterCall.bSucceeded)
                     Test->AddInfo(AfterCall.Error);
-                auto* Fresh = World->SpawnActor<ADasProbeActor>(Actor->GetClass(), FTransform::Identity);
+                auto* Fresh = World->SpawnActor<ADasActor>(Actor->GetClass(), FTransform::Identity);
                 Check(Fresh && Score && Score->GetPropertyValue_InContainer(Fresh) == 45 && Count &&
                           Count->GetPropertyValue_InContainer(Payload->ContainerPtrToValuePtr<void>(Fresh)) == 56,
                       TEXT("PIE_new_actor_defaults_after_rename"));
@@ -2956,9 +2968,9 @@ bool FDasRenameScopePIETest::RunTest(const FString& Parameters)
     SetDefaults(Grand, 45, 56);
     FActorSpawnParameters Spawn;
     Spawn.Name = TEXT("RenameActor");
-    auto* Actor = World->SpawnActor<ADasProbeActor>(Grand->GeneratedClass, FTransform::Identity, Spawn);
+    auto* Actor = World->SpawnActor<ADasActor>(Grand->GeneratedClass, FTransform::Identity, Spawn);
     Spawn.Name = TEXT("RenameUntouched");
-    auto* Untouched = World->SpawnActor<ADasProbeActor>(Grand->GeneratedClass, FTransform::Identity, Spawn);
+    auto* Untouched = World->SpawnActor<ADasActor>(Grand->GeneratedClass, FTransform::Identity, Spawn);
     if (!TestTrue(TEXT("Spawn rename actors"), Actor && Untouched))
     {
         IFileManager::Get().Delete(*Path);
@@ -3071,7 +3083,7 @@ public:
                                                                               EDasMethodSignature::Double, Actor);
             Check(AfterCall.bSucceeded && AfterCall.DoubleValue == static_cast<double>(0.1f),
                   TEXT("PIE_callback_uses_new_double_field"));
-            auto* Fresh = World->SpawnActor<ADasProbeActor>(Actor->GetClass(), FTransform::Identity);
+            auto* Fresh = World->SpawnActor<ADasActor>(Actor->GetClass(), FTransform::Identity);
             Check(Fresh && D && R && D->GetPropertyValue_InContainer(Fresh) == 23 &&
                       R->GetPropertyValue_InContainer(Fresh) == 2.25,
                   TEXT("PIE_fresh_child_uses_promoted_defaults"));
@@ -3133,9 +3145,9 @@ bool FDasNumericWidenPIETest::RunTest(const FString& Parameters)
     FindFProperty<FFloatProperty>(Child->GeneratedClass, TEXT("Rate"))->SetPropertyValue_InContainer(CDO, 2.25f);
     FActorSpawnParameters Spawn;
     Spawn.Name = TEXT("WidenActor");
-    auto* Actor = World->SpawnActor<ADasProbeActor>(Child->GeneratedClass, FTransform::Identity, Spawn);
+    auto* Actor = World->SpawnActor<ADasActor>(Child->GeneratedClass, FTransform::Identity, Spawn);
     Spawn.Name = TEXT("WidenUntouched");
-    auto* Untouched = World->SpawnActor<ADasProbeActor>(Child->GeneratedClass, FTransform::Identity, Spawn);
+    auto* Untouched = World->SpawnActor<ADasActor>(Child->GeneratedClass, FTransform::Identity, Spawn);
     if (!TestTrue(TEXT("Spawn widening actors"), Actor && Untouched))
     {
         IFileManager::Get().Delete(*Path);
@@ -3150,7 +3162,7 @@ bool FDasNumericWidenPIETest::RunTest(const FString& Parameters)
 #include "Blueprint/BlueprintExceptionInfo.h"
 #include "UObject/Script.h"
 void DasCreateNumericGraphFixture(UBlueprint* B);
-int32 DasReadNumericGraphFixture(ADasProbeActor* A);
+int32 DasReadNumericGraphFixture(ADasActor* A);
 int32 DasNumericGraphAdapterCount(UBlueprint* B);
 namespace
 {
@@ -3301,7 +3313,7 @@ public:
             const auto AfterCall = Runtime.RunNamedFramePersistent(Path, TEXT("ue_WidenFields_ReadRate"), {},
                                                                               EDasMethodSignature::Double, Actor);
             Check(AfterCall.bSucceeded && AfterCall.DoubleValue == 0, TEXT("PIE_callback_uses_new_double_field"));
-            auto* Fresh = World->SpawnActor<ADasProbeActor>(Actor->GetClass(), FTransform::Identity);
+            auto* Fresh = World->SpawnActor<ADasActor>(Actor->GetClass(), FTransform::Identity);
             Check(Fresh && D && R && D->GetPropertyValue_InContainer(Fresh) == 23 &&
                       R->GetPropertyValue_InContainer(Fresh) == 2,
                   TEXT("PIE_fresh_child_uses_promoted_defaults"));
@@ -3365,9 +3377,9 @@ bool FDasNumericConvertPIETest::RunTest(const FString& Parameters)
     FindFProperty<FFloatProperty>(Child->GeneratedClass, TEXT("Rate"))->SetPropertyValue_InContainer(CDO, 2.25f);
     FActorSpawnParameters Spawn;
     Spawn.Name = TEXT("WidenActor");
-    auto* Actor = World->SpawnActor<ADasProbeActor>(Child->GeneratedClass, FTransform::Identity, Spawn);
+    auto* Actor = World->SpawnActor<ADasActor>(Child->GeneratedClass, FTransform::Identity, Spawn);
     Spawn.Name = TEXT("WidenUntouched");
-    auto* Untouched = World->SpawnActor<ADasProbeActor>(Child->GeneratedClass, FTransform::Identity, Spawn);
+    auto* Untouched = World->SpawnActor<ADasActor>(Child->GeneratedClass, FTransform::Identity, Spawn);
     if (!TestTrue(TEXT("Spawn widening actors"), Actor && Untouched))
     {
         IFileManager::Get().Delete(*Path);
@@ -3436,12 +3448,12 @@ public:
         if (Actor)
         {
             const FString Key = TEXT("retire.RetireFields::retire.RetireFields.Score");
-            auto ReadScore = [](ADasProbeActor* O)
+            auto ReadScore = [](ADasActor* O)
             {
                 auto* P = O ? FindFProperty<FIntProperty>(O->GetClass(), TEXT("Score")) : nullptr;
                 return P ? P->GetPropertyValue_InContainer(O) : -1;
             };
-            auto ArchivedScore = [&](ADasProbeActor* O)
+            auto ArchivedScore = [&](ADasActor* O)
             {
                 const auto* V = O ? O->RetiredDasValues.Find(Key) : nullptr;
                 return V ? V->IntValue : -1;
@@ -3485,7 +3497,7 @@ public:
             {
                 FActorSpawnParameters Spawn;
                 Spawn.Name = TEXT("ArchiveFresh");
-                auto* Fresh = World->SpawnActor<ADasProbeActor>(Actor->GetClass(), FTransform::Identity, Spawn);
+                auto* Fresh = World->SpawnActor<ADasActor>(Actor->GetClass(), FTransform::Identity, Spawn);
                 Check(ArchivedScore(Fresh) == 23, TEXT("spawn_retired_child_inherits_archive"));
                 Check(FFileHelper::SaveStringToFile(Source, *Path, FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM),
                       TEXT("write_restore_declaration"));
@@ -3574,8 +3586,8 @@ bool FDasArchivePIETest::RunTest(const FString& Parameters)
         TEXT("Score"))->SetPropertyValue_InContainer(Child->GeneratedClass->GetDefaultObject(), 23);
     FActorSpawnParameters Spawn;
     Spawn.Name = TEXT("ArchiveActor");
-    if (!TestTrue(TEXT("Spawn archive actor"), World->SpawnActor<ADasProbeActor>(
-                                                   Child->GeneratedClass, FTransform::Identity, Spawn) != nullptr))
+    if (!TestTrue(TEXT("Spawn archive actor"),
+                       World->SpawnActor<ADasActor>(Child->GeneratedClass, FTransform::Identity, Spawn) != nullptr))
     {
         IFileManager::Get().Delete(*Path);
         return false;
@@ -3642,7 +3654,7 @@ public:
             Start = FPlatformTime::Seconds();
             return false;
         }
-        auto Call = [&](ADasProbeActor* O, int32 Selector)
+        auto Call = [&](ADasActor* O, int32 Selector)
         {
             const auto V = Runtime.RunPersistent(LifePath, Selector, O);
             Check(V.bSucceeded, TEXT("lifecycle_diagnostic_succeeds"));
@@ -3651,8 +3663,9 @@ public:
         auto Bindings = [&]()
         {
             return Runtime.SubscriptionCount(Actor) == 2 && Runtime.SubscriptionCount(External) == 2 &&
-                   Signal->OnDasSignal.GetAllObjects().Num() == 1 && Actor->OnDasSignal.GetAllObjects().Num() == 2 &&
-                   External->OnDasSignal.GetAllObjects().Num() == 1;
+                   CastChecked<ADasProbeActor>(Signal)->OnDasSignal.GetAllObjects().Num() == 1 &&
+                   CastChecked<ADasProbeActor>(Actor)->OnDasSignal.GetAllObjects().Num() == 2 &&
+                   CastChecked<ADasProbeActor>(External)->OnDasSignal.GetAllObjects().Num() == 1;
         };
         if (Phase == 1)
         {
@@ -3669,7 +3682,8 @@ public:
             const int32 Before = Call(External, 3);
             Check(Actor->Destroy(), TEXT("destroy_reinstanced_actor"));
             Check(Call(External, 3) == Before + 1000 && Runtime.SubscriptionCount(Actor) == 0 &&
-                      Runtime.SubscriptionCount(External) == 1 && !Signal->OnDasSignal.IsBound(),
+                      Runtime.SubscriptionCount(External) == 1 &&
+                      !CastChecked<ADasProbeActor>(Signal)->OnDasSignal.IsBound(),
                   TEXT("real_destroy_delivers_script_end_once_then_revokes_owner_bindings"));
             GEditor->RequestEndPlayMap();
             Phase = 2;
@@ -3682,7 +3696,8 @@ public:
         Check(Suspended, TEXT("explicit_idle_preservation_scope"));
         if (Suspended)
         {
-            Check(Runtime.SubscriptionCount() == 0 && !Signal->OnDasSignal.IsBound() && !Actor->OnDasSignal.IsBound(),
+            Check(Runtime.SubscriptionCount() == 0 && !CastChecked<ADasProbeActor>(Signal)->OnDasSignal.IsBound() &&
+                      !CastChecked<ADasProbeActor>(Actor)->OnDasSignal.IsBound(),
                   TEXT("proxies_detached_during_scope"));
             const auto OneShot = Runtime.RunFile(LifePath, 0, false, Actor);
             const auto Persistent = Runtime.RunPersistent(LifePath, 0, Actor);
@@ -3698,8 +3713,8 @@ public:
             Check(Bindings() && Call(Actor, 0) == 1 && Call(Actor, 2) == 0,
                   TEXT("scope_resumes_without_script_end_or_duplicate_proxies"));
         }
-        Signal->EmitDasSignal(2);
-        Actor->EmitDasSignal(3);
+        CastChecked<ADasProbeActor>(Signal)->EmitDasSignal(2);
+        CastChecked<ADasProbeActor>(Actor)->EmitDasSignal(3);
         Check(Call(Actor, 3) == 5 && Call(External, 3) == 3, TEXT("independent_listener_state_before_migration"));
         FString Removed = Source;
         const int32 A = Removed.Find(TEXT("    //RetireBegin")), B = Removed.Find(TEXT("    //RetireEnd"));
@@ -3729,7 +3744,8 @@ public:
                   TEXT("self_peer_and_external_owner_bindings_reinstalled_once"));
             if (Actor)
             {
-                Check(External->Peer == Actor, TEXT("external_native_peer_points_at_replacement"));
+                Check(CastChecked<ADasProbeActor>(External)->Peer == Actor,
+                      TEXT("external_native_peer_points_at_replacement"));
                 Check(Call(Actor, 0) == 1 && Call(Actor, 2) == 0 && Call(External, 0) == 1 && Call(External, 2) == 0,
                       TEXT("no_gameplay_lifecycle_event_during_compile"));
             }
@@ -3810,8 +3826,8 @@ public:
                 TEXT("NewQuery")) &&
                 BP->FunctionGraphs.ContainsByPredicate([](const auto& G) { return G->GetFName() == TEXT("NewQuery"); }),
                 TEXT("retry_after_rollback_creates_added_method_with_exact_name"));
-            Signal->EmitDasSignal(7);
-            Actor->EmitDasSignal(11);
+            CastChecked<ADasProbeActor>(Signal)->EmitDasSignal(7);
+            CastChecked<ADasProbeActor>(Actor)->EmitDasSignal(11);
             Check(Call(Actor, 3) == 23 && Call(External, 3) == 14,
                   TEXT("retained_handler_state_and_no_duplicate_delivery_after_success_and_rollback"));
             TicksBefore = Call(Actor, 1);
@@ -3838,6 +3854,8 @@ bool FDasLifecycleMigrationTest::RunTest(const FString& Parameters)
     auto& Runtime = FModuleManager::LoadModuleChecked<FDasRuntimeModule>(TEXT("DasRuntime"));
     FString Source;
     FFileHelper::LoadFileToString(Source, *Runtime.ScriptPath(TEXT("dsl_retired_fields.das")));
+    // Only this lifecycle fixture requires native signal and Peer storage.
+    Source.ReplaceInline(TEXT("[ue_class("), TEXT("[ue_class(parent=\"/Script/DasRuntime.DasProbeActor\","));
     const FString Guid = FGuid::NewGuid().ToString(EGuidFormats::Digits),
                   Script =
                       TEXT("dsl_lifecycle_migration_")+ Guid +
@@ -3863,15 +3881,15 @@ bool FDasLifecycleMigrationTest::RunTest(const FString& Parameters)
     }
     FActorSpawnParameters Spawn;
     Spawn.Name = TEXT("MigrationSignal");
-    auto* Signal = World->SpawnActor<ADasProbeActor>(ADasProbeActor::StaticClass(), FTransform::Identity, Spawn);
+    auto* Signal = World->SpawnActor<ADasActor>(ADasProbeActor::StaticClass(), FTransform::Identity, Spawn);
     Spawn.Name = TEXT("MigrationActor");
-    auto* Actor = World->SpawnActor<ADasProbeActor>(BP->GeneratedClass, FTransform::Identity, Spawn);
+    auto* Actor = World->SpawnActor<ADasActor>(BP->GeneratedClass, FTransform::Identity, Spawn);
     Spawn.Name = TEXT("MigrationExternal");
-    auto* External = World->SpawnActor<ADasProbeActor>(ADasProbeActor::StaticClass(), FTransform::Identity, Spawn);
+    auto* External = World->SpawnActor<ADasActor>(ADasProbeActor::StaticClass(), FTransform::Identity, Spawn);
     if (!TestTrue(TEXT("Spawn migration actors"), Signal && Actor && External))
         return false;
-    Actor->Peer = Signal;
-    External->Peer = Actor;
+    CastChecked<ADasProbeActor>(Actor)->Peer = Signal;
+    CastChecked<ADasProbeActor>(External)->Peer = Actor;
     Actor->LifecycleScript = LifePath;
     External->LifecycleScript = LifePath;
     ADD_LATENT_AUTOMATION_COMMAND(FStartPIECommand(false));
@@ -3937,7 +3955,7 @@ public:
             Start = FPlatformTime::Seconds();
             return false;
         }
-        auto Invoke = [&](ADasProbeActor* Owner, const TCHAR* Entry, UObject* Value)
+        auto Invoke = [&](ADasActor* Owner, const TCHAR* Entry, UObject* Value)
         {
             FDasScalarValue Arg;
             Arg.Kind = 8;
@@ -3946,12 +3964,12 @@ public:
             return Runtime.RunNamedFramePersistent(Path, FString(TEXT("ue_ObjectFields_")) + Entry, {Arg},
                                                                  EDasMethodSignature::Void, Owner);
         };
-        auto Read = [&](ADasProbeActor* Owner, const TCHAR* Entry, const TCHAR* Class)
+        auto Read = [&](ADasActor* Owner, const TCHAR* Entry, const TCHAR* Class)
         {
             return Runtime.RunNamedFramePersistent(Path, FString(TEXT("ue_ObjectFields_")) + Entry, {},
                                                                  EDasMethodSignature::Object, Owner, Class);
         };
-        auto Field = [](ADasProbeActor* O, FName Name)
+        auto Field = [](ADasActor* O, FName Name)
         {
             auto* P = O ? FindFProperty<FObjectProperty>(O->GetClass(), Name) : nullptr;
             return P ? P->GetObjectPropertyValue_InContainer(O) : nullptr;
@@ -4094,9 +4112,9 @@ bool FDasObjectFieldsPIETest::RunTest(const FString& Parameters)
     }
     FActorSpawnParameters Spawn;
     Spawn.Name = TEXT("ObjectFieldA");
-    auto* A = W->SpawnActor<ADasProbeActor>(BP->GeneratedClass, FTransform::Identity, Spawn);
+    auto* A = W->SpawnActor<ADasActor>(BP->GeneratedClass, FTransform::Identity, Spawn);
     Spawn.Name = TEXT("ObjectFieldB");
-    auto* B = W->SpawnActor<ADasProbeActor>(BP->GeneratedClass, FTransform::Identity, Spawn);
+    auto* B = W->SpawnActor<ADasActor>(BP->GeneratedClass, FTransform::Identity, Spawn);
     if (!TestTrue(TEXT("Spawn object field actors"), A && B))
         return false;
     ADD_LATENT_AUTOMATION_COMMAND(FStartPIECommand(false));
@@ -4257,7 +4275,7 @@ bool FDasAuthoredValuesPIETest::RunTest(const FString& Parameters)
     FActorSpawnParameters P;
     P.Name = TEXT("AuthoredActor");
     if (!TestTrue(TEXT("Spawn typed PIE actor"),
-                       W->SpawnActor<ADasProbeActor>(BP->GeneratedClass, FTransform::Identity, P) != nullptr))
+                       W->SpawnActor<ADasActor>(BP->GeneratedClass, FTransform::Identity, P) != nullptr))
         return false;
     ADD_LATENT_AUTOMATION_COMMAND(FStartPIECommand(false));
     FAutomationTestFramework::Get().EnqueueLatentCommand(MakeShared<FDasAuthoredValuesPIECommand>(
@@ -4303,7 +4321,7 @@ bool FDasDirectTypesPIETest::RunTest(const FString& Parameters)
     FActorSpawnParameters P;
     P.Name = TEXT("AuthoredActor");
     if (!TestTrue(TEXT("Spawn typed PIE actor"),
-                       W->SpawnActor<ADasProbeActor>(BP->GeneratedClass, FTransform::Identity, P) != nullptr))
+                       W->SpawnActor<ADasActor>(BP->GeneratedClass, FTransform::Identity, P) != nullptr))
         return false;
     ADD_LATENT_AUTOMATION_COMMAND(FStartPIECommand(false));
     FAutomationTestFramework::Get().EnqueueLatentCommand(MakeShared<FDasAuthoredValuesPIECommand>(

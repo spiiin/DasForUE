@@ -5,7 +5,7 @@
 #include "DasTypeRegistry.h"
 #include "DasReflectedTypes.h"
 #include "DasRuntime.h"
-#include "DasProbeActor.h"
+#include "DasActor.h"
 #include "DasBlueprintRollback.h"
 #include "DasNumericGraphMigration.h"
 #include "DasNumericLibrary.h"
@@ -700,8 +700,7 @@ bool FDasTypeService::MigrateStructFields(const FString& Script, const FString& 
     const bool TableOnly =
         !Root && !Tables.IsEmpty() && Nodes.IsEmpty() &&
         !Scope.ContainsByPredicate([](const TStrongObjectPtr<UObject>& A) { return A->IsA<UBlueprint>(); });
-    if (!TableOnly &&
-        (!Root || !Root->GeneratedClass || !Root->GeneratedClass->IsChildOf(ADasProbeActor::StaticClass())))
+    if (!TableOnly && (!Root || !Root->GeneratedClass || !Root->GeneratedClass->IsChildOf(ADasActor::StaticClass())))
     {
         Error = TEXT("Expected imported DSL Actor root using struct");
         return false;
@@ -953,7 +952,7 @@ bool FDasTypeService::MigrateStructFields(const FString& Script, const FString& 
                 Data.Add(MoveTemp(Image));
             }
     }
-    for (TObjectIterator<ADasProbeActor> It; It; ++It)
+    for (TObjectIterator<ADasActor> It; It; ++It)
         for (const auto& V : It->RetiredDasValues)
             if (V.Value.StructValue.IsValid() &&
                 ContainsTarget(const_cast<UScriptStruct*>(V.Value.StructValue.GetScriptStruct())))

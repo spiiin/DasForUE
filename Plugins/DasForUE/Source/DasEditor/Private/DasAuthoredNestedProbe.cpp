@@ -5,7 +5,7 @@
 #include "DasInterfaceProbe.h"
 #include "DasOutRefProbe.h"
 #include "DasContainerCallsProbe.h"
-#include "DasProbeActor.h"
+#include "DasActor.h"
 #include "DasReflectedTypes.h"
 #include "Engine/Blueprint.h"
 #include "Engine/World.h"
@@ -441,7 +441,7 @@ int32 RunDasAuthoredNestedProbe(const FString& Id, const FString& Phase)
         W->GetOutermost()->SetPackageFlags(PKG_ContainsMap);
         FActorSpawnParameters P;
         P.Name = TEXT("TypedActor");
-        auto* A = W->SpawnActor<ADasProbeActor>(BP->GeneratedClass, FTransform::Identity, P);
+        auto* A = W->SpawnActor<ADasActor>(BP->GeneratedClass, FTransform::Identity, P);
         A->TypeRegistry = Registry;
         for (auto* T : Types)
             Check(SaveAuthoredNested(T), TEXT("save_nested_type"));
@@ -456,10 +456,10 @@ int32 RunDasAuthoredNestedProbe(const FString& Id, const FString& Phase)
             return 1;
         Check(FDasDSLService::Reimport(BP, Error), TEXT("reimport_nested_class"));
     }
-    ADasProbeActor* A = nullptr;
+    ADasActor* A = nullptr;
     for (auto& Actor : W->PersistentLevel->Actors)
         if (Actor && Actor->GetFName() == TEXT("TypedActor"))
-            A = Cast<ADasProbeActor>(Actor.Get());
+            A = Cast<ADasActor>(Actor.Get());
     if (!A)
         return 1;
     auto* Config = FindFProperty<FStructProperty>(A->GetClass(), TEXT("Config"));
@@ -543,7 +543,7 @@ int32 RunDasAuthoredNestedProbe(const FString& Id, const FString& Phase)
               TEXT("nested_source_alias_uses_stable_ID_binding"));
         for (auto& Actor : W->PersistentLevel->Actors)
             if (Actor && Actor->GetFName() == TEXT("TypedActor"))
-                A = Cast<ADasProbeActor>(Actor.Get());
+                A = Cast<ADasActor>(Actor.Get());
         Config = FindFProperty<FStructProperty>(A->GetClass(), TEXT("Config"));
         Input.StructValue.InitializeAs(Config->Struct);
         Left = AuthoredNestedInner(Config->Struct, Input.StructValue.GetMutableMemory(), TEXT("Left"), Leaf);

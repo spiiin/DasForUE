@@ -1,6 +1,7 @@
 #include "DasDSLService.h"
 #include "DasLifecycleTestObserver.h"
 #include "DasScriptComponent.h"
+#include "DasActor.h"
 #include "DasProbeActor.h"
 #include "DasRuntime.h"
 #include "DasActorComponentProbe.h"
@@ -54,10 +55,10 @@ public:
             return true;
         }
         auto* World = GEditor->PlayWorld.Get();
-        ADasProbeActor* A = nullptr;
-        ADasProbeActor* B = nullptr;
+        ADasActor* A = nullptr;
+        ADasActor* B = nullptr;
         if (World)
-            for (TActorIterator<ADasProbeActor> It(World); It; ++It)
+            for (TActorIterator<ADasActor> It(World); It; ++It)
             {
                 if (It->GetFName() == TEXT("ComponentFirst"))
                     A = *It;
@@ -113,18 +114,18 @@ public:
         if (auto* Fn = A->FindFunction(TEXT("CallValues")))
             A->ProcessEvent(Fn, &Values);
         Check(Values.Result == 1 && A->LastDasError.IsEmpty(), TEXT("PIE_typed_method_values_cross_context"));
-        A->EmitDasSignal(7);
+        CastChecked<ADasProbeActor>(A)->EmitDasSignal(7);
         Check(DasComponentInt(CA, TEXT("SignalTotal")) == 7 && DasComponentInt(CB, TEXT("SignalTotal")) == 0,
                                                                                TEXT("PIE_owner_delegate_isolated"));
         CA->DestroyComponent();
-        A->EmitDasSignal(9);
+        CastChecked<ADasProbeActor>(A)->EmitDasSignal(9);
         Check(DasComponentInt(CA, TEXT("EndCount")) == 1 &&
                               DasComponentInt(CA, TEXT("SignalTotal")) == 7 && R.SubscriptionCount(CA) == 0,
                                               TEXT("PIE_component_destroy_revokes_callback"));
         B->Destroy();
         Check(DasComponentInt(CB, TEXT("EndCount")) == 1 && R.SubscriptionCount(CB) == 0,
                               TEXT("PIE_actor_destroy_ends_component"));
-        auto* Remaining = World->SpawnActor<ADasProbeActor>(State->Blueprint->GeneratedClass);
+        auto* Remaining = World->SpawnActor<ADasActor>(State->Blueprint->GeneratedClass);
         Remaining->OnEndPlay.AddDynamic(State->Observer.Get(), &UDasComponentLifecycleObserver::OnEnded);
         Remaining->FindComponentByClass<UDasScriptComponent>()->OnScriptEnded.AddUObject(
             State->Observer.Get(), &UDasComponentLifecycleObserver::OnComponentEnded);
@@ -154,7 +155,7 @@ bool FDasActorComponentPIETest::RunTest(const FString&)
     {
         FActorSpawnParameters Spawn;
         Spawn.Name = Name;
-        World->SpawnActor<ADasProbeActor>(BP->GeneratedClass, FTransform::Identity, Spawn);
+        World->SpawnActor<ADasActor>(BP->GeneratedClass, FTransform::Identity, Spawn);
     }
     ADD_LATENT_AUTOMATION_COMMAND(FStartPIECommand(false));
     FAutomationTestFramework::Get().EnqueueLatentCommand(MakeShared<FComponentPIECommand>(State, this));

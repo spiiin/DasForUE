@@ -2,6 +2,7 @@
 #include "DasAuthoring.h"
 #include "DasDSLService.h"
 #include "DasRuntime.h"
+#include "DasActor.h"
 #include "DasProbeActor.h"
 #include "../../DasRuntime/Private/DasScriptDelegateProxy.h"
 #include "Engine/Blueprint.h"
@@ -138,8 +139,8 @@ int32 UDasHandlerReferencesCommandlet::Main(const FString&)
     };
     World->InitializeActorsForPlay(FURL());
     FEditorScriptExecutionGuard AllowScript;
-    auto* Actor = World->SpawnActor<ADasProbeActor>(BP->GeneratedClass);
-    TStrongObjectPtr<ADasProbeActor> Keep(Actor);
+    auto* Actor = World->SpawnActor<ADasActor>(BP->GeneratedClass);
+    TStrongObjectPtr<ADasActor> Keep(Actor);
     auto Started = R.RunLifecycle(Path, EDasCallback::Tick, Actor, .01f);
     auto Exercise =
         R.RunNamedFramePersistent(Path, TEXT("ue_ReferenceActor_Exercise"), {}, EDasMethodSignature::Int, Actor);
@@ -156,7 +157,7 @@ int32 UDasHandlerReferencesCommandlet::Main(const FString&)
     R.ReleaseObject(Actor);
     Write(Free);
     auto* Owner = World->SpawnActor<ADasProbeActor>();
-    TStrongObjectPtr<ADasProbeActor> KeepOwner(Owner);
+    TStrongObjectPtr<ADasActor> KeepOwner(Owner);
     const auto Main = R.RunPersistent(Path, 0, Owner);
     Check(Main.bSucceeded && Main.Value == 42, TEXT("free_factory_bind_add_remove_refout_object_array_runtime"),
                                                     Main.Error);
@@ -167,8 +168,8 @@ int32 UDasHandlerReferencesCommandlet::Main(const FString&)
         return R.RunNamedFramePersistent(Path, TEXT("read"), {}, EDasMethodSignature::Int, Owner);
     };
     Check(ReadTotal().Value == 2, TEXT("free_multicast_add_is_unique_and_remove_matches_function"));
-    Owner->OnDasSignal.Broadcast(3);
-    Check(ReadTotal().Value == 5 && Owner->OnDasSignal.GetAllObjects().Num() == 1,
+    CastChecked<ADasProbeActor>(Owner)->OnDasSignal.Broadcast(3);
+    Check(ReadTotal().Value == 5 && CastChecked<ADasProbeActor>(Owner)->OnDasSignal.GetAllObjects().Num() == 1,
           TEXT("free_native_event_uses_vm_proxy"));
     const auto Timer = R.RunNamedVoidPersistent(Path, TEXT("timer"), Owner);
     for (int32 I = 0; I < 2; ++I)
@@ -202,11 +203,12 @@ int32 UDasHandlerReferencesCommandlet::Main(const FString&)
                   ->GetPropertyValue_InContainer(Params.GetStructMemory()) == 14,
           TEXT("native_delegate_invokes_free_result_synchronously"));
     CollectGarbage(RF_NoFlags);
-    Owner->OnDasSignal.Broadcast(1);
+    CastChecked<ADasProbeActor>(Owner)->OnDasSignal.Broadcast(1);
     Check(Proxy->IsActive() && ReadTotal().Value == 7, TEXT("free_proxy_and_snapshot_contract_survive_GC"));
     const auto Stop = R.RunNamedVoidPersistent(Path, TEXT("stop"), Owner);
-    Owner->OnDasSignal.Broadcast(100);
-    Check(Stop.bSucceeded && Owner->OnDasSignal.GetAllObjects().IsEmpty() && ReadTotal().Value == 7,
+    CastChecked<ADasProbeActor>(Owner)->OnDasSignal.Broadcast(100);
+    Check(Stop.bSucceeded && CastChecked<ADasProbeActor>(Owner)->OnDasSignal.GetAllObjects().IsEmpty() &&
+              ReadTotal().Value == 7,
           TEXT("free_native_event_remove_cleans_owned_registration"), Stop.Error);
     Write(Free.Replace(TEXT("return value+10"), TEXT("return missing+10")));
     const auto Rejected = ReadTotal();
@@ -225,16 +227,18 @@ int32 UDasHandlerReferencesCommandlet::Main(const FString&)
                                        TEXT("accepted_reload_revokes_old_proxy_even_if_native_pinned"),
                                             Reload.Error + Reload.ReloadError);
     const auto NewMain = R.RunPersistent(Path, 0, Owner);
-    Check(NewMain.bSucceeded && NewMain.Value == 42 && Owner->OnDasSignal.GetAllObjects().Num() == 1,
+    Check(NewMain.bSucceeded && NewMain.Value == 42 &&
+              CastChecked<ADasProbeActor>(Owner)->OnDasSignal.GetAllObjects().Num() == 1,
           TEXT("free_rebind_after_reload_has_one_registration"), NewMain.Error);
     const auto End = R.RunLifecycle(Path, EDasCallback::EndPlay, Owner);
-    Check(End.bSucceeded && Owner->OnDasSignal.GetAllObjects().IsEmpty(),
+    Check(End.bSucceeded && CastChecked<ADasProbeActor>(Owner)->OnDasSignal.GetAllObjects().IsEmpty(),
           TEXT("free_EndPlay_without_BeginPlay_revokes_native_bindings"), End.Error);
     R.ReleaseObject(Owner);
-    Check(Owner->OnDasSignal.GetAllObjects().IsEmpty(), TEXT("release_detaches_free_native_event_and_revokes_lease"));
+    Check(CastChecked<ADasProbeActor>(Owner)->OnDasSignal.GetAllObjects().IsEmpty(),
+          TEXT("release_detaches_free_native_event_and_revokes_lease"));
     const auto Restart = R.RunPersistent(Path, 0, Owner);
-    Check(Restart.bSucceeded && Owner->OnDasSignal.GetAllObjects().Num() == 1, TEXT("free_restart_before_destroy"),
-                                                                                    Restart.Error);
+    Check(Restart.bSucceeded && CastChecked<ADasProbeActor>(Owner)->OnDasSignal.GetAllObjects().Num() == 1,
+          TEXT("free_restart_before_destroy"), Restart.Error);
     Owner->Destroy();
     FTSTicker::GetCoreTicker().Tick(.02f);
     R.PersistentContextCount();

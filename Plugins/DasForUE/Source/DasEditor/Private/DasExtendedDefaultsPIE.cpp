@@ -1,7 +1,7 @@
 #include "DasDSLService.h"
 #include "DasRuntime.h"
 #include "Modules/ModuleManager.h"
-#include "DasProbeActor.h"
+#include "DasActor.h"
 #include "DasExtendedDefaultsProbe.h"
 #include "Engine/Blueprint.h"
 #include "Engine/World.h"
@@ -69,7 +69,7 @@ bool FExtendedDefaultsPIETest::RunTest(const FString&)
         AddError(Error);
         return false;
     }
-    if (!World->SpawnActor<ADasProbeActor>(BP->GeneratedClass))
+    if (!World->SpawnActor<ADasActor>(BP->GeneratedClass))
         return false;
     ADD_LATENT_AUTOMATION_COMMAND(FStartPIECommand(false));
     FAutomationTestFramework::Get().EnqueueLatentCommand(MakeShared<FExtendedDefaultsPIECommand>(BP, this));

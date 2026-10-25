@@ -154,19 +154,24 @@ bool FDasClassSchema::Validate(FString& Error) const
 {
     Error.Reset();
     if (!Identifier(Name.ToString()) || Name.IsNone() ||
-        (Parent != TEXT("Actor") &&
-                        Parent != TEXT("Pawn") &&
-                                       Parent != TEXT("Character") &&
-                                                      Parent !=
-                                                          TEXT("ActorComponent") &&
-                                                               Parent !=
-                                                                   TEXT("SaveGame") &&
-                                                                        Parent !=
-                                                                            TEXT("DataAsset") &&
-                                                                                 Parent !=
-                                                                                     TEXT("PrimaryDataAsset") &&
-                                                                                          Parent !=
-                                                                                              TEXT("FunctionLibrary")))
+        (Parent !=
+         TEXT("Actor") &&
+#if DAS_WITH_TEST_PROBES
+              Parent != TEXT("DasProbeActor") &&
+#endif
+                             Parent != TEXT("Pawn") &&
+                                            Parent !=
+                                                TEXT("Character") &&
+                                                     Parent !=
+                                                         TEXT("ActorComponent") &&
+                                                              Parent !=
+                                                                  TEXT("SaveGame") &&
+                                                                       Parent !=
+                                                                           TEXT("DataAsset") &&
+                                                                                Parent !=
+                                                                                    TEXT("PrimaryDataAsset") &&
+                                                                                         Parent !=
+                                                                                             TEXT("FunctionLibrary")))
     {
         Error = TEXT("Expected a named Actor, Pawn, Character, ActorComponent or function-library schema");
         return false;

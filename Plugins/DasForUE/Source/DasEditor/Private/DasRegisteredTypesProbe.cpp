@@ -4,7 +4,7 @@
 #include "DasDSLService.h"
 #include "DasAuthoring.h"
 #include "DasRuntime.h"
-#include "DasProbeActor.h"
+#include "DasActor.h"
 #include "DasDefinedEnum.h"
 #include "K2Node_SwitchEnum.h"
 #include "K2Node_FunctionEntry.h"
@@ -18,12 +18,12 @@
 void DasFailEnumAppendForTesting(int32 Stage);
 void BuildDasEnumNodeProbes(UBlueprint*, UEnum*);
 bool BuildDasNestedWrapper(const FString&, UScriptStruct*, FString&);
-void SeedDasNestedProbe(ADasProbeActor*);
+void SeedDasNestedProbe(ADasActor*);
 void BuildDasStructFieldProbes(UBlueprint*, UScriptStruct*);
 bool RunDasStructFieldProbe(const FString&, UDasTypeRegistry*, UBlueprint*, UWorld*, bool, FDasRuntimeModule&, bool);
 bool RunDasEnumValuesProbe(const FString&, UDasTypeRegistry*, UBlueprint*, UWorld*, bool, FDasRuntimeModule&);
 bool RunDasEnumRenameProbe(const FString&, UDasTypeRegistry*, UBlueprint*, UWorld*, bool, FDasRuntimeModule&);
-bool RunDasEnumNodeProbes(ADasProbeActor*, bool);
+bool RunDasEnumNodeProbes(ADasActor*, bool);
 #include "Engine/Blueprint.h"
 #include "Engine/World.h"
 #include "Engine/Level.h"
@@ -85,7 +85,7 @@ UK2Node_SwitchEnum* RouteSwitch(UBlueprint* BP)
                     return S;
     return nullptr;
 }
-int32 RouteResult(ADasProbeActor* A, uint8 Value)
+int32 RouteResult(ADasActor* A, uint8 Value)
 {
     auto* F = A->FindFunction(TEXT("RouteEnum"));
     if (!F)
@@ -218,7 +218,7 @@ int32 RunDasRegisteredTypesProbe(const FString& Params)
         World->GetOutermost()->SetPackageFlags(PKG_ContainsMap);
         FActorSpawnParameters P;
         P.Name = TEXT("TypedActor");
-        auto* Actor = World->SpawnActor<ADasProbeActor>(BP->GeneratedClass, FTransform::Identity, P);
+        auto* Actor = World->SpawnActor<ADasActor>(BP->GeneratedClass, FTransform::Identity, P);
         if (!Actor)
             return 1;
         Actor->TypeRegistry = Registry;
@@ -359,10 +359,10 @@ int32 RunDasRegisteredTypesProbe(const FString& Params)
                                              TEXT("State") && Struct->GetName() ==
                                                                   TEXT("Settings"),
                                                                        TEXT("IDs_map_alias_names_to_original_assets"));
-    ADasProbeActor* Actor = nullptr;
+    ADasActor* Actor = nullptr;
     for (auto& V : World->PersistentLevel->Actors)
         if (V && V->GetFName() == TEXT("TypedActor"))
-            Actor = Cast<ADasProbeActor>(V.Get());
+            Actor = Cast<ADasActor>(V.Get());
     if (!Actor)
         return 1;
     Actor->TypeRegistry = Registry;
@@ -404,7 +404,7 @@ int32 RunDasRegisteredTypesProbe(const FString& Params)
                 FKismetEditorUtilities::CompileBlueprint(BP);
                 for (auto& V : World->PersistentLevel->Actors)
                     if (V && V->GetFName() == TEXT("TypedActor"))
-                        Actor = Cast<ADasProbeActor>(V.Get());
+                        Actor = Cast<ADasActor>(V.Get());
                 Mode = FindFProperty<FByteProperty>(Actor->GetClass(), TEXT("Mode"));
                 Config = FindFProperty<FStructProperty>(Actor->GetClass(), TEXT("Config"));
             };
@@ -434,7 +434,7 @@ int32 RunDasRegisteredTypesProbe(const FString& Params)
                 DasFailEnumAppendForTesting(0);
                 for (auto& V : World->PersistentLevel->Actors)
                     if (V && V->GetFName() == TEXT("TypedActor"))
-                        Actor = Cast<ADasProbeActor>(V.Get());
+                        Actor = Cast<ADasActor>(V.Get());
                 Mode = FindFProperty<FByteProperty>(Actor->GetClass(), TEXT("Mode"));
                 Config = FindFProperty<FStructProperty>(Actor->GetClass(), TEXT("Config"));
                 Check(Failed &&
@@ -463,7 +463,7 @@ int32 RunDasRegisteredTypesProbe(const FString& Params)
             {
                 for (auto& V : World->PersistentLevel->Actors)
                     if (V && V->GetFName() == TEXT("TypedActor"))
-                        Actor = Cast<ADasProbeActor>(V.Get());
+                        Actor = Cast<ADasActor>(V.Get());
                 Mode = FindFProperty<FByteProperty>(Actor->GetClass(), TEXT("Mode"));
                 Config = FindFProperty<FStructProperty>(Actor->GetClass(), TEXT("Config"));
             };

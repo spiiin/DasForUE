@@ -1,5 +1,5 @@
 #include "DasDefaultsMergeProbe.h"
-#include "DasProbeActor.h"
+#include "DasActor.h"
 #include "DasRuntime.h"
 #include "Modules/ModuleManager.h"
 #include "Engine/StaticMesh.h"
@@ -12,10 +12,10 @@ bool RunDasDefaultsMergeProbe(UWorld* World, FString& Report)
 {
     if (!World || !World->PersistentLevel)
         return false;
-    ADasProbeActor* A = nullptr;
-    ADasProbeActor* M = nullptr;
+    ADasActor* A = nullptr;
+    ADasActor* M = nullptr;
     for (const auto& Actor : World->PersistentLevel->Actors)
-        if (auto* P = Cast<ADasProbeActor>(Actor))
+        if (auto* P = Cast<ADasActor>(Actor))
         {
             if (P->Tags.Contains(TEXT("MergeInherited")))
                 A = P;
@@ -62,7 +62,7 @@ bool RunDasDefaultsMergeProbe(UWorld* World, FString& Report)
                                                      MM->GetStaticMesh()->GetPathName() ==
                                                          TEXT("/Engine/BasicShapes/Cylinder.Cylinder"),
                                                               TEXT("native_component_asset_overrides"));
-    auto* Fresh = World->SpawnActor<ADasProbeActor>(A->GetClass());
+    auto* Fresh = World->SpawnActor<ADasActor>(A->GetClass());
     Check(Fresh && Int(Fresh, TEXT("Auto")) == 20 && Int(Fresh, TEXT("Manual")) == 77 &&
                                                          Int(Ref(Fresh, TEXT("OtherWorker")), TEXT("Bonus")) == 52,
                                                              TEXT("fresh_spawn_merged_CDO"));

@@ -5,7 +5,7 @@
 #include "UObject/StrongObjectPtr.h"
 #include "DasSchema.h"
 #include "DasTypeRegistry.h"
-#include "DasProbeActor.h"
+#include "DasActor.h"
 #include "DasProbeInterface.h"
 #include "Misc/Paths.h"
 #include "DasAuthoredInterfaceClass.h"
@@ -109,7 +109,7 @@ inline void RunDasAuthoredInterfaceNativeValues(FDasRuntimeModule& R, UObject* A
     Mode.ObjectClass = TEXT("/Script/DasRuntime.EDasCallMode");
     Mode.IntValue = 7;
     Echo(TEXT("EchoMode"), EDasMethodSignature::Enum, Mode);
-    if (auto* Owner = Cast<ADasProbeActor>(Actor); Owner && Owner->TypeRegistry)
+    if (auto* Owner = Cast<ADasActor>(Actor); Owner && Owner->TypeRegistry)
     {
         FString RegistryError;
         auto* Enum = Cast<UEnum>(Owner->TypeRegistry->Resolve(TEXT("interfacevalues.State"), true, RegistryError));
@@ -410,7 +410,7 @@ inline bool RunDasAuthoredInterfaceValues(FDasRuntimeModule& R, UObject* Actor, 
                 R.ScriptPath(Script), TEXT("ue_CounterActor_EchoDetails"), {ArrayProbeWrong},
                                            EDasMethodSignature::Struct, Actor, ArrayProbeInput.ObjectClass);
             Expect(!ArrayProbeRejected.bSucceeded, TEXT("authored_struct_array_wrong_identity_rejected"));
-            auto* OtherElement = Cast<UScriptStruct>(CastChecked<ADasProbeActor>(Actor)->TypeRegistry->Resolve(
+            auto* OtherElement = Cast<UScriptStruct>(CastChecked<ADasActor>(Actor)->TypeRegistry->Resolve(
                 TEXT("interfacevalues.Settings"), false, ArrayProbeError));
             FDasDeclaredType OtherDeclared;
             OtherDeclared.Kind = TEXT("array");
@@ -591,7 +591,7 @@ inline bool RunDasAuthoredInterfaceValues(FDasRuntimeModule& R, UObject* Actor, 
         RunRefPair(TEXT("RefEvents"), RefObject, [&](const auto& Changed, const auto& Previous)
                         { return !Changed.ObjectValue.Get() && Previous.ObjectValue.Get() == Actor; });
         FString RefError;
-        auto* RefRegistry = CastChecked<ADasProbeActor>(Actor)->TypeRegistry.Get();
+        auto* RefRegistry = CastChecked<ADasActor>(Actor)->TypeRegistry.Get();
         auto* StateType = Cast<UEnum>(RefRegistry->Resolve(TEXT("interfacevalues.State"), true, RefError));
         FDasScalarValue RefState;
         RefState.Kind = 13;

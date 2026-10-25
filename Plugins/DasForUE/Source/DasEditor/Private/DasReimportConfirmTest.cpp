@@ -3,7 +3,7 @@
 // first, then the removal). Long plans are summarized.
 #include "DasAutoReimport.h"
 #include "DasDSLService.h"
-#include "DasProbeActor.h"
+#include "DasActor.h"
 #include "DasRuntime.h"
 #include "AssetRegistry/AssetRegistryModule.h"
 #include "Engine/Blueprint.h"
@@ -152,7 +152,7 @@ bool FDasReimportConfirmTest::RunTest(const FString&)
     TestTrue(TEXT("field removed"), BP->GeneratedClass->FindPropertyByName(TEXT("Scaler")) == nullptr);
     TestEqual(TEXT("new default on the class"), Value(BP->GeneratedClass->GetDefaultObject(), TEXT("Points")),
                                                       FString(TEXT("20")));
-    auto* Actor = Cast<ADasProbeActor>(FindPlaced());
+    auto* Actor = Cast<ADasActor>(FindPlaced());
     TestTrue(TEXT("placed actor migrated"),
                   Actor && Value(Actor, TEXT("Points")) == TEXT("20") &&
                                                                 Value(Actor, TEXT("Scaler")) == TEXT("<missing>"));

@@ -1,7 +1,7 @@
 #include "DasDSLService.h"
 #include "DasTypeService.h"
 #include "DasRuntime.h"
-#include "DasProbeActor.h"
+#include "DasActor.h"
 #include "DasPropertyTypes.h"
 #include "DasAuthoring.h"
 #include "DasSoftReferences.h"
@@ -37,9 +37,9 @@ public:
         auto* W = GEditor->PlayWorld.Get();
         if (Ending)
             return !W;
-        ADasProbeActor* A = nullptr;
+        ADasActor* A = nullptr;
         if (W)
-            for (TActorIterator<ADasProbeActor> I(W); I; ++I)
+            for (TActorIterator<ADasActor> I(W); I; ++I)
                 if (I->GetFName() == TEXT("SoftReferences"))
                     A = *I;
         if ((!A || SoftCount(A, TEXT("Ready")) < 3) && FPlatformTime::Seconds() - Start < 30 &&
@@ -146,7 +146,7 @@ bool FDasSoftReferencesPIE::RunTest(const FString&)
         return false;
     FActorSpawnParameters Spawn;
     Spawn.Name = TEXT("SoftReferences");
-    if (!W->SpawnActor<ADasProbeActor>(BP->GeneratedClass, FTransform::Identity, Spawn))
+    if (!W->SpawnActor<ADasActor>(BP->GeneratedClass, FTransform::Identity, Spawn))
         return false;
     ADD_LATENT_AUTOMATION_COMMAND(FStartPIECommand(false));
     ADD_LATENT_AUTOMATION_COMMAND(FSoftReferenceCommand(BP, this));

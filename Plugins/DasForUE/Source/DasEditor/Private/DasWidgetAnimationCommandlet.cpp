@@ -1,6 +1,6 @@
 #include "DasWidgetAnimationCommandlet.h"
 #include "DasRuntime.h"
-#include "DasProbeActor.h"
+#include "DasActor.h"
 #include "DasScriptUserWidget.h"
 #include "Animation/WidgetAnimation.h"
 #include "Animation/WidgetAnimationState.h"
@@ -54,7 +54,7 @@ int32 UDasWidgetAnimationCommandlet::Main(const FString& Params)
         GEngine->DestroyWorldContext(World.Get());
         World->DestroyWorld(false);
     };
-    auto* Actor = World->SpawnActor<ADasProbeActor>();
+    auto* Actor = World->SpawnActor<ADasActor>();
     TStrongObjectPtr<UDasWidgetAnimationFixture> Widget(NewObject<UDasWidgetAnimationFixture>(World.Get()));
     Widget->Initialize();
     TSharedPtr<SWidget> Slate = Widget->TakeWidget();

@@ -6,6 +6,7 @@
 #include "UObject/Package.h"
 #include "DasCallFrame.h"
 #include "DasObjectFixture.h"
+#include "DasActor.h"
 #include "DasProbeActor.h"
 #include "DasDelegateSignatures.h"
 #include "DasContainerTypes.h"
@@ -84,7 +85,7 @@ bool CheckDasCallbackTypes(FString& Error)
     {
         if (!ValidateDasCallbackPayload(ClassValue, Usage, Error))
             return Fail(TEXT("Null class callback rejected"));
-        ClassValue.ClassValue = ADasProbeActor::StaticClass();
+        ClassValue.ClassValue = ADasActor::StaticClass();
         if (!ValidateDasCallbackPayload(ClassValue, Usage, Error))
             return false;
         ClassValue.ClassValue = USceneComponent::StaticClass();
@@ -228,7 +229,7 @@ bool CheckDasCallbackTypes(FString& Error)
                 .IsNone())
             return Fail(TEXT("Safe class callback widening rejected"));
         if (!Proxy
-                 ->ConfigureDynamic(Sig.Get(), ADasProbeActor::StaticClass()->GetPathName(), EDasMethodSignature::Class,
+                 ->ConfigureDynamic(Sig.Get(), ADasActor::StaticClass()->GetPathName(), EDasMethodSignature::Class,
                                     Error)
                  .IsNone())
             return Fail(TEXT("Unsafe class callback narrowing accepted"));

@@ -1,8 +1,9 @@
 options gen2
+require ue_probe_actor
 require ue_dsl
 
 // Emit the inherited OnDas*Signal events using Blueprint-callable EmitDas*Signal.
-[ue_class(module_id="events", Blueprintable)]
+[ue_class(module_id="events", Blueprintable,parent="/Script/DasRuntime.DasProbeActor")]
 class ScalarEventActor {
     @ue_property=(EditAnywhere, BlueprintReadWrite)
     Total:float=0.0

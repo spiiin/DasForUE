@@ -1,6 +1,6 @@
 #include "DasInitializerProbe.h"
 #include "DasRuntime.h"
-#include "DasProbeActor.h"
+#include "DasActor.h"
 #include "DasScriptComponent.h"
 #include "Modules/ModuleManager.h"
 #include "Engine/World.h"
@@ -58,10 +58,10 @@ bool RunDasInitializerLifetimeProbe(UClass* Target, UClass* Inherited, UClass* S
     };
     auto& R = FModuleManager::LoadModuleChecked<FDasRuntimeModule>(TEXT("DasRuntime"));
     TStrongObjectPtr<UWorld> World(UWorld::CreateWorld(EWorldType::Game, false));
-    auto* A = World->SpawnActor<ADasProbeActor>(Target);
-    auto* I = World->SpawnActor<ADasProbeActor>(Inherited);
-    auto* Skip = World->SpawnActor<ADasProbeActor>(Skipped);
-    auto* F = World->SpawnActor<ADasProbeActor>(Failure);
+    auto* A = World->SpawnActor<ADasActor>(Target);
+    auto* I = World->SpawnActor<ADasActor>(Inherited);
+    auto* Skip = World->SpawnActor<ADasActor>(Skipped);
+    auto* F = World->SpawnActor<ADasActor>(Failure);
     if (!A || !I || !Skip || !F)
         return false;
     Check(Value(A, TEXT("InitCount")) == 0, TEXT("no_runtime_initializer_during_construction"));

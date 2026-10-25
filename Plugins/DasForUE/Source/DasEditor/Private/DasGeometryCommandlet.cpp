@@ -1,7 +1,7 @@
 #include "DasGeometryCommandlet.h"
 #include "DasGeometry.h"
 #include "DasRuntime.h"
-#include "DasProbeActor.h"
+#include "DasActor.h"
 #include "DasSchema.h"
 #include "Layout/Geometry.h"
 #include "Components/Border.h"
@@ -88,7 +88,7 @@ int32 UDasGeometryCommandlet::Main(const FString& Params)
         GEngine->DestroyWorldContext(World.Get());
         World->DestroyWorld(false);
     };
-    auto* Actor = World->SpawnActor<ADasProbeActor>();
+    auto* Actor = World->SpawnActor<ADasActor>();
     auto* Player = World->SpawnActor<APlayerController>();
     const auto Run = [&](const TCHAR* Entry)
     {

@@ -1178,10 +1178,12 @@ public:
         AddUEExtern<DAS_BIND_FUN(SubscribeObjectInt)>(*this, Library, "ue_subscribe_object_int",
                                                       das::SideEffects::modifyExternal, "SubscribeObjectInt");
 
+#if DAS_WITH_TEST_PROBES
         AddUEExtern<DAS_BIND_FUN(SubscribeInt)>(*this, Library, "ue_subscribe_int", das::SideEffects::modifyExternal,
                                                 "SubscribeInt");
         AddUEExtern<DAS_BIND_FUN(EmitSignal)>(*this, Library, "ue_emit_signal", das::SideEffects::modifyExternal,
                                               "EmitSignal");
+#endif
         AddUEExtern<DAS_BIND_FUN(ClassDefaultObject), das::SimNode_ExtFuncCallAndCopyOrMove>(
             *this, Library, "__ue_class_default_object", das::SideEffects::modifyExternal);
         AddUEExtern<DAS_BIND_FUN((InitializePersistentGlobal<int32,das::Type::tInt>))>(

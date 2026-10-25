@@ -1,8 +1,9 @@
 options gen2
+require ue_probe_actor
 require ue_dsl
 require ue_component_types
 [ue_class(Blueprintable)]
-class ComponentOwner : Actor {
+class ComponentOwner : ProbeActor {
     components = ue_components(VisibleAnywhere, BlueprintReadOnly, Category="Components") {
         // Подсчёт очков
         var Behavior:ScoreComponent

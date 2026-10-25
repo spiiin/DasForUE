@@ -5,7 +5,7 @@
 #include "EdGraphSchema_K2.h"
 #include "K2Node_FunctionEntry.h"
 #include "DasBlueprintLibrary.h"
-#include "DasProbeActor.h"
+#include "DasActor.h"
 #include "Engine/World.h"
 #include "Engine/BlueprintGeneratedClass.h"
 #include "Misc/ScopeExit.h"
@@ -276,7 +276,7 @@ int32 UDasStaticLibraryCommandlet::Main(const FString& Params)
         const auto Result =
             Runtime.RunLibraryFrame(Contract, TEXT("dsl_library_values.das"), Spawn->EntryPoint, {Context, Class},
                                                    EDasMethodSignature::Object, TEXT("/Script/Engine.Actor"));
-        auto* Actor = Cast<ADasProbeActor>(Result.ObjectValue.Get());
+        auto* Actor = Cast<ADasActor>(Result.ObjectValue.Get());
         Check(Result.bSucceeded && Actor && Actor->LastDasError.IsEmpty() &&
               FindFProperty<FIntProperty>(Actor->GetClass(), TEXT("Score"))->GetPropertyValue_InContainer(Actor) == 42,
                                           TEXT("library_nested_authored_actor_construction_uses_own_contract"));

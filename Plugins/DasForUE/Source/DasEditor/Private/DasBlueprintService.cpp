@@ -17,7 +17,7 @@
 #include "DasDelegateLibrary.h"
 #include "Misc/SecureHash.h"
 #include "StructUtils/InstancedStruct.h"
-#include "DasProbeActor.h"
+#include "DasActor.h"
 #include "DasScriptComponent.h"
 #include "DasRuntime.h"
 #include "Editor.h"
@@ -119,16 +119,14 @@ bool AdapterCall(const UK2Node_CallFunction* Call)
     const auto* T = Call->GetTargetFunction();
     if (!T)
         return false;
-    for (const auto Name : {GET_FUNCTION_NAME_CHECKED(ADasProbeActor, ExecuteDasConstFrame),
-                            GET_FUNCTION_NAME_CHECKED(ADasProbeActor, ExecuteDasConstFrameOutputs),
-                            GET_FUNCTION_NAME_CHECKED(ADasProbeActor, ExecuteDas),
-                            GET_FUNCTION_NAME_CHECKED(ADasProbeActor, ExecuteDasNamed),
-                            GET_FUNCTION_NAME_CHECKED(ADasProbeActor, ExecuteDasFloat),
-                            GET_FUNCTION_NAME_CHECKED(ADasProbeActor, ExecuteDasBool),
-                            GET_FUNCTION_NAME_CHECKED(ADasProbeActor, ExecuteDasVoid),
-                            GET_FUNCTION_NAME_CHECKED(ADasProbeActor, ExecuteDasFrame),
-                            GET_FUNCTION_NAME_CHECKED(ADasProbeActor, ExecuteDasFrameOutputs)})
-        if (T == ADasProbeActor::StaticClass()->FindFunctionByName(Name) ||
+    for (const auto Name :
+         {GET_FUNCTION_NAME_CHECKED(ADasActor, ExecuteDasConstFrame),
+          GET_FUNCTION_NAME_CHECKED(ADasActor, ExecuteDasConstFrameOutputs),
+          GET_FUNCTION_NAME_CHECKED(ADasActor, ExecuteDas), GET_FUNCTION_NAME_CHECKED(ADasActor, ExecuteDasNamed),
+          GET_FUNCTION_NAME_CHECKED(ADasActor, ExecuteDasFloat), GET_FUNCTION_NAME_CHECKED(ADasActor, ExecuteDasBool),
+          GET_FUNCTION_NAME_CHECKED(ADasActor, ExecuteDasVoid), GET_FUNCTION_NAME_CHECKED(ADasActor, ExecuteDasFrame),
+          GET_FUNCTION_NAME_CHECKED(ADasActor, ExecuteDasFrameOutputs)})
+        if (T == ADasActor::StaticClass()->FindFunctionByName(Name) ||
             T == UDasScriptComponent::StaticClass()->FindFunctionByName(Name) ||
             T == DasNativeScriptHost(
                      TEXT("Pawn"))->FindFunctionByName(Name) ||
@@ -503,8 +501,7 @@ bool SetInterfaceEvent(UBlueprint* BP, const FDasMethodSchema& M)
     Event->PostPlacedNewNode();
     Event->AllocateDefaultPins();
     auto* Call = NewObject<UK2Node_CallFunction>(Graph);
-    Call->SetFromFunction(
-        BP->ParentClass->FindFunctionByName(GET_FUNCTION_NAME_CHECKED(ADasProbeActor, ExecuteDasFrame)));
+    Call->SetFromFunction(BP->ParentClass->FindFunctionByName(GET_FUNCTION_NAME_CHECKED(ADasActor, ExecuteDasFrame)));
     Graph->AddNode(Call, false, false);
     Call->CreateNewGuid();
     Call->PostPlacedNewNode();
@@ -564,10 +561,10 @@ bool SetFrameMethod(UBlueprint* BP, const FDasMethodSchema& M)
     const FName Target = M.bStatic
                              ? (Directed ? GET_FUNCTION_NAME_CHECKED(UDasBlueprintLibrary, ExecuteLibraryFrameOutputs)
                                          : GET_FUNCTION_NAME_CHECKED(UDasBlueprintLibrary, ExecuteLibraryFrame))
-                         : M.bConst ? (Directed ? GET_FUNCTION_NAME_CHECKED(ADasProbeActor, ExecuteDasConstFrameOutputs)
-                                                : GET_FUNCTION_NAME_CHECKED(ADasProbeActor, ExecuteDasConstFrame))
-                                    : (Directed ? GET_FUNCTION_NAME_CHECKED(ADasProbeActor, ExecuteDasFrameOutputs)
-                                                : GET_FUNCTION_NAME_CHECKED(ADasProbeActor, ExecuteDasFrame));
+                         : M.bConst ? (Directed ? GET_FUNCTION_NAME_CHECKED(ADasActor, ExecuteDasConstFrameOutputs)
+                                                : GET_FUNCTION_NAME_CHECKED(ADasActor, ExecuteDasConstFrame))
+                                    : (Directed ? GET_FUNCTION_NAME_CHECKED(ADasActor, ExecuteDasFrameOutputs)
+                                                : GET_FUNCTION_NAME_CHECKED(ADasActor, ExecuteDasFrame));
     UEdGraph* G = nullptr;
     for (UEdGraph* Existing : DasOwnedMethodGraphs(BP))
         if (Existing->GetFName() == M.Name)
@@ -816,12 +813,12 @@ bool SetMethod(UBlueprint* BP, const FDasMethodSchema& Method)
         return SetFrameMethod(BP, Method);
     const bool Action = Method.Signature == EDasMethodSignature::Void;
     const FName TargetName =
-        Action                                           ? GET_FUNCTION_NAME_CHECKED(ADasProbeActor, ExecuteDasVoid)
-        : Method.Signature == EDasMethodSignature::Float ? GET_FUNCTION_NAME_CHECKED(ADasProbeActor, ExecuteDasFloat)
+        Action                                           ? GET_FUNCTION_NAME_CHECKED(ADasActor, ExecuteDasVoid)
+        : Method.Signature == EDasMethodSignature::Float ? GET_FUNCTION_NAME_CHECKED(ADasActor, ExecuteDasFloat)
         : Method.Signature == EDasMethodSignature::Bool
-            ? GET_FUNCTION_NAME_CHECKED(ADasProbeActor, ExecuteDasBool)
-            : Method.EntryPoint == TEXT("main")? GET_FUNCTION_NAME_CHECKED(ADasProbeActor, ExecuteDas)
-                                               : GET_FUNCTION_NAME_CHECKED(ADasProbeActor, ExecuteDasNamed);
+            ? GET_FUNCTION_NAME_CHECKED(ADasActor, ExecuteDasBool)
+            : Method.EntryPoint == TEXT("main")? GET_FUNCTION_NAME_CHECKED(ADasActor, ExecuteDas)
+                                               : GET_FUNCTION_NAME_CHECKED(ADasActor, ExecuteDasNamed);
     UFunction* Target = BP->ParentClass->FindFunctionByName(TargetName);
     UEdGraph* Graph = nullptr;
     for (UEdGraph* Existing : DasOwnedMethodGraphs(BP))

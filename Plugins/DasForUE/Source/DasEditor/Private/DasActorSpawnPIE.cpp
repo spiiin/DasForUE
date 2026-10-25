@@ -1,5 +1,5 @@
 #include "DasDSLService.h"
-#include "DasProbeActor.h"
+#include "DasActor.h"
 #include "DasScriptComponent.h"
 #include "DasRuntime.h"
 #include "DasClassMethodsProbe.h"
@@ -24,7 +24,7 @@ int32 SpawnValue(UObject* O, const TCHAR* N)
 struct FSpawnState
 {
     TStrongObjectPtr<UBlueprint> Driver, Target, Child;
-    TStrongObjectPtr<ADasProbeActor> Spawned;
+    TStrongObjectPtr<ADasActor> Spawned;
     TStrongObjectPtr<UDasScriptComponent> Component;
     TStrongObjectPtr<UWorld> ForeignWorld;
     TStrongObjectPtr<AActor> ForeignActor;
@@ -55,9 +55,9 @@ public:
             Test->TestTrue(TEXT("EndPIE releases spawned sessions"), !W && R.PersistentContextCount() == 0);
             return true;
         }
-        ADasProbeActor* Driver = nullptr;
+        ADasActor* Driver = nullptr;
         if (W)
-            for (TActorIterator<ADasProbeActor> I(W); I; ++I)
+            for (TActorIterator<ADasActor> I(W); I; ++I)
                 if (I->GetFName() == TEXT("SpawnDriver"))
                     Driver = *I;
         if (!Driver || !W->HasBegunPlay())
@@ -107,7 +107,7 @@ public:
             if (!Created.bSucceeded)
                 Test->AddError(Created.Error);
             auto* Field = FindFProperty<FObjectProperty>(Driver->GetClass(), TEXT("Spawned"));
-            auto* Actor = Field ? Cast<ADasProbeActor>(Field->GetObjectPropertyValue_InContainer(Driver)) : nullptr;
+            auto* Actor = Field ? Cast<ADasActor>(Field->GetObjectPropertyValue_InContainer(Driver)) : nullptr;
             if (!Actor)
             {
                 Test->AddError(TEXT("spawned actor missing"));
@@ -214,7 +214,7 @@ bool FDasActorSpawnPIE::RunTest(const FString&)
     auto* W = FAutomationEditorCommonUtils::CreateNewMap();
     FActorSpawnParameters P;
     P.Name = TEXT("SpawnDriver");
-    auto* Actor = W->SpawnActor<ADasProbeActor>(Driver->GeneratedClass, FTransform::Identity, P);
+    auto* Actor = W->SpawnActor<ADasActor>(Driver->GeneratedClass, FTransform::Identity, P);
     auto* Field = FindFProperty<FClassProperty>(Driver->GeneratedClass, TEXT("SpawnClass"));
     if (!Actor || !Field)
     {

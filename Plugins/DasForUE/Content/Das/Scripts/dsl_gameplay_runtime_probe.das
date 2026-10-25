@@ -1,8 +1,9 @@
 options gen2
+require ue_probe_actor
 options gc
 require ue_scene_components
 
-[ue_class(module_id="gameplayprobe",Blueprintable)]
+[ue_class(module_id="gameplayprobe",Blueprintable,parent="/Script/DasRuntime.DasProbeActor")]
 class GameplayRuntimeProbe {
     @ue_property=(BlueprintReadWrite)
     Pulses:int=0

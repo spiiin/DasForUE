@@ -27,7 +27,7 @@ bool TestDasInstanceDefaults(const FString& Id, const FString& Phase, FString& E
     {
         World->DestroyWorld(false);
     };
-    auto* Owner = World->SpawnActor<ADasProbeActor>();
+    auto* Owner = World->SpawnActor<ADasActor>();
     for (const auto* Kind : {TEXT("actor"), TEXT("component")})
     {
         const FString File = FString(TEXT("dsl_defaults_")) + Kind +
@@ -71,7 +71,7 @@ bool TestDasInstanceDefaults(const FString& Id, const FString& Phase, FString& E
         }
         UObject* Target = nullptr;
         if (FString(Kind) == TEXT("actor"))
-            Target = World->SpawnActor<ADasProbeActor>(Consumer->GeneratedClass);
+            Target = World->SpawnActor<ADasActor>(Consumer->GeneratedClass);
         else
         {
             auto* Component = NewObject<UDasScriptComponent>(Owner, Consumer->GeneratedClass);
@@ -170,7 +170,7 @@ bool TestDasInstanceDefaults(const FString& Id, const FString& Phase, FString& E
             !FDasDSLService::Reimport(Reload, Error))
             return Fail(TEXT("Reimport changed instance default"));
         FKismetEditorUtilities::CompileBlueprint(Caller);
-        auto* Actor = World->SpawnActor<ADasProbeActor>(Caller->GeneratedClass);
+        auto* Actor = World->SpawnActor<ADasActor>(Caller->GeneratedClass);
         if (!Actor)
             return Fail(TEXT("Reload caller spawn"));
         int32 Result = 0;
@@ -223,7 +223,7 @@ bool TestDasInstanceDefaults(const FString& Id, const FString& Phase, FString& E
     }
     if (!Child)
         return Fail(TEXT("Load default child"));
-    auto* Instance = World->SpawnActor<ADasProbeActor>(Child->GeneratedClass);
+    auto* Instance = World->SpawnActor<ADasActor>(Child->GeneratedClass);
     if (!Instance)
         return Fail(TEXT("Spawn default child"));
     ON_SCOPE_EXIT

@@ -8,7 +8,7 @@
 #include "DasDSLService.h"
 #include "DasRuntime.h"
 #include "DasAuthoring.h"
-#include "DasProbeActor.h"
+#include "DasActor.h"
 #include "DasScriptComponent.h"
 #include "Engine/Blueprint.h"
 #include "Engine/World.h"
@@ -98,8 +98,8 @@ int32 UDasComputedDefaultsCommandlet::Main(const FString& Params)
     TStrongObjectPtr<UWorld> WorldKeep;
     UBlueprint* BP = nullptr;
     UWorld* W = nullptr;
-    ADasProbeActor* A = nullptr;
-    ADasProbeActor* Manual = nullptr;
+    ADasActor* A = nullptr;
+    ADasActor* Manual = nullptr;
     ON_SCOPE_EXIT
     {
         if (W)
@@ -159,8 +159,8 @@ int32 UDasComputedDefaultsCommandlet::Main(const FString& Params)
         WorldKeep.Reset(W);
         W->SetFlags(RF_Public | RF_Standalone);
         W->GetOutermost()->SetPackageFlags(PKG_ContainsMap);
-        A = W->SpawnActor<ADasProbeActor>(BP->GeneratedClass);
-        Manual = W->SpawnActor<ADasProbeActor>(BP->GeneratedClass);
+        A = W->SpawnActor<ADasActor>(BP->GeneratedClass);
+        Manual = W->SpawnActor<ADasActor>(BP->GeneratedClass);
         if (!A || !Manual)
             return 1;
         A->Tags.Add(TEXT("ComputedDefault"));
@@ -299,7 +299,7 @@ int32 UDasComputedDefaultsCommandlet::Main(const FString& Params)
                                                           TEXT("computeddefaults.ComputedChild"), Child, Error),
                                                   TEXT("computed_inherited_property_defaults")))
             return 1;
-        auto* ChildActor = W->SpawnActor<ADasProbeActor>(Child->GeneratedClass);
+        auto* ChildActor = W->SpawnActor<ADasActor>(Child->GeneratedClass);
         if (!Check(ChildActor && ComputedInt(ChildActor, TEXT("Score")) == 85 && ComputedCall(ChildActor) == 172 &&
                                              ChildActor->LastDasError.IsEmpty(),
                                              TEXT("inherited_source_field_dependencies")))
@@ -312,7 +312,7 @@ int32 UDasComputedDefaultsCommandlet::Main(const FString& Params)
                                                           TEXT("computeddefaults.ComputedSibling"), Sibling, Error),
                                                   TEXT("computed_sibling_import")))
             return 1;
-        auto* SiblingActor = W->SpawnActor<ADasProbeActor>(Sibling->GeneratedClass);
+        auto* SiblingActor = W->SpawnActor<ADasActor>(Sibling->GeneratedClass);
         if (!Check(SiblingActor &&
                    ComputedInt(SiblingActor, TEXT("Score")) == 40 &&
                                ComputedInt(SiblingActor, TEXT("Derived")) == 41 && ComputedCall(SiblingActor) == 81 &&
@@ -329,7 +329,7 @@ int32 UDasComputedDefaultsCommandlet::Main(const FString& Params)
         // Blueprint compilation may collect/reinstance objects: retain the world and
         // refresh actor references from its owned actor list before using an Outer.
         for (const auto& Actor : W->PersistentLevel->Actors)
-            if (auto* Live = Cast<ADasProbeActor>(Actor))
+            if (auto* Live = Cast<ADasActor>(Actor))
             {
                 if (Live->Tags.Contains(TEXT("ComputedDefault")))
                     A = Live;
@@ -362,7 +362,7 @@ int32 UDasComputedDefaultsCommandlet::Main(const FString& Params)
             W->InitWorld();
         W->UpdateWorldComponents(true, false);
         for (const auto& Actor : W->PersistentLevel->Actors)
-            if (auto* P = Cast<ADasProbeActor>(Actor))
+            if (auto* P = Cast<ADasActor>(Actor))
             {
                 if (P->Tags.Contains(TEXT("ComputedDefault")))
                     A = P;
@@ -380,14 +380,14 @@ int32 UDasComputedDefaultsCommandlet::Main(const FString& Params)
         A = nullptr;
         Manual = nullptr;
         for (const auto& Actor : W->PersistentLevel->Actors)
-            if (auto* P = Cast<ADasProbeActor>(Actor))
+            if (auto* P = Cast<ADasActor>(Actor))
             {
                 if (P->Tags.Contains(TEXT("ComputedDefault")))
                     A = P;
                 if (P->Tags.Contains(TEXT("ComputedManual")))
                     Manual = P;
             }
-        auto* Fresh = W->SpawnActor<ADasProbeActor>(BP->GeneratedClass);
+        auto* Fresh = W->SpawnActor<ADasActor>(BP->GeneratedClass);
         const bool Good = Fresh && ComputedCall(Fresh) == 82 && Fresh->LastDasError.IsEmpty();
         if (Fresh)
         {

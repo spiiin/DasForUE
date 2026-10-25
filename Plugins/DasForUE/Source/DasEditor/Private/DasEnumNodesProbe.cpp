@@ -13,7 +13,7 @@
 #include "K2Node_VariableGet.h"
 #include "K2Node_VariableSet.h"
 #include "Kismet/KismetMathLibrary.h"
-#include "DasProbeActor.h"
+#include "DasActor.h"
 #include "UObject/StructOnScope.h"
 #include "Editor.h"
 namespace
@@ -155,7 +155,7 @@ void BuildDasEnumNodeProbes(UBlueprint* BP, UEnum* Enum)
     }
     FKismetEditorUtilities::CompileBlueprint(BP);
 }
-bool RunDasEnumNodeProbes(ADasProbeActor* Actor, bool Added)
+bool RunDasEnumNodeProbes(ADasActor* Actor, bool Added)
 {
     auto Run = [&](FName Name, int32 Input = 0)
     {

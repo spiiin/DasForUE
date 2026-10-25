@@ -2,7 +2,7 @@
 #include "DasComponentDefaults.h"
 #include "DasAuthoring.h"
 #include "DasRuntime.h"
-#include "DasProbeActor.h"
+#include "DasActor.h"
 #include "Engine/Blueprint.h"
 #include "Engine/BlueprintGeneratedClass.h"
 #include "Engine/World.h"
@@ -80,7 +80,7 @@ bool FDasNativeComponentsTest::RunTest(const FString&)
     }
     TestNull(TEXT("defaults label is not a runtime field"), BP->GeneratedClass->FindPropertyByName(TEXT("defaults")));
     TStrongObjectPtr<UWorld> World(UWorld::CreateWorld(EWorldType::Game, false));
-    auto* Actor = World->SpawnActor<ADasProbeActor>(BP->GeneratedClass);
+    auto* Actor = World->SpawnActor<ADasActor>(BP->GeneratedClass);
     if (!TestNotNull(TEXT("spawn"), Actor))
     {
         World->DestroyWorld(false);

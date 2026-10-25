@@ -1,4 +1,5 @@
 options gen2
+require ue_probe_actor
 options gc
 require ue_native_engine_values
 require ue_dsl
@@ -381,7 +382,7 @@ def exercise_names(api:ValueDriverRef):int {
     if (length(api.CopyNameScores(empty))!=0 || length(api.CopyNameTags(emptyTags))!=0) { return -103 }
     return 1
 }
-[ue_class(module_id="methodvalues", type_registry="REGISTRY", Blueprintable)]
+[ue_class(module_id="methodvalues", type_registry="REGISTRY", Blueprintable,parent="/Script/DasRuntime.DasProbeActor")]
 class ValueDriver {
     @ue_property=(EditAnywhere,BlueprintReadWrite)
     EnumScores:table<MethodState;int>

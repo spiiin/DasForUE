@@ -56,9 +56,9 @@ int32 RunDasTypedObjectProbe(const FString& Id, const FString& Phase)
         W->GetOutermost()->SetPackageFlags(PKG_ContainsMap);
         FActorSpawnParameters P;
         P.Name = TEXT("TypedActor");
-        auto* A = W->SpawnActor<ADasProbeActor>(BP->GeneratedClass, FTransform::Identity, P);
+        auto* A = W->SpawnActor<ADasActor>(BP->GeneratedClass, FTransform::Identity, P);
         P.Name = TEXT("TargetActor");
-        auto* T = W->SpawnActor<ADasProbeActor>(ADasProbeActor::StaticClass(), FTransform::Identity, P);
+        auto* T = W->SpawnActor<ADasActor>(ADasActor::StaticClass(), FTransform::Identity, P);
         auto* TargetProperty = FindFProperty<FObjectProperty>(A->GetClass(), TEXT("Target"));
         if (!TargetProperty)
             return 1;
@@ -74,13 +74,13 @@ int32 RunDasTypedObjectProbe(const FString& Id, const FString& Phase)
             return 1;
         Check(FDasDSLService::Reimport(BP, Error), TEXT("reimport_typed_object_class"));
     }
-    ADasProbeActor* Actor = nullptr;
+    ADasActor* Actor = nullptr;
     AActor* Target = nullptr;
     for (const auto& A : W->PersistentLevel->Actors)
         if (A)
         {
             if (A->GetFName() == TEXT("TypedActor"))
-                Actor = Cast<ADasProbeActor>(A.Get());
+                Actor = Cast<ADasActor>(A.Get());
             if (A->GetFName() == TEXT("TargetActor"))
                 Target = A.Get();
         }

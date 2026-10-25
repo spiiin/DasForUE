@@ -3,7 +3,7 @@
 #include "DasDefinedEnum.h"
 #include "DasRuntime.h"
 #include "DasAuthoring.h"
-#include "DasProbeActor.h"
+#include "DasActor.h"
 #include "Engine/Blueprint.h"
 #include "Engine/World.h"
 #include "Engine/Level.h"
@@ -20,7 +20,7 @@
 #include "HAL/FileManager.h"
 #include "Editor.h"
 void DasFailEnumAppendForTesting(int32);
-bool RunDasEnumNodeProbes(ADasProbeActor*, bool);
+bool RunDasEnumNodeProbes(ADasActor*, bool);
 namespace
 {
 bool SaveRename(UObject* O)
@@ -47,12 +47,12 @@ bool RunDasEnumRenameProbe(const FString& Script, UDasTypeRegistry* Registry, UB
             UE_LOG(LogTemp, Display, TEXT("Rename detail: %s"), *Error);
     };
     auto* Enum = CastChecked<UDasDefinedEnum>(Registry->Resolve(TEXT("direct.State"), true, Error));
-    ADasProbeActor* Actor = nullptr;
+    ADasActor* Actor = nullptr;
     auto Refresh = [&]()
     {
         for (auto& V : World->PersistentLevel->Actors)
             if (V && V->GetFName() == TEXT("TypedActor"))
-                Actor = Cast<ADasProbeActor>(V.Get());
+                Actor = Cast<ADasActor>(V.Get());
     };
     Refresh();
     if (!Actor)

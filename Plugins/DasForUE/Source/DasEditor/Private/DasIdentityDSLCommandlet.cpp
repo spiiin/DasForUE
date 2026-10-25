@@ -3,7 +3,7 @@
 #include "DasAuthoring.h"
 #include "DasFoundationManifest.h"
 #include "DasDSLService.h"
-#include "DasProbeActor.h"
+#include "DasActor.h"
 #include "Engine/Engine.h"
 #include "Engine/World.h"
 #include "Engine/Blueprint.h"
@@ -103,9 +103,9 @@ int32 UDasIdentityDSLCommandlet::Main(const FString& Params)
         World->DestroyWorld(false);
     };
     World->InitializeActorsForPlay(FURL());
-    auto* A = World->SpawnActor<ADasProbeActor>();
-    auto* B = World->SpawnActor<ADasProbeActor>();
-    TStrongObjectPtr<ADasProbeActor> KeepA(A), KeepB(B);
+    auto* A = World->SpawnActor<ADasActor>();
+    auto* B = World->SpawnActor<ADasActor>();
+    TStrongObjectPtr<ADasActor> KeepA(A), KeepB(B);
     auto Run = [&](const TCHAR* Entry, int Input, UObject* Owner)
     {
         return R.RunNamedPersistent(Path, Entry, Input, Owner);

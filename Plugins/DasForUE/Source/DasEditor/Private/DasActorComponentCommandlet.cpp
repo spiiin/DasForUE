@@ -91,7 +91,7 @@ bool CheckOwnerAccessor(const FString& Base, UBlueprint* Owner, FString& Error)
                                                                              Error))
         return Fail(Error, TEXT("Owner accessor probe import failed"));
     TStrongObjectPtr<UWorld> W(UWorld::CreateWorld(EWorldType::Game, false));
-    auto* Actor = W->SpawnActor<ADasProbeActor>(Owner->GeneratedClass);
+    auto* Actor = W->SpawnActor<ADasActor>(Owner->GeneratedClass);
     auto* Component = NewObject<UDasScriptComponent>(Actor, BP->GeneratedClass);
     const FString File = R.ScriptPath(TEXT("dsl_owner_probe.das"));
     const auto Read =
@@ -123,19 +123,19 @@ bool CheckAuthoredReferences(const FString& Base, UBlueprint* Owner, FString& Er
                                                                                              DriverBP, Error))
         return Fail(Error, TEXT("Scalar reference fixtures import failed"));
     UClass* OriginalClass = TargetBP->GeneratedClass;
-    CastChecked<ADasProbeActor>(OriginalClass->GetDefaultObject())->AuthoredTypeId.Reset();
+    CastChecked<ADasActor>(OriginalClass->GetDefaultObject())->AuthoredTypeId.Reset();
     UBlueprint* Reapplied = nullptr;
     if (!FDasDSLService::Apply(
             TEXT("dsl_ref_scalar_target.das"),
                  Base + TEXT("/BP_ScalarTarget"), TEXT("refscalar.ScalarTarget"), Reapplied, Error) ||
                              Reapplied != TargetBP || TargetBP->GeneratedClass != OriginalClass ||
-                             CastChecked<ADasProbeActor>(OriginalClass->GetDefaultObject())->AuthoredTypeId !=
+                             CastChecked<ADasActor>(OriginalClass->GetDefaultObject())->AuthoredTypeId !=
                                  TEXT("refscalar.ScalarTarget"))
         return Fail(Error, TEXT("Reapplied import did not restore cooked identity in place"));
     UE_LOG(LogTemp, Display, TEXT("PASS DSL_existing_import_receives_cooked_identity_without_recompile"));
     TStrongObjectPtr<UWorld> World(UWorld::CreateWorld(EWorldType::Game, false));
-    auto* Target = World->SpawnActor<ADasProbeActor>(TargetBP->GeneratedClass);
-    auto* Driver = World->SpawnActor<ADasProbeActor>(DriverBP->GeneratedClass);
+    auto* Target = World->SpawnActor<ADasActor>(TargetBP->GeneratedClass);
+    auto* Driver = World->SpawnActor<ADasActor>(DriverBP->GeneratedClass);
     FDasScalarValue Input;
     Input.Kind = 8;
     Input.ObjectClass = TEXT("/Script/CoreUObject.Object");
@@ -184,7 +184,7 @@ bool CheckAuthoredReferences(const FString& Base, UBlueprint* Owner, FString& Er
         TargetField->GetObjectPropertyValue_InContainer(Target) != Driver)
         return Fail(Error, TEXT("Refused assignments changed the target fields"));
     UE_LOG(LogTemp, Display, TEXT("PASS DSL_typed_other_object_incompatible_value_assignments_refused"));
-    Input.ObjectValue = World->SpawnActor<ADasProbeActor>(Owner->GeneratedClass);
+    Input.ObjectValue = World->SpawnActor<ADasActor>(Owner->GeneratedClass);
     const auto Wrong = Call(TEXT("ue_RefHarness_Exercise"), {Input}, EDasMethodSignature::Int);
     const auto Forged = Call(TEXT("ue_RefHarness_Forged"), {Input}, EDasMethodSignature::Int);
     if (Wrong.bSucceeded || Forged.bSucceeded ||
@@ -219,8 +219,8 @@ bool CheckAuthoredReferences(const FString& Base, UBlueprint* Owner, FString& Er
     if (!FDasDSLService::Apply(TEXT("dsl_ref_same_class.das"), Base + TEXT("/BP_Peer"), TEXT("refpeer.Peer"), PeerBP,
                                                                                              Error))
         return Fail(Error, TEXT("Same-class peer import failed"));
-    auto* First = World->SpawnActor<ADasProbeActor>(PeerBP->GeneratedClass);
-    auto* Second = World->SpawnActor<ADasProbeActor>(PeerBP->GeneratedClass);
+    auto* First = World->SpawnActor<ADasActor>(PeerBP->GeneratedClass);
+    auto* Second = World->SpawnActor<ADasActor>(PeerBP->GeneratedClass);
     FDasScalarValue PeerInput;
     PeerInput.Kind = 8;
     PeerInput.ObjectClass = TEXT("/Script/CoreUObject.Object");
@@ -257,8 +257,8 @@ bool CheckClassCallbacks(const FString& Base, FString& Error)
                                     Base + TEXT("/BP_LifecycleOnly"), TEXT("callbackprobe.LifecycleOnly"), BP, Error))
         return Fail(Error, TEXT("Callback-only class import failed"));
     TStrongObjectPtr<UWorld> World(UWorld::CreateWorld(EWorldType::Game, false));
-    auto* Actor = World->SpawnActor<ADasProbeActor>(BP->GeneratedClass);
-    TStrongObjectPtr<ADasProbeActor> Keep(Actor);
+    auto* Actor = World->SpawnActor<ADasActor>(BP->GeneratedClass);
+    TStrongObjectPtr<ADasActor> Keep(Actor);
     if (Actor->LifecycleScript != TEXT("dsl_class_lifecycle_only.das"))
         return Fail(Error, TEXT("Callback-only Actor has no lifecycle script"));
     Actor->PostInitializeComponents();
@@ -479,7 +479,7 @@ int32 UDasActorComponentCommandlet::Main(const FString& Params)
         auto* W = UWorld::CreateWorld(EWorldType::Editor, false, TEXT("Map"), CreatePackage(*(Base + TEXT("/Map"))));
         W->SetFlags(RF_Public | RF_Standalone);
         W->GetOutermost()->SetPackageFlags(PKG_ContainsMap);
-        W->SpawnActor<ADasProbeActor>(BP->GeneratedClass);
+        W->SpawnActor<ADasActor>(BP->GeneratedClass);
         if (!Save(W))
         {
             UE_LOG(LogTemp, Error, TEXT("Saving the probe map failed"));

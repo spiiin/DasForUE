@@ -1,6 +1,6 @@
 #include "DasDSLService.h"
 #include "DasRuntime.h"
-#include "DasProbeActor.h"
+#include "DasActor.h"
 #include "Modules/ModuleManager.h"
 #include "Engine/Blueprint.h"
 #include "Engine/BlueprintGeneratedClass.h"
@@ -62,11 +62,11 @@ UBlueprint* WidenBP(const FString& Base, const TCHAR* Name)
 {
     return LoadObject<UBlueprint>(nullptr, *(Base + Name + TEXT(".")+ Name));
 }
-ADasProbeActor* WidenActor(UWorld* World, FName Name)
+ADasActor* WidenActor(UWorld* World, FName Name)
 {
     if (World && World->PersistentLevel)
         for (auto& Entry : World->PersistentLevel->Actors)
-            if (auto* A = Cast<ADasProbeActor>(Entry.Get()))
+            if (auto* A = Cast<ADasActor>(Entry.Get()))
                 if (A->GetFName() == Name)
                     return A;
     return nullptr;
@@ -119,10 +119,10 @@ int32 RunDasNumericWidenProbe(const FString& Params)
         FAssetRegistryModule::AssetCreated(World);
         FActorSpawnParameters Spawn;
         Spawn.Name = TEXT("ParentActor");
-        SetWidenValues(World->SpawnActor<ADasProbeActor>(Parent->GeneratedClass, FTransform::Identity, Spawn),
-                       MIN_int32, 0.1f);
+        SetWidenValues(World->SpawnActor<ADasActor>(Parent->GeneratedClass, FTransform::Identity, Spawn), MIN_int32,
+                       0.1f);
         Spawn.Name = TEXT("ChildActor");
-        SetWidenValues(World->SpawnActor<ADasProbeActor>(Child->GeneratedClass, FTransform::Identity, Spawn), MAX_int32,
+        SetWidenValues(World->SpawnActor<ADasActor>(Child->GeneratedClass, FTransform::Identity, Spawn), MAX_int32,
                        -13.25f);
         Check(SaveWidenAsset(Parent) && SaveWidenAsset(Child) && SaveWidenAsset(World),
               TEXT("save_original_numeric_scope"));

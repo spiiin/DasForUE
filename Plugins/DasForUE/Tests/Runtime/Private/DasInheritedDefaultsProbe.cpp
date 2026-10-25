@@ -1,5 +1,5 @@
 #include "DasInheritedDefaultsProbe.h"
-#include "DasProbeActor.h"
+#include "DasActor.h"
 #include "DasScriptComponent.h"
 #include "Engine/World.h"
 #include "Engine/Level.h"
@@ -7,13 +7,13 @@
 #include "UObject/StructOnScope.h"
 bool RunDasInheritedDefaultsProbe(UWorld* World, FString& Report)
 {
-    ADasProbeActor* A = nullptr;
-    ADasProbeActor* M = nullptr;
-    ADasProbeActor* Leaf = nullptr;
+    ADasActor* A = nullptr;
+    ADasActor* M = nullptr;
+    ADasActor* Leaf = nullptr;
     if (!World || !World->PersistentLevel)
         return false;
     for (const auto& Actor : World->PersistentLevel->Actors)
-        if (auto* P = Cast<ADasProbeActor>(Actor))
+        if (auto* P = Cast<ADasActor>(Actor))
         {
             if (P->Tags.Contains(TEXT("InheritedDefault")))
                 A = P;
@@ -93,7 +93,7 @@ bool RunDasInheritedDefaultsProbe(UWorld* World, FString& Report)
                        Int(C->GetClass()->GetSuperClass()->GetDefaultObject(), TEXT("Bonus")) == 7 &&
                            Call(C, TEXT("Read")) == 55 && C->LastDasError.IsEmpty(),
                                 TEXT("component_inherited_defaults_and_manual_overrides"));
-    auto* Fresh = World->SpawnActor<ADasProbeActor>(Class);
+    auto* Fresh = World->SpawnActor<ADasActor>(Class);
     Check(Fresh && Int(Fresh, TEXT("Score")) == 25 && Int(Fresh, TEXT("Manual")) == 77 &&
                                                           Int(Fresh, TEXT("Frozen")) == 10, TEXT("fresh_spawn"));
     if (Fresh)

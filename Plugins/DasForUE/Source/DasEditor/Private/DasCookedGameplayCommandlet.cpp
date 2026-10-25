@@ -8,7 +8,7 @@
 #include "DasStaticLibraryProbe.h"
 #include "DasDSLService.h"
 #include "DasPureFunctionTestGraph.h"
-#include "DasProbeActor.h"
+#include "DasActor.h"
 #include "DasScriptComponent.h"
 #include "UObject/UnrealType.h"
 #include "Engine/Blueprint.h"
@@ -222,7 +222,7 @@ int32 UDasCookedGameplayCommandlet::Main(const FString& Params)
     {
         FActorSpawnParameters P;
         P.Name = Name;
-        auto* A = World->SpawnActor<ADasProbeActor>(BP->GeneratedClass, FTransform::Identity, P);
+        auto* A = World->SpawnActor<ADasActor>(BP->GeneratedClass, FTransform::Identity, P);
         if (A)
             A->Tags.Add(Name);
         return A;

@@ -1,7 +1,7 @@
 #include "DasInputEventsCommandlet.h"
 #include "DasInputEvents.h"
 #include "DasRuntime.h"
-#include "DasProbeActor.h"
+#include "DasActor.h"
 #include "DasSchema.h"
 #include "Input/Events.h"
 #include "Layout/WidgetPath.h"
@@ -148,7 +148,7 @@ int32 UDasInputEventsCommandlet::Main(const FString& Params)
         GEngine->DestroyWorldContext(World.Get());
         World->DestroyWorld(false);
     };
-    auto* Actor = World->SpawnActor<ADasProbeActor>();
+    auto* Actor = World->SpawnActor<ADasActor>();
     TArray<FDasScalarValue> Args;
     for (const auto& S : Snapshots)
     {

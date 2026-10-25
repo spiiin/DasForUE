@@ -3,7 +3,7 @@
 #include "DasRuntime.h"
 #include "DasAuthoring.h"
 #include "DasExtendedDefaultsProbe.h"
-#include "DasProbeActor.h"
+#include "DasActor.h"
 #include "Engine/Blueprint.h"
 #include "Engine/World.h"
 #include "UObject/UnrealType.h"
@@ -116,7 +116,7 @@ int32 UDasExtendedDefaultsCommandlet::Main(const FString& Params)
             return 1;
         Map->SetFlags(RF_Public | RF_Standalone);
         Map->GetOutermost()->SetPackageFlags(PKG_ContainsMap);
-        auto* Placed = Map->SpawnActor<ADasProbeActor>(BP->GeneratedClass);
+        auto* Placed = Map->SpawnActor<ADasActor>(BP->GeneratedClass);
         if (!Placed)
             return 1;
         Placed->Tags.Add(TEXT("ExtendedDefaultsFixture"));

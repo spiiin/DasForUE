@@ -1,5 +1,6 @@
 #include <limits>
 #include "DasStaticLibraryProbe.h"
+#include "DasActor.h"
 #include "DasProbeActor.h"
 #include "DasRuntime.h"
 #include "DasSchema.h"
@@ -25,10 +26,10 @@ bool RunDasTextByteEventsProbe(ADasStaticLibraryProbe* Carrier, FString& Report)
     auto& R = FModuleManager::LoadModuleChecked<FDasRuntimeModule>(TEXT("DasRuntime"));
     FActorSpawnParameters Spawn;
     Spawn.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-    auto* A = Carrier->GetWorld()->SpawnActor<ADasProbeActor>(Class, FTransform::Identity, Spawn);
+    auto* A = Carrier->GetWorld()->SpawnActor<ADasActor>(Class, FTransform::Identity, Spawn);
     if (!A)
         return false;
-    TStrongObjectPtr<ADasProbeActor> Keep(A);
+    TStrongObjectPtr<ADasActor> Keep(A);
     Check(DasTextDefaultsEqual(FText::GetEmpty(), FText::AsCultureInvariant(TEXT(""))),
                                TEXT("empty_unnamed_text_default_cook_normalization"));
     const FText EmptyFirst = FText::AsLocalizable_Advanced_LocText(TEXT("TextByteEvents"), TEXT("EmptyFirst"), TEXT("Same display")),
@@ -85,10 +86,10 @@ bool RunDasTextByteEventsProbe(ADasStaticLibraryProbe* Carrier, FString& Report)
                 DasTextDefaultsEqual(Returned->GetPropertyValue_InContainer(NativeArgs.GetStructMemory()), Original);
         }
         Check(NativePass && A->LastDasError.IsEmpty(), TEXT("text_byte_authored_interface_native_return_ref_out"));
-        auto* Peer = Carrier->GetWorld()->SpawnActor<ADasProbeActor>(Class, FTransform::Identity, Spawn);
+        auto* Peer = Carrier->GetWorld()->SpawnActor<ADasActor>(Class, FTransform::Identity, Spawn);
         if (!Peer)
             return false;
-        TStrongObjectPtr<ADasProbeActor> KeepPeer(Peer);
+        TStrongObjectPtr<ADasActor> KeepPeer(Peer);
         for (const auto* Name : {TEXT("RunText"), TEXT("RunByte")})
         {
             auto* F = Peer->FindFunction(Name);
@@ -131,21 +132,22 @@ bool RunDasTextByteEventsProbe(ADasStaticLibraryProbe* Carrier, FString& Report)
         auto* Byte = FindFProperty<FByteProperty>(Class, TEXT("LastByte"));
         auto* Text = FindFProperty<FTextProperty>(Class, TEXT("LastText"));
         const int32 Before = Seen ? Seen->GetPropertyValue_InContainer(A) : 0;
-        A->OnDasByteSignal.Broadcast(255);
-        A->OnDasTextSignal.Broadcast(Original);
-        A->OnDasTextRefSignal.Broadcast(Original);
-        A->OnDasArrayByteSignal.Broadcast({0, 255});
-        A->OnDasArrayTextSignal.Broadcast({Original, FText::AsCultureInvariant(TEXT("Invariant"))});
+        CastChecked<ADasProbeActor>(A)->OnDasByteSignal.Broadcast(255);
+        CastChecked<ADasProbeActor>(A)->OnDasTextSignal.Broadcast(Original);
+        CastChecked<ADasProbeActor>(A)->OnDasTextRefSignal.Broadcast(Original);
+        CastChecked<ADasProbeActor>(A)->OnDasArrayByteSignal.Broadcast({0, 255});
+        CastChecked<ADasProbeActor>(A)->OnDasArrayTextSignal.Broadcast(
+            {Original, FText::AsCultureInvariant(TEXT("Invariant"))});
         TArray<float> Floats = {1.25f, -2.5f};
         TArray<bool> Bools = {true, false};
         TArray<FName> Names = {TEXT("First"), TEXT("Second")};
-        A->OnDasArrayFloatSignal.Broadcast(Floats);
-        A->OnDasArrayBoolSignal.Broadcast(Bools);
-        A->OnDasArrayNameSignal.Broadcast(Names);
+        CastChecked<ADasProbeActor>(A)->OnDasArrayFloatSignal.Broadcast(Floats);
+        CastChecked<ADasProbeActor>(A)->OnDasArrayBoolSignal.Broadcast(Bools);
+        CastChecked<ADasProbeActor>(A)->OnDasArrayNameSignal.Broadcast(Names);
         TArray<float> Oversized;
         Oversized.SetNum(4097);
-        A->OnDasArrayFloatSignal.Broadcast(Oversized);
-        A->OnDasArrayFloatSignal.Broadcast({std::numeric_limits<float>::infinity()});
+        CastChecked<ADasProbeActor>(A)->OnDasArrayFloatSignal.Broadcast(Oversized);
+        CastChecked<ADasProbeActor>(A)->OnDasArrayFloatSignal.Broadcast({std::numeric_limits<float>::infinity()});
         Check(Floats.Num() == 2 && Bools.Num() == 2 && Names.Num() == 2,
               TEXT("callback_arrays_do_not_mutate_native_source"));
         Check(Seen && Seen->GetPropertyValue_InContainer(A) == Before + 8 && Byte &&

@@ -1,7 +1,7 @@
 #include "DasTypeService.h"
 #include "DasTypeRegistry.h"
 #include "DasRuntime.h"
-#include "DasProbeActor.h"
+#include "DasActor.h"
 #include "DasNumericLibrary.h"
 #include "StructUtils/UserDefinedStruct.h"
 #include "UserDefinedStructure/UserDefinedStructEditorData.h"
@@ -31,12 +31,12 @@ bool RunDasStructNumericProbe(const FString& Script, UDasTypeRegistry* Registry,
             UE_LOG(LogTemp, Display, TEXT("Numeric struct detail: %s"), *Error);
     };
     auto* Type = CastChecked<UUserDefinedStruct>(Registry->Resolve(TEXT("direct.Settings"), false, Error));
-    ADasProbeActor* Actor = nullptr;
+    ADasActor* Actor = nullptr;
     auto Refresh = [&]()
     {
         for (auto& V : World->PersistentLevel->Actors)
             if (V && V->GetFName() == TEXT("TypedActor"))
-                Actor = Cast<ADasProbeActor>(V.Get());
+                Actor = Cast<ADasActor>(V.Get());
     };
     Refresh();
     if (!Actor)

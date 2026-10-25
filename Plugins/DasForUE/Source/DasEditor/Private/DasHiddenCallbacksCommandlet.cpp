@@ -2,7 +2,7 @@
 #include "DasDSLService.h"
 #include "DasAuthoring.h"
 #include "DasRuntime.h"
-#include "DasProbeActor.h"
+#include "DasActor.h"
 #include "EdGraphSchema_K2.h"
 #include "Kismet2/KismetEditorUtilities.h"
 #include "Engine/Engine.h"
@@ -135,8 +135,8 @@ int32 UDasHiddenCallbacksCommandlet::Main(const FString& Params)
         World->DestroyWorld(false);
     };
     World->InitializeActorsForPlay(FURL());
-    auto* Actor = World->SpawnActor<ADasProbeActor>(BP->GeneratedClass);
-    TStrongObjectPtr<ADasProbeActor> Keep(Actor);
+    auto* Actor = World->SpawnActor<ADasActor>(BP->GeneratedClass);
+    TStrongObjectPtr<ADasActor> Keep(Actor);
     auto* Component = NewObject<UEnhancedInputComponent>(Actor);
     Actor->InputComponent = Component;
     Component->RegisterComponent();

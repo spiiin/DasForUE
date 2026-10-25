@@ -4,7 +4,7 @@
 #include "DasNativeHashProbeComponent.h"
 #include "DasDSLService.h"
 #include "DasTypeService.h"
-#include "DasProbeActor.h"
+#include "DasActor.h"
 #include "Engine/Blueprint.h"
 #include "Engine/DataAsset.h"
 #include "Curves/CurveFloat.h"
@@ -57,7 +57,7 @@ int32 UDasSoftReferencesCommandlet::Main(const FString& Params)
         if (!World)
             return 1;
         TStrongObjectPtr<UWorld> Keep(World);
-        auto* Owner = World->SpawnActor<ADasProbeActor>();
+        auto* Owner = World->SpawnActor<ADasActor>();
         if (!Owner)
         {
             World->DestroyWorld(false);
@@ -126,7 +126,7 @@ int32 UDasSoftReferencesCommandlet::Main(const FString& Params)
     World->GetOutermost()->SetPackageFlags(PKG_ContainsMap);
     FActorSpawnParameters Spawn;
     Spawn.Name = TEXT("SoftReferences");
-    auto* Actor = World->SpawnActor<ADasProbeActor>(BP->GeneratedClass, FTransform::Identity, Spawn);
+    auto* Actor = World->SpawnActor<ADasActor>(BP->GeneratedClass, FTransform::Identity, Spawn);
     if (Actor)
         P->SetPropertyValue_InContainer(Actor, FSoftObjectPtr(FSoftObjectPath(Lazy)));
     const bool Good = Actor && Save(World);

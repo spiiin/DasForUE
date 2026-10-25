@@ -1,7 +1,7 @@
 #include "DasClassMethodsProbe.h"
 #include "DasRuntime.h"
 #include "Modules/ModuleManager.h"
-#include "DasProbeActor.h"
+#include "DasActor.h"
 #include "Engine/World.h"
 #include "GameFramework/Actor.h"
 #include "Components/SceneComponent.h"
@@ -29,7 +29,7 @@ bool RunDasClassMethodsProbe(UObject* Target, FString& Report)
             continue;
         for (UClass* Value :
              TArray<UClass*>{AActor::StaticClass(),
-                             Base == AActor::StaticClass() && !Target->IsA<AActor>() ? ADasProbeActor::StaticClass()
+                             Base == AActor::StaticClass() && !Target->IsA<AActor>() ? ADasActor::StaticClass()
                                                                                      : Target->GetClass(),
                              nullptr})
         {

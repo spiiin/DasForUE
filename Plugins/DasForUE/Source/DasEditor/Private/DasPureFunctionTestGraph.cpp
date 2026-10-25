@@ -1,5 +1,5 @@
 #include "DasPureFunctionTestGraph.h"
-#include "DasProbeActor.h"
+#include "DasActor.h"
 #include "UObject/UnrealType.h"
 #include "Engine/Blueprint.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
@@ -28,9 +28,8 @@ UBlueprint* CreateDasPureConsumer(UClass* Parent, UPackage* Package, FName Name,
     if (!Function || !Function->HasAllFunctionFlags(FUNC_BlueprintPure | FUNC_BlueprintCallable))
         return Fail(TEXT("Query must be a callable pure function"));
     auto* BP = FKismetEditorUtilities::CreateBlueprint(
-        Function->HasAnyFunctionFlags(FUNC_Static) ? ADasProbeActor::StaticClass() : Parent, Package, Name,
-        BPTYPE_Normal, UBlueprint::StaticClass(), UBlueprintGeneratedClass::StaticClass(),
-        TEXT("PureFunctionValidation"));
+        Function->HasAnyFunctionFlags(FUNC_Static) ? ADasActor::StaticClass() : Parent, Package, Name, BPTYPE_Normal,
+        UBlueprint::StaticClass(), UBlueprintGeneratedClass::StaticClass(), TEXT("PureFunctionValidation"));
     if (!BP)
         return Fail(TEXT("Cannot create pure consumer"));
     if (!AddDasPureConsumerGraph(BP, Function, Error, UseDefaults))

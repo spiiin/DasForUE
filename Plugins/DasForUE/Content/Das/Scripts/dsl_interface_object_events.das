@@ -1,8 +1,9 @@
 options gen2
+require ue_probe_actor
 require ue_dsl
 require ue_object_types
 
-[ue_class(module_id="interfaceevents",Blueprintable)]
+[ue_class(module_id="interfaceevents",Blueprintable,parent="/Script/DasRuntime.DasProbeActor")]
 class InterfaceEventActor {
     @ue_property=(EditAnywhere,BlueprintReadWrite)
     Target:DasEventInterface

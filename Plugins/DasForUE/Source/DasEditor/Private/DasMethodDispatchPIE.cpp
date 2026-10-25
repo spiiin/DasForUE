@@ -1,5 +1,5 @@
 #include "DasDSLService.h"
-#include "DasProbeActor.h"
+#include "DasActor.h"
 #include "DasRuntime.h"
 #include "Editor.h"
 #include "Engine/Blueprint.h"
@@ -34,7 +34,7 @@ int32 DispatchScore(UObject* O)
     auto* P = FindFProperty<FIntProperty>(O->GetClass(), TEXT("Score"));
     return P ? P->GetPropertyValue_InContainer(O) : MIN_int32;
 }
-int32 DispatchCall(ADasProbeActor* O, const TCHAR* Name, int32 Input)
+int32 DispatchCall(ADasActor* O, const TCHAR* Name, int32 Input)
 {
     struct FArgs
     {
@@ -118,11 +118,11 @@ public:
                    TEXT("DAS_METHOD_DISPATCH_PIE_RESULT=%s"), State->Passed ? TEXT("PASS"): TEXT("FAIL"));
             return true;
         }
-        ADasProbeActor* Base = nullptr;
-        ADasProbeActor* Child = nullptr;
-        ADasProbeActor* Replace = nullptr;
+        ADasActor* Base = nullptr;
+        ADasActor* Child = nullptr;
+        ADasActor* Replace = nullptr;
         if (W)
-            for (TActorIterator<ADasProbeActor> It(W); It; ++It)
+            for (TActorIterator<ADasActor> It(W); It; ++It)
             {
                 if (It->GetFName() == TEXT("DispatchBase"))
                     Base = *It;
@@ -250,7 +250,7 @@ bool FDasMethodDispatchPIETest::RunTest(const FString&)
     {
         FActorSpawnParameters P;
         P.Name = Name;
-        return W->SpawnActor<ADasProbeActor>(Blueprint->GeneratedClass, FTransform::Identity, P);
+        return W->SpawnActor<ADasActor>(Blueprint->GeneratedClass, FTransform::Identity, P);
     };
     if (!TestTrue(TEXT("Spawn all dispatch actors"), Spawn(State->Base.Get(), TEXT("DispatchBase")) &&
                                                            Spawn(State->Child.Get(), TEXT("DispatchChild")) &&
