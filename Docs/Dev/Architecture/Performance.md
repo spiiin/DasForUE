@@ -451,3 +451,10 @@ when it applies).
 `DasForUE.ScriptFunction` measures `add(int, float)` with the fast path on and off in one run: 453 vs 3698 ns
 in the editor, 445 vs 5048 ns in the packaged game. The VM itself takes about 100 ns; the rest of the fast call
 is the same scopes as the full path (restart, active context, struct collection, event drain).
+
+The fast path is not regressing (2026-10-25): over 21 packaged runs of 24-25 October it took 415-452 ns in 18
+and 518, 676 and 750 ns in three runs spread over the two days, the last with the full path slower too (4835 ns
+against 4.0-4.2 us); in the editor both paths move together between about 430 / 3000 ns and 1500 / 8000 ns, the
+two states of the machine seen in every benchmark. So the probe now runs both paths side by side (21 rounds,
+alternating order) and reports the ratio fast / full of each round besides the median times. First run: editor
+438 / 3006 ns, fast / full 0.146 [0.143..0.152]; packaged 427 / 4041 ns, 0.106 [0.105..0.107].

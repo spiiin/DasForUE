@@ -248,12 +248,14 @@ bool RunDasScriptFunctionProbe(UWorld* GameWorld, FString& Report)
     Check(TDasFunction<int32(int32, float)>(Script, TEXT("add")).Signature() == TEXT("add(int, float) : int"),
           TEXT("script_function_signature_text"));
 
-    // Cost of one call (informational; the machine's speed varies between runs).
+    // Cost of one call (informational). The machine's speed varies between runs (up to 2x), so the fast and the
+    // full path run side by side: Rounds rounds, fast then full, then full then fast; the comparison is the ratio
+    // fast / full of each round (median and p5..p95), the times are medians.
     auto Time = [&](bool bFast)
     {
         FastPath->Set(bFast ? 1 : 0, ECVF_SetByCode);
         const TDasFunction<int32(int32, float)> Add(Script, TEXT("add"));
-        constexpr int32 Count = 1 << 13;
+        constexpr int32 Count = 1 << 11;
         Add.Call(Owner, 0, 0.f);
         int64 Sum = 0;
         const double Start = FPlatformTime::Seconds();
@@ -265,9 +267,28 @@ bool RunDasScriptFunctionProbe(UWorld* GameWorld, FString& Report)
         const double Ns = (FPlatformTime::Seconds() - Start) * 1e9 / Count;
         return Sum == int64(Count) * (Count - 1) / 2 + Count ? Ns : -1.0;
     };
-    const double FastNs = Time(true), FullNs = Time(false);
-    Check(FastNs > 0 && FullNs > 0, TEXT("script_function_bench"),
-          FString::Printf(TEXT("add(int, float): fast %.0f ns, full %.0f ns a call"), FastNs, FullNs));
+    constexpr int32 Rounds = 21;
+    TArray<double> Fast, Full, Ratios;
+    bool bTimed = true;
+    for (int32 Round = 0; Round < Rounds && bTimed; ++Round)
+    {
+        double Ns[2] = {};
+        for (const bool bFast : {Round % 2 == 0, Round % 2 != 0})
+            Ns[bFast] = Time(bFast);
+        bTimed = Ns[0] > 0 && Ns[1] > 0;
+        Full.Add(Ns[0]);
+        Fast.Add(Ns[1]);
+        Ratios.Add(Ns[1] / FMath::Max(Ns[0], 1e-9));
+    }
+    auto At = [](TArray<double> Values, double P)
+    {
+        Values.Sort();
+        return Values.IsEmpty() ? 0.0 : Values[FMath::Clamp(int32(P * (Values.Num() - 1) + 0.5), 0, Values.Num() - 1)];
+    };
+    Check(bTimed, TEXT("script_function_bench"),
+          FString::Printf(TEXT("add(int, float): fast %.0f ns, full %.0f ns a call (medians of %d rounds); "
+                               "fast / full %.3f [%.3f..%.3f]"),
+                          At(Fast, .5), At(Full, .5), Rounds, At(Ratios, .5), At(Ratios, .05), At(Ratios, .95)));
     FastPath->Set(FastPathBefore, ECVF_SetByCode);
 
     R.ReleaseObject(Owner);
