@@ -97,6 +97,7 @@
         { "name": "method-values", "map": "/Game/DasMethodValues/{method-values}/Map", "switch": "-DasMethodValues",
           "marker": "DAS_METHOD_VALUES_RESULT=PASS" }
       ] },
+    { "name": "clean-distribution", "kind": "script", "script": "TestCleanDistribution.ps1" },
     { "name": "editor-isolation", "kind": "script", "script": "TestEditorIsolation.ps1", "comment": "Build and launch a normal Editor without test extensions. Run last: it builds another Editor project." }
   ],
   "presets": {

@@ -69,3 +69,7 @@ __pycache__/
 
 /Tests/DasEditorIsolation/Build/Windows/FileOpenOrder/
 /Tests/DasEditorIsolation/Config/DefaultInput.ini
+
+/Examples/CleanGameplay/Content/CleanGameplay/
+/Examples/CleanGameplay/Build/Windows/FileOpenOrder/
+/Examples/CleanGameplay/Config/DefaultInput.ini
