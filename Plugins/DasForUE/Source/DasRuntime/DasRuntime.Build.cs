@@ -1,5 +1,6 @@
 using UnrealBuildTool;
 using System.IO;
+using EpicGames.Core;
 
 public class DasRuntime : ModuleRules
 {
@@ -11,6 +12,27 @@ public class DasRuntime : ModuleRules
         bool ShippingProbe = Target.Configuration == UnrealTargetConfiguration.Shipping &&
             System.Environment.GetEnvironmentVariable("DAS_GAS_SHIPPING_VALIDATION") == "1";
         PrivateDefinitions.Add("DAS_GAS_SHIPPING_VALIDATION=" + (ShippingProbe ? "1" : "0"));
+        // Editor commandlets need probes; game/server builds require explicit project opt-in.
+        string ProbeOptIn = Target.ProjectFile == null ? null :
+            Path.Combine(Target.ProjectFile.Directory.FullName, "Config", "DasIncludeTestFixtures.txt");
+        bool TestProbes = Target.Type == TargetType.Editor;
+        if (ProbeOptIn != null && File.Exists(ProbeOptIn))
+        {
+            ExternalDependencies.Add(ProbeOptIn);
+            if (File.ReadAllText(ProbeOptIn).Trim() != "include-plugin-test-fixtures")
+                throw new BuildException("Invalid DAS test-fixture opt-in: " + ProbeOptIn);
+            TestProbes = true;
+        }
+        PublicDefinitions.Add("DAS_WITH_TEST_PROBES=" + (TestProbes ? "1" : "0"));
+        if (TestProbes)
+        {
+            string Tests = Path.Combine(PluginDirectory, "Tests", "Runtime");
+            if (!ConditionalAddModuleDirectory(new DirectoryReference(Tests)))
+                throw new BuildException("Missing DAS probe sources: " + Tests);
+            PublicIncludePaths.Add(Path.Combine(Tests, "Public"));
+            PrivateIncludePaths.Add(Path.Combine(Tests, "Private"));
+            PrivateIncludePaths.Add(Path.Combine(ModuleDirectory, "Private"));
+        }
         PCHUsage = PCHUsageMode.NoPCHs;
         bUseUnity = false;
         bEnableExceptions = true;

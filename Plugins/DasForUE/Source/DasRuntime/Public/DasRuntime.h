@@ -177,6 +177,10 @@ private:
 };
 
 // Shared by the editor commandlet and the packaged smoke game.
+#if DAS_WITH_TEST_PROBES
 DASRUNTIME_API bool RunDasFoundationTests(FString& Report);
+#endif
 // Opt-in benchmark; reports scoped counters, never installs a process allocator hook.
+#if DAS_WITH_TEST_PROBES
 DASRUNTIME_API bool RunDasPerformanceProbe(FString& Report, FString& Json, int32 Iterations = 64, int32 Samples = 9);
+#endif

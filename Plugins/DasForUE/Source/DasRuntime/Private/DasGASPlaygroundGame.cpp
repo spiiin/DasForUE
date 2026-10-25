@@ -7,7 +7,7 @@
 #include "GameplayAbilitiesDeveloperSettings.h"
 #include "Misc/CommandLine.h"
 #include "Misc/Parse.h"
-#if !UE_BUILD_SHIPPING || DAS_GAS_SHIPPING_VALIDATION
+#if DAS_WITH_TEST_PROBES && (!UE_BUILD_SHIPPING || DAS_GAS_SHIPPING_VALIDATION)
 void StartDasGASPlaygroundValidation(UWorld* World);
 #endif
 
@@ -67,7 +67,7 @@ void ADasGASPlaygroundGameMode::InitGame(const FString& MapName, const FString& 
 void ADasGASPlaygroundGameMode::BeginPlay()
 {
     Super::BeginPlay();
-#if !UE_BUILD_SHIPPING || DAS_GAS_SHIPPING_VALIDATION
+#if DAS_WITH_TEST_PROBES && (!UE_BUILD_SHIPPING || DAS_GAS_SHIPPING_VALIDATION)
     if (FParse::Param(FCommandLine::Get(), TEXT("DasGASAbilityPackaged")))
         StartDasGASPlaygroundValidation(GetWorld());
 #endif

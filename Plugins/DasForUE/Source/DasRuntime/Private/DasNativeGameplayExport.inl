@@ -118,7 +118,11 @@ bool FDasRuntimeModule::ExportNativeGameplay(const FString& OutputPath, const FS
     {
         auto Def = MakeShared<FJsonObject>();
         Def->SetStringField(TEXT("path"), Class->GetPathName());
+#if DAS_WITH_TEST_PROBES
         Def->SetBoolField(TEXT("fixture"), Class == UDasNativeHashProbeComponent::StaticClass());
+#else
+        Def->SetBoolField(TEXT("fixture"), false);
+#endif
         TArray<TSharedPtr<FJsonValue>> Fields, Methods, Skipped;
         auto Reject = [&](const TCHAR* Domain, const FString& Name, const FString& Reason)
         {

@@ -659,10 +659,12 @@ FProperty* DSLNativeSelfField(const FDasDeclaredClass& C, const das::string& Nam
         if (auto* P = Base->FindPropertyByName(*DSLText(Name)))
             return P;
     }
+#if DAS_WITH_TEST_PROBES
     // Explicit test-only native host extension, never inferred from bridge storage.
     if (C.NativeParent == TEXT("/Script/Engine.Actor") && IsDasNativeArraySelfProbeEnabled() &&
                                DSLText(Name).StartsWith(TEXT("DasNativeArray")))
         return ADasProbeActor::StaticClass()->FindPropertyByName(*DSLText(Name));
+#endif
     return nullptr;
 }
 bool DSLNativeSelfKnown(const FDasDeclaredClass& C, const das::string& N)

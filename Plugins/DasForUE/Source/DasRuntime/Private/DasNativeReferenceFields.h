@@ -3,8 +3,10 @@
 #include "DasPropertyAccess.h"
 #if DAS_PROJECT_NATIVE_GAMEPLAY
 #include "DasProjectNativeGameplay.generated.h"
-#else
+#elif DAS_WITH_TEST_PROBES
 #include "Generated/DasNativeGameplay.generated.h"
+#else
+#include "Generated/DasNativeGameplayRuntime.generated.h"
 #endif
 inline FDasPropertyAccess DasNativeAccessContract(const FDasNativeGameplayField& Row)
 {

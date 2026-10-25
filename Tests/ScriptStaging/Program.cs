@@ -15,10 +15,12 @@ class Program
         Check(!production.Any(p=>Path.GetFileName(p)=="ue_aot_emit.das"),"Build-time emitter leaked");
         Check(production.All(p=>Path.GetExtension(p)==".das"),"Non-script artifact leaked");
         var selected=production.ToHashSet(StringComparer.OrdinalIgnoreCase);
-        foreach (string file in production.Where(p=>Path.GetDirectoryName(p)==Path.Combine(root,"Scripts")))
+        foreach (string file in production.Where(p=>!p.Contains(Path.DirectorySeparatorChar+"daslib"+Path.DirectorySeparatorChar)))
             foreach (Match dep in Regex.Matches(File.ReadAllText(file),@"(?m)^\s*require\s+([\w/]+)"))
             {
                 string local=Path.GetFullPath(Path.Combine(root,"Scripts",dep.Groups[1].Value+".das"));
+                string runtime=Path.GetFullPath(Path.Combine(root,"Runtime",dep.Groups[1].Value+".das"));
+                if(File.Exists(runtime)) local=runtime;
                 if(File.Exists(local)) Check(selected.Contains(local),"Unstaged local require: "+local);
             }
         string[] smoke=DasScriptStaging.SelectPluginFiles(root,Path.Combine(repo,"Tests/DasForUESmoke/Config/DasPluginScripts.txt"));

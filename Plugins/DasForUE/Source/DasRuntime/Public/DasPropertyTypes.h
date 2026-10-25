@@ -19,4 +19,6 @@ DASRUNTIME_API EDasEnumStorage DasResolvedEnumStorage(const FDasDeclaredType& Ty
 DASRUNTIME_API FProperty* CreateDasProperty(FFieldVariant Owner, FName Name, const FDasDeclaredType& Type,
                                             EDasPropertyUsage Usage, FString& Error);
 
+#if DAS_WITH_TEST_PROBES
 DASRUNTIME_API bool CheckDasPropertyTypes(FString& Error);
+#endif

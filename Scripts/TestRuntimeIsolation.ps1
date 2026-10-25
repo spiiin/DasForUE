@@ -1,0 +1,27 @@
+param([string]$Engine='C:\src\unreal\UnrealEngine',[switch]$SkipBuild)
+$ErrorActionPreference='Stop'
+Import-Module (Join-Path $PSScriptRoot 'DasTest.psm1') -Force
+$Das=Get-DasContext -Engine $Engine
+& C:\Python312\python.exe (Join-Path $PSScriptRoot 'GenerateRuntimeBindings.py') --check
+if($LASTEXITCODE){throw 'Runtime bindings stale or reference test fixtures'}
+$Project=Join-Path $Das.Repo 'Tests/DasRuntimeIsolation/DasRuntimeIsolation.uproject'
+# Run only through the shared build agent. Always build this target: SkipBuild applies to the smoke Editor.
+Invoke-DasBuild $Das -Name 'runtime without probes' -BuildArguments @('DasRuntimeIsolation','Win64','Development',"-Project=$Project",'-WaitMutex','-NoXGE','-MaxParallelActions=12')
+$Root=Split-Path $Project
+$Manifests=@(Get-ChildItem (Join-Path $Root 'Intermediate/Build') -Filter '*.uhtmanifest' -Recurse)
+if(!$Manifests){throw 'Missing UHT manifest for isolation target'}
+foreach($Manifest in $Manifests){
+    if((Get-Content $Manifest.FullName -Raw) -match 'Tests[\\/]+Runtime[\\/]'){
+        throw "Test reflection leaked into production UHT manifest: $($Manifest.FullName)"
+    }
+}
+$Responses=@(Get-ChildItem (Join-Path $Root 'Intermediate/Build') -Filter '*.rsp' -Recurse)
+if(!$Responses){throw 'Missing build response files for isolation target'}
+$ProbeNames=@(Get-ChildItem (Join-Path $Das.Repo 'Plugins/DasForUE/Tests/Runtime') -Filter '*.cpp' -Recurse | ForEach-Object { [regex]::Escape($_.Name) })
+$ProbePattern='Tests[\\/]+Runtime[\\/]|'+($ProbeNames -join '|')
+foreach($Response in $Responses){
+    if((Get-Content $Response.FullName -Raw) -match $ProbePattern){
+        throw "Test sources leaked into production build: $($Response.FullName)"
+    }
+}
+Write-Output 'DAS_RUNTIME_ISOLATION=PASS (game linked; no test source directories or UHT fixtures)'

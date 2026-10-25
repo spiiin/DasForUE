@@ -3,7 +3,7 @@ $ErrorActionPreference='Stop'
 Import-Module (Join-Path $PSScriptRoot 'DasTest.psm1') -Force
 $Das=Get-DasContext -Engine $Engine
 if (!$SkipBuild) {Invoke-DasBuild $Das -Name 'UE AOT generator'}
-$Generated=Join-Path $Das.Repo 'Plugins\DasForUE\Source\DasRuntime\Private\Generated\UEGuardAot.cpp'
+$Generated=Join-Path $Das.Repo 'Plugins\DasForUE\Tests\Runtime\Private\Generated\UEGuardAot.cpp'
 Invoke-DasCommandlet $Das -Run DasUEAot -Name 'ue-aot-generate' -Arguments @("-Output=$Generated") -Marker 'DAS_UE_AOT_GENERATED=PASS' | Out-Null
 Invoke-DasBuild $Das -Name 'Link generated UE AOT' -Log (Join-Path $Das.Logs 'ue-aot-link.log')
 & C:\Python312\python.exe (Join-Path $PSScriptRoot 'AuditUEExternGuards.py') --repo $Das.Repo --output (Join-Path $Das.Logs 'ue-aot-guard-coverage.json')

@@ -26,3 +26,8 @@ if ($Check) {
     Copy-Item -LiteralPath $Module -Destination $CommittedModule
 }
 Write-Output 'DAS_BINDINGS_RESULT=PASS'
+
+$RuntimeArguments=@()
+if($Check){$RuntimeArguments+='--check'}
+& $Python (Join-Path $PSScriptRoot 'GenerateRuntimeBindings.py') @RuntimeArguments
+if($LASTEXITCODE){throw 'Runtime binding generation failed'}

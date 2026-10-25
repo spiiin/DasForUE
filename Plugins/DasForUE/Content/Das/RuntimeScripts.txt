@@ -20,14 +20,13 @@ Scripts/ue_gas.das
 Scripts/ue_gas_authored.das
 Scripts/ue_gas_authored_types.das
 Scripts/ue_gas_types.das
-Scripts/ue_generated.das
+Runtime/ue_generated.das
 Scripts/ue_geometry.das
 Scripts/ue_image_soft_brush.das
 Scripts/ue_input_events.das
 Scripts/ue_input_value.das
 Scripts/ue_native_delegate.das
-Scripts/ue_native_gameplay.das
-Scripts/ue_native_hash_probe.das
+Runtime/ue_native_gameplay.das
 Scripts/ue_native_self_refs.das
 Scripts/ue_object_keys.das
 Scripts/ue_object_types.das

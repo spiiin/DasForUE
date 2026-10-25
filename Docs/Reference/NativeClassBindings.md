@@ -59,7 +59,7 @@ Rules for discovery:
 - Classes must be loadable native `/Script/` classes. Unknown modules/classes, Blueprint classes, interfaces declared as objects and duplicates fail without writing a partial manifest. Plugins must be enabled in the project; generation does not edit `Build.cs` or plugin settings.
 - Parameter and return classes get *dependency views* (checked typed references). Their own members are exported only when their declarations are in the discovered sources.
 
-Artifacts: `Bindings/NativeGameplay.json` (build-time audit of selected and skipped members with reasons), `Plugins/DasForUE/Source/DasRuntime/Private/Generated/DasNativeGameplay.generated.h` (compiled registry; no JSON is read at runtime; `GenerateNativeGameplay.ps1 -Check` fails if it is stale) and `ue_native_gameplay.das`. Skipped members and reasons are listed in the JSON; see also the [API coverage audit](../Dev/Audits/ApiCoverage.md).
+Artifacts: `Bindings/NativeGameplay.json` (build-time audit of selected and skipped members with reasons), `Plugins/DasForUE/Source/DasRuntime/Private/Generated/DasNativeGameplayRuntime.generated.h` (compiled registry; no JSON is read at runtime; `GenerateNativeGameplay.ps1 -Check` fails if it is stale) and `ue_native_gameplay.das`. Skipped members and reasons are listed in the JSON; see also the [API coverage audit](../Dev/Audits/ApiCoverage.md).
 
 ## Fields
 
@@ -182,3 +182,6 @@ Every access checks the live owner/world context and the expected receiver and m
 - Generated artifacts belong to one engine/API version; regenerate after changing engine version or sources.
 
 See also: [Generated bindings](GeneratedBindings.md) · [API packages](../Api/README.md) · [Self access](../Guide/DSL/SelfAccess.md) · [Object and class references](../Guide/DSL/ObjectAndClassReferences.md) · [Limitations](Limitations.md)
+
+The full test registry is generated into `Plugins/DasForUE/Tests/Runtime/Private/Generated/DasNativeGameplay.generated.h`.
+Ordinary games compile the production registry; Editor and explicitly opted-in smoke games compile the test registry.

@@ -9,6 +9,9 @@ import unittest
 
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'Plugins', 'DasForUE', 'Source')
 
+# Existing automation fixtures whose filenames do not use the Test/Probe suffix.
+TEST_SOURCES = {'DasEditor/Private/DasReloadMatrix.cpp'}
+
 # Ported type -> (patterns, files allowed to contain them).
 PORTED = {
     'GameplayTag': (
@@ -38,11 +41,12 @@ class TypeAdapterGateTest(unittest.TestCase):
         for kind, (patterns, allowed) in PORTED.items():
             regex = re.compile('|'.join(patterns))
             for name, path in sources():
-                if name in allowed or re.search(r'Tests?\.|Probe|Commandlet', name):
+                relative = os.path.relpath(path, ROOT).replace(os.sep, '/')
+                if name in allowed or relative in TEST_SOURCES or re.search(r'Tests?\.|Probe|Commandlet', name):
                     continue
                 # Reflection registry data must retain native identifiers, including
                 # nested struct paths. It contains no hand-written type dispatch.
-                if os.path.relpath(path, ROOT).replace(os.sep, '/') == 'DasRuntime/Private/Generated/DasNativeGameplay.generated.h':
+                if relative == 'DasRuntime/Private/Generated/DasNativeGameplayRuntime.generated.h':
                     continue
                 with open(path, encoding='utf-8', errors='replace') as f:
                     for number, line in enumerate(f, 1):

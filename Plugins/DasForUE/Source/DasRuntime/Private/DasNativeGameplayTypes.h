@@ -2,7 +2,6 @@
 #include "DasTypeAdapters.h"
 #include "CoreMinimal.h"
 #include "DasSchema.h"
-#include "DasNativeHashProbeComponent.h"
 #include "DasAuthoring.h"
 #include "DasContainerTypes.h"
 #include "DasSoftReferences.h"

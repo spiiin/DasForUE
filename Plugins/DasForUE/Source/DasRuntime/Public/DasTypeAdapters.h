@@ -76,4 +76,6 @@ private:
 DASRUNTIME_API const IDasTypeAdapter* DasLeafValueAdapter(const FString& StructPath);
 // Math value struct (Vector, Vector2D, Rotator, Transform) by path.
 DASRUNTIME_API const IDasTypeAdapter* DasMathAdapter(const FString& StructPath);
+#if DAS_WITH_TEST_PROBES
 DASRUNTIME_API bool CheckDasTypeAdapters(FString& Error);
+#endif
