@@ -613,6 +613,20 @@ static_assert(sizeof(FDasArrayValue) == sizeof(das::Array) && alignof(FDasArrayV
               "FDasArrayValue must have the layout of das::Array");
 // An array result of a compiled call: made in the context's heap like SimNode_DasNative::ReturnObjects (an object
 // that is not a Class reads as null).
+// The checks of SimNode_DasNativeRoute for a compiled routed call, with the interpreter's errors.
+void DasNativeAotRoute(const FDasObjectHandle& Self, const char* ClassPath, das::Context* Context)
+{
+    NativeGameplayObject(Self, ClassPath, true, Context);
+}
+void DasNativeAotRouteArgument(const FDasObjectHandle& Handle, das::Context* Context)
+{
+    if (Handle.Token && !TryObject(Handle, Context))
+        Context->throw_error("object handle is null, expired, or belongs to another context");
+}
+void DasNativeAotRouted()
+{
+    ++DasNativeRoutedCallCount();
+}
 FDasArrayValue DasNativeAotObjects(UObject* const* Objects, int32 Count, UClass* Class, das::Context* Context)
 {
     FDasArrayValue Result;

@@ -660,9 +660,9 @@ void RunDasInteropProbe(FDasInteropBench& B)
             int64(Direct));
     }
     // Object checks of compiled calls fail with the interpreter's message (mode 7: a null receiver, mode 8: a null
-    // argument of a NonNullArgs bind); only the location differs, AOT errors have none. Mode 6 above proved that
-    // main is compiled.
-    for (const int32 Mode : {7, 8})
+    // argument of a NonNullArgs bind, mode 14: a routed gameplay call's receiver outside the owner's world); only the
+    // location differs, AOT errors have none. Mode 6 above proved that main is compiled (with the route in it).
+    for (const int32 Mode : {7, 8, 14})
     {
         FString Errors[2];
         for (const bool bAot : {false, true})

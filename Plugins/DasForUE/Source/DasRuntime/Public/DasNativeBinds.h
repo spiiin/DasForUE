@@ -194,6 +194,11 @@ DASRUNTIME_API FName DasNativeAotName(FDasNameValue Value, das::Context* Context
 DASRUNTIME_API FText DasNativeAotText(FDasTextValue Value, das::Context* Context);
 DASRUNTIME_API FDasNameValue DasNativeAotNameValue(FName Value, das::Context* Context);
 DASRUNTIME_API FDasTextValue DasNativeAotTextValue(const FText& Value, das::Context* Context);
+// A gameplay call routed to a bind (Reflects), compiled: the checks of the interpreter's route node. They fail by
+// throwing, before the bind's entry opens its error slot; DasNativeAotRouted counts the call.
+DASRUNTIME_API void DasNativeAotRoute(const FDasObjectHandle& Self, const char* ClassPath, das::Context* Context);
+DASRUNTIME_API void DasNativeAotRouteArgument(const FDasObjectHandle& Handle, das::Context* Context);
+DASRUNTIME_API void DasNativeAotRouted();
 // An array result: handles made for Class in the context's heap.
 DASRUNTIME_API FDasArrayValue DasNativeAotObjects(UObject* const* Objects, int32 Count, UClass* Class,
                                                   das::Context* Context);
@@ -571,6 +576,34 @@ private:
             auto Call = [](T* Object, auto&... V) -> decltype(auto) { return Caller::Call(Object, V...); };
             return Aot::Run(true, bNonNull, Context, Call, Self, Args...);
         }
+        // A routed gameplay call (Reflects; never NonNullArgs): the receiver's class path follows the receiver.
+        template <class Caller>
+        static typename Aot::Result Route(const FDasObjectHandle& Self, const char* ClassPath,
+                                          typename Aot::template TArg<A>... Args, das::Context* Context)
+        {
+            DasNativeAotRoute(Self, ClassPath, Context);
+            (RouteArgument<A>(Args, Context), ...);
+            DasNativeAotRouted();
+            return Invoke<Caller, false>(Self, Args..., Context);
+        }
+        template <class V> static void RouteArgument(typename Aot::template TArg<V> Arg, das::Context* Context)
+        {
+            using D = std::decay_t<V>;
+            if constexpr (std::is_pointer_v<D> && !std::is_same_v<D, UClass*>)
+                DasNativeAotRouteArgument(Arg, Context);
+            else
+            {
+                (void)Arg;
+                (void)Context;
+            }
+        }
+        template <class Caller> static void* RouteEntry()
+        {
+            if constexpr (Aot::Supported)
+                return reinterpret_cast<void*>(&Route<Caller>);
+            else
+                return nullptr;
+        }
         template <class Caller> static void* Entry(EDasBind Flags)
         {
             if constexpr (Aot::Supported)
@@ -607,6 +640,10 @@ private:
         template <auto Fn, class T> static void* AotEntry(EDasBind Flags)
         {
             return TMethodAot<R, T, A...>::template Entry<TAotCaller<Fn, T>>(Flags);
+        }
+        template <auto Fn, class T> static void* RouteAotEntry()
+        {
+            return TMethodAot<R, T, A...>::template RouteEntry<TAotCaller<Fn, T>>();
         }
     };
     template <class F> struct TMethod;
@@ -651,11 +688,15 @@ private:
         {
             return TMethodAot<R, T, A...>::template Entry<TAotCaller<Fn, T>>(Flags);
         }
+        template <auto Fn, class T> static void* RouteAotEntry()
+        {
+            return TMethodAot<R, T, A...>::template RouteEntry<TAotCaller<Fn, T>>();
+        }
     };
     template <class T> friend class TDasNativeClass;
 
     void Add(const TCHAR* ScriptName, FDasNativeThunk Thunk, FDasNativeParam Result, TArray<FDasNativeParam> Args,
-             EDasBind Flags, FDasNativeClassFn Receiver, void* AotEntry = nullptr);
+             EDasBind Flags, FDasNativeClassFn Receiver, void* AotEntry = nullptr, void* RouteAotEntry = nullptr);
     // AotCast: the AOT entry of the class's as_<Name> helper.
     void AddClass(const TCHAR* ScriptName, FDasNativeClassFn Class, void* AotCast = nullptr);
     void SetReflects(const TCHAR* FunctionName);
@@ -679,7 +720,7 @@ public:
         TArray<FDasNativeParam> Args{FDasNativeParam{EDasNativeType::Object, &T::StaticClass}};
         Args.Append(S::Arguments());
         Module.Add(ScriptName, &S::template Thunk<Fn>, S::Result(), MoveTemp(Args), Flags, &T::StaticClass,
-                   S::template AotEntry<Fn, T>(Flags));
+                   S::template AotEntry<Fn, T>(Flags), S::template RouteAotEntry<Fn, T>());
         return *this;
     }
     // The method added last does what the UFUNCTION FunctionName of T does. Gameplay scripts that call that

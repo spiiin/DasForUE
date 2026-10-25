@@ -22,6 +22,25 @@
  // require math
 #include "daScript/simulate/aot_builtin_math.h"
  // require builtin
+ // require ue_dsl
+ // require ue_generated
+ // require ue_object_types
+ // require ue_scene_components
+ // require ue_object_keys
+ // require ue_native_self_refs
+ // require ue_input_value
+ // require ue_enhanced_input
+ // require ue_character_control
+ // require ue_soft_references
+ // require ue_effects
+ // require ue_text
+ // require ue_gameplay_services
+ // require ue_gameplay_tags
+ // require ue_gas_authored_types
+ // require ue_gas_types
+ // require ue_native_hash_probe
+ // require ue_pickup_components
+ // require ue_native_gameplay
 
 #if defined(_MSC_VER)
 #pragma warning(push)
@@ -60,7 +79,507 @@
 namespace das {
 namespace _anon_17415879208726647114 {
 
+namespace ue_dsl { struct Actor; };
+namespace ue_dsl { struct Pawn; };
+namespace ue_dsl { struct Character; };
+namespace ue_dsl { struct ActorComponent; };
+namespace ue_dsl { struct SaveGame; };
+namespace ue_dsl { struct DataAsset; };
+namespace ue_dsl { struct PrimaryDataAsset; };
+namespace ue_dsl { struct WorldSubsystem; };
+namespace ue_dsl { struct GameInstanceSubsystem; };
+namespace ue_generated { struct UEName; };
+namespace ue_generated { struct C_Interface_479883b5; };
+namespace ue_generated { struct C_Object_55c3753a; };
+namespace ue_generated { struct C_DasCollectionInterface_0db01736; };
+namespace ue_generated { struct C_DasEventInterface_8cc64841; };
+namespace ue_generated { struct C_DasObjectFixture_5f019a81; };
+namespace ue_generated { struct C_DasProbeInterface_149aa9c6; };
+namespace ue_generated { struct C_Actor_adf65d5b; };
+namespace ue_generated { struct S_Vector_4bd4f956; };
+namespace ue_generated { struct S_DasCallMetrics_8fde8e48; };
+namespace ue_generated { struct S_DasCallPayload_a9a75418; };
+namespace ue_generated { struct S_DasNamedMode_5e046658; };
+namespace ue_generated { struct H_Map_float_bool_d958a815_Entry; };
+namespace ue_generated { struct H_Map_float_bool_d958a815; };
+namespace ue_generated { struct H_Map_int_bool_8c6d2863_Entry; };
+namespace ue_generated { struct H_Map_int_bool_8c6d2863; };
+namespace ue_generated { struct H_Map_int_float_d002fe13_Entry; };
+namespace ue_generated { struct H_Map_int_float_d002fe13; };
+namespace ue_generated { struct H_Map_int_string_aa6f8c57_Entry; };
+namespace ue_generated { struct H_Map_int_string_aa6f8c57; };
+namespace ue_generated { struct H_Map_name_enum_30635d8d_Entry; };
+namespace ue_generated { struct H_Map_name_enum_30635d8d; };
+namespace ue_generated { struct H_Map_string_double_21761321_Entry; };
+namespace ue_generated { struct H_Map_string_double_21761321; };
+namespace ue_generated { struct H_Set_double_7bda134e; };
+namespace ue_generated { struct H_Set_enum_cc9ec014; };
+namespace ue_generated { struct H_Set_float_112e6353; };
+namespace ue_generated { struct H_Set_int_bf4eb51c; };
+namespace ue_generated { struct H_Set_name_171ad8fa; };
+namespace ue_generated { struct H_Set_string_071b6f13; };
+namespace ue_generated { struct fixture_ExchangeMode_Result; };
+namespace ue_generated { struct fixture_ExchangeName_Result; };
+namespace ue_generated { struct fixture_ExchangeNamedMode_Result; };
+namespace ue_generated { struct fixture_ExchangeObject_Result; };
+namespace ue_generated { struct fixture_MutateMap_Result; };
+namespace ue_generated { struct fixture_MutateNamedModes_Result; };
+namespace ue_generated { struct fixture_MutatePayload_Result; };
+namespace ue_generated { struct fixture_MutateSet_Result; };
+namespace ue_generated { struct fixture_MutateStrings_Result; };
+namespace ue_generated { struct fixture_MutateValues_Result; };
+namespace ue_generated { struct fixture_SwapFixtureObjects_Result; };
+namespace ue_generated { struct ue_probe_Stats_Result; };
+namespace ue_object_types { struct __ue_class_84139dc31e225308a4b516ddc3116fd2; };
+namespace ue_object_types { struct __ue_class_f6005a7380ac4daaf37e8e855ef43965; };
+namespace ue_scene_components { struct SceneComponentRef; };
+namespace ue_native_self_refs { struct NativePawnRef; };
+namespace ue_enhanced_input { struct InputActionRef; };
+namespace ue_enhanced_input { struct PlayerControllerRef; };
+namespace ue_enhanced_input { struct InputMappingContextRef; };
+namespace ue_character_control { struct CharacterRef; };
+namespace ue_character_control { struct CharacterMovementRef; };
+namespace ue_character_control { struct CapsuleComponentRef; };
+namespace ue_character_control { struct SkeletalMeshComponentRef; };
+namespace ue_character_control { struct CameraComponentRef; };
+namespace ue_soft_references { struct __ue_soft_object_f6005a7380ac4daaf37e8e855ef43965; };
+namespace ue_soft_references { struct __ue_soft_class_84139dc31e225308a4b516ddc3116fd2; };
+namespace ue_effects { struct SoundBaseRef; };
+namespace ue_effects { struct NiagaraSystemRef; };
+namespace ue_effects { struct __ue_soft_object_2df58a47ded4d94d7949e0eb0a7e0e96; };
+namespace ue_effects { struct __ue_soft_object_d966b6257a361119bbe2579f5c3e1c19; };
+namespace ue_text { struct TextRenderComponentRef; };
+namespace ue_gameplay_services { struct TraceComponentRef; };
+namespace ue_gameplay_services { struct UserWidgetRef; };
+namespace ue_gameplay_services { struct TextBlockRef; };
+namespace ue_gameplay_services { struct ButtonRef; };
+namespace ue_gameplay_services { struct PhysicalMaterialRef; };
+namespace ue_gameplay_services { struct __ue_class_bef7439f5548cab9e44a9cc746738ce6; };
+namespace ue_gameplay_tags { struct GameplayTag; };
+namespace ue_gameplay_tags { struct GameplayTagContainer; };
+namespace ue_gas_authored_types { struct AuthoredAbilitySystemComponentRef; };
+namespace ue_gas_authored_types { struct AttributeSetRef; };
+namespace ue_gas_authored_types { struct AuthoredGameplayEffectRef; };
+namespace ue_gas_authored_types { struct AuthoredGameplayAbilityRef; };
+namespace ue_gas_authored_types { struct GASMagnitudeCalculationRef; };
+namespace ue_gas_authored_types { struct __ue_class_a93815722820a417be30e1c784fec2d7; };
+namespace ue_gas_authored_types { struct __ue_class_d4dd60eff4756a3867b1e24d98bc6abd; };
+namespace ue_gas_authored_types { struct __ue_class_150cc8dca5bbd3d9eb76978e649779ce; };
+namespace ue_gas_types { struct HealthAbilitySystemComponentRef; };
+namespace ue_native_hash_probe { struct NativeHashProbeRef; };
+namespace ue_pickup_components { struct StaticMeshRef; };
+namespace ue_pickup_components { struct StaticMeshComponentRef; };
+namespace ue_pickup_components { struct SphereComponentRef; };
+namespace ue_pickup_components { struct __ue_soft_object_9baab3dfd8d29401dac9a981eb9ba591; };
+namespace ue_native_gameplay { struct Native_ClothingSimulationInteractorRef_75d9e2c1; };
+namespace ue_native_gameplay { struct Native_ActorComponentRef_97441d45; };
+namespace ue_native_gameplay { struct Native_AnimInstanceRef_b5f8c607; };
+namespace ue_native_gameplay { struct Native_AnimMontageRef_e25467ee; };
+namespace ue_native_gameplay { struct Native_AnimationAssetRef_c8dec86d; };
+namespace ue_native_gameplay { struct Native_CameraShakeSourceComponentRef_cf819c92; };
+namespace ue_native_gameplay { struct Native_CheatManagerRef_d4008399; };
+namespace ue_native_gameplay { struct Native_ChildActorComponentRef_405d4379; };
+namespace ue_native_gameplay { struct Native_ControllerRef_78a9db5e; };
+namespace ue_native_gameplay { struct Native_CurveTableRef_4055f623; };
+namespace ue_native_gameplay { struct Native_DataTableRef_733a5dd1; };
+namespace ue_native_gameplay { struct Native_FontRef_684a8ec8; };
+namespace ue_native_gameplay { struct Native_ForceFeedbackEffectRef_551fc643; };
+namespace ue_native_gameplay { struct Native_GameInstanceRef_c6fa677d; };
+namespace ue_native_gameplay { struct Native_HUDRef_239f3d7c; };
+namespace ue_native_gameplay { struct Native_HapticFeedbackEffect_BaseRef_ab5298cf; };
+namespace ue_native_gameplay { struct Native_LevelRef_d84e35d3; };
+namespace ue_native_gameplay { struct Native_LocalPlayerRef_bcc672be; };
+namespace ue_native_gameplay { struct Native_MaterialInstanceDynamicRef_65b20eca; };
+namespace ue_native_gameplay { struct Native_MaterialInterfaceRef_d64f3063; };
+namespace ue_native_gameplay { struct Native_MeshDeformerRef_3a940416; };
+namespace ue_native_gameplay { struct Native_MeshDeformerInstanceRef_1f839542; };
+namespace ue_native_gameplay { struct Native_MeshDeformerInstanceSettingsRef_14d5c797; };
+namespace ue_native_gameplay { struct Native_MovementComponentRef_83cb39c9; };
+namespace ue_native_gameplay { struct Native_PawnMovementComponentRef_653cf1d0; };
+namespace ue_native_gameplay { struct Native_PhysicsAssetRef_1c443d0e; };
+namespace ue_native_gameplay { struct Native_PhysicsVolumeRef_d3600a0c; };
+namespace ue_native_gameplay { struct Native_PlayerCameraManagerRef_7d85a11d; };
+namespace ue_native_gameplay { struct Native_PlayerStateRef_bd340396; };
+namespace ue_native_gameplay { struct Native_RuntimeVirtualTextureRef_e53bf8a2; };
+namespace ue_native_gameplay { struct Native_SkeletalMeshRef_3e70a4ab; };
+namespace ue_native_gameplay { struct Native_SkinnedAssetRef_4bc30438; };
+namespace ue_native_gameplay { struct Native_SkinnedMeshComponentRef_86806378; };
+namespace ue_native_gameplay { struct Native_SoundClassRef_dbf04ee6; };
+namespace ue_native_gameplay { struct Native_SoundConcurrencyRef_36fc67f9; };
+namespace ue_native_gameplay { struct Native_SoundEffectSourcePresetChainRef_1f5469bc; };
+namespace ue_native_gameplay { struct Native_SoundSubmixBaseRef_9443b147; };
+namespace ue_native_gameplay { struct Native_SpectatorPawnRef_c2962b49; };
+namespace ue_native_gameplay { struct Native_StaticMeshSocketRef_d3e8fe65; };
+namespace ue_native_gameplay { struct Native_TouchInterfaceRef_ae05e058; };
+namespace ue_native_gameplay { struct Native_InputModifierRef_de1d97c5; };
+namespace ue_native_gameplay { struct Native_InputTriggerRef_9095301f; };
+namespace ue_native_gameplay { struct Native_PlayerMappableKeySettingsRef_585857fd; };
+namespace ue_native_gameplay { struct Native_AbilitySystemComponentRef_4c40231b; };
+namespace ue_native_gameplay { struct Native_AttributeSetRef_21a737ee; };
+namespace ue_native_gameplay { struct Native_GameplayEffectRef_77c7fc7b; };
+namespace ue_native_gameplay { struct Native_GameplayEffectComponentRef_48d8f122; };
+namespace ue_native_gameplay { struct Native_GameplayEffectUIDataRef_21cf1352; };
+namespace ue_native_gameplay { struct Native_StaticMeshDescriptionRef_26792a74; };
+namespace ue_native_gameplay { struct Native_PanelSlotRef_ee99b2a9; };
+namespace ue_native_gameplay { struct Native_PanelWidgetRef_7bd308a3; };
+namespace ue_native_gameplay { struct Native_UserWidgetExtensionRef_d851f6f2; };
+namespace ue_native_gameplay { struct Native_WidgetRef_f2421369; };
+namespace ue_native_gameplay { struct Native_WidgetAnimationRef_462f92b4; };
+namespace ue_native_gameplay { struct Native_WidgetNavigationRef_8de38c28; };
+namespace ue_native_gameplay { struct Box; };
+namespace ue_native_gameplay { struct Vector2f; };
+namespace ue_native_gameplay { struct Box2f; };
+namespace ue_native_gameplay { struct BoxSphereBounds; };
+namespace ue_native_gameplay { struct IntPoint; };
+namespace ue_native_gameplay { struct PlatformUserId; };
+namespace ue_native_gameplay { struct Vector4; };
+namespace ue_native_gameplay { struct DasGASAbilityTaskResult; };
+namespace ue_native_gameplay { struct DasAuthoredAbilityContext; };
+namespace ue_native_gameplay { struct DasAuthoredAbilityGrant; };
+namespace ue_native_gameplay { struct DasAuthoredAbilityState; };
+namespace ue_native_gameplay { struct DasAuthoredAttributeChange; };
+namespace ue_native_gameplay { struct DasAuthoredEffectResult; };
+namespace ue_native_gameplay { struct DasAuthoredEffectSpec; };
+namespace ue_native_gameplay { struct DasAuthoredEffectState; };
+namespace ue_native_gameplay { struct DasCallMetrics; };
+namespace ue_native_gameplay { struct DasCallPayload; };
+namespace ue_native_gameplay { struct DasGASCalculationContext; };
+namespace ue_native_gameplay { struct DasGASCueHit; };
+namespace ue_native_gameplay { struct DasGASCueEffectContext; };
+namespace ue_native_gameplay { struct DasGASCueParameters; };
+namespace ue_native_gameplay { struct DasGASCueEvent; };
+namespace ue_native_gameplay { struct DasGASExecutionResult; };
+namespace ue_native_gameplay { struct DasGASTargetData; };
+namespace ue_native_gameplay { struct DasGASTargetingPreview; };
+namespace ue_native_gameplay { struct DasGASTargetingQuery; };
+namespace ue_native_gameplay { struct DasGASTargetingResult; };
+namespace ue_native_gameplay { struct DasGameplayAttributeChange; };
+namespace ue_native_gameplay { struct DasHashSnapshot; };
+namespace ue_native_gameplay { struct DasHashContainerSnapshot; };
+namespace ue_native_gameplay { struct DasHealthEffectResult; };
+namespace ue_native_gameplay { struct DasHealthEffectSpec; };
+namespace ue_native_gameplay { struct DasNamedMode; };
+namespace ue_native_gameplay { struct DasNativeHashValue; };
+namespace ue_native_gameplay { struct DasNativeSoftValue; };
+namespace ue_native_gameplay { struct DataRegistryType; };
+namespace ue_native_gameplay { struct CurveTableRowHandle; };
+namespace ue_native_gameplay { struct LightingChannels; };
+namespace ue_native_gameplay { struct NavAvoidanceMask; };
+namespace ue_native_gameplay { struct PoseSnapshot; };
+namespace ue_native_gameplay { struct SingleAnimationPlayData; };
+namespace ue_native_gameplay { struct StreamingSourceShape; };
+namespace ue_native_gameplay { struct WalkableSlopeOverride; };
+namespace ue_native_gameplay { struct Key; };
+namespace ue_native_gameplay { struct EnhancedActionKeyMapping; };
+namespace ue_native_gameplay { struct InputMappingContextMappingData; };
+namespace ue_native_gameplay { struct ActiveGameplayEffectHandle; };
+namespace ue_native_gameplay { struct GameplayAbilityActorInfo; };
+namespace ue_native_gameplay { struct GameplayAbilitySpecHandle; };
+namespace ue_native_gameplay { struct InheritedTagContainer; };
+namespace ue_native_gameplay { struct ScalableFloat; };
+namespace ue_native_gameplay { struct PhysicalMaterialDamageModifier; };
+namespace ue_native_gameplay { struct PhysicalMaterialStrength; };
+namespace ue_native_gameplay { struct Anchors; };
+namespace ue_native_gameplay { struct Margin; };
+namespace ue_native_gameplay { struct SlateColor; };
+namespace ue_native_gameplay { struct WidgetTransform; };
+namespace ue_native_gameplay { struct __ue_class_54171b28df3af163ef1a57a7ed50afe9; };
+namespace ue_native_gameplay { struct __ue_soft_class_54171b28df3af163ef1a57a7ed50afe9; };
 // unused enumeration CollisionProfile
+// unused structure Actor
+// unused structure Pawn
+// unused structure Character
+// unused structure ActorComponent
+// unused structure SaveGame
+// unused structure DataAsset
+// unused structure PrimaryDataAsset
+// unused structure WorldSubsystem
+// unused structure GameInstanceSubsystem
+// unused enumeration E_EDasCallMode_aac7a973
+// unused enumeration E_ETickingGroup_c76e3870
+// unused structure UEName
+// unused structure C_Interface_479883b5
+// unused structure C_Object_55c3753a
+// unused structure C_DasCollectionInterface_0db01736
+// unused structure C_DasEventInterface_8cc64841
+// unused structure C_DasObjectFixture_5f019a81
+// unused structure C_DasProbeInterface_149aa9c6
+// unused structure S_Vector_4bd4f956
+// unused structure S_DasCallMetrics_8fde8e48
+// unused structure S_DasCallPayload_a9a75418
+// unused structure S_DasNamedMode_5e046658
+// unused structure H_Map_float_bool_d958a815_Entry
+// unused structure H_Map_float_bool_d958a815
+// unused structure H_Map_int_bool_8c6d2863_Entry
+// unused structure H_Map_int_bool_8c6d2863
+// unused structure H_Map_int_float_d002fe13_Entry
+// unused structure H_Map_int_float_d002fe13
+// unused structure H_Map_int_string_aa6f8c57_Entry
+// unused structure H_Map_int_string_aa6f8c57
+// unused structure H_Map_name_enum_30635d8d_Entry
+// unused structure H_Map_name_enum_30635d8d
+// unused structure H_Map_string_double_21761321_Entry
+// unused structure H_Map_string_double_21761321
+// unused structure H_Set_double_7bda134e
+// unused structure H_Set_enum_cc9ec014
+// unused structure H_Set_float_112e6353
+// unused structure H_Set_int_bf4eb51c
+// unused structure H_Set_name_171ad8fa
+// unused structure H_Set_string_071b6f13
+// unused structure fixture_ExchangeMode_Result
+// unused structure fixture_ExchangeName_Result
+// unused structure fixture_ExchangeNamedMode_Result
+// unused structure fixture_ExchangeObject_Result
+// unused structure fixture_MutateMap_Result
+// unused structure fixture_MutateNamedModes_Result
+// unused structure fixture_MutatePayload_Result
+// unused structure fixture_MutateSet_Result
+// unused structure fixture_MutateStrings_Result
+// unused structure fixture_MutateValues_Result
+// unused structure fixture_SwapFixtureObjects_Result
+// unused structure ue_probe_Stats_Result
+namespace ue_generated {
+
+struct C_Actor_adf65d5b {
+    FDasObjectHandle handle;
+};
+static_assert(sizeof(C_Actor_adf65d5b)==8,"structure size mismatch with DAS");
+static_assert(offsetof(C_Actor_adf65d5b,handle)==0,"structure field offset mismatch with DAS");
+}
+// unused structure __ue_class_84139dc31e225308a4b516ddc3116fd2
+// unused structure __ue_class_f6005a7380ac4daaf37e8e855ef43965
+// unused structure SceneComponentRef
+// unused structure NativePawnRef
+// unused enumeration InputValueType
+// unused enumeration TriggerEvent
+// unused structure InputActionRef
+// unused structure PlayerControllerRef
+// unused structure InputMappingContextRef
+// unused structure CharacterRef
+// unused structure CharacterMovementRef
+// unused structure CapsuleComponentRef
+// unused structure SkeletalMeshComponentRef
+// unused structure CameraComponentRef
+// unused structure __ue_soft_object_f6005a7380ac4daaf37e8e855ef43965
+// unused structure __ue_soft_class_84139dc31e225308a4b516ddc3116fd2
+// unused structure SoundBaseRef
+// unused structure NiagaraSystemRef
+// unused structure __ue_soft_object_2df58a47ded4d94d7949e0eb0a7e0e96
+// unused structure __ue_soft_object_d966b6257a361119bbe2579f5c3e1c19
+// unused structure TextRenderComponentRef
+// unused enumeration TraceChannel
+// unused structure TraceComponentRef
+// unused structure UserWidgetRef
+// unused structure TextBlockRef
+// unused structure ButtonRef
+// unused structure PhysicalMaterialRef
+// unused structure __ue_class_bef7439f5548cab9e44a9cc746738ce6
+// unused structure GameplayTag
+// unused structure GameplayTagContainer
+// unused structure AuthoredAbilitySystemComponentRef
+// unused structure AttributeSetRef
+// unused structure AuthoredGameplayEffectRef
+// unused structure AuthoredGameplayAbilityRef
+// unused structure GASMagnitudeCalculationRef
+// unused structure __ue_class_a93815722820a417be30e1c784fec2d7
+// unused structure __ue_class_d4dd60eff4756a3867b1e24d98bc6abd
+// unused structure __ue_class_150cc8dca5bbd3d9eb76978e649779ce
+// unused enumeration HealthAttribute
+// unused enumeration HealthEffect
+// unused structure HealthAbilitySystemComponentRef
+// unused structure NativeHashProbeRef
+// unused structure StaticMeshRef
+// unused structure StaticMeshComponentRef
+// unused structure SphereComponentRef
+// unused structure __ue_soft_object_9baab3dfd8d29401dac9a981eb9ba591
+// unused enumeration EAnimationMode
+// unused enumeration EAspectRatioAxisConstraint
+// unused enumeration EAttachLocation
+// unused enumeration EAttachmentRule
+// unused enumeration ECameraProjectionMode
+// unused enumeration ECanBeCharacterBase
+// unused enumeration EClothingTeleportMode
+// unused enumeration ECollisionChannel
+// unused enumeration ECollisionEnabled
+// unused enumeration ECollisionResponse
+// unused enumeration EComponentMobility
+// unused enumeration EControllerAnalogStick
+// unused enumeration EControllerHand
+// unused enumeration ECustomBoneAttributeLookup
+// unused enumeration EDOFMode
+// unused enumeration EDasCallMode
+// unused enumeration EDasLegacyMode
+// unused enumeration EDasNativeHashKey
+// unused enumeration EDetachmentRule
+// unused enumeration EDetailMode
+// unused enumeration EFirstPersonPrimitiveType
+// unused enumeration EFlowDirectionPreference
+// unused enumeration EFrictionCombineMode
+// unused enumeration EGameplayEffectPeriodInhibitionRemovedPolicy
+// unused enumeration EGameplayEffectStackingDurationPolicy
+// unused enumeration EGameplayEffectStackingExpirationPolicy
+// unused enumeration EGameplayEffectStackingPeriodPolicy
+// unused enumeration EGameplayEffectStackingType
+// unused enumeration EHLODBatchingPolicy
+// unused enumeration EHLODLevelExclusion
+// unused enumeration EHorizTextAligment
+// unused enumeration EIndirectLightingCacheQuality
+// unused enumeration EInputActionAccumulationBehavior
+// unused enumeration EInputActionValueType
+// unused enumeration EKinematicBonesUpdateToPhysics
+// unused enumeration ELightmapType
+// unused enumeration EMappingContextInputModeFilterOptions
+// unused enumeration EMappingContextRegistrationTrackingMode
+// unused enumeration EMouseCursor
+// unused enumeration EMovementMode
+// unused enumeration ENetDormancy
+// unused enumeration ENetRole
+// unused enumeration ENetworkSmoothingMode
+// unused enumeration EPerQualityLevels
+// unused enumeration EPhysBodyOp
+// unused enumeration EPhysicalSurface
+// unused enumeration EPhysicsTransformUpdateMode
+// unused enumeration EPlaneConstraintAxisSetting
+// unused enumeration EPlayerMappableKeySettingBehaviors
+// unused enumeration ERadialImpulseFalloff
+// unused enumeration ERayTracingGroupCullingPriority
+// unused enumeration ERelativeTransformSpace
+// unused enumeration ERendererStencilMask
+// unused enumeration ERuntimeVirtualTextureMainPassType
+// unused enumeration EShadowCacheInvalidationBehavior
+// unused enumeration ESkinWeightProfileLayer
+// unused enumeration ESlateColorStylingMode
+// unused enumeration ESlateVisibility
+// unused enumeration ESpawnActorCollisionHandlingMethod
+// unused enumeration EStaticMeshPaintSupport
+// unused enumeration ETeleportType
+// unused enumeration ETickingGroup
+// unused enumeration ETouchIndex
+// unused enumeration EUINavigation
+// unused enumeration EUINavigationRule
+// unused enumeration EUMGSequencePlayMode
+// unused enumeration EVerticalTextAligment
+// unused enumeration EViewTargetBlendFunction
+// unused enumeration EVirtualizationMode
+// unused enumeration EVisibilityBasedAnimTickOption
+// unused enumeration EWalkableSlopeBehavior
+// unused enumeration EWidgetClipping
+// unused enumeration EWidgetPixelSnapping
+// unused enumeration EWidgetTickFrequency
+// unused structure Native_ClothingSimulationInteractorRef_75d9e2c1
+// unused structure Native_ActorComponentRef_97441d45
+// unused structure Native_AnimInstanceRef_b5f8c607
+// unused structure Native_AnimMontageRef_e25467ee
+// unused structure Native_AnimationAssetRef_c8dec86d
+// unused structure Native_CameraShakeSourceComponentRef_cf819c92
+// unused structure Native_CheatManagerRef_d4008399
+// unused structure Native_ChildActorComponentRef_405d4379
+// unused structure Native_ControllerRef_78a9db5e
+// unused structure Native_CurveTableRef_4055f623
+// unused structure Native_DataTableRef_733a5dd1
+// unused structure Native_FontRef_684a8ec8
+// unused structure Native_ForceFeedbackEffectRef_551fc643
+// unused structure Native_GameInstanceRef_c6fa677d
+// unused structure Native_HUDRef_239f3d7c
+// unused structure Native_HapticFeedbackEffect_BaseRef_ab5298cf
+// unused structure Native_LevelRef_d84e35d3
+// unused structure Native_LocalPlayerRef_bcc672be
+// unused structure Native_MaterialInstanceDynamicRef_65b20eca
+// unused structure Native_MaterialInterfaceRef_d64f3063
+// unused structure Native_MeshDeformerRef_3a940416
+// unused structure Native_MeshDeformerInstanceRef_1f839542
+// unused structure Native_MeshDeformerInstanceSettingsRef_14d5c797
+// unused structure Native_MovementComponentRef_83cb39c9
+// unused structure Native_PawnMovementComponentRef_653cf1d0
+// unused structure Native_PhysicsAssetRef_1c443d0e
+// unused structure Native_PhysicsVolumeRef_d3600a0c
+// unused structure Native_PlayerCameraManagerRef_7d85a11d
+// unused structure Native_PlayerStateRef_bd340396
+// unused structure Native_RuntimeVirtualTextureRef_e53bf8a2
+// unused structure Native_SkeletalMeshRef_3e70a4ab
+// unused structure Native_SkinnedAssetRef_4bc30438
+// unused structure Native_SkinnedMeshComponentRef_86806378
+// unused structure Native_SoundClassRef_dbf04ee6
+// unused structure Native_SoundConcurrencyRef_36fc67f9
+// unused structure Native_SoundEffectSourcePresetChainRef_1f5469bc
+// unused structure Native_SoundSubmixBaseRef_9443b147
+// unused structure Native_SpectatorPawnRef_c2962b49
+// unused structure Native_StaticMeshSocketRef_d3e8fe65
+// unused structure Native_TouchInterfaceRef_ae05e058
+// unused structure Native_InputModifierRef_de1d97c5
+// unused structure Native_InputTriggerRef_9095301f
+// unused structure Native_PlayerMappableKeySettingsRef_585857fd
+// unused structure Native_AbilitySystemComponentRef_4c40231b
+// unused structure Native_AttributeSetRef_21a737ee
+// unused structure Native_GameplayEffectRef_77c7fc7b
+// unused structure Native_GameplayEffectComponentRef_48d8f122
+// unused structure Native_GameplayEffectUIDataRef_21cf1352
+// unused structure Native_StaticMeshDescriptionRef_26792a74
+// unused structure Native_PanelSlotRef_ee99b2a9
+// unused structure Native_PanelWidgetRef_7bd308a3
+// unused structure Native_UserWidgetExtensionRef_d851f6f2
+// unused structure Native_WidgetRef_f2421369
+// unused structure Native_WidgetAnimationRef_462f92b4
+// unused structure Native_WidgetNavigationRef_8de38c28
+// unused structure Box
+// unused structure Vector2f
+// unused structure Box2f
+// unused structure BoxSphereBounds
+// unused structure IntPoint
+// unused structure PlatformUserId
+// unused structure Vector4
+// unused structure DasGASAbilityTaskResult
+// unused structure DasAuthoredAbilityContext
+// unused structure DasAuthoredAbilityGrant
+// unused structure DasAuthoredAbilityState
+// unused structure DasAuthoredAttributeChange
+// unused structure DasAuthoredEffectResult
+// unused structure DasAuthoredEffectSpec
+// unused structure DasAuthoredEffectState
+// unused structure DasCallMetrics
+// unused structure DasCallPayload
+// unused structure DasGASCalculationContext
+// unused structure DasGASCueHit
+// unused structure DasGASCueEffectContext
+// unused structure DasGASCueParameters
+// unused structure DasGASCueEvent
+// unused structure DasGASExecutionResult
+// unused structure DasGASTargetData
+// unused structure DasGASTargetingPreview
+// unused structure DasGASTargetingQuery
+// unused structure DasGASTargetingResult
+// unused structure DasGameplayAttributeChange
+// unused structure DasHashSnapshot
+// unused structure DasHashContainerSnapshot
+// unused structure DasHealthEffectResult
+// unused structure DasHealthEffectSpec
+// unused structure DasNamedMode
+// unused structure DasNativeHashValue
+// unused structure DasNativeSoftValue
+// unused structure DataRegistryType
+// unused structure CurveTableRowHandle
+// unused structure LightingChannels
+// unused structure NavAvoidanceMask
+// unused structure PoseSnapshot
+// unused structure SingleAnimationPlayData
+// unused structure StreamingSourceShape
+// unused structure WalkableSlopeOverride
+// unused structure Key
+// unused structure EnhancedActionKeyMapping
+// unused structure InputMappingContextMappingData
+// unused structure ActiveGameplayEffectHandle
+// unused structure GameplayAbilityActorInfo
+// unused structure GameplayAbilitySpecHandle
+// unused structure InheritedTagContainer
+// unused structure ScalableFloat
+// unused structure PhysicalMaterialDamageModifier
+// unused structure PhysicalMaterialStrength
+// unused structure Anchors
+// unused structure Margin
+// unused structure SlateColor
+// unused structure WidgetTransform
+// unused structure __ue_class_54171b28df3af163ef1a57a7ed50afe9
+// unused structure __ue_soft_class_54171b28df3af163ef1a57a7ed50afe9
 
 
 static void resolveTypeInfoAnnotations()
@@ -72,207 +591,266 @@ static void resolveTypeInfoAnnotations()
 }
 
 
-inline int32_t main_c81850823cf29cbd ( Context * __context__, int32_t __input_rename_at_20_0 );
+inline int32_t main_d1961945e8669361 ( Context * __context__, int32_t __input_rename_at_24_0 );
+inline FVector K2_GetActorLocation_e3603ed86be94129 ( Context * __context__, struct ue_generated::C_Actor_adf65d5b const  & __receiver_rename_at_80_34 );
 
 void __init_script ( Context * __context__, bool __init_shared )
 {
 }
 
-inline int32_t main_c81850823cf29cbd ( Context * __context__, int32_t __input_rename_at_20_0 )
+inline int32_t main_d1961945e8669361 ( Context * __context__, int32_t __input_rename_at_24_0 )
 {
-    int32_t __mode_rename_at_21_1 = ((int32_t)(SimPolicy<int32_t>::Mod(__input_rename_at_20_0,16,*__context__,nullptr)));
-    int32_t __count_rename_at_22_2 = ((int32_t)(SimPolicy<int32_t>::Div(__input_rename_at_20_0,16,*__context__,nullptr)));
-    int32_t __acc_rename_at_23_3 = 0;
-    if ( __mode_rename_at_21_1 == 0 )
+    int32_t __mode_rename_at_25_1 = ((int32_t)(SimPolicy<int32_t>::Mod(__input_rename_at_24_0,16,*__context__,nullptr)));
+    int32_t __count_rename_at_26_2 = ((int32_t)(SimPolicy<int32_t>::Div(__input_rename_at_24_0,16,*__context__,nullptr)));
+    int32_t __acc_rename_at_27_3 = 0;
+    if ( __mode_rename_at_25_1 == 0 )
     {
         {
-            bool __need_loop_25 = true;
+            bool __need_loop_29 = true;
             // i: int const
-            das_iterator<range> __i_iterator((range(0,__count_rename_at_22_2)));
-            int32_t __i_rename_at_25_4;
-            __need_loop_25 = __i_iterator.first(__context__,(__i_rename_at_25_4)) && __need_loop_25;
-            for ( ; __need_loop_25 ; __need_loop_25 = __i_iterator.next(__context__,(__i_rename_at_25_4)) )
+            das_iterator<range> __i_iterator((range(0,__count_rename_at_26_2)));
+            int32_t __i_rename_at_29_4;
+            __need_loop_29 = __i_iterator.first(__context__,(__i_rename_at_29_4)) && __need_loop_29;
+            for ( ; __need_loop_29 ; __need_loop_29 = __i_iterator.next(__context__,(__i_rename_at_29_4)) )
             {
-                __acc_rename_at_23_3 ^= (__i_rename_at_25_4 & 7);
+                __acc_rename_at_27_3 ^= (__i_rename_at_29_4 & 7);
             }
-            __i_iterator.close(__context__,(__i_rename_at_25_4));
+            __i_iterator.close(__context__,(__i_rename_at_29_4));
         };
     } else {
-        if ( __mode_rename_at_21_1 == 1 )
+        if ( __mode_rename_at_25_1 == 1 )
         {
             {
-                bool __need_loop_27 = true;
+                bool __need_loop_31 = true;
                 // i: int const
-                das_iterator<range> __i_iterator((range(0,__count_rename_at_22_2)));
-                int32_t __i_rename_at_27_5;
-                __need_loop_27 = __i_iterator.first(__context__,(__i_rename_at_27_5)) && __need_loop_27;
-                for ( ; __need_loop_27 ; __need_loop_27 = __i_iterator.next(__context__,(__i_rename_at_27_5)) )
+                das_iterator<range> __i_iterator((range(0,__count_rename_at_26_2)));
+                int32_t __i_rename_at_31_5;
+                __need_loop_31 = __i_iterator.first(__context__,(__i_rename_at_31_5)) && __need_loop_31;
+                for ( ; __need_loop_31 ; __need_loop_31 = __i_iterator.next(__context__,(__i_rename_at_31_5)) )
                 {
-                    __acc_rename_at_23_3 ^= (__i_rename_at_27_5 + 1);
+                    __acc_rename_at_27_3 ^= (__i_rename_at_31_5 + 1);
                 }
-                __i_iterator.close(__context__,(__i_rename_at_27_5));
+                __i_iterator.close(__context__,(__i_rename_at_31_5));
             };
         } else {
-            if ( __mode_rename_at_21_1 == 2 )
+            if ( __mode_rename_at_25_1 == 2 )
             {
                 {
-                    bool __need_loop_29 = true;
+                    bool __need_loop_33 = true;
                     // i: int const
-                    das_iterator<range> __i_iterator((range(0,__count_rename_at_22_2)));
-                    int32_t __i_rename_at_29_6;
-                    __need_loop_29 = __i_iterator.first(__context__,(__i_rename_at_29_6)) && __need_loop_29;
-                    for ( ; __need_loop_29 ; __need_loop_29 = __i_iterator.next(__context__,(__i_rename_at_29_6)) )
+                    das_iterator<range> __i_iterator((range(0,__count_rename_at_26_2)));
+                    int32_t __i_rename_at_33_6;
+                    __need_loop_33 = __i_iterator.first(__context__,(__i_rename_at_33_6)) && __need_loop_33;
+                    for ( ; __need_loop_33 ; __need_loop_33 = __i_iterator.next(__context__,(__i_rename_at_33_6)) )
                     {
-                        __acc_rename_at_23_3 ^= (das_ordered2([&](auto && __lr_left, auto && __lr_right) { return (__lr_left + __lr_right); }, [&]() { return dasue::aot::Call<12594730263501179578ULL,int32_t,const char *,das::Context *>((das_string_cast(((char *) "health"))),__context__); }, [&]() { return __i_rename_at_29_6; }));
+                        __acc_rename_at_27_3 ^= (das_ordered2([&](auto && __lr_left, auto && __lr_right) { return (__lr_left + __lr_right); }, [&]() { return dasue::aot::Call<12594730263501179578ULL,int32_t,const char *,das::Context *>((das_string_cast(((char *) "health"))),__context__); }, [&]() { return __i_rename_at_33_6; }));
                     }
-                    __i_iterator.close(__context__,(__i_rename_at_29_6));
+                    __i_iterator.close(__context__,(__i_rename_at_33_6));
                 };
             } else {
-                if ( __mode_rename_at_21_1 == 3 )
+                if ( __mode_rename_at_25_1 == 3 )
                 {
                     {
-                        bool __need_loop_31 = true;
+                        bool __need_loop_35 = true;
                         // i: int const
-                        das_iterator<range> __i_iterator((range(0,__count_rename_at_22_2)));
-                        int32_t __i_rename_at_31_7;
-                        __need_loop_31 = __i_iterator.first(__context__,(__i_rename_at_31_7)) && __need_loop_31;
-                        for ( ; __need_loop_31 ; __need_loop_31 = __i_iterator.next(__context__,(__i_rename_at_31_7)) )
+                        das_iterator<range> __i_iterator((range(0,__count_rename_at_26_2)));
+                        int32_t __i_rename_at_35_7;
+                        __need_loop_35 = __i_iterator.first(__context__,(__i_rename_at_35_7)) && __need_loop_35;
+                        for ( ; __need_loop_35 ; __need_loop_35 = __i_iterator.next(__context__,(__i_rename_at_35_7)) )
                         {
-                            __acc_rename_at_23_3 ^= dasue::aot::Call<14567322116369018978ULL,int32_t,const char *,int32_t,das::Context *>((das_string_cast(((char *) "interop_missing"))),__i_rename_at_31_7,__context__);
+                            __acc_rename_at_27_3 ^= dasue::aot::Call<14567322116369018978ULL,int32_t,const char *,int32_t,das::Context *>((das_string_cast(((char *) "interop_missing"))),__i_rename_at_35_7,__context__);
                         }
-                        __i_iterator.close(__context__,(__i_rename_at_31_7));
+                        __i_iterator.close(__context__,(__i_rename_at_35_7));
                     };
                 } else {
-                    if ( __mode_rename_at_21_1 == 4 )
+                    if ( __mode_rename_at_25_1 == 4 )
                     {
                         {
-                            bool __need_loop_33 = true;
+                            bool __need_loop_37 = true;
                             // i: int const
-                            das_iterator<range> __i_iterator((range(0,__count_rename_at_22_2)));
-                            int32_t __i_rename_at_33_8;
-                            __need_loop_33 = __i_iterator.first(__context__,(__i_rename_at_33_8)) && __need_loop_33;
-                            for ( ; __need_loop_33 ; __need_loop_33 = __i_iterator.next(__context__,(__i_rename_at_33_8)) )
+                            das_iterator<range> __i_iterator((range(0,__count_rename_at_26_2)));
+                            int32_t __i_rename_at_37_8;
+                            __need_loop_37 = __i_iterator.first(__context__,(__i_rename_at_37_8)) && __need_loop_37;
+                            for ( ; __need_loop_37 ; __need_loop_37 = __i_iterator.next(__context__,(__i_rename_at_37_8)) )
                             {
-                                __acc_rename_at_23_3 ^= (das_ordered2([&](auto && __lr_left, auto && __lr_right) { return (__lr_left + __lr_right); }, [&]() { return dasue::aot::Call<4443721035264859406ULL,int32_t,int32_t,das::Context *>(2023,__context__); }, [&]() { return __i_rename_at_33_8; }));
+                                __acc_rename_at_27_3 ^= (das_ordered2([&](auto && __lr_left, auto && __lr_right) { return (__lr_left + __lr_right); }, [&]() { return dasue::aot::Call<4443721035264859406ULL,int32_t,int32_t,das::Context *>(2023,__context__); }, [&]() { return __i_rename_at_37_8; }));
                             }
-                            __i_iterator.close(__context__,(__i_rename_at_33_8));
+                            __i_iterator.close(__context__,(__i_rename_at_37_8));
                         };
                     } else {
-                        if ( __mode_rename_at_21_1 == 6 )
+                        if ( __mode_rename_at_25_1 == 6 )
                         {
-                            FDasObjectHandle __a_rename_at_35_9_ConstRef = ((FDasObjectHandle)dasue::aot::Call<10271152040514954383ULL,FDasObjectHandle,das::Context *>(__context__));
-                            FDasObjectHandle const  & __a_rename_at_35_9 = __a_rename_at_35_9_ConstRef;
+                            FDasObjectHandle __a_rename_at_39_9_ConstRef = ((FDasObjectHandle)dasue::aot::Call<10271152040514954383ULL,FDasObjectHandle,das::Context *>(__context__));
+                            FDasObjectHandle const  & __a_rename_at_39_9 = __a_rename_at_39_9_ConstRef;
 ;
-                            FDasObjectHandle __o_rename_at_36_10_ConstRef = ((FDasObjectHandle)dasue::aot::Call<13255835625439558329ULL,FDasObjectHandle,das::Context *>(__context__));
-                            FDasObjectHandle const  & __o_rename_at_36_10 = __o_rename_at_36_10_ConstRef;
+                            FDasObjectHandle __o_rename_at_40_10_ConstRef = ((FDasObjectHandle)dasue::aot::Call<13255835625439558329ULL,FDasObjectHandle,das::Context *>(__context__));
+                            FDasObjectHandle const  & __o_rename_at_40_10 = __o_rename_at_40_10_ConstRef;
 ;
                             {
-                                bool __need_loop_37 = true;
+                                bool __need_loop_41 = true;
                                 // i: int const
-                                das_iterator<range> __i_iterator((range(0,__count_rename_at_22_2)));
-                                int32_t __i_rename_at_37_11;
-                                __need_loop_37 = __i_iterator.first(__context__,(__i_rename_at_37_11)) && __need_loop_37;
-                                for ( ; __need_loop_37 ; __need_loop_37 = __i_iterator.next(__context__,(__i_rename_at_37_11)) )
+                                das_iterator<range> __i_iterator((range(0,__count_rename_at_26_2)));
+                                int32_t __i_rename_at_41_11;
+                                __need_loop_41 = __i_iterator.first(__context__,(__i_rename_at_41_11)) && __need_loop_41;
+                                for ( ; __need_loop_41 ; __need_loop_41 = __i_iterator.next(__context__,(__i_rename_at_41_11)) )
                                 {
-                                    FDasObjectHandle _temp_make_local_40_42_0; _temp_make_local_40_42_0;
-                                    FDasObjectHandle _temp_make_local_40_57_1; _temp_make_local_40_57_1;
-                                    dasue::aot::Call<7534139473802858080ULL,void,const FDasObjectHandle &,const FDasObjectHandle &,das::Context *>(__a_rename_at_35_9,__o_rename_at_36_10,__context__);
-                                    FDasObjectHandle __owner_rename_at_39_12_ConstRef = ((FDasObjectHandle)dasue::aot::Call<17131769012766809815ULL,FDasObjectHandle,const FDasObjectHandle &,das::Context *>(__a_rename_at_35_9,__context__));
-                                    FDasObjectHandle const  & __owner_rename_at_39_12 = __owner_rename_at_39_12_ConstRef;
+                                    FDasObjectHandle _temp_make_local_44_42_0; _temp_make_local_44_42_0;
+                                    FDasObjectHandle _temp_make_local_44_57_1; _temp_make_local_44_57_1;
+                                    dasue::aot::Call<7534139473802858080ULL,void,const FDasObjectHandle &,const FDasObjectHandle &,das::Context *>(__a_rename_at_39_9,__o_rename_at_40_10,__context__);
+                                    FDasObjectHandle __owner_rename_at_43_12_ConstRef = ((FDasObjectHandle)dasue::aot::Call<17131769012766809815ULL,FDasObjectHandle,const FDasObjectHandle &,das::Context *>(__a_rename_at_39_9,__context__));
+                                    FDasObjectHandle const  & __owner_rename_at_43_12 = __owner_rename_at_43_12_ConstRef;
 ;
-                                    __acc_rename_at_23_3 ^= (das_ordered2([&](auto && __lr_left, auto && __lr_right) { return (__lr_left + __lr_right); }, [&]() { return (das_ordered2([&](auto && __lr_left, auto && __lr_right) { return (__lr_left + __lr_right); }, [&]() { return (dasue::aot::Call<12974640665444694324ULL,bool,const FDasObjectHandle &,das::Context *>(__owner_rename_at_39_12,__context__) ? das_auto_cast<int32_t>::cast(1) : das_auto_cast<int32_t>::cast(0)); }, [&]() { return (dasue::aot::Call<12974640665444694324ULL,bool,const FDasObjectHandle &,das::Context *>(das_arg<FDasObjectHandle>::pass((_temp_make_local_40_42_0 = (dasue::aot::Call<6912063908781469078ULL,FDasObjectHandle,const FDasObjectHandle &,das::Context *>(das_arg<FDasObjectHandle>::pass((_temp_make_local_40_57_1 = (dasue::aot::Call<2866703971846506807ULL,FDasObjectHandle,const FDasObjectHandle &,das::Context *>(__owner_rename_at_39_12,__context__)))),__context__)))),__context__) ? das_auto_cast<int32_t>::cast(2) : das_auto_cast<int32_t>::cast(0)); })); }, [&]() { return __i_rename_at_37_11; }));
+                                    __acc_rename_at_27_3 ^= (das_ordered2([&](auto && __lr_left, auto && __lr_right) { return (__lr_left + __lr_right); }, [&]() { return (das_ordered2([&](auto && __lr_left, auto && __lr_right) { return (__lr_left + __lr_right); }, [&]() { return (dasue::aot::Call<12974640665444694324ULL,bool,const FDasObjectHandle &,das::Context *>(__owner_rename_at_43_12,__context__) ? das_auto_cast<int32_t>::cast(1) : das_auto_cast<int32_t>::cast(0)); }, [&]() { return (dasue::aot::Call<12974640665444694324ULL,bool,const FDasObjectHandle &,das::Context *>(das_arg<FDasObjectHandle>::pass((_temp_make_local_44_42_0 = (dasue::aot::Call<6912063908781469078ULL,FDasObjectHandle,const FDasObjectHandle &,das::Context *>(das_arg<FDasObjectHandle>::pass((_temp_make_local_44_57_1 = (dasue::aot::Call<2866703971846506807ULL,FDasObjectHandle,const FDasObjectHandle &,das::Context *>(__owner_rename_at_43_12,__context__)))),__context__)))),__context__) ? das_auto_cast<int32_t>::cast(2) : das_auto_cast<int32_t>::cast(0)); })); }, [&]() { return __i_rename_at_41_11; }));
                                 }
-                                __i_iterator.close(__context__,(__i_rename_at_37_11));
+                                __i_iterator.close(__context__,(__i_rename_at_41_11));
                             };
                         } else {
-                            if ( __mode_rename_at_21_1 == 9 )
+                            if ( __mode_rename_at_25_1 == 9 )
                             {
-                                FVector __direction_rename_at_43_13 = dasue::aot::Call<6919704508721111447ULL,FVector,das::Context *>(__context__);
-                                double __length_rename_at_44_14 = 0.00000000000000000e+00;
+                                FVector __direction_rename_at_47_13 = dasue::aot::Call<6919704508721111447ULL,FVector,das::Context *>(__context__);
+                                double __length_rename_at_48_14 = 0.00000000000000000e+00;
                                 {
-                                    bool __need_loop_45 = true;
+                                    bool __need_loop_49 = true;
                                     // i: int const
-                                    das_iterator<range> __i_iterator((range(0,__count_rename_at_22_2)));
-                                    int32_t __i_rename_at_45_15;
-                                    __need_loop_45 = __i_iterator.first(__context__,(__i_rename_at_45_15)) && __need_loop_45;
-                                    for ( ; __need_loop_45 ; __need_loop_45 = __i_iterator.next(__context__,(__i_rename_at_45_15)) )
+                                    das_iterator<range> __i_iterator((range(0,__count_rename_at_26_2)));
+                                    int32_t __i_rename_at_49_15;
+                                    __need_loop_49 = __i_iterator.first(__context__,(__i_rename_at_49_15)) && __need_loop_49;
+                                    for ( ; __need_loop_49 ; __need_loop_49 = __i_iterator.next(__context__,(__i_rename_at_49_15)) )
                                     {
-                                        FVector _temp_make_local_47_28_2; _temp_make_local_47_28_2;
-                                        FVector _temp_make_local_47_12_3; _temp_make_local_47_12_3;
-                                        double __size_rename_at_46_16 = ((double)double(__i_rename_at_45_15 & 7));
-                                        dasue::aot::Call<1607348563581001200ULL,void,const FVector &,FVector &,double &,das::Context *>(das_arg<FVector>::pass((_temp_make_local_47_28_2 = (dasue::aot::Call<17709328592876325252ULL,FVector,const FVector &,double,double,das::Context *>(das_arg<FVector>::pass((_temp_make_local_47_12_3 = (dasue::aot::Call<1330956332943852056ULL,FVector,das::Context *>(__context__)))),__size_rename_at_46_16,__size_rename_at_46_16,__context__)))),das_arg<FVector>::pass(__direction_rename_at_43_13),__length_rename_at_44_14,__context__);
-                                        __acc_rename_at_23_3 ^= (int32_t(__length_rename_at_44_14 + 5.00000000000000000e-01) + __i_rename_at_45_15);
+                                        FVector _temp_make_local_51_28_2; _temp_make_local_51_28_2;
+                                        FVector _temp_make_local_51_12_3; _temp_make_local_51_12_3;
+                                        double __size_rename_at_50_16 = ((double)double(__i_rename_at_49_15 & 7));
+                                        dasue::aot::Call<1607348563581001200ULL,void,const FVector &,FVector &,double &,das::Context *>(das_arg<FVector>::pass((_temp_make_local_51_28_2 = (dasue::aot::Call<17709328592876325252ULL,FVector,const FVector &,double,double,das::Context *>(das_arg<FVector>::pass((_temp_make_local_51_12_3 = (dasue::aot::Call<1330956332943852056ULL,FVector,das::Context *>(__context__)))),__size_rename_at_50_16,__size_rename_at_50_16,__context__)))),das_arg<FVector>::pass(__direction_rename_at_47_13),__length_rename_at_48_14,__context__);
+                                        __acc_rename_at_27_3 ^= (int32_t(__length_rename_at_48_14 + 5.00000000000000000e-01) + __i_rename_at_49_15);
                                     }
-                                    __i_iterator.close(__context__,(__i_rename_at_45_15));
+                                    __i_iterator.close(__context__,(__i_rename_at_49_15));
                                 };
                             } else {
-                                if ( __mode_rename_at_21_1 == 10 )
+                                if ( __mode_rename_at_25_1 == 10 )
                                 {
-                                    FVector __step_rename_at_51_17_ConstRef = ((FVector)dasue::aot::Call<4355089008579512058ULL,FVector,double,double,double,das::Context *>(1.00000000000000000e+00,0.00000000000000000e+00,0.00000000000000000e+00,__context__));
-                                    FVector const  & __step_rename_at_51_17 = __step_rename_at_51_17_ConstRef;
+                                    FVector __step_rename_at_55_17_ConstRef = ((FVector)dasue::aot::Call<4355089008579512058ULL,FVector,double,double,double,das::Context *>(1.00000000000000000e+00,0.00000000000000000e+00,0.00000000000000000e+00,__context__));
+                                    FVector const  & __step_rename_at_55_17 = __step_rename_at_55_17_ConstRef;
 ;
                                     {
-                                        bool __need_loop_52 = true;
+                                        bool __need_loop_56 = true;
                                         // i: int const
-                                        das_iterator<range> __i_iterator((range(0,__count_rename_at_22_2)));
-                                        int32_t __i_rename_at_52_18;
-                                        __need_loop_52 = __i_iterator.first(__context__,(__i_rename_at_52_18)) && __need_loop_52;
-                                        for ( ; __need_loop_52 ; __need_loop_52 = __i_iterator.next(__context__,(__i_rename_at_52_18)) )
+                                        das_iterator<range> __i_iterator((range(0,__count_rename_at_26_2)));
+                                        int32_t __i_rename_at_56_18;
+                                        __need_loop_56 = __i_iterator.first(__context__,(__i_rename_at_56_18)) && __need_loop_56;
+                                        for ( ; __need_loop_56 ; __need_loop_56 = __i_iterator.next(__context__,(__i_rename_at_56_18)) )
                                         {
-                                            FVector _temp_make_local_53_18_4; _temp_make_local_53_18_4;
-                                            FVector __w_rename_at_53_19_ConstRef = ((FVector)(dasue::aot::CallOp<11005769877631882766ULL,FVector,const FVector &,const FVector &>(das_arg<FVector>::pass((_temp_make_local_53_18_4 = (dasue::aot::Call<4355089008579512058ULL,FVector,double,double,double,das::Context *>(double(__i_rename_at_52_18 & 7),0.00000000000000000e+00,0.00000000000000000e+00,__context__)))),das_arg<FVector>::pass((dasue::aot::CallOp<17404226676109900178ULL,FVector,const FVector &,double>(__step_rename_at_51_17,2.00000000000000000e+00))))));
-                                            FVector const  & __w_rename_at_53_19 = __w_rename_at_53_19_ConstRef;
+                                            FVector _temp_make_local_57_18_4; _temp_make_local_57_18_4;
+                                            FVector __w_rename_at_57_19_ConstRef = ((FVector)(dasue::aot::CallOp<11005769877631882766ULL,FVector,const FVector &,const FVector &>(das_arg<FVector>::pass((_temp_make_local_57_18_4 = (dasue::aot::Call<4355089008579512058ULL,FVector,double,double,double,das::Context *>(double(__i_rename_at_56_18 & 7),0.00000000000000000e+00,0.00000000000000000e+00,__context__)))),das_arg<FVector>::pass((dasue::aot::CallOp<17404226676109900178ULL,FVector,const FVector &,double>(__step_rename_at_55_17,2.00000000000000000e+00))))));
+                                            FVector const  & __w_rename_at_57_19 = __w_rename_at_57_19_ConstRef;
 ;
-                                            __acc_rename_at_23_3 ^= (das_ordered2([&](auto && __lr_left, auto && __lr_right) { return (__lr_left * __lr_right); }, [&]() { return int32_t(das_ordered2([&](auto && __lr_left, auto && __lr_right) { return (__lr_left + __lr_right); }, [&]() { return dasue::aot::Call<16429738110919662158ULL,double,const FVector &,das::Context *>(__w_rename_at_53_19,__context__); }, [&]() { return 5.00000000000000000e-01; })); }, [&]() { return (__i_rename_at_52_18 + 1); }));
+                                            __acc_rename_at_27_3 ^= (das_ordered2([&](auto && __lr_left, auto && __lr_right) { return (__lr_left * __lr_right); }, [&]() { return int32_t(das_ordered2([&](auto && __lr_left, auto && __lr_right) { return (__lr_left + __lr_right); }, [&]() { return dasue::aot::Call<16429738110919662158ULL,double,const FVector &,das::Context *>(__w_rename_at_57_19,__context__); }, [&]() { return 5.00000000000000000e-01; })); }, [&]() { return (__i_rename_at_56_18 + 1); }));
                                         }
-                                        __i_iterator.close(__context__,(__i_rename_at_52_18));
+                                        __i_iterator.close(__context__,(__i_rename_at_56_18));
                                     };
                                 } else {
-                                    if ( __mode_rename_at_21_1 == 11 )
+                                    if ( __mode_rename_at_25_1 == 11 )
                                     {
                                         {
-                                            bool __need_loop_58 = true;
+                                            bool __need_loop_62 = true;
                                             // i: int const
-                                            das_iterator<range> __i_iterator((range(0,__count_rename_at_22_2)));
-                                            int32_t __i_rename_at_58_20;
-                                            __need_loop_58 = __i_iterator.first(__context__,(__i_rename_at_58_20)) && __need_loop_58;
-                                            for ( ; __need_loop_58 ; __need_loop_58 = __i_iterator.next(__context__,(__i_rename_at_58_20)) )
+                                            das_iterator<range> __i_iterator((range(0,__count_rename_at_26_2)));
+                                            int32_t __i_rename_at_62_20;
+                                            __need_loop_62 = __i_iterator.first(__context__,(__i_rename_at_62_20)) && __need_loop_62;
+                                            for ( ; __need_loop_62 ; __need_loop_62 = __i_iterator.next(__context__,(__i_rename_at_62_20)) )
                                             {
-                                                float3 __w_rename_at_59_21 = ((float3)(SimPolicy<float3>::Add(float3(float(__i_rename_at_58_20 & 7),0.00000000e+00f,0.00000000e+00f),v_make_vec4f(2.00000000e+00f,0.00000000e+00f,0.00000000e+00f,0.f),*__context__,nullptr)));
-                                                __acc_rename_at_23_3 ^= (int32_t(length3(__w_rename_at_59_21) + 5.00000000e-01f) * (__i_rename_at_58_20 + 1));
+                                                float3 __w_rename_at_63_21 = ((float3)(SimPolicy<float3>::Add(float3(float(__i_rename_at_62_20 & 7),0.00000000e+00f,0.00000000e+00f),v_make_vec4f(2.00000000e+00f,0.00000000e+00f,0.00000000e+00f,0.f),*__context__,nullptr)));
+                                                __acc_rename_at_27_3 ^= (int32_t(length3(__w_rename_at_63_21) + 5.00000000e-01f) * (__i_rename_at_62_20 + 1));
                                             }
-                                            __i_iterator.close(__context__,(__i_rename_at_58_20));
+                                            __i_iterator.close(__context__,(__i_rename_at_62_20));
                                         };
                                     } else {
-                                        if ( __mode_rename_at_21_1 == 7 )
+                                        if ( __mode_rename_at_25_1 == 12 )
                                         {
-                                            FVector _temp_make_local_64_20_5; _temp_make_local_64_20_5;
-                                            FDasObjectHandle __none_rename_at_63_22;das_zero(__none_rename_at_63_22);
-                                            das_copy(__acc_rename_at_23_3,int32_t(dasue::aot::Call<2177605327252515959ULL,double,const FVector &,das::Context *>(das_arg<FVector>::pass((_temp_make_local_64_20_5 = (dasue::aot::Call<116633212593090415ULL,FVector,const FDasObjectHandle &,das::Context *>(das_arg<FDasObjectHandle>::pass(__none_rename_at_63_22),__context__)))),__context__)));
-                                        } else {
-                                            if ( __mode_rename_at_21_1 == 8 )
-                                            {
-                                                FDasObjectHandle _temp_make_local_67_16_6; _temp_make_local_67_16_6;
-                                                FDasObjectHandle __none_rename_at_66_23;das_zero(__none_rename_at_66_23);
-                                                das_copy(__acc_rename_at_23_3,int32_t(dasue::aot::Call<17224542184391648678ULL,float,const FDasObjectHandle &,const FDasObjectHandle &,das::Context *>(das_arg<FDasObjectHandle>::pass((_temp_make_local_67_16_6 = (dasue::aot::Call<10271152040514954383ULL,FDasObjectHandle,das::Context *>(__context__)))),das_arg<FDasObjectHandle>::pass(__none_rename_at_66_23),__context__)));
-                                            } else {
-                                                int32_t __iso_rename_at_70_24 = ((int32_t)builtin_string_length((das_string_cast(((char * const )(dasue::aot::Call<13387352495426118873ULL,char *,FDasDateTimeValue,das::Context *>(dasue::aot::Call<8825012288880494545ULL,FDasDateTimeValue,int32_t,int32_t,int32_t,das::Context *>(2024,2,29,__context__),__context__))))),__context__));
-                                                {
-                                                    bool __need_loop_71 = true;
-                                                    // i: int const
-                                                    das_iterator<range> __i_iterator((range(0,__count_rename_at_22_2)));
-                                                    int32_t __i_rename_at_71_25;
-                                                    __need_loop_71 = __i_iterator.first(__context__,(__i_rename_at_71_25)) && __need_loop_71;
-                                                    for ( ; __need_loop_71 ; __need_loop_71 = __i_iterator.next(__context__,(__i_rename_at_71_25)) )
-                                                    {
-                                                        FVector _temp_make_local_72_23_7; _temp_make_local_72_23_7;
-                                                        FVector _temp_make_local_72_66_8; _temp_make_local_72_66_8;
-                                                        FVector __turned_rename_at_72_26_ConstRef = ((FVector)dasue::aot::Call<10699467065866260611ULL,FVector,const FVector &,double,const FVector &,das::Context *>(das_arg<FVector>::pass((_temp_make_local_72_23_7 = (dasue::aot::Call<1330956332943852056ULL,FVector,das::Context *>(__context__)))),1.80000000000000000e+02,das_arg<FVector>::pass((_temp_make_local_72_66_8 = (dasue::aot::Call<3537813788641287030ULL,FVector,das::Context *>(__context__)))),__context__));
-                                                        FVector const  & __turned_rename_at_72_26 = __turned_rename_at_72_26_ConstRef;
+                                            FDasObjectHandle __a_rename_at_67_22_ConstRef = ((FDasObjectHandle)dasue::aot::Call<10271152040514954383ULL,FDasObjectHandle,das::Context *>(__context__));
+                                            FDasObjectHandle const  & __a_rename_at_67_22 = __a_rename_at_67_22_ConstRef;
 ;
-                                                        __acc_rename_at_23_3 ^= (das_ordered2([&](auto && __lr_left, auto && __lr_right) { return (__lr_left + __lr_right); }, [&]() { return (das_ordered2([&](auto && __lr_left, auto && __lr_right) { return (__lr_left + __lr_right); }, [&]() { return (das_ordered2([&](auto && __lr_left, auto && __lr_right) { return (__lr_left + __lr_right); }, [&]() { return int32_t(das_ordered2([&](auto && __lr_left, auto && __lr_right) { return (__lr_left + __lr_right); }, [&]() { return dasue::aot::Call<2177605327252515959ULL,double,const FVector &,das::Context *>(__turned_rename_at_72_26,__context__); }, [&]() { return 5.00000000000000000e-01; })); }, [&]() { return dasue::aot::Call<12959918929561704913ULL,int32_t,FDasDateTimeValue,das::Context *>(dasue::aot::Call<8825012288880494545ULL,FDasDateTimeValue,int32_t,int32_t,int32_t,das::Context *>(2024,2,29,__context__),__context__); })); }, [&]() { return __iso_rename_at_70_24; })); }, [&]() { return __i_rename_at_71_25; }));
+                                            FDasObjectHandle __o_rename_at_68_23_ConstRef = ((FDasObjectHandle)dasue::aot::Call<13255835625439558329ULL,FDasObjectHandle,das::Context *>(__context__));
+                                            FDasObjectHandle const  & __o_rename_at_68_23 = __o_rename_at_68_23_ConstRef;
+;
+                                            FDasNameValue __tag_rename_at_69_24 = ((FDasNameValue)dasue::aot::Call<12621544412519124933ULL,FDasNameValue,const char *,das::Context *>((das_string_cast(((char *) "interop_tag"))),__context__));
+                                            {
+                                                bool __need_loop_70 = true;
+                                                // i: int const
+                                                das_iterator<range> __i_iterator((range(0,__count_rename_at_26_2)));
+                                                int32_t __i_rename_at_70_25;
+                                                __need_loop_70 = __i_iterator.first(__context__,(__i_rename_at_70_25)) && __need_loop_70;
+                                                for ( ; __need_loop_70 ; __need_loop_70 = __i_iterator.next(__context__,(__i_rename_at_70_25)) )
+                                                {
+                                                    __acc_rename_at_27_3 ^= (das_ordered2([&](auto && __lr_left, auto && __lr_right) { return (__lr_left + __lr_right); }, [&]() { return (das_ordered2([&](auto && __lr_left, auto && __lr_right) { return (__lr_left + __lr_right); }, [&]() { return ((dasue::aot::CallOp<12848554350907821446ULL,bool,const FDasObjectHandle &,const FDasObjectHandle &>(__a_rename_at_67_22,__o_rename_at_68_23)) ? das_auto_cast<int32_t>::cast(0) : das_auto_cast<int32_t>::cast(1)); }, [&]() { return (dasue::aot::Call<11685679920807904481ULL,bool,const FDasObjectHandle &,FDasNameValue,das::Context *>(__a_rename_at_67_22,__tag_rename_at_69_24,__context__) ? das_auto_cast<int32_t>::cast(2) : das_auto_cast<int32_t>::cast(0)); })); }, [&]() { return __i_rename_at_70_25; }));
+                                                }
+                                                __i_iterator.close(__context__,(__i_rename_at_70_25));
+                                            };
+                                        } else {
+                                            if ( __mode_rename_at_25_1 == 13 )
+                                            {
+                                                FDasObjectHandle __a_rename_at_74_26_ConstRef = ((FDasObjectHandle)dasue::aot::Call<10271152040514954383ULL,FDasObjectHandle,das::Context *>(__context__));
+                                                FDasObjectHandle const  & __a_rename_at_74_26 = __a_rename_at_74_26_ConstRef;
+;
+                                                {
+                                                    bool __need_loop_75 = true;
+                                                    // i: int const
+                                                    das_iterator<range> __i_iterator((range(0,__count_rename_at_26_2)));
+                                                    int32_t __i_rename_at_75_27;
+                                                    __need_loop_75 = __i_iterator.first(__context__,(__i_rename_at_75_27)) && __need_loop_75;
+                                                    for ( ; __need_loop_75 ; __need_loop_75 = __i_iterator.next(__context__,(__i_rename_at_75_27)) )
+                                                    {
+                                                        TArray<FDasObjectHandle> _temp_make_local_76_25_5; _temp_make_local_76_25_5;
+                                                        __acc_rename_at_27_3 ^= (das_ordered2([&](auto && __lr_left, auto && __lr_right) { return (__lr_left + __lr_right); }, [&]() { return builtin_array_size(das_arg<TArray<FDasObjectHandle>>::pass((_temp_make_local_76_25_5 = (dasue::aot::Call<4010729844359107551ULL,TArray<FDasObjectHandle>,const FDasObjectHandle &,das::Context *>(__a_rename_at_74_26,__context__))))); }, [&]() { return __i_rename_at_75_27; }));
                                                     }
-                                                    __i_iterator.close(__context__,(__i_rename_at_71_25));
+                                                    __i_iterator.close(__context__,(__i_rename_at_75_27));
+                                                };
+                                            } else {
+                                                if ( __mode_rename_at_25_1 == 14 )
+                                                {
+                                                    FDasObjectHandle _temp_make_local_79_51_6; _temp_make_local_79_51_6;
+                                                    FDasObjectHandle _temp_make_local_79_36_7; _temp_make_local_79_36_7;
+                                                    FVector _temp_make_local_80_17_8; _temp_make_local_80_17_8;
+                                                    struct ue_generated::C_Actor_adf65d5b __r_rename_at_79_28_ConstRef = ((struct ue_generated::C_Actor_adf65d5b)(([&]() -> struct ue_generated::C_Actor_adf65d5b {
+                                                        struct ue_generated::C_Actor_adf65d5b __mks_79;
+                                                        das_copy((__mks_79.handle),(dasue::aot::Call<13115504636563985664ULL,FDasObjectHandle,const FDasObjectHandle &,const char *,das::Context *>(das_arg<FDasObjectHandle>::pass((_temp_make_local_79_51_6 = (dasue::aot::Call<2866703971846506807ULL,FDasObjectHandle,const FDasObjectHandle &,das::Context *>(das_arg<FDasObjectHandle>::pass((_temp_make_local_79_36_7 = (dasue::aot::Call<10271152040514954383ULL,FDasObjectHandle,das::Context *>(__context__)))),__context__)))),(das_string_cast(((char *) "/Script/Engine.Actor"))),__context__)));
+                                                        return __mks_79;
+                                                    })()));
+                                                    struct ue_generated::C_Actor_adf65d5b const  & __r_rename_at_79_28 = __r_rename_at_79_28_ConstRef;
+;
+                                                    das_copy(__acc_rename_at_27_3,int32_t(dasue::aot::Call<2177605327252515959ULL,double,const FVector &,das::Context *>(das_arg<FVector>::pass((_temp_make_local_80_17_8 = (K2_GetActorLocation_e3603ed86be94129(__context__,__r_rename_at_79_28)))),__context__)));
+                                                } else {
+                                                    if ( __mode_rename_at_25_1 == 7 )
+                                                    {
+                                                        FVector _temp_make_local_83_20_9; _temp_make_local_83_20_9;
+                                                        FDasObjectHandle __none_rename_at_82_29;das_zero(__none_rename_at_82_29);
+                                                        das_copy(__acc_rename_at_27_3,int32_t(dasue::aot::Call<2177605327252515959ULL,double,const FVector &,das::Context *>(das_arg<FVector>::pass((_temp_make_local_83_20_9 = (dasue::aot::Call<116633212593090415ULL,FVector,const FDasObjectHandle &,das::Context *>(das_arg<FDasObjectHandle>::pass(__none_rename_at_82_29),__context__)))),__context__)));
+                                                    } else {
+                                                        if ( __mode_rename_at_25_1 == 8 )
+                                                        {
+                                                            FDasObjectHandle _temp_make_local_86_16_10; _temp_make_local_86_16_10;
+                                                            FDasObjectHandle __none_rename_at_85_30;das_zero(__none_rename_at_85_30);
+                                                            das_copy(__acc_rename_at_27_3,int32_t(dasue::aot::Call<17224542184391648678ULL,float,const FDasObjectHandle &,const FDasObjectHandle &,das::Context *>(das_arg<FDasObjectHandle>::pass((_temp_make_local_86_16_10 = (dasue::aot::Call<10271152040514954383ULL,FDasObjectHandle,das::Context *>(__context__)))),das_arg<FDasObjectHandle>::pass(__none_rename_at_85_30),__context__)));
+                                                        } else {
+                                                            int32_t __iso_rename_at_89_31 = ((int32_t)builtin_string_length((das_string_cast(((char * const )(dasue::aot::Call<13387352495426118873ULL,char *,FDasDateTimeValue,das::Context *>(dasue::aot::Call<8825012288880494545ULL,FDasDateTimeValue,int32_t,int32_t,int32_t,das::Context *>(2024,2,29,__context__),__context__))))),__context__));
+                                                            {
+                                                                bool __need_loop_90 = true;
+                                                                // i: int const
+                                                                das_iterator<range> __i_iterator((range(0,__count_rename_at_26_2)));
+                                                                int32_t __i_rename_at_90_32;
+                                                                __need_loop_90 = __i_iterator.first(__context__,(__i_rename_at_90_32)) && __need_loop_90;
+                                                                for ( ; __need_loop_90 ; __need_loop_90 = __i_iterator.next(__context__,(__i_rename_at_90_32)) )
+                                                                {
+                                                                    FVector _temp_make_local_91_23_11; _temp_make_local_91_23_11;
+                                                                    FVector _temp_make_local_91_66_12; _temp_make_local_91_66_12;
+                                                                    FVector __turned_rename_at_91_33_ConstRef = ((FVector)dasue::aot::Call<10699467065866260611ULL,FVector,const FVector &,double,const FVector &,das::Context *>(das_arg<FVector>::pass((_temp_make_local_91_23_11 = (dasue::aot::Call<1330956332943852056ULL,FVector,das::Context *>(__context__)))),1.80000000000000000e+02,das_arg<FVector>::pass((_temp_make_local_91_66_12 = (dasue::aot::Call<3537813788641287030ULL,FVector,das::Context *>(__context__)))),__context__));
+                                                                    FVector const  & __turned_rename_at_91_33 = __turned_rename_at_91_33_ConstRef;
+;
+                                                                    __acc_rename_at_27_3 ^= (das_ordered2([&](auto && __lr_left, auto && __lr_right) { return (__lr_left + __lr_right); }, [&]() { return (das_ordered2([&](auto && __lr_left, auto && __lr_right) { return (__lr_left + __lr_right); }, [&]() { return (das_ordered2([&](auto && __lr_left, auto && __lr_right) { return (__lr_left + __lr_right); }, [&]() { return int32_t(das_ordered2([&](auto && __lr_left, auto && __lr_right) { return (__lr_left + __lr_right); }, [&]() { return dasue::aot::Call<2177605327252515959ULL,double,const FVector &,das::Context *>(__turned_rename_at_91_33,__context__); }, [&]() { return 5.00000000000000000e-01; })); }, [&]() { return dasue::aot::Call<12959918929561704913ULL,int32_t,FDasDateTimeValue,das::Context *>(dasue::aot::Call<8825012288880494545ULL,FDasDateTimeValue,int32_t,int32_t,int32_t,das::Context *>(2024,2,29,__context__),__context__); })); }, [&]() { return __iso_rename_at_89_31; })); }, [&]() { return __i_rename_at_90_32; }));
+                                                                }
+                                                                __i_iterator.close(__context__,(__i_rename_at_90_32));
+                                                            };
+                                                        };
+                                                    };
                                                 };
                                             };
                                         };
@@ -285,11 +863,21 @@ inline int32_t main_c81850823cf29cbd ( Context * __context__, int32_t __input_re
             };
         };
     };
-    return das_auto_cast<int32_t>::cast(__acc_rename_at_23_3);
+    return das_auto_cast<int32_t>::cast(__acc_rename_at_27_3);
 }
-static vec4f __wrap_main_c81850823cf29cbd ( Context * __context__ ) {
+
+inline FVector K2_GetActorLocation_e3603ed86be94129 ( Context * __context__, struct ue_generated::C_Actor_adf65d5b const  &  __receiver_rename_at_80_34 )
+{
+    return das_auto_cast_ref<FVector>::cast(dasue::aot::Call<7843237298495227699ULL,FVector,const FDasObjectHandle &,const char *,das::Context *>(__receiver_rename_at_80_34.handle,(das_string_cast(((char *) "/Script/Engine.Actor"))),__context__));
+}
+static vec4f __wrap_main_d1961945e8669361 ( Context * __context__ ) {
     int32_t arg_input = cast_aot_arg<int32_t>::to(*__context__,__context__->abiArguments()[0]);
-    return cast<int32_t>::from(main_c81850823cf29cbd(__context__, arg_input));
+    return cast<int32_t>::from(main_d1961945e8669361(__context__, arg_input));
+}
+static vec4f __wrap_K2_GetActorLocation_e3603ed86be94129 ( Context * __context__ ) {
+    struct ue_generated::C_Actor_adf65d5b const  &  arg_receiver = cast_aot_arg<struct ue_generated::C_Actor_adf65d5b const  & >::to(*__context__,__context__->abiArguments()[0]);
+    *((FVector *) __context__->abiCMRES) = K2_GetActorLocation_e3603ed86be94129(__context__, arg_receiver);
+    return v_zero();
 }
 
 #ifdef _MSC_VER
@@ -297,8 +885,10 @@ static vec4f __wrap_main_c81850823cf29cbd ( Context * __context__ ) {
 #endif
 struct AotFunction { uint64_t hash; bool is_cmres; void * fn; vec4f (*wrappedFn)(Context*); };
 static AotFunction functions[] = {
-    // main Ci hash=0xc81850823cf29cbd
-    { 0xf4bfa59be1ecf4ca, false, (void*)&main_c81850823cf29cbd, &__wrap_main_c81850823cf29cbd },
+    // main Ci hash=0xd1961945e8669361, K2_GetActorLocation CS<ue_generated::C_Actor_adf65d5b>=0xe3603ed86be94129
+    { 0x4426e0d933a74aac, false, (void*)&main_d1961945e8669361, &__wrap_main_d1961945e8669361 },
+    // K2_GetActorLocation CS<ue_generated::C_Actor_adf65d5b> hash=0xe3603ed86be94129
+    { 0xa0b33fefa66285cf, true, (void*)&K2_GetActorLocation_e3603ed86be94129, &__wrap_K2_GetActorLocation_e3603ed86be94129 },
 };
 #ifdef _MSC_VER
 #pragma optimize("", on)

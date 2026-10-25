@@ -130,7 +130,8 @@ static bool SameParam(const FDasNativeParam& A, const FDasNativeParam& B)
 }
 
 void FDasNativeModule::Add(const TCHAR* ScriptName, FDasNativeThunk Thunk, FDasNativeParam Result,
-                           TArray<FDasNativeParam> Args, EDasBind Flags, FDasNativeClassFn Receiver, void* AotEntry)
+                           TArray<FDasNativeParam> Args, EDasBind Flags, FDasNativeClassFn Receiver, void* AotEntry,
+                           void* RouteAotEntry)
 {
     auto& Desc = *static_cast<FDasNativeModuleDesc*>(Module);
     if (!Desc.Error.IsEmpty())
@@ -139,6 +140,7 @@ void FDasNativeModule::Add(const TCHAR* ScriptName, FDasNativeThunk Thunk, FDasN
     F.Name = ScriptName ? ScriptName : TEXT("");
     F.Thunk = Thunk;
     F.AotEntry = AotEntry;
+    F.RouteAotEntry = RouteAotEntry;
     F.Result = Result;
     F.Arguments = MoveTemp(Args);
     F.Flags = Flags;

@@ -346,6 +346,14 @@ rows of one run only.
   ~47 ns a compiled math call costs, two thirds is the bridge (thread and context checks, the role guard, the
   pending-error check); the function with its value copies is ~16 ns.
 
+  Everything open (2026-10-25: names, texts, classes, operators, arrays of objects, struct snapshots, call frames,
+  enums, traces, UI and input values, routed `Reflects` calls; only the two externs that take a block stay
+  closed). One run in a fast state of the machine (all numbers about half of the run above), interpreter / AOT:
+  `names_equality` (`==` of a class type and an `FName` parameter) 194.1 / 179.2, `object_array` (an array result)
+  125.4 / 112.2, `vector_math` 125.9 / 116.6, `native_refs` 151.0 / 96.2; the bridge 19.3 ns, the guard 3.3 ns. An
+  earlier run in a slow state showed `names_equality` 197.7 / 338.7: one run is not enough to compare two paths
+  whose difference is small.
+
 Coverage of the AngelScript binds by the native modules: `Docs/Dev/Architecture/NativeBindsCoverage.md`.
 
 ### Gameplay methods answered by binds (`Reflects`) — 2026-10-24

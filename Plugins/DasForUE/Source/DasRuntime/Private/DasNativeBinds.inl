@@ -694,7 +694,8 @@ struct SimNode_DasNativeRoute : SimNode_DasNative
         GuardUEExtern();
         if (!Module->bLoaded)
             Context.throw_error_at(debugInfo, "%s", TCHAR_TO_UTF8(*Module->Error));
-        vec4f Raw[FDasNativeModule::MaxArguments + 2]; // the receiver, its class path, the other arguments
+        // The receiver, its class path, the other arguments (and the context argument of a route with an AOT entry).
+        vec4f Raw[FDasNativeModule::MaxArguments + 3];
         evalArgs(Context, Raw);
         const auto* Handle = static_cast<const FDasObjectHandle*>(das::cast<void*>::to(Raw[0]));
         NativeGameplayObject(*Handle, das::cast<const char*>::to(Raw[1]), true, &Context);
@@ -710,6 +711,17 @@ struct SimNode_DasNativeRoute : SimNode_DasNative
         return Run(Context, Raw);
     }
 };
+// The C++ types of a route's AOT entry (TMethodAot::Route): the bind's, with the receiver's class path after the
+// receiver; empty when it has none.
+FString DasNativeRouteAbiTypes(const FDasNativeFunctionDesc& F)
+{
+    const FString BindTypes = DasNativeAbiTypes(F);
+    const FString Receiver = TEXT(",const FDasObjectHandle &");
+    const int32 At = BindTypes.Find(Receiver);
+    if (!F.RouteAotEntry || BindTypes.IsEmpty() || At == INDEX_NONE)
+        return FString();
+    return BindTypes.Left(At + Receiver.Len()) + TEXT(",const char *") + BindTypes.Mid(At + Receiver.Len());
+}
 // A parameter or result type of a route: objects are UObjectHandle (the gameplay method's reference type carries
 // the class), everything else is the bind's type.
 das::TypeDeclPtr DasNativeRouteTypeDecl(const FDasNativeParam& Param, const FDasNativeResolvedParam& Resolved,
@@ -724,8 +736,9 @@ public:
     const FDasNativeModuleDesc* Module;
     const FDasNativeFunctionDesc* Function;
     das::string Label;
+    // bAot: the route has an AOT entry; generated code passes the context as the last argument.
     FDasNativeRouteFunction(const FDasNativeModuleDesc& Origin, const FDasNativeFunctionDesc& F,
-                            const das::ModuleLibrary& Lib)
+                            const das::ModuleLibrary& Lib, bool bAot)
         : ExternalFnBase(TCHAR_TO_UTF8(*F.RouteName), nullptr), Module(&Origin), Function(&F),
           Label(TCHAR_TO_UTF8(*F.ReflectedName))
     {
@@ -734,8 +747,11 @@ public:
                                             das::makeType<const char*>(Lib)};
         for (int32 I = 1; I < F.Arguments.Num(); ++I)
             Types.push_back(DasNativeRouteTypeDecl(F.Arguments[I], F.Resolved[I], Lib, true));
+        if (bAot)
+            Types.push_back(das::makeType<das::Context*>(Lib));
         constructExternal(Types);
-        // Object receivers have no AOT ABI: callers stay in the interpreter (FDasClosedCallsLint).
+        // Compiled only once RegisterRouteAot sets the entry; otherwise callers stay in the interpreter
+        // (FDasClosedCallsLint).
         noAot = true;
     }
     virtual das::SimNode* makeSimNode(das::Context& Context, const das::vector<das::ExpressionPtr>&) override
@@ -949,8 +965,29 @@ private:
     {
         static int32 Routes = 0;
         F.RouteName = FString::Printf(TEXT("__ue_native_route_%d"), ++Routes);
-        das::addExternFunc(Foundation, new FDasNativeRouteFunction(Desc, F, Library), DasNativeIsCmres(F.Result.Type),
+        const FString AotTypes = DasNativeRouteAbiTypes(F);
+        auto* Route = new FDasNativeRouteFunction(Desc, F, Library, !AotTypes.IsEmpty());
+        if (!AotTypes.IsEmpty())
+            RegisterRouteAot(Desc, F, *Route, AotTypes);
+        das::addExternFunc(Foundation, Route, DasNativeIsCmres(F.Result.Type),
                            das::SideEffects::modifyExternal | das::SideEffects::accessExternal);
+    }
+    // The route's AOT entry (TMethodAot::Route) under a key of the reflected UFUNCTION and the C++ types
+    // (DasNativeRouteAbiTypes).
+    static void RegisterRouteAot(const FDasNativeModuleDesc& Origin, const FDasNativeFunctionDesc& F,
+                                 FDasNativeRouteFunction& Fn, const FString& Types)
+    {
+        const FString Name = TEXT("route:") + F.ReflectedPath;
+        const uint64 Key = dasue::aot::Key(TCHAR_TO_UTF8(*Name), TCHAR_TO_UTF8(*Types));
+        if (const auto* Existing = UEAotEntries.Find(Key);
+            Existing && Existing->Function != F.RouteAotEntry && (!Existing->Loaded || *Existing->Loaded))
+        {
+            UE_LOG(LogDasRuntime, Warning, TEXT("Route %s: AOT key collision, it stays in the interpreter"), *Name);
+            return;
+        }
+        AddUEAotEntry(Key, {F.RouteAotEntry, Name + TEXT(":") + Types, F.ReflectedName, &Origin.bLoaded});
+        Fn.cppName = TCHAR_TO_UTF8(*FString::Printf(TEXT("dasue::aot::Call<%lluULL,%s>"), Key, *Types));
+        Fn.noAot = false;
     }
     // The AOT entry goes into the bridge registry under a key of module, name and C++ types; the function's
     // cppName is the bridge call. Resolve refuses an entry of an unloaded module.

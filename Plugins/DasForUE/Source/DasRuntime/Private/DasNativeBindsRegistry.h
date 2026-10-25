@@ -42,6 +42,7 @@ struct FDasNativeFunctionDesc
     FString Name;
     FDasNativeThunk Thunk = nullptr;
     void* AotEntry = nullptr; // DasNativeBinds.h AotInvoke, when every type has an AOT ABI
+    void* RouteAotEntry = nullptr; // methods: the entry of the routed gameplay call (TMethodAot::Route)
     FDasNativeParam Result;
     TArray<FDasNativeParam> Arguments; // a method's receiver is Arguments[0]
     EDasBind Flags = EDasBind::None;

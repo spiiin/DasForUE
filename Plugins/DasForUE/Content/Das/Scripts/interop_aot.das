@@ -4,6 +4,7 @@ require ue_time
 require ue_math
 require ue_engine
 require interop_objects
+require ue_native_gameplay
 require math
 
 // AOT against the interpreter (DasInteropProbe.inl, C3): input = iterations * 16 + mode; the results are folded
@@ -15,7 +16,8 @@ require math
 // Mode 9 passes variables to binds with reference parameters (output parameters). Mode 10 is vector arithmetic
 // with ue_foundation's externs and operators; mode 11 is the same arithmetic on daScript's float3, the floor.
 // Mode 12: == of a class type and a bind with an FName parameter (two calls an iteration). Mode 13: a bind with an
-// array result (the actor's components: none outside a world).
+// array result (the actor's components: none outside a world). Mode 14 fails: a gameplay call on a native reference
+// that a bind answers (Reflects: K2_GetActorLocation) needs a receiver in the owner's world.
 def leaf(value:int):int { return value+1 }
 
 [export]
@@ -73,6 +75,9 @@ def main(input:int):int {
         for (i in range(0,count)) {
             acc^=length(a.get_all_components())+i
         }
+    } elif (mode==14) {
+        let r=ue_ref(type<ActorRef>,interop_actor().handle())
+        acc=int(r.K2_GetActorLocation().size_2d())
     } elif (mode==7) {
         var none : AActor
         acc=int(none.get_actor_location().size_2d())
