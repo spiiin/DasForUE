@@ -36,6 +36,7 @@ int32 UDasExportCommandlet::Main(const FString& Params)
             }
         }
     }
+#if DAS_WITH_EDITOR_TESTS
     FString Probe;
     if (FParse::Value(*Params, TEXT("Probe="), Probe))
     {
@@ -124,6 +125,7 @@ int32 UDasExportCommandlet::Main(const FString& Params)
         UE_LOG(LogTemp, Display, TEXT("DAS_PACKAGE_PREFLIGHT=PASS value=42"));
         return 0;
     }
+#endif
     FString Selection, Output, Error;
     if (!FParse::Value(*Params, TEXT("Selection="), Selection) || !FParse::Value(*Params, TEXT("Output="), Output))
         return 1;

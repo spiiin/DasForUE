@@ -3,7 +3,7 @@
 class UBlueprint;
 struct FDasAuthoringModule;
 bool DasMergeDefaults(UBlueprint* Blueprint, const FDasAuthoringModule& Next, const FString& ClassId, FString& Error);
-#if WITH_DEV_AUTOMATION_TESTS
+#if WITH_DEV_AUTOMATION_TESTS && DAS_WITH_EDITOR_TESTS
 void DasFailDefaultsMergeForTesting(int32 Stage);
 #endif
 

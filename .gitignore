@@ -66,3 +66,6 @@ __pycache__/
 
 /Tests/DasRuntimeIsolation/Build/Windows/FileOpenOrder/
 /Tests/DasRuntimeIsolation/Config/DefaultInput.ini
+
+/Tests/DasEditorIsolation/Build/Windows/FileOpenOrder/
+/Tests/DasEditorIsolation/Config/DefaultInput.ini

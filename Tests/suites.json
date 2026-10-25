@@ -96,7 +96,8 @@
           "switch": "-DasComputedDefaults", "marker": "DAS_COMPUTED_DEFAULTS_PACKAGED=PASS" },
         { "name": "method-values", "map": "/Game/DasMethodValues/{method-values}/Map", "switch": "-DasMethodValues",
           "marker": "DAS_METHOD_VALUES_RESULT=PASS" }
-      ] }
+      ] },
+    { "name": "editor-isolation", "kind": "script", "script": "TestEditorIsolation.ps1", "comment": "Build and launch a normal Editor without test extensions. Run last: it builds another Editor project." }
   ],
   "presets": {
     "quick": ["build", "python", "foundation", "automation-quick"],

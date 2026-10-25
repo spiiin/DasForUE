@@ -4,7 +4,7 @@
 #include "DasRuntime.h"
 #include "DasActor.h"
 #include "DasProbeActor.h"
-#include "../../DasRuntime/Private/DasScriptDelegateProxy.h"
+#include "../../../Source/DasRuntime/Private/DasScriptDelegateProxy.h"
 #include "Engine/Blueprint.h"
 #include "Engine/World.h"
 #include "Engine/Engine.h"

@@ -41,7 +41,11 @@
 #include "Misc/ScopeExit.h"
 namespace
 {
+#if DAS_WITH_EDITOR_TESTS
 int32 StructFailStage = 0;
+#else
+constexpr int32 StructFailStage = 0;
+#endif
 FEdGraphPinType ScalarPin(const FString& Kind)
 {
     FDasDeclaredType Type;
@@ -259,10 +263,12 @@ bool FDasTypeService::PlanStructMigration(const FString& Script, const FString& 
         Out.Removed.Sort();
     return true;
 }
+#if DAS_WITH_EDITOR_TESTS
 void DasFailStructMigrationForTesting(int32 Stage)
 {
     StructFailStage = Stage;
 }
+#endif
 bool FDasTypeService::MigrateStructFields(const FString& Script, const FString& RegistryPath, FString& Error,
                                           const FString& RulesFile)
 {

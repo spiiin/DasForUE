@@ -32,7 +32,7 @@ function GetPawnAIHashes {
  foreach($Name in @('UnrealEditor-DasRuntime.dll','UnrealEditor-DasEditor.dll')){
   $Result[$Name]=(Get-FileHash -LiteralPath "$Repo/Tests/DasForUESmoke/Binaries/Win64/$Name" -Algorithm SHA256).Hash
  }
- foreach($Name in @('Plugins/DasForUE/Source/DasEditor/Private/DasPawnAICommandlet.cpp','Plugins/DasForUE/Source/DasEditor/Public/DasPawnAICommandlet.h','Tests/PawnAI/probe.template.das','Bindings/Packages/PawnCharacterAINavigation.profile.json')){
+ foreach($Name in @('Plugins/DasForUE/Tests/Editor/Private/DasPawnAICommandlet.cpp','Plugins/DasForUE/Tests/Editor/Public/DasPawnAICommandlet.h','Tests/PawnAI/probe.template.das','Bindings/Packages/PawnCharacterAINavigation.profile.json')){
   $Result[$Name]=(Get-FileHash -LiteralPath "$Repo/$Name" -Algorithm SHA256).Hash
  }
  $Result['generated_module']=(Get-FileHash -LiteralPath (Join-Path $Validation ($Definition.staged_module+'.das')) -Algorithm SHA256).Hash

@@ -1,10 +1,10 @@
-# Test-only runtime sources
+# Test-only plugin extensions
 
 `Runtime/` is an additional UBT module directory, not an unconditional source directory.
-`DasRuntime.Build.cs` adds it only for Editor targets (test commandlets/automation) or a
-project with `Config/DasIncludeTestFixtures.txt` containing `include-plugin-test-fixtures`.
+`DasRuntime.Build.cs` adds it only for an Editor target whose project explicitly enables
+editor tests (see below), or a project with `Config/DasIncludeTestFixtures.txt` containing `include-plugin-test-fixtures`.
 The smoke project opts in, including packaged Development and Shipping checks.
-Ordinary Game/Client/Server targets do not compile these sources or reflect these types.
+Ordinary Editor/Game/Client/Server targets do not compile these sources or reflect these types.
 
 `DAS_WITH_TEST_PROBES` gates the few white-box includes that must share a translation
 unit with private VM/physics state. The implementations live here, not in production
@@ -28,8 +28,7 @@ Production generated bindings and native registries exclude fixture types.
 `GenerateRuntimeBindings.py` derives them from the same reflection IR using the explicit
 `ReflectedTypes.json` test inventory. Production staging selects `Content/Das/Runtime`
 variants; smoke/editor targets retain the full test catalog in `Content/Das/Scripts`.
-Editor builds still include the probes: separating editor test tooling is a separate
-boundary from excluding tests from game runtime builds.
+Ordinary editor builds exclude probes as well; test projects opt in explicitly.
 
 Validate through the shared build agent: `actor-host-regression,foundation,native-defaults,runtime-isolation`.
 `actor-host-regression` prepares method-value assets, then checks clean/test host selection,
@@ -43,6 +42,32 @@ runs the archived ordinary Development game. The project never opts into runtime
 fixtures. Its game module checks fixture-class absence, spawning the authored
 actor, BeginPlay/Tick, the delayed callback, its root component and reflected
 Unreal-to-daScript method dispatch. Validation code lives in the test project,
-not in the plugin runtime. Editor builds still include the authoring test tooling.
+not in the plugin runtime. This project explicitly opts into the authoring test tooling for its Editor target only.
 Run this suite through the shared build agent; output is `Build/IsolationPackaged`
 and `logs/isolation-packaged.log`. Generated Blueprint assets are ignored by Git.
+
+## Editor tests
+
+`Editor/` contains regression commandlets, automation/PIE tests and their fixtures.
+`DasEditor.Build.cs` adds this conditional module directory only when the project
+has `Config/DasIncludeEditorTests.txt` containing `include-plugin-editor-tests`.
+This also enables runtime fixtures for that project's Editor target. It does not
+enable test fixtures or test scripts in the project's Game target. The smoke
+project separately opts into game fixtures for its packaged regression suites.
+
+Tests retain `/Script/DasEditor` class paths and can exercise private services in
+the same module; no extra public exports or production dependency on a test DLL
+are necessary. `DAS_WITH_EDITOR_TESTS` also gates failure-injection hooks and the
+test-only modes of the production exporter commandlets. The regular exporter,
+source catalog, asset preflight, native API generator, DSL editing, reimport and
+migration services remain in `Source/DasEditor`.
+
+`editor-isolation` builds and starts `Tests/DasEditorIsolation`, which has no opt-in.
+It checks UHT/build inputs for both test directories and checks loaded classes and
+production editor commands, then imports a project-owned DSL class on ADasActor.
+Run it last in a suite batch because it changes the
+shared engine Editor module build ID. All builds run through the shared agent.
+
+The test build helper passes `-ForceHeaderGeneration`: these projects share plugin
+UHT output paths, and switching their conditional source sets must refresh generated
+reflection. Use the same flag for manual target switches outside the helper.

@@ -25,11 +25,17 @@
 #include "Serialization/ObjectWriter.h"
 #include "UObject/MetaData.h"
 
+#if DAS_WITH_EDITOR_TESTS
 static bool GDasFailGASUpdate = false;
+#else
+constexpr bool GDasFailGASUpdate = false;
+#endif
+#if DAS_WITH_EDITOR_TESTS
 void DasFailGASUpdateForTesting(bool bFail)
 {
     GDasFailGASUpdate = bFail;
 }
+#endif
 namespace
 {
 FString SetDigest(const FDasGASSetDeclaration& D)

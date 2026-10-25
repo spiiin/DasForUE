@@ -16,7 +16,7 @@
 - `Plugins/DasForUE/Source/DasRuntime/Private/DasRuntime.cpp`: доступ к self и свойствам.
 - `Plugins/DasForUE/Content/Das/Scripts/self_properties.das`: работающий пример чтения
   float/int и записи новых значений в текущий UObject/Actor.
-- `Plugins/DasForUE/Source/DasEditor/Private/DasReloadCommandlet.cpp`: сценарии проверки;
+- `Plugins/DasForUE/Tests/Editor/Private/DasReloadCommandlet.cpp`: сценарии проверки;
   логика генерации теперь вызывается через сервис, а не реализована внутри теста.
 
 ## Пример daScript

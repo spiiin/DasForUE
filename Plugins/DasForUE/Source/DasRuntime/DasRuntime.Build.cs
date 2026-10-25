@@ -12,10 +12,18 @@ public class DasRuntime : ModuleRules
         bool ShippingProbe = Target.Configuration == UnrealTargetConfiguration.Shipping &&
             System.Environment.GetEnvironmentVariable("DAS_GAS_SHIPPING_VALIDATION") == "1";
         PrivateDefinitions.Add("DAS_GAS_SHIPPING_VALIDATION=" + (ShippingProbe ? "1" : "0"));
-        // Editor commandlets need probes; game/server builds require explicit project opt-in.
+        // Test fixtures require an explicit project opt-in, including in the editor.
         string ProbeOptIn = Target.ProjectFile == null ? null :
             Path.Combine(Target.ProjectFile.Directory.FullName, "Config", "DasIncludeTestFixtures.txt");
-        bool TestProbes = Target.Type == TargetType.Editor;
+        string EditorOptIn = Target.ProjectFile == null ? null :
+            Path.Combine(Target.ProjectFile.Directory.FullName, "Config", "DasIncludeEditorTests.txt");
+        bool TestProbes = Target.Type == TargetType.Editor && EditorOptIn != null && File.Exists(EditorOptIn);
+        if (TestProbes)
+        {
+            ExternalDependencies.Add(EditorOptIn);
+            if (File.ReadAllText(EditorOptIn).Trim() != "include-plugin-editor-tests")
+                throw new BuildException("Invalid DAS editor-test opt-in: " + EditorOptIn);
+        }
         if (ProbeOptIn != null && File.Exists(ProbeOptIn))
         {
             ExternalDependencies.Add(ProbeOptIn);

@@ -17,7 +17,7 @@ import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SOURCE = os.path.join(ROOT, "Plugins", "DasForUE", "Source")
-TEST_SOURCE = os.path.join(ROOT, "Plugins", "DasForUE", "Tests", "Runtime")
+TEST_SOURCE = os.path.join(ROOT, "Plugins", "DasForUE", "Tests")
 MAX_LINE = 400  # limit for new lines; string literals may exceed ColumnLimit
 
 

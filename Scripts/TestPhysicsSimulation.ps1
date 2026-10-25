@@ -31,7 +31,7 @@ function GetPhysicsHashes {
  foreach($Name in @('UnrealEditor-DasRuntime.dll','UnrealEditor-DasEditor.dll')){
   $Result[$Name]=(Get-FileHash -LiteralPath "$Repo/Tests/DasForUESmoke/Binaries/Win64/$Name" -Algorithm SHA256).Hash
  }
- foreach($Name in @('Plugins/DasForUE/Source/DasEditor/Private/DasPhysicsSimulationCommandlet.cpp','Plugins/DasForUE/Source/DasEditor/Public/DasPhysicsSimulationCommandlet.h','Tests/PhysicsSimulation/probe.template.das')){
+ foreach($Name in @('Plugins/DasForUE/Tests/Editor/Private/DasPhysicsSimulationCommandlet.cpp','Plugins/DasForUE/Tests/Editor/Public/DasPhysicsSimulationCommandlet.h','Tests/PhysicsSimulation/probe.template.das')){
   $Result[$Name]=(Get-FileHash -LiteralPath "$Repo/$Name" -Algorithm SHA256).Hash
  }
  $Result['generated_module']=(Get-FileHash -LiteralPath (Join-Path $Validation ($Definition.staged_module+'.das')) -Algorithm SHA256).Hash

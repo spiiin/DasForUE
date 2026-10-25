@@ -1,0 +1,20 @@
+{
+  "FileVersion": 3,
+  "AdditionalPluginDirectories": [
+    "../../Plugins"
+  ],
+  "Modules": [
+    {
+      "Name": "DasEditorIsolation",
+      "Type": "Editor",
+      "LoadingPhase": "PostEngineInit"
+    }
+  ],
+  "Plugins": [
+    {
+      "Name": "DasForUE",
+      "Enabled": true
+    }
+  ],
+  "DisableEnginePluginsByDefault": true
+}

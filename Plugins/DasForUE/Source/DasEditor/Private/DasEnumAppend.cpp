@@ -42,7 +42,11 @@
 #include "Modules/ModuleManager.h"
 namespace
 {
+#if DAS_WITH_EDITOR_TESTS
 int32 EnumAppendFailStage = 0;
+#else
+constexpr int32 EnumAppendFailStage = 0;
+#endif
 void SortTypes(FDasReflectedTypes& M)
 {
     M.Enums.Sort([](const auto& A, const auto& B) { return A.Id < B.Id; });
@@ -317,10 +321,12 @@ bool CheckBlueprint(UBlueprint* BP, const TSet<UEnum*>& Types, const FString& Sc
     return true;
 }
 }
+#if DAS_WITH_EDITOR_TESTS
 void DasFailEnumAppendForTesting(int32 Stage)
 {
     EnumAppendFailStage = Stage;
 }
+#endif
 static bool MigrateEnums(const FString& Script, const FString& RegistryPath, FString& Error, bool RepairGraphs,
                          bool RenameOnly, const TMap<FString, TMap<int64, int64>>* ValueRules = nullptr)
 {

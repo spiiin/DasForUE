@@ -37,6 +37,9 @@ function Invoke-DasBuild {
     if ($NoEngineChanges) { $Arguments += '-NoEngineChanges' }
     if ($Log) { $Arguments += "-Log=$Log" }
     if ($PSBoundParameters.ContainsKey("BuildArguments")) { $Arguments = $BuildArguments }
+    # Test projects share plugin UHT outputs but select different conditional module directories.
+    # Regenerate reflection when switching between clean and test-enabled targets.
+    if ($Arguments -notcontains '-ForceHeaderGeneration') { $Arguments += '-ForceHeaderGeneration' }
     & (Join-Path $Das.Engine 'Engine\Build\BatchFiles\Build.bat') @Arguments | ForEach-Object { Write-Host $_ }
     if ($LASTEXITCODE) { throw "$Name build failed" }
 }
