@@ -37,6 +37,9 @@ function Invoke-DasBuild {
     if ($NoEngineChanges) { $Arguments += '-NoEngineChanges' }
     if ($Log) { $Arguments += "-Log=$Log" }
     if ($PSBoundParameters.ContainsKey("BuildArguments")) { $Arguments = $BuildArguments }
+    # Test projects share plugin UHT outputs but select different conditional module directories.
+    # Regenerate reflection when switching between clean and test-enabled targets.
+    if ($Arguments -notcontains '-ForceHeaderGeneration') { $Arguments += '-ForceHeaderGeneration' }
     & (Join-Path $Das.Engine 'Engine\Build\BatchFiles\Build.bat') @Arguments | ForEach-Object { Write-Host $_ }
     if ($LASTEXITCODE) { throw "$Name build failed" }
 }
@@ -270,6 +273,22 @@ function Clear-DasRunArtifacts {
     Write-Output "DAS_CLEANUP removed=$Removed kept=$Kept"
 }
 
+# Windows PowerShell turns native stderr into ErrorRecord objects under Stop. unittest writes its
+# normal progress/report there; only its exit code decides success. Restore the caller's policy.
+function Invoke-DasPythonTests {
+    param([Parameter(Mandatory)][string[]]$Path, [string]$Python='C:/Python312/python.exe', [string]$Log)
+    foreach ($TestPath in $Path) {
+        $Previous = $ErrorActionPreference
+        $ErrorActionPreference = 'Continue'
+        try {
+            if ($Log) { & $Python $TestPath *> $Log }
+            else { & $Python $TestPath 2>&1 | ForEach-Object { "$_" } }
+            $Code = $LASTEXITCODE
+        } finally { $ErrorActionPreference = $Previous }
+        if ($Code) { throw "Python tests failed ($Code): $TestPath" }
+    }
+}
+
 Export-ModuleMember -Function Get-DasContext, Invoke-DasBuild, Assert-DasLog, Invoke-DasCommandlet, Invoke-DasAutomation,
     Invoke-DasPackaged, Invoke-DasAssetPhases, Test-DasResult, Get-DasResult, Assert-DasResult,
-    Lock-SourceHashes, Write-DasValidation, Get-DasValidationPaths, Invoke-DasValidation, Clear-DasRunArtifacts -Variable DasEngineErrorPattern
+    Lock-SourceHashes, Write-DasValidation, Get-DasValidationPaths, Invoke-DasValidation, Clear-DasRunArtifacts, Invoke-DasPythonTests -Variable DasEngineErrorPattern

@@ -398,3 +398,13 @@ ran in 0.59 seconds; the full focused script with two cooks took 257 seconds.
 The default cooked rename loses `73` and leaves the new default `20`, while
 control `123` survives; Editor rename preserves `73`. This PASS characterizes
 that limitation and must not be described as successful packaged rename migration.
+
+## Script staging
+
+The smoke project's Config/DasIncludeTestFixtures.txt explicitly opts into test scripts for packaged regressions. Ordinary projects use the plugin runtime allowlist. Do not copy this marker into release projects. Queue test-suite <unique-id> script-staging repo=<worktree> to validate the actual C# selector. See [Script staging](../Guide/GettingStarted/ScriptStaging.md).
+
+## Runtime probe isolation
+
+See [test source boundary](../../Plugins/DasForUE/Tests/README.md). Runtime probes and
+reflected fixtures are compiled for Editor/test targets only. Ordinary game builds
+exclude them; `runtime-isolation` verifies this with a separate minimal game target.

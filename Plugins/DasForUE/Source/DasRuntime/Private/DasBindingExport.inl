@@ -112,113 +112,15 @@ TSharedPtr<FJsonObject> ExportParameterType(FProperty* Property, TMap<FString, T
         const FString Path = Type->GetPathName();
         Field->SetStringField(TEXT("kind"), TEXT("struct"));
         Field->SetStringField(TEXT("type_path"), Path);
-        if (DasIsWidgetAnimationType(Type))
+        if (const auto* Policy = DasNativeTypePolicy(Type); Policy && Policy->Transport)
         {
-            Field->SetStringField(TEXT("transport"), TEXT("weak_widget_animation_v1"));
+            Field->SetStringField(TEXT("transport"), Policy->Transport);
             if (!Structs.Contains(Path))
             {
                 auto Definition = MakeShared<FJsonObject>();
                 Definition->SetStringField(TEXT("type_path"), Path);
                 Definition->SetStringField(TEXT("cpp_type"), Type->GetStructCPPName());
-                Definition->SetStringField(TEXT("transport"), TEXT("weak_widget_animation_v1"));
-                Definition->SetArrayField(TEXT("fields"), {});
-                Structs.Add(Path, Definition);
-            }
-            return Field;
-        }
-        if (DasIsPaintContextType(Type))
-        {
-            Field->SetStringField(TEXT("transport"), TEXT("scoped_paint_context_v1"));
-            if (!Structs.Contains(Path))
-            {
-                auto Definition = MakeShared<FJsonObject>();
-                Definition->SetStringField(TEXT("type_path"), Path);
-                Definition->SetStringField(TEXT("cpp_type"), Type->GetStructCPPName());
-                Definition->SetStringField(TEXT("transport"), TEXT("scoped_paint_context_v1"));
-                Definition->SetArrayField(TEXT("fields"), {});
-                Structs.Add(Path, Definition);
-            }
-            return Field;
-        }
-        if (DasIsEventReplyType(Type))
-        {
-            Field->SetStringField(TEXT("transport"), TEXT("scoped_event_reply_v1"));
-            if (!Structs.Contains(Path))
-            {
-                auto Definition = MakeShared<FJsonObject>();
-                Definition->SetStringField(TEXT("type_path"), Path);
-                Definition->SetStringField(TEXT("cpp_type"), Type->GetStructCPPName());
-                Definition->SetStringField(TEXT("transport"), TEXT("scoped_event_reply_v1"));
-                Definition->SetArrayField(TEXT("fields"), {});
-                Structs.Add(Path, Definition);
-            }
-            return Field;
-        }
-        if (DasIsGeometryType(Type))
-        {
-            Field->SetStringField(TEXT("transport"), TEXT("slate_geometry_snapshot_v1"));
-            if (!Structs.Contains(Path))
-            {
-                auto Definition = MakeShared<FJsonObject>();
-                Definition->SetStringField(TEXT("type_path"), Path);
-                Definition->SetStringField(TEXT("cpp_type"), Type->GetStructCPPName());
-                Definition->SetStringField(TEXT("transport"), TEXT("slate_geometry_snapshot_v1"));
-                Definition->SetArrayField(TEXT("fields"), {});
-                Structs.Add(Path, Definition);
-            }
-            return Field;
-        }
-        if (DasIsInputEventType(Type))
-        {
-            Field->SetStringField(TEXT("transport"), TEXT("slate_input_event_snapshot_v1"));
-            if (!Structs.Contains(Path))
-            {
-                auto Definition = MakeShared<FJsonObject>();
-                Definition->SetStringField(TEXT("type_path"), Path);
-                Definition->SetStringField(TEXT("cpp_type"), Type->GetStructCPPName());
-                Definition->SetStringField(TEXT("transport"), TEXT("slate_input_event_snapshot_v1"));
-                Definition->SetArrayField(TEXT("fields"), {});
-                Structs.Add(Path, Definition);
-            }
-            return Field;
-        }
-        if (Type == FInputActionValue::StaticStruct())
-        {
-            Field->SetStringField(TEXT("transport"), TEXT("input_action_value_v1"));
-            if (!Structs.Contains(Path))
-            {
-                auto Definition = MakeShared<FJsonObject>();
-                Definition->SetStringField(TEXT("type_path"), Path);
-                Definition->SetStringField(TEXT("cpp_type"), TEXT("FInputActionValue"));
-                Definition->SetStringField(TEXT("transport"), TEXT("input_action_value_v1"));
-                Definition->SetArrayField(TEXT("fields"), {});
-                Structs.Add(Path, Definition);
-            }
-            return Field;
-        }
-        if (Type == FConstraintInstanceAccessor::StaticStruct())
-        {
-            Field->SetStringField(TEXT("transport"), TEXT("constraint_component_v1"));
-            if (!Structs.Contains(Path))
-            {
-                auto Definition = MakeShared<FJsonObject>();
-                Definition->SetStringField(TEXT("type_path"), Path);
-                Definition->SetStringField(TEXT("cpp_type"), TEXT("FConstraintInstanceAccessor"));
-                Definition->SetStringField(TEXT("transport"), TEXT("constraint_component_v1"));
-                Definition->SetArrayField(TEXT("fields"), {});
-                Structs.Add(Path, Definition);
-            }
-            return Field;
-        }
-        if (Type == FHitResult::StaticStruct())
-        {
-            Field->SetStringField(TEXT("transport"), TEXT("hit_result_v1"));
-            if (!Structs.Contains(Path))
-            {
-                auto Definition = MakeShared<FJsonObject>();
-                Definition->SetStringField(TEXT("type_path"), Path);
-                Definition->SetStringField(TEXT("cpp_type"), TEXT("FHitResult"));
-                Definition->SetStringField(TEXT("transport"), TEXT("hit_result_v1"));
+                Definition->SetStringField(TEXT("transport"), Policy->Transport);
                 Definition->SetArrayField(TEXT("fields"), {});
                 Structs.Add(Path, Definition);
             }
@@ -489,30 +391,11 @@ bool FDasRuntimeModule::ExportBindings(const FString& SelectionPath, const FStri
                     Field->SetBoolField(TEXT("input"), Parameter.bInput);
                     Field->SetBoolField(TEXT("output"), Parameter.bOutput);
                     Field->SetStringField(TEXT("type_path"), Parameter.TypePath);
-                    if (Parameter.Kind == EMarshallingKind::Struct &&
-                        Parameter.TypePath == FConstraintInstanceAccessor::StaticStruct()->GetPathName())
-                        Field->SetStringField(TEXT("transport"), TEXT("constraint_component_v1"));
-                    if (Parameter.Kind == EMarshallingKind::Struct &&
-                        Parameter.TypePath == FHitResult::StaticStruct()->GetPathName())
-                        Field->SetStringField(TEXT("transport"), TEXT("hit_result_v1"));
-                    if (Parameter.Kind == EMarshallingKind::Struct &&
-                        DasIsWidgetAnimationType(FindObject<UScriptStruct>(nullptr, *Parameter.TypePath)))
-                        Field->SetStringField(TEXT("transport"), TEXT("weak_widget_animation_v1"));
-                    if (Parameter.Kind == EMarshallingKind::Struct &&
-                        DasIsPaintContextType(FindObject<UScriptStruct>(nullptr, *Parameter.TypePath)))
-                        Field->SetStringField(TEXT("transport"), TEXT("scoped_paint_context_v1"));
-                    if (Parameter.Kind == EMarshallingKind::Struct &&
-                        DasIsEventReplyType(FindObject<UScriptStruct>(nullptr, *Parameter.TypePath)))
-                        Field->SetStringField(TEXT("transport"), TEXT("scoped_event_reply_v1"));
-                    if (Parameter.Kind == EMarshallingKind::Struct &&
-                        DasIsGeometryType(FindObject<UScriptStruct>(nullptr, *Parameter.TypePath)))
-                        Field->SetStringField(TEXT("transport"), TEXT("slate_geometry_snapshot_v1"));
-                    if (Parameter.Kind == EMarshallingKind::Struct &&
-                        DasIsInputEventType(FindObject<UScriptStruct>(nullptr, *Parameter.TypePath)))
-                        Field->SetStringField(TEXT("transport"), TEXT("slate_input_event_snapshot_v1"));
-                    if (Parameter.Kind == EMarshallingKind::Struct &&
-                        Parameter.TypePath == FInputActionValue::StaticStruct()->GetPathName())
-                        Field->SetStringField(TEXT("transport"), TEXT("input_action_value_v1"));
+                    if (Parameter.Kind == EMarshallingKind::Struct)
+                        if (const auto* A = FDasTypeAdapters::Get().FindStructPath(Parameter.TypePath))
+                            if (const auto* NativePolicy = A->GetNativePolicy();
+                                NativePolicy && NativePolicy->Transport)
+                                Field->SetStringField(TEXT("transport"), NativePolicy->Transport);
                     if (Parameter.Kind == EMarshallingKind::Enum)
                     {
                         UEnum* Enum = FindObject<UEnum>(nullptr, *Parameter.TypePath);

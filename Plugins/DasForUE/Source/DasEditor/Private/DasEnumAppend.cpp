@@ -7,7 +7,7 @@
 #include "Serialization/JsonSerializer.h"
 #include "Misc/FileHelper.h"
 #include "DasBlueprintRollback.h"
-#include "DasProbeActor.h"
+#include "DasActor.h"
 #include "K2Node_SwitchEnum.h"
 #include "K2Node_Select.h"
 #include "K2Node_EnumLiteral.h"
@@ -42,7 +42,11 @@
 #include "Modules/ModuleManager.h"
 namespace
 {
+#if DAS_WITH_EDITOR_TESTS
 int32 EnumAppendFailStage = 0;
+#else
+constexpr int32 EnumAppendFailStage = 0;
+#endif
 void SortTypes(FDasReflectedTypes& M)
 {
     M.Enums.Sort([](const auto& A, const auto& B) { return A.Id < B.Id; });
@@ -317,10 +321,12 @@ bool CheckBlueprint(UBlueprint* BP, const TSet<UEnum*>& Types, const FString& Sc
     return true;
 }
 }
+#if DAS_WITH_EDITOR_TESTS
 void DasFailEnumAppendForTesting(int32 Stage)
 {
     EnumAppendFailStage = Stage;
 }
+#endif
 static bool MigrateEnums(const FString& Script, const FString& RegistryPath, FString& Error, bool RepairGraphs,
                          bool RenameOnly, const TMap<FString, TMap<int64, int64>>* ValueRules = nullptr)
 {
@@ -681,7 +687,7 @@ static bool MigrateEnums(const FString& Script, const FString& RegistryPath, FSt
             return false;
         }
         GraphRoot = *RepairBPs.CreateConstIterator();
-        if (!GraphRoot->GeneratedClass->IsChildOf(ADasProbeActor::StaticClass()) ||
+        if (!GraphRoot->GeneratedClass->IsChildOf(ADasActor::StaticClass()) ||
             GraphRoot->GetOutermost()->GetMetaData().GetValue(GraphRoot, TEXT("DasDSLSource")) != Script)
         {
             Error = TEXT("Enum node repair requires the imported DSL Actor root");
@@ -818,7 +824,7 @@ static bool MigrateEnums(const FString& Script, const FString& RegistryPath, FSt
                                                                     : nullptr});
                 }
         }
-        for (TObjectIterator<ADasProbeActor> It; It; ++It)
+        for (TObjectIterator<ADasActor> It; It; ++It)
             for (const auto& Pair : It->RetiredDasValues)
             {
                 const auto& V = Pair.Value;

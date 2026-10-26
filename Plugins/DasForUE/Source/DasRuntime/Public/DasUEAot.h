@@ -195,8 +195,9 @@ template <class F> struct Signature
 };
 template <class R, class... A> struct Signature<R (*)(A...)>
 {
-    static constexpr bool Supported =
-        Type<R>::Name && !std::is_same_v<R, das::Context*> && (bool(Type<A>::Name) && ...) && ((0 + ... + int(std::is_same_v<A, das::Context*>)) == 1);
+    static constexpr bool Supported = Type<R>::Name && !std::is_same_v<R, das::Context*> &&
+                                      (bool(Type<A>::Name) && ...) &&
+                                      ((0 + ... + int(std::is_same_v<A, das::Context*>)) == 1);
     static FString CppTypes()
     {
         FString S = UTF8_TO_TCHAR(Type<R>::Name);
@@ -289,4 +290,14 @@ template <uint64_t Id, class R, class... A> R CallOp(A... Args)
         return Result;
     }
 }
+// Interop calls carry VM-owned argument values and TypeInfo only for the duration of the call.
+// The registry stores a checked thunk, never an unguarded builtin address.
+template <uint64_t Id> vec4f Interop(das::Context& Context, das::SimNode_CallBase* Node, vec4f* Args)
+{
+    using FInterop = vec4f (*)(das::Context&, das::SimNode_CallBase*, vec4f*);
+    static FCallSite Site;
+    auto Fn = reinterpret_cast<FInterop>(Resolve(Id, &Context, Site));
+    return Fn(Context, Node, Args);
+}
+
 }

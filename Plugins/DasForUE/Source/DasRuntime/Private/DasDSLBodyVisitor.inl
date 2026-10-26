@@ -552,8 +552,8 @@ struct FDSLBodyVisitor : das::Visitor
         auto* C = new das::ExprCall(F->at, DSLSelfAccessor("ue_get_self_", P->Type));
         C->arguments.push_back(new das::ExprConstString(F->at, DSLUtf8(P->Name)));
         const auto Type = SelfPropertyType(F, P);
-        return Type && (DSLTypedClass(Type) || DSLContainer(Type) || DSLDirectEnum(Type) || DSLDirectStruct(Type) ||
-                        DSLTypedReference(Type) || !DSLMathPath(Type).IsEmpty())
+        return Type && (DSLTypedClass(Type) || DSLContainer(Type) || DSLTypedValue(Type, EDasTypeKind::Enum) ||
+                        DSLDirectStruct(Type) || DSLTypedReference(Type) || !DSLMathPath(Type).IsEmpty())
                    ? DSLDirectUnpack(F->at, Type, C, PropertyPath(P))
                    : C;
     }
@@ -686,9 +686,9 @@ struct FDSLBodyVisitor : das::Visitor
             }
             return DSLCall(E->at, Name, {new das::ExprConstString(E->at, DSLUtf8(P->Name)), Value});
         }
-        C->arguments.push_back(Type && (DSLTypedClass(Type) || DSLContainer(Type) || DSLDirectEnum(Type) ||
-                                        DSLDirectStruct(Type) || DSLTypedReference(Type) ||
-                                        !DSLMathPath(Type).IsEmpty())
+        C->arguments.push_back(Type && (DSLTypedClass(Type) || DSLContainer(Type) ||
+                                        DSLTypedValue(Type, EDasTypeKind::Enum) || DSLDirectStruct(Type) ||
+                                        DSLTypedReference(Type) || !DSLMathPath(Type).IsEmpty())
                                    ? DSLDirectPack(E->at, Type, Value, PropertyPath(P))
                                    : Value);
         return C;
@@ -752,7 +752,8 @@ struct FDSLBodyVisitor : das::Visitor
             Path += (Path.empty() ? "" : ".") + *It;
             Type = Field->type;
         }
-        if (!Type || DSLContainer(Type) || DSLDirectStruct(Type) || DSLDirectEnum(Type) || !DSLMathPath(Type).IsEmpty())
+        if (!Type || DSLContainer(Type) || DSLDirectStruct(Type) || DSLTypedValue(Type, EDasTypeKind::Enum) ||
+            !DSLMathPath(Type).IsEmpty())
             return false;
         const char* Suffix = DasScalarKindSuffix(DSLTypeName(Type));
         if (!Suffix)
@@ -878,7 +879,8 @@ struct FDSLBodyVisitor : das::Visitor
     };
     static const char* InPlaceScalar(const das::TypeDeclPtr& T)
     {
-        if (!T || DSLContainer(T) || DSLDirectStruct(T) || DSLDirectEnum(T) || !DSLMathPath(T).IsEmpty())
+        if (!T || DSLContainer(T) || DSLDirectStruct(T) || DSLTypedValue(T, EDasTypeKind::Enum) ||
+            !DSLMathPath(T).IsEmpty())
             return nullptr;
         return DasScalarKindSuffix(DSLTypeName(T));
     }
@@ -966,9 +968,8 @@ struct FDSLBodyVisitor : das::Visitor
                 };
                 auto Accessor = [&](const char* Verb)
                 {
-                    return InPlace.bArray
-                               ? "__ue_self_array_" + das::string(Verb) + "_" + InPlace.Element
-                               : "__ue_self_map_" + das::string(Verb) + "_" + InPlace.Key + "_" + InPlace.Element;
+                    return InPlace.bArray ? "__ue_self_array_" + das::string(Verb) + "_" + InPlace.Element
+                                          : "__ue_self_map_" + das::string(Verb) + "_" + InPlace.Element;
                 };
                 das::ExpressionPtr Value = new das::ExprVar(At, "value");
                 if (!Assignment->rtti_isCopy() && !Assignment->rtti_isClone())
@@ -1171,19 +1172,22 @@ struct FDSLBodyVisitor : das::Visitor
             Type = Field->type;
         }
         const FString K = DSLTypeName(Type);
-        if (DSLDirectEnum(Type) || DSLTypedReference(Type) || DSLDirectStruct(Type) || !DSLMathPath(Type).IsEmpty() ||
-            DSLContainer(Type))
+        if (DSLTypedValue(Type, EDasTypeKind::Enum) || DSLTypedReference(Type) || DSLDirectStruct(Type) ||
+            !DSLMathPath(Type).IsEmpty() || DSLContainer(Type))
         {
             if (Compound)
             {
                 Error = TEXT("Typed value struct members support assignment, not compound arithmetic");
                 return E;
             }
-            const das::string Kind = DSLDirectEnum(Type) ? "enum" : DSLTypedReference(Type) ? "object" : "struct";
-            const FString ValuePath = DSLDirectEnum(Type) || DSLDirectStruct(Type) || DSLContainer(Type)
-                                          ? DSLDirectPath(Type, Folder, Registry)
-                                      : DSLTypedReference(Type) ? DSLTypedReferencePath(Type)
-                                                                : DSLMathPath(Type);
+            const das::string Kind = DSLTypedValue(Type, EDasTypeKind::Enum) ? "enum"
+                                     : DSLTypedReference(Type)               ? "object"
+                                                                             : "struct";
+            const FString ValuePath =
+                DSLTypedValue(Type, EDasTypeKind::Enum) || DSLDirectStruct(Type) || DSLContainer(Type)
+                    ? DSLDirectPath(Type, Folder, Registry)
+                : DSLTypedReference(Type) ? DSLTypedReferencePath(Type)
+                                          : DSLMathPath(Type);
             if (DSLContainer(Type))
                 DSLEnsureStructHelpers(Type, ValuePath, Group, Source->module, GeneratedHelpers, HelperPaths);
             const das::string Name =
@@ -1469,7 +1473,8 @@ struct FDSLBodyVisitor : das::Visitor
                         Capability->Signature != EDasMethodSignature::Void;
                 if (Found && Capability->bDynamic)
                 {
-                    const bool Class = DSLTypedClass(T), Object = DSLTypedReference(T), Enum = DSLDirectEnum(T),
+                    const bool Class = DSLTypedClass(T), Object = DSLTypedReference(T),
+                               Enum = DSLTypedValue(T, EDasTypeKind::Enum),
                                Struct = DSLDirectStruct(T) || DSLContainer(T);
                     FString Issue;
                     Found = (Class || Object || Enum || Struct) &&
@@ -1516,7 +1521,7 @@ struct FDSLBodyVisitor : das::Visitor
             E->name = NextTick ? "__ue_timer_next_tick_array" : "__ue_timer_start_array";
             E->arguments[PayloadIndex] = DSLDirectPack(E->at, CaptureType, E->arguments[PayloadIndex], Path);
         }
-        else if (CaptureType && DSLDirectEnum(CaptureType))
+        else if (CaptureType && DSLTypedValue(CaptureType, EDasTypeKind::Enum))
         {
             const FString Path = DSLDirectPath(CaptureType, Folder, Registry);
             E->arguments[PayloadIndex] = DSLDirectPack(E->at, CaptureType, E->arguments[PayloadIndex], Path);
@@ -1945,8 +1950,7 @@ struct FDSLBodyVisitor : das::Visitor
                         Op = DSLCall(At, (Insert ? "__ue_self_set_insert_" : "__ue_self_set_erase_") + InPlace.Key,
                                      {Property, Arg(1)});
                     else
-                        Op = Insert ? DSLCall(At, "__ue_self_map_set_" + InPlace.Key + "_" + InPlace.Element,
-                                              {Property, Arg(1), Arg(2)})
+                        Op = Insert ? DSLCall(At, "__ue_self_map_set_" + InPlace.Element, {Property, Arg(1), Arg(2)})
                                     : DSLCall(At, "__ue_self_map_erase_" + InPlace.Key, {Property, Arg(1)});
                     Body->list.push_back(Result ? static_cast<das::ExpressionPtr>(new das::ExprReturn(At, Op)) : Op);
                 }

@@ -5,7 +5,7 @@ $ErrorActionPreference='Stop'
 $Repo=Split-Path -Parent $PSScriptRoot
 $Project=Join-Path $Repo 'Tests/DasForUESmoke/DasForUESmoke.uproject'
 foreach($Test in @('TestBindingsGenerator.py','TestHitResultGenerator.py','TestConstraintTransportGenerator.py')){
- & C:\Python312\python.exe "$PSScriptRoot/$Test"
+ Invoke-DasPythonTests -Path "$PSScriptRoot/$Test"
  if($LASTEXITCODE){throw "$Test failed"}
 }
 if(!$SkipBuild){
@@ -46,7 +46,13 @@ foreach($Case in @('transport','scope')){
 '{"schema_version":1,"modules":["Engine"],"subsystems":[{"id":"collision_physics","modules":["Engine"],"roots":[]}]}'|Set-Content -LiteralPath "$Stage/inventory-profile.json" -Encoding utf8
 & $Editor $Project -run=DasNativeGameplay -Coverage "-Profile=$Stage/inventory-profile.json" "-Output=$Stage/inventory.json" "-abslog=$Stage/inventory.log" -Multiprocess -unattended -NullRHI -nosplash -stdout -ddc=NoZenLocalFallback -NoZenAutoLaunch *> "$Stage/inventory-stdout.log"
 if($LASTEXITCODE){throw 'Fresh constraint native inventory failed'}
-& C:\Python312\python.exe "$PSScriptRoot/ReportApiPackage.py" --report $ReportPath --inventory "$Stage/inventory.json" --baseline "$Repo/Build/ApiPackages/ue_api_world/latest-report.json" --baseline "$Repo/Build/ApiPackages/ue_api_math/latest-report.json" --output "$Repo/Bindings/Packages/ue_api_collision.summary.json" --markdown "$Repo/Docs/Dev/Api/Blockers/CollisionPhysicsBlockers.md"
+# These comparisons are informational; a fresh worktree need not have unrelated packages published.
+# Keep diagnostic output with this run rather than rewriting delivered coverage documentation.
+$BaselineArgs=@()
+foreach($BaselinePath in @("$Repo/Build/ApiPackages/ue_api_world/latest-report.json", "$Repo/Build/ApiPackages/ue_api_math/latest-report.json")) {
+ if(Test-Path -LiteralPath $BaselinePath) { $BaselineArgs+=@('--baseline',$BaselinePath) }
+}
+& C:\Python312\python.exe "$PSScriptRoot/ReportApiPackage.py" --report $ReportPath --inventory "$Stage/inventory.json" @BaselineArgs --output "$Stage/constraint-summary.json" --markdown "$Stage/ConstraintBlockers.md"
 if($LASTEXITCODE){throw 'Constraint blocker report failed'}
 foreach($Dll in $Dlls){if((Get-FileHash $Dll -Algorithm SHA256).Hash -ne $Hashes[$Dll]){throw 'DLL changed during validation; rerun against completed build'}}
 [ordered]@{state='PASS';python_tests=112;whole_collision_module='PASS';component_getter_library_ref_out='PASS';physical_generation_rebuild='PASS';pending_mutation_and_delayed_result='PASS';weak_owner_GC_destroy='PASS';null_wrong_type_direction_unassigned_foreign_context='PASS';snapshot_collection='PASS';report=$ReportPath;counts=$Report.counts;dll_sha256=$Hashes;published=$false;PIE='not_run';packaged='not_run';commit='not_created'}|ConvertTo-Json -Depth 20|Set-Content -LiteralPath "$Repo/logs/constraint-transport-validation.json" -Encoding utf8

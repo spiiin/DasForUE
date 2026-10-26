@@ -6,7 +6,7 @@ var saved:UEPaintContext
 var old_frame:UCallHandle
 var brush:UObjectHandle
 var font:UObjectHandle
-def white():S_LinearColor_f4abb14b {return S_LinearColor_f4abb14b(f_r=1.0,f_g=1.0,f_b=1.0,f_a=1.0)}
+def white():UELinearColor {return ue_linear_color(1.0f,1.0f,1.0f,1.0f)}
 def line(c:UEPaintContext):UEPaintContext {return ue_ui_DrawLine(c,ue_vector2d(5.0lf,5.0lf),ue_vector2d(30.0lf,25.0lf),white(),true,1.0)}
 [export]
 def setup(b:UObjectHandle;f:UObjectHandle):int {brush:=b;font:=f;return 1}

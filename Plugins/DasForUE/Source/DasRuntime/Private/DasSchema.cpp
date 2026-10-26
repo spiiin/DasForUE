@@ -1,4 +1,5 @@
 #include "DasDataAssets.h"
+#include "DasTypeContracts.h"
 #include "UObject/TextProperty.h"
 #include "Internationalization/Text.h"
 #include "DasScriptHosts.h"
@@ -132,8 +133,9 @@ bool ResolveDasReferenceDefault(bool IsClass, const FString& BasePath, const FSt
             Class && Class->IsChildOf(Base) && !Class->HasAnyClassFlags(CLASS_Deprecated | CLASS_NewerVersionExists);
     }
     else
-        Good &= Out && Out->IsAsset() && !Out->IsA<UClass>() &&
-                (Base->HasAnyClassFlags(CLASS_Interface) ? Out->GetClass()->ImplementsInterface(Base) : Out->IsA(Base));
+        Good &=
+            Out && Out->IsAsset() && !Out->IsA<UClass>() &&
+            (Base->HasAnyClassFlags(CLASS_Interface) ? DasImplementsInterface(Out->GetClass(), Base) : Out->IsA(Base));
     if (!Good)
     {
         Out = nullptr;
@@ -156,24 +158,28 @@ bool FDasClassSchema::Validate(FString& Error) const
     if (!Identifier(Name.ToString()) || Name.IsNone() ||
         (Parent !=
          TEXT("WorldSubsystem") &&
-              Parent !=
-                  TEXT("GameInstanceSubsystem") &&
-                       Parent !=
-                           TEXT("Actor") &&
-                                Parent !=
-                                    TEXT("Pawn") &&
-                                         Parent !=
-                                             TEXT("Character") &&
-                                                  Parent !=
-                                                      TEXT("ActorComponent") &&
-                                                           Parent !=
-                                                               TEXT("SaveGame") &&
-                                                                    Parent !=
-                                                                        TEXT("DataAsset") &&
-                                                                             Parent !=
-                                                                                 TEXT("PrimaryDataAsset") &&
-                                                                                      Parent !=
-                                                                                          TEXT("FunctionLibrary")))
+             Parent !=
+                 TEXT("GameInstanceSubsystem") &&
+                     Parent !=
+                         TEXT("Actor") &&
+#if DAS_WITH_TEST_PROBES
+                             Parent !=
+                                 TEXT("DasProbeActor") &&
+#endif
+                                     Parent !=
+                                         TEXT("Pawn") &&
+                                              Parent !=
+                                                  TEXT("Character") &&
+                                                       Parent !=
+                                                           TEXT("ActorComponent") &&
+                                                                Parent !=
+                                                                    TEXT("SaveGame") &&
+                                                                         Parent !=
+                                                                             TEXT("DataAsset") &&
+                                                                                  Parent !=
+                                                                                      TEXT("PrimaryDataAsset") &&
+                                                                                           Parent !=
+                                                                                               TEXT("FunctionLibrary")))
     {
         Error = TEXT("Expected a named Actor, Pawn, Character, ActorComponent or function-library schema");
         return false;
@@ -296,69 +302,16 @@ bool FDasClassSchema::Validate(FString& Error) const
             }
             ParameterNames.Add(P.Name);
         }
-        for (const auto& P : M.EffectiveParameters())
-            if (P.Kind == EDasMethodSignature::Object &&
-                (!FindObject<UClass>(nullptr, *P.ClassPath) ||
-                 (!P.ClassPath.StartsWith(
-                     TEXT("/Script/")) &&
-                     !FindObject<UClass>(nullptr, *P.ClassPath)->HasAnyClassFlags(CLASS_Interface))))
-            {
-                Error = TEXT("Object parameter requires loaded native class path");
-                return false;
-            }
-        if (Contract.ReturnKind == EDasMethodSignature::Object &&
-            (!FindObject<UClass>(nullptr, *M.ReturnClass) ||
-             (!M.ReturnClass.StartsWith(
-                 TEXT("/Script/")) && !FindObject<UClass>(nullptr, *M.ReturnClass)->HasAnyClassFlags(CLASS_Interface))))
-        {
-            Error = TEXT("Object result requires loaded native class path");
-            return false;
-        }
-        auto ClassBase = [](const FString& Path)
-        {
-            auto* B = FindObject<UClass>(nullptr, *Path);
-            return Path.StartsWith(TEXT("/Script/")) && IsValid(B) &&
-                                   !B->HasAnyClassFlags(CLASS_Interface | CLASS_Deprecated | CLASS_NewerVersionExists);
-        };
-        for (const auto& P : M.EffectiveParameters())
-            if (P.Kind == EDasMethodSignature::Class && !ClassBase(P.ClassPath))
-            {
-                Error = TEXT("Class parameter requires a loaded native base class");
-                return false;
-            }
-        if (Contract.ReturnKind == EDasMethodSignature::Class && !ClassBase(M.ReturnClass))
-        {
-            Error = TEXT("Class result requires a loaded native base class");
-            return false;
-        }
-        for (const auto& P : M.EffectiveParameters())
-            if (P.Kind == EDasMethodSignature::Struct && !ValidateDasValueStruct(P.ClassPath, Error))
-                return false;
-        if (Contract.ReturnKind == EDasMethodSignature::Struct && !ValidateDasValueStruct(M.ReturnClass, Error))
+        if (!ValidateDasLoweredSignatureType(Contract.ReturnKind, M.ReturnClass, EDasTypeUse::AuthoredReturn, Error))
             return false;
         for (const auto& P : M.EffectiveParameters())
-            if (P.Kind == EDasMethodSignature::Enum && !ResolveDasEnum(P.ClassPath, Error))
+            if (!ValidateDasLoweredSignatureType(P.Kind, P.ClassPath,
+                                                 P.Direction == TEXT("in") ? EDasTypeUse::AuthoredInput
+                                                                           : P.Direction ==
+                                                                                 TEXT("out") ? EDasTypeUse::AuthoredOut
+                                                                                             : EDasTypeUse::AuthoredRef,
+                                                                                      Error))
                 return false;
-        if (Contract.ReturnKind == EDasMethodSignature::Enum && !ResolveDasEnum(M.ReturnClass, Error))
-            return false;
-        if (Contract.ReturnKind == EDasMethodSignature::Delegate)
-        {
-            TStrongObjectPtr<UFunction> Sig(MakeDasSingleDelegateSignature(M.ReturnClass, Error));
-            if (!Sig)
-                return false;
-        }
-        for (const auto& P : M.EffectiveParameters())
-            if (P.Kind == EDasMethodSignature::Delegate)
-            {
-                if (P.Direction != TEXT("in"))
-                {
-                    Error = TEXT("Delegate-valued ref/out parameters are unsupported");
-                    return false;
-                }
-                TStrongObjectPtr<UFunction> Sig(MakeDasSingleDelegateSignature(P.ClassPath, Error));
-                if (!Sig)
-                    return false;
-            }
         if (!ValidMeta(M.Metadata, true))
             return false;
         Names.Add(M.Name);

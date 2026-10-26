@@ -3,7 +3,7 @@ Import-Module (Join-Path $PSScriptRoot 'DasTest.psm1') -Force
 
 $ErrorActionPreference='Stop';$Repo=Split-Path -Parent $PSScriptRoot
 $Python='C:/Python312/python.exe';$Project="$Repo/Tests/DasForUESmoke/DasForUESmoke.uproject"
-& $Python "$PSScriptRoot/TestGeometryGenerator.py";if($LASTEXITCODE){throw 'Geometry generator tests failed'}
+Invoke-DasPythonTests -Python $Python -Path "$PSScriptRoot/TestGeometryGenerator.py";if($LASTEXITCODE){throw 'Geometry generator tests failed'}
 if(!$SkipBuild){Invoke-DasBuild (Get-DasContext -Engine $Engine) -BuildArguments @(
     'DasForUESmokeEditor', 'Win64', 'Development', "-Project=$Project", '-WaitMutex', '-NoXGE',
     '-MaxParallelActions=8', "-Log=$Repo/logs/geometry-build.log") *> "$Repo/logs/geometry-build-stdout.log";if($LASTEXITCODE){throw 'Geometry build failed'}}

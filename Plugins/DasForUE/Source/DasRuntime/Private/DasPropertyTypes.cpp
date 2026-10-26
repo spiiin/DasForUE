@@ -1,22 +1,12 @@
 #include "DasPropertyTypes.h"
 #include "DasTypeAdapters.h"
 #include "DasSoftReferences.h"
-#include "DasDefinedEnum.h"
 #include "UObject/UnrealType.h"
 #include "UObject/StrProperty.h"
 #include "UObject/TextProperty.h"
 
 namespace
 {
-bool HashKey(EDasTypeKind K)
-{
-    return K == EDasTypeKind::Int || K == EDasTypeKind::Byte || K == EDasTypeKind::String || K == EDasTypeKind::Name ||
-           K == EDasTypeKind::Enum || K == EDasTypeKind::Object;
-}
-bool Container(EDasTypeKind K)
-{
-    return K == EDasTypeKind::Array || K == EDasTypeKind::Set || K == EDasTypeKind::Map;
-}
 bool Validate(const FDasDeclaredType& T, EDasPropertyUsage Usage, FString& Error, int32 Depth, int32& Nodes)
 {
     auto Fail = [&](const TCHAR* Why)
@@ -27,9 +17,7 @@ bool Validate(const FDasDeclaredType& T, EDasPropertyUsage Usage, FString& Error
     if (Depth > 16 || ++Nodes > 1024)
         return Fail(TEXT("Property type exceeds depth/node limit"));
     const auto K = T.GetKind();
-    if (T.WeakReference &&
-        (K != EDasTypeKind::Object || (FindObject<UClass>(nullptr, *T.TypePath) &&
-                                       FindObject<UClass>(nullptr, *T.TypePath)->HasAnyClassFlags(CLASS_Interface))))
+    if (T.WeakReference && K != EDasTypeKind::Object)
         return Fail(TEXT("Weak storage requires a concrete object class"));
     if (K == EDasTypeKind::Invalid || K == EDasTypeKind::Void || K == EDasTypeKind::Delegate ||
         K == EDasTypeKind::Event)
@@ -40,56 +28,36 @@ bool Validate(const FDasDeclaredType& T, EDasPropertyUsage Usage, FString& Error
         return Fail(TEXT("Authored object identity on a non-object type"));
     if (!T.DelegateWire.IsEmpty())
         return Fail(TEXT("Unexpected delegate signature"));
-    if (Container(K))
+    const auto* Adapter = FDasTypeAdapters::Get().Find(T);
+    // The kind adapter remains available for malformed identities so shape errors stay explicit.
+    const auto* ShapeAdapter = Adapter ? Adapter : FDasTypeAdapters::Get().FindKind(K);
+    const auto Slots = ShapeAdapter ? ShapeAdapter->GetContainerSlots() : TConstArrayView<FDasContainerSlot>();
+    if (!Slots.IsEmpty())
     {
-        if ((T.Element && T.Element->WeakReference) || (T.Key && T.Key->WeakReference) ||
-            (T.Value && T.Value->WeakReference))
-            return Fail(TEXT("Direct weak-reference containers need a storage-preserving carrier"));
         if (!T.TypePath.IsEmpty())
             return Fail(TEXT("Container type_path must be empty"));
-        if (K == EDasTypeKind::Map)
+        const int32 Present = int32(bool(T.Element)) + int32(bool(T.Key)) + int32(bool(T.Value));
+        if (Present != Slots.Num())
+            return Fail(TEXT("Unsupported container shape"));
+        for (const auto& Slot : Slots)
         {
-            if (!T.Key || !T.Value || T.Element || !HashKey(T.Key->GetKind()) || Container(T.Value->GetKind()) ||
-                T.Value->GetKind() == EDasTypeKind::Class)
-                return Fail(TEXT("Unsupported map shape"));
-            if (!Validate(*T.Key, Usage, Error, Depth + 1, Nodes) ||
-                !Validate(*T.Value, Usage, Error, Depth + 1, Nodes))
+            const auto& Child = T.*Slot.Descriptor;
+            if (!Child)
+                return Fail(TEXT("Missing container child"));
+            if (Child->WeakReference)
+                return Fail(TEXT("Direct weak-reference containers need a storage-preserving carrier"));
+            const auto* ChildAdapter = FDasTypeAdapters::Get().Find(*Child);
+            if (ChildAdapter && !ChildAdapter->SupportsContainerValue())
+                return Fail(TEXT("Unsupported container child type"));
+            if (!Validate(*Child, Usage, Error, Depth + 1, Nodes))
                 return false;
-            if (T.Key->GetKind() == EDasTypeKind::Object)
-            {
-                auto* C = FindObject<UClass>(nullptr, *T.Key->TypePath);
-                if (C->HasAnyClassFlags(CLASS_Interface))
-                    return Fail(TEXT("Interface object keys are unsupported"));
-            }
-        }
-        else
-        {
-            if (!T.Element || T.Key || T.Value || Container(T.Element->GetKind()) ||
-                T.Element->GetKind() == EDasTypeKind::Class ||
-                (K == EDasTypeKind::Set && !HashKey(T.Element->GetKind())))
-                return Fail(TEXT("Unsupported element shape"));
-            if (!Validate(*T.Element, Usage, Error, Depth + 1, Nodes))
-                return false;
-            if (K == EDasTypeKind::Set && T.Element->GetKind() == EDasTypeKind::Object)
-            {
-                auto* C = FindObject<UClass>(nullptr, *T.Element->TypePath);
-                if (C->HasAnyClassFlags(CLASS_Interface))
-                    return Fail(TEXT("Interface object sets are unsupported"));
-            }
+            if (Slot.bHashKey && (!ChildAdapter || !ChildAdapter->CanBeContainerKey(*Child)))
+                return Fail(TEXT("Unsupported container hash key"));
         }
         return true;
     }
     if (T.Element || T.Key || T.Value)
         return Fail(TEXT("Leaf has container members"));
-    if (K == EDasTypeKind::Object || K == EDasTypeKind::Class)
-    {
-        auto* C = FindObject<UClass>(nullptr, *T.TypePath);
-        if (!C || (K == EDasTypeKind::Class && C->HasAnyClassFlags(CLASS_Interface)))
-            return Fail(TEXT("Missing or incompatible loaded class"));
-        if (Usage == EDasPropertyUsage::Container && !T.TypePath.StartsWith(TEXT("/Script/")))
-            return Fail(TEXT("Container references require native classes"));
-        return true;
-    }
     if (K == EDasTypeKind::Struct)
     {
         auto* S = FindObject<UScriptStruct>(nullptr, *T.TypePath);
@@ -97,21 +65,13 @@ bool Validate(const FDasDeclaredType& T, EDasPropertyUsage Usage, FString& Error
             return Fail(TEXT("Missing loaded struct"));
         return Usage != EDasPropertyUsage::Container || ValidateDasValueStruct(T.TypePath, Error);
     }
-    if (K == EDasTypeKind::Enum)
-    {
-        auto* E = FindObject<UEnum>(nullptr, *T.TypePath);
-        if (!E)
-            return Fail(TEXT("Missing loaded enum"));
-        for (int32 I = 0; I < E->NumEnums(); ++I)
+    if (Adapter)
+        if (const auto Result = Adapter->ValidateDeclared(T, Usage, Error); Result.IsSet())
         {
-            if (E->GetNameStringByIndex(I).EndsWith(TEXT("_MAX")))
-                continue;
-            const auto N = E->GetValueByIndex(I);
-            if (N < 0 || N > 254)
-                return Fail(TEXT("Enum property requires values in 0..254"));
+            if (!Result.GetValue())
+                Error += TEXT(": ") + T.Kind + TEXT(" ") + T.TypePath;
+            return Result.GetValue();
         }
-        return true;
-    }
     return T.TypePath.IsEmpty() ? true : Fail(TEXT("Primitive has a type identity"));
 }
 bool Describe(const FProperty* P, FDasDeclaredType& Out, FString& Error, int32 Depth, int32& Nodes)
@@ -127,7 +87,6 @@ bool Describe(const FProperty* P, FDasDeclaredType& Out, FString& Error, int32 D
         return false;
     }
     Out = {};
-    Out.WeakReference = CastField<FWeakObjectProperty>(P) != nullptr;
     const auto K = DasPropertyKind(P);
     Out.Kind = DasTypeKindName(K);
     if (K == EDasTypeKind::Invalid)
@@ -135,49 +94,28 @@ bool Describe(const FProperty* P, FDasDeclaredType& Out, FString& Error, int32 D
         Error = TEXT("Unsupported reflected property: ")+ P->GetClass()->GetName();
         return false;
     }
-    if (auto* A = CastField<FArrayProperty>(P))
+    if (const auto* Adapter = FDasTypeAdapters::Get().FindProperty(P))
     {
-        auto Child = MakeShared<FDasDeclaredType>();
-        Out.Element = Child;
-        return Describe(A->Inner, *Child, Error, Depth + 1, Nodes);
-    }
-    if (auto* S = CastField<FSetProperty>(P))
-    {
-        auto Child = MakeShared<FDasDeclaredType>();
-        Out.Element = Child;
-        return Describe(S->ElementProp, *Child, Error, Depth + 1, Nodes);
-    }
-    if (auto* M = CastField<FMapProperty>(P))
-    {
-        auto Key = MakeShared<FDasDeclaredType>(), Value = MakeShared<FDasDeclaredType>();
-        Out.Key = Key;
-        Out.Value = Value;
-        return Describe(M->KeyProp, *Key, Error, Depth + 1, Nodes) &&
-               Describe(M->ValueProp, *Value, Error, Depth + 1, Nodes);
-    }
-    if (auto* E = CastField<FEnumProperty>(P))
-    {
-        if (!E->GetUnderlyingProperty() || !E->GetUnderlyingProperty()->IsA<FByteProperty>())
+        const auto Slots = Adapter->GetContainerSlots();
+        if (!Slots.IsEmpty())
         {
-            Error = TEXT("Only byte-sized enum storage is supported");
-            return false;
+            for (const auto& Slot : Slots)
+            {
+                auto Child = MakeShared<FDasDeclaredType>();
+                Out.*Slot.Descriptor = Child;
+                if (!Describe(Slot.ReadProperty(P), *Child, Error, Depth + 1, Nodes))
+                    return false;
+            }
+            return true;
         }
-        Out.TypePath = E->GetEnum()->GetPathName();
-        Out.EnumStorage = EDasEnumStorage::Enum8;
     }
-    else if (auto* B = CastField<FByteProperty>(P); B && B->Enum)
-    {
-        Out.TypePath = B->Enum->GetPathName();
-        Out.EnumStorage = EDasEnumStorage::Byte;
-    }
-    else if (auto* Soft = DasSoftCarrierForProperty(P))
+    if (const auto* Adapter = FDasTypeAdapters::Get().FindProperty(P))
+        if (const auto Result = Adapter->DescribeProperty(P, Out, Error); Result.IsSet())
+            return Result.GetValue();
+    if (auto* Soft = DasSoftCarrierForProperty(P))
         Out.TypePath = Soft->GetPathName();
-    else if (auto* C = CastField<FClassProperty>(P))
-        Out.TypePath = C->MetaClass->GetPathName();
     else if (auto* S = CastField<FStructProperty>(P))
         Out.TypePath = S->Struct->GetPathName();
-    else if (auto* ReferenceClass = DasReferencePropertyClass(P))
-        Out.TypePath = ReferenceClass->GetPathName();
     if (K == EDasTypeKind::Delegate || K == EDasTypeKind::Event)
     {
         Error = TEXT("Delegate signature requires its explicit authoring contract");
@@ -191,93 +129,14 @@ FProperty* Build(FFieldVariant Owner, FName Name, const FDasDeclaredType& T, EDa
     if (const auto* Adapter = FDasTypeAdapters::Get().Find(T))
         if (FProperty* P = Adapter->MakeProperty(Owner, Name, T, Usage))
             return P;
-    switch (T.GetKind())
+    if (T.GetKind() == EDasTypeKind::Struct)
     {
-    case EDasTypeKind::Struct:
-    {
-        if (auto* Soft = DasSoftProperty(T.TypePath))
-            return CreateDasSoftProperty(Owner, Name, Soft);
         auto* P = new FStructProperty(Owner, Name);
         P->Struct = FindObject<UScriptStruct>(nullptr, *T.TypePath);
         return P;
     }
-    case EDasTypeKind::Object:
-    {
-        auto* C = FindObject<UClass>(nullptr, *T.TypePath);
-        if (T.WeakReference)
-        {
-            auto* P = new FWeakObjectProperty(Owner, Name);
-            P->PropertyClass = C;
-            return P;
-        }
-        if (C->HasAnyClassFlags(CLASS_Interface))
-        {
-            auto* P = new FInterfaceProperty(Owner, Name);
-            P->InterfaceClass = C;
-            return P;
-        }
-        auto* P = new FObjectProperty(Owner, Name);
-        P->PropertyClass = C;
-        return P;
-    }
-    case EDasTypeKind::Class:
-    {
-        auto* P = new FClassProperty(Owner, Name);
-        P->PropertyClass = UClass::StaticClass();
-        P->MetaClass = FindObject<UClass>(nullptr, *T.TypePath);
-        return P;
-    }
-    case EDasTypeKind::Enum:
-    {
-        auto* E = FindObject<UEnum>(nullptr, *T.TypePath);
-        if (DasResolvedEnumStorage(T) == EDasEnumStorage::Enum8)
-        {
-            auto* P = new FEnumProperty(Owner, Name);
-            P->SetEnum(E);
-            P->AddCppProperty(new FByteProperty(P, TEXT("UnderlyingType")));
-            return P;
-        }
-        auto* P = new FByteProperty(Owner, Name);
-        P->Enum = E;
-        return P;
-    }
-    case EDasTypeKind::Array:
-    {
-        auto* P = new FArrayProperty(Owner, Name);
-        P->Inner =
-            Build(P, Usage == EDasPropertyUsage::DelegateParameter ? TEXT("Inner"): TEXT("Values"), *T.Element, Usage);
-        return P;
-    }
-    case EDasTypeKind::Set:
-    {
-        auto* P = new FSetProperty(Owner, Name);
-        P->ElementProp = Build(P, TEXT("Element"), *T.Element, Usage);
-        P->ElementProp->SetPropertyFlags(CPF_HasGetValueTypeHash);
-        return P;
-    }
-    case EDasTypeKind::Map:
-    {
-        auto* P = new FMapProperty(Owner, Name);
-        P->KeyProp = Build(P, TEXT("Key"), *T.Key, Usage);
-        P->KeyProp->SetPropertyFlags(CPF_HasGetValueTypeHash);
-        P->ValueProp = Build(P, TEXT("Value"), *T.Value, Usage);
-        return P;
-    }
-    default:
-        return nullptr;
-    }
+    return nullptr;
 }
-}
-EDasEnumStorage DasResolvedEnumStorage(const FDasDeclaredType& Type)
-{
-    if (Type.GetKind() != EDasTypeKind::Enum)
-        return EDasEnumStorage::Automatic;
-    if (Type.EnumStorage != EDasEnumStorage::Automatic)
-        return Type.EnumStorage;
-    const auto* Enum = FindObject<UEnum>(nullptr, *Type.TypePath);
-    return Enum && !Enum->IsA<UDasDefinedEnum>() && Enum->GetCppForm() == UEnum::ECppForm::EnumClass
-               ? EDasEnumStorage::Enum8
-               : EDasEnumStorage::Byte;
 }
 FString FDasDeclaredType::StorageIdentity() const
 {
@@ -302,24 +161,10 @@ EDasTypeKind DasPropertyKind(const FProperty* P)
 {
     if (!P || P->ArrayDim != 1)
         return EDasTypeKind::Invalid;
-    if (CastField<FArrayProperty>(P))
-        return EDasTypeKind::Array;
-    if (CastField<FSetProperty>(P))
-        return EDasTypeKind::Set;
-    if (CastField<FMapProperty>(P))
-        return EDasTypeKind::Map;
-    if (auto* B = CastField<FByteProperty>(P))
-        return B->Enum ? EDasTypeKind::Enum : EDasTypeKind::Byte;
-    if (CastField<FEnumProperty>(P))
-        return EDasTypeKind::Enum;
     if (const auto* Adapter = FDasTypeAdapters::Get().FindProperty(P); Adapter && !Adapter->GetStruct())
         return Adapter->GetKind();
-    if (CastField<FClassProperty>(P))
-        return EDasTypeKind::Class;
     if (CastField<FSoftObjectProperty>(P))
         return EDasTypeKind::Struct;
-    if (DasReferencePropertyClass(P))
-        return EDasTypeKind::Object;
     if (CastField<FStructProperty>(P))
         return EDasTypeKind::Struct;
     if (CastField<FDelegateProperty>(P))

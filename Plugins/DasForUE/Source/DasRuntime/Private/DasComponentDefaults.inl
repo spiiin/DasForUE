@@ -360,23 +360,3 @@ void DSLPrepareClassDefaults(const das::StructurePtr& S, const TArray<FDSLCompon
                 DSLComputedDefaults->PendingReferences.Add(It->init);
         }
 }
-FDasDeclaredLiteral DSLReferencePropertyDefault(das::Structure::FieldDeclaration& F, bool Class)
-{
-    FDasDeclaredLiteral V;
-    V.Kind = TEXT("null");
-    if (!F.init)
-        return V;
-    auto* Call = F.init->rtti_isCall() ? static_cast<das::ExprCall*>(F.init) : nullptr;
-    if (!Call || Call->name != (Class ? "ue_class_default" : "ue_asset_default") || Call->arguments.size() != 1 ||
-        Call->arguments[0]->__rtti != das::string("ExprConstString"))
-        DSLFail(TEXT("Reference defaults require ue_class_default/ue_asset_default with a literal path"));
-    if (DSLComputedDefaults && !DSLComputedDefaults->Resolved && DSLComputedDefaults->PendingReferences.Contains(Call))
-    {
-        F.init = nullptr;
-        return V;
-    }
-    V.Kind = TEXT("string");
-    V.String = DSLText(static_cast<das::ExprConstString*>(Call->arguments[0])->text);
-    F.init = nullptr;
-    return V;
-}

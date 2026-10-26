@@ -1,11 +1,25 @@
+#if DAS_WITH_TEST_PROBES
+#include "DasNativeHashProbeComponent.h"
+#endif
 #include "Hash/CityHash.h"
 #include "UObject/FieldPath.h"
 #include "DasGameplayTags.h"
 #include "DasTypeAdapters.h"
+#include "DasTypeContracts.h"
+#include "DasOpaqueTypeAdapters.h"
+#include "DasContainerAdapters.h"
+#include "DasInterfaceContracts.h"
+#include "DasEnumAdapter.h"
+#include "DasObjectClassAdapters.h"
+#include "DasValueKinds.h"
 #include "DasUEAot.h"
+#if DAS_WITH_TEST_PROBES
 #include "DasUEAotProbe.h"
+#endif
 #include "Async/Async.h"
+#if DAS_WITH_TEST_PROBES
 #include "DasObjectFixture.h"
+#endif
 #include "DasExecutionRolePrivate.h"
 #include "DasGASAuthoring.h"
 #include "DasGASCalculations.h"
@@ -46,8 +60,12 @@
 #include "Engine/CollisionProfile.h"
 #include "GameFramework/DamageType.h"
 #include "DasCallbackTypes.h"
+#if DAS_WITH_TEST_PROBES
 #include "DasDefaultValueProbe.h"
+#endif
+#if DAS_WITH_TEST_PROBES
 #include "DasObjectFixture.h"
+#endif
 #include "Misc/EngineVersion.h"
 #include "Misc/App.h"
 #include "Misc/CommandLine.h"
@@ -57,7 +75,9 @@
 #include "Misc/CoreDelegates.h"
 #include "DasPropertyTypes.h"
 #include "DasPropertyValues.h"
+#if DAS_WITH_TEST_PROBES
 #include "DasInteropProbe.h"
+#endif
 #include "DasCallPhases.h"
 #include "DasNativeBindsRegistry.h"
 #include "DasScriptWriteTracker.h"
@@ -129,7 +149,9 @@
 #include "DasFoundationManifest.h"
 #include "DasExecutionRole.h"
 #include "DasAsyncPhysicsBridge.h"
+#if DAS_WITH_TEST_PROBES
 #include "DasExecutionGuardProbe.h"
+#endif
 #include "DasAsyncPhysicsVM.h"
 #include "DasScopedPhysicsBody.h"
 #include "DasSoftReferences.h"
@@ -140,13 +162,18 @@
 #include "DasReflectedTypes.h"
 #include "DasAuthoring.h"
 #include "DasNativeDefaults.h"
+#if DAS_WITH_TEST_PROBES
 #include "DasNativeDefaultsProbe.h"
+#endif
 #include "DasDelegateSignatures.h"
 #include "Serialization/JsonSerializer.h"
 #include "Policies/CondensedJsonPrintPolicy.h"
 #include "Dom/JsonObject.h"
 #include "Misc/EngineVersion.h"
+#include "DasActor.h"
+#if DAS_WITH_TEST_PROBES
 #include "DasProbeActor.h"
+#endif
 #include "DasScriptComponent.h"
 #include "DasIntDelegateProxy.h"
 #include "DasScriptDelegateProxy.h"
@@ -290,7 +317,7 @@ template <> struct ext_ret_to_carrier<FDasNameValue, uint64_t>
 };
 }
 MAKE_TYPE_FACTORY(UObjectHandle, FDasObjectHandle); // DasScriptValues.h
-MAKE_TYPE_FACTORY(UEClassHandle, FDasClassHandle); // DasScriptValues.h
+MAKE_TYPE_FACTORY(UEClassHandle, FDasClassHandle);  // DasScriptValues.h
 namespace das
 {
 template <> struct cast<FDasClassHandle>
@@ -338,7 +365,7 @@ template <> struct cast<FDasStructValue>
 };
 }
 // Owned numeric snapshot, not the unreflected native layout and not a context token.
-MAKE_TYPE_FACTORY(UEEventReply, FDasEventReplyValue); // DasScriptValues.h
+MAKE_TYPE_FACTORY(UEEventReply, FDasEventReplyValue);                 // DasScriptValues.h
 MAKE_TYPE_FACTORY(UEWidgetAnimationHandle, FDasWidgetAnimationValue); // DasScriptValues.h
 namespace das
 {
@@ -437,9 +464,9 @@ MAKE_TYPE_FACTORY(UEQuat, FQuat);
 MAKE_TYPE_FACTORY(UELinearColor, FLinearColor);
 MAKE_TYPE_FACTORY(UEColor, FColor);
 MAKE_TYPE_FACTORY(UETransform, FTransform);
-MAKE_TYPE_FACTORY(UETraceHit, FDasTraceHit); // DasScriptValues.h
+MAKE_TYPE_FACTORY(UETraceHit, FDasTraceHit);           // DasScriptValues.h
 MAKE_TYPE_FACTORY(UEOverlapResult, FDasOverlapResult); // DasScriptValues.h
-MAKE_TYPE_FACTORY(UCallHandle, FDasCallHandle); // DasScriptValues.h
+MAKE_TYPE_FACTORY(UCallHandle, FDasCallHandle);        // DasScriptValues.h
 
 DEFINE_LOG_CATEGORY_STATIC(LogDasRuntime, Log, All);
 
@@ -500,6 +527,8 @@ FSourceSet* AuthoredReferenceSources = nullptr;
 #include "DasRuntimeSubscriptionApi.inl"
 #include "DasRuntimeTypeAnnotations.inl"
 #include "DasTypeAdaptersBuiltin.inl"
+#include "DasMapInterop.inl"
+#include "DasTypeSupport.inl"
 #include "DasPersistentGlobals.inl"
 #include "DasCollisionNames.inl"
 #include "DasFoundationModule.inl"
@@ -570,9 +599,9 @@ TArray<FDasNativeModuleInfo> DescribeDasNativeModules()
                             PolicyClass = Class;
                             break;
                         }
-            Info.RouteNote = !U                      ? FString(TEXT("UFUNCTION not found"))
-                             : !MissingView.IsEmpty() ? MissingView
-                                                      : DasNativeRoutePolicy(U, PolicyClass);
+            Info.RouteNote = !U  ? FString(TEXT("UFUNCTION not found"))
+        : !MissingView.IsEmpty() ? MissingView
+                                 : DasNativeRoutePolicy(U, PolicyClass);
             Info.bRouted = Info.RouteNote.IsEmpty();
         };
         for (const FDasNativeFunctionDesc& F : Desc->Functions)
@@ -647,7 +676,7 @@ UObject* DasNativeAotObject(const FDasObjectHandle& Handle, UClass* Class, das::
     if (Object && !Object->IsA(Class))
     {
         DasNativeError(FString::Printf(TEXT("argument %d must be %s, got %s"), Number, *Class->GetName(),
-                                       *Object->GetClass()->GetName()));
+                                            *Object->GetClass()->GetName()));
         return nullptr;
     }
     if (!Object && Kind == EDasNativeAotObject::Receiver)
@@ -666,7 +695,7 @@ UClass* DasNativeAotClass(FDasClassHandle Handle, UClass* Base, das::Context* Co
     else if (!Class->IsChildOf(Base))
     {
         DasNativeError(FString::Printf(TEXT("argument %d must be a subclass of %s, got %s"), Number, *Base->GetName(),
-                                       *Class->GetName()));
+                                            *Class->GetName()));
         return nullptr;
     }
     return Class;
@@ -719,6 +748,10 @@ void DasRegisterBuiltinTypeAdapters(FDasTypeAdapters& Registry)
 {
     RegisterBuiltinTypeAdapters(Registry);
 }
+FString DasTypeAdapterSupportManifest()
+{
+    return BuildTypeAdapterSupportManifest();
+}
 void FDasRuntimeModule::StartupModule()
 {
     DasInstallScriptWriteTracker();
@@ -732,6 +765,8 @@ void FDasRuntimeModule::StartupModule()
     ++UEAotGeneration;
     das::Module::Initialize();
     new FUnrealFoundationModule();
+    // Prime immutable transport identities on the startup thread.
+    FDasTypeAdapters::Get();
     InputRestoreTickHandle = FWorldDelegates::OnWorldTickStart.AddLambda(
         [](UWorld* World, ELevelTick, float)
         {
@@ -867,10 +902,9 @@ void FDasRuntimeModule::StartupModule()
 
 // das.StructStats: the snapshot diagnostics so far (DasStructStatsLine).
 static FAutoConsoleCommand GDasStructStatsCommand(TEXT("das.StructStats"),
-                                                  TEXT("Logs struct snapshot counts per top-level execution"),
-                                                  FConsoleCommandDelegate::CreateLambda(
-                                                      []() { UE_LOG(LogDasRuntime, Display, TEXT("%s"),
-                                                                    *DasStructStatsLine()); }));
+    TEXT("Logs struct snapshot counts per top-level execution"),
+         FConsoleCommandDelegate::CreateLambda([]()
+                                               { UE_LOG(LogDasRuntime, Display, TEXT("%s"), *DasStructStatsLine()); }));
 void FDasRuntimeModule::ShutdownModule()
 {
     UE_LOG(LogDasRuntime, Display, TEXT("%s"), *DasStructStatsLine());
@@ -942,7 +976,12 @@ FString FDasRuntimeModule::ScriptPath(const FString& Name) const
         Cached && Now - Cached->CheckedAt < CVarScriptChangePollSeconds.GetValueOnGameThread())
         return Cached->Path;
     const FString Project = FPaths::ConvertRelativePathToFull(FPaths::ProjectContentDir() / TEXT("Das/Scripts") / Name);
-    FString Path = IFileManager::Get().FileExists(*Project) ? Project : Root / TEXT("Scripts") / Name;
+    FString Plugin = Root / TEXT("Scripts") / Name;
+#if !DAS_WITH_TEST_PROBES
+    if (Name == TEXT("ue_generated.das") || Name == TEXT("ue_native_gameplay.das"))
+        Plugin = Root / TEXT("Runtime") / Name;
+#endif
+    FString Path = IFileManager::Get().FileExists(*Project) ? Project : Plugin;
     if (bCache)
         ScriptPathCache.Add(Name, {Path, Now});
     return Path;
@@ -1107,54 +1146,9 @@ FString DasFoundationExternManifest()
     return FString::Join(Lines, TEXT("\n")) + TEXT("\n");
 }
 
-// Value kinds with their property class and daScript self/reference types, for the Python generators.
-// Foundation tests compare it with Bindings/Kinds.json.
-FString DasKindManifest()
-{
-    TMap<FString, FString> Results;
-    if (das::Module* Module = das::Module::require("ue_foundation"))
-        Module->functions.foreach (
-            [&](const das::FunctionPtr& Fn)
-            {
-                if (!Fn->result)
-                    return;
-                FString Type = UTF8_TO_TCHAR(Fn->result->describe().c_str());
-                Type.RemoveFromEnd(TEXT(" const"));
-                Type.RemoveFromStart(TEXT("ue_foundation::"));
-                Results.Add(UTF8_TO_TCHAR(Fn->name.c_str()), Type);
-            });
-    TArray<FString> Rows;
-    auto Row = [&](const TCHAR* Name, const FString& Property, bool bStructLeaf)
-    {
-        Rows.Add(FString::Printf(
-            TEXT("    {\"name\": \"%s\", \"property\": \"%s\", \"self\": \"%s\", \"reference\": \"%s\", ")
-                TEXT("\"struct_leaf\": %s}"), Name, *Property,
-                     *Results.FindRef(FString(TEXT("ue_get_self_")) + Name),
-                                      *Results.FindRef(FString(TEXT("__ue_authored_get_")) + Name),
-                                                       bStructLeaf ? TEXT("true") : TEXT("false")));
-    };
-#define DAS_KIND_MANIFEST_SCALAR(Suffix, SelfKind, RefKind) Row(TEXT(#Suffix), DasKindPropertyName<SelfKind>(), true);
-#define DAS_KIND_MANIFEST_REFERENCE(Suffix, SelfKind, RefKind)                                                         \
-    Row(TEXT(#Suffix), DasKindPropertyName<SelfKind>(), false);
-    DAS_SCALAR_ACCESSOR_KINDS(DAS_KIND_MANIFEST_SCALAR)
-    DAS_REFERENCE_ACCESSOR_KINDS(DAS_KIND_MANIFEST_REFERENCE)
-#undef DAS_KIND_MANIFEST_SCALAR
-#undef DAS_KIND_MANIFEST_REFERENCE
-    return TEXT("{\n  \"kinds\": [\n") + FString::Join(Rows, TEXT(",\n")) + TEXT("\n  ]\n}\n");
-}
-
-// Informational: cost of the guard every UE extern call runs (foundation benchmark breakdown).
-void DasSetSelfSitesEnabled(bool bEnabled)
-{
-    GDasSelfSitesEnabled = bEnabled;
-}
-double DasExternGuardBenchmarkNs(int32 Iterations)
-{
-    const double Start = FPlatformTime::Seconds();
-    for (int32 I = 0; I < Iterations; ++I)
-        GuardUEExtern();
-    return (FPlatformTime::Seconds() - Start) * 1e9 / FMath::Max(1, Iterations);
-}
+#if DAS_WITH_TEST_PROBES
+#include "DasRuntimeDiagnostics.inl"
+#endif
 
 #include "DasRuntimeModuleDispatch.inl"
 #include "DasRuntimeModuleExecution.inl"
@@ -1221,7 +1215,7 @@ bool FDasRuntimeModule::BeginPreserveContextsForReinstance(UClass* RootClass)
                 S->bReinstanceTickEnabled = A->IsActorTickEnabled();
             }
         };
-        RememberLifecycle(Cast<ADasProbeActor>(S->Owner.Get()));
+        RememberLifecycle(Cast<ADasActor>(S->Owner.Get()));
         RememberLifecycle(Cast<ADasPawn>(S->Owner.Get()));
         RememberLifecycle(Cast<ADasCharacter>(S->Owner.Get()));
         ClearSessionTimers(*S);
@@ -1249,7 +1243,7 @@ void FDasRuntimeModule::EndPreserveContextsForReinstance(const FString& Approved
                     Actor->SetActorTickEnabled(Saved->bReinstanceTickEnabled);
                 }
             };
-            RestoreLifecycle(Cast<ADasProbeActor>(Saved->Owner.Get()));
+            RestoreLifecycle(Cast<ADasActor>(Saved->Owner.Get()));
             RestoreLifecycle(Cast<ADasPawn>(Saved->Owner.Get()));
             RestoreLifecycle(Cast<ADasCharacter>(Saved->Owner.Get()));
             if (Saved->bReinstanceOwnerInScope)
@@ -1322,11 +1316,17 @@ FDasExecutionResult FDasRuntimeModule::RunLibraryFrame(const FString& Contract, 
     TGuardValue<const FString*> Scope(LibraryInvocationContract, &Contract);
     return RunNamedFramePersistent(ScriptPath(Script), Entry, Arguments, Kind, Owner, ReturnClass);
 }
+#if DAS_WITH_TEST_PROBES
 #include "DasPerformanceProbe.inl"
 #include "DasInteropProbe.inl"
+#endif
 
+#if DAS_WITH_TEST_PROBES
 #include "DasExecutionGuardProbe.inl"
+#endif
+#if DAS_WITH_TEST_PROBES
 #include "DasUEAotProbe.inl"
+#endif
 
 #include "DasAsyncPhysicsVM.inl"
 

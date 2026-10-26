@@ -4,35 +4,14 @@ TSharedPtr<FJsonValue> DSLDefaultJsonValue(const das::TypeDeclPtr& T, das::Expre
 {
     if (!E)
         DSLFail(TEXT("Missing container default value"));
-    if (DSLSoft(T))
+    if (const auto* Adapted = DSLValueAdapter(T))
+        if (auto Value = Adapted->Script->DefaultJson(T, E, Group, Module))
+            return Value;
+    if (DSLObjectKey(T))
     {
-        if (E->__rtti != das::string("ExprCallMacro"))
-            DSLFail(TEXT("Soft container defaults require ue_soft(type<SoftType>, literal_path)"));
-        auto* Call = static_cast<das::ExprCallMacro*>(E);
-        if (Call->name != "ue_soft" || Call->arguments.size() != 2 || !Call->arguments[0]->rtti_isTypeDecl() ||
-            Call->arguments[1]->__rtti != das::string("ExprConstString"))
-            DSLFail(TEXT("Soft default requires type and literal path"));
-        auto Input = DSLObjectNormalize(static_cast<das::ExprTypeDecl*>(Call->arguments[0])->typeexpr, Group, Module);
-        if (!DSLSoft(Input) || DSLSoftPath(Input) != DSLSoftPath(T))
-            DSLFail(TEXT("Soft default type differs from container element"));
-        const FString Path = DSLText(static_cast<das::ExprConstString*>(Call->arguments[1])->text);
-        FString Error;
-        if (!ValidateDasSoftPath(Path, Error))
-            DSLFail(Error);
-        return MakeShared<FJsonValueString>(Path);
-    }
-    if (DSLTypedReference(T) || DSLObjectKey(T))
-    {
-        if ((DSLTypedReference(T) && DSLAuthoredView(T)) ||
-            (DSLObjectKey(T) && !DSLKeyAnnotation(T)->AuthoredId.IsEmpty()))
+        if (!DSLKeyAnnotation(T)->AuthoredId.IsEmpty())
             DSLFail(TEXT("Container asset defaults require native reference types"));
-        auto* Call = E->rtti_isCall() ? static_cast<das::ExprCall*>(E) : nullptr;
-        if (!Call || Call->name != "ue_asset_default" || Call->arguments.size() != 1 ||
-            Call->arguments[0]->__rtti != das::string("ExprConstString"))
-            DSLFail(TEXT("Container assets require ue_asset_default(path)"));
-        auto Object = MakeShared<FJsonObject>();
-        Object->SetStringField(TEXT("asset"), DSLText(static_cast<das::ExprConstString*>(Call->arguments[0])->text));
-        return MakeShared<FJsonValueObject>(Object);
+        return DSLReferenceAssetDefault(E);
     }
     if (DSLContainer(T))
     {
@@ -79,33 +58,6 @@ TSharedPtr<FJsonValue> DSLDefaultJsonValue(const das::TypeDeclPtr& T, das::Expre
         }
         DSLFail(TEXT("Struct defaults require ue_default_text or an empty constructor"));
     }
-    if (DSLDirectEnum(T))
-    {
-        das::Structure::FieldDeclaration F;
-        F.type = T;
-        F.init = E;
-        FString Member;
-        if (E->rtti_isField())
-        {
-            auto* V = static_cast<das::ExprField*>(E);
-            if (!V->value->rtti_isVar() || static_cast<das::ExprVar*>(V->value)->name != T->enumType->name)
-                DSLFail(TEXT("Container enum default requires its declared enum"));
-            Member = DSLText(V->name);
-        }
-        else if (E->__rtti == das::string("ExprConstEnumeration"))
-        {
-            Member = DSLText(static_cast<das::ExprConstEnumeration*>(E)->text);
-            int32 Dot;
-            if (Member.FindLastChar('.', Dot))
-                Member = Member.Mid(Dot + 1);
-            int32 Colon = Member.Find(TEXT("::"), ESearchCase::CaseSensitive, ESearchDir::FromEnd);
-            if (Colon != INDEX_NONE)
-                Member = Member.Mid(Colon + 2);
-        }
-        else
-            DSLFail(TEXT("Container enum default requires a named enum member"));
-        return MakeShared<FJsonValueString>(Member);
-    }
     if (!DSLMathPath(T).IsEmpty())
     {
         // Constructors are source syntax. Lower their native math fields into the
@@ -143,22 +95,6 @@ TSharedPtr<FJsonValue> DSLDefaultJsonValue(const das::TypeDeclPtr& T, das::Expre
     {
         const auto D = DSLByteDefault(E);
         return MakeShared<FJsonValueNumber>(D.Number);
-    }
-    if (K == TEXT("text"))
-    {
-        const auto D = DSLTextDefault(E);
-        auto O = MakeShared<FJsonObject>();
-        O->SetStringField(TEXT("text"), D.String);
-        return MakeShared<FJsonValueObject>(O);
-    }
-
-    if (K == TEXT("name"))
-    {
-        auto* Call = E->rtti_isCall() ? static_cast<das::ExprCall*>(E) : nullptr;
-        if (!Call || Call->name != "ue_name_value" || Call->arguments.size() != 1 ||
-            Call->arguments[0]->__rtti != das::string("ExprConstString"))
-            DSLFail(TEXT("Container FName defaults require ue_name_value(string)"));
-        return MakeShared<FJsonValueString>(DSLText(static_cast<das::ExprConstString*>(Call->arguments[0])->text));
     }
     if (K == TEXT("string") && E->__rtti == das::string("ExprConstString"))
         return MakeShared<FJsonValueString>(DSLText(static_cast<das::ExprConstString*>(E)->text));

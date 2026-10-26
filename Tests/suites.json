@@ -1,122 +1,640 @@
 {
   "comment": "Regression suites for Scripts/RunDasTests.ps1. Suites run in this order; 'requires' pulls in prerequisites unless -NoDependencies is given (then their probe files from an earlier run are used).",
   "suites": [
-    { "name": "build", "kind": "build", "log": "combined-editor-build" },
-    { "name": "savegame-compatibility", "kind": "script", "script": "TestSaveGameCompatibility.ps1", "requires": ["build"] },
-    { "name": "savegame-compatibility-runtime", "kind": "script", "script": "TestSaveGameCompatibilityRuntime.ps1", "requires": ["build"] },
-    { "name": "dsl-diagnostics", "kind": "script", "script": "TestDSLDiagnostics.ps1", "requires": ["build"] },
-    { "name": "complete-builtins", "kind": "script", "script": "TestCompleteBuiltinTypes.ps1", "requires": ["build"] },
-    { "name": "authored-subsystems-packaged", "kind": "script", "script": "TestSubsystemsPackaged.ps1", "requires": ["build"] },
-    { "name": "authored-subsystems", "kind": "script", "script": "TestSubsystems.ps1" },
-    { "name": "authored-subsystems-pie", "kind": "automation", "test": "DasForUE.Subsystems.PIE", "log": "authored-subsystems-pie", "minimum": 1 },
-    { "name": "quat", "kind": "script", "script": "TestQuat.ps1", "requires": ["build"] },
-    { "name": "builtin-values", "kind": "script", "script": "TestBuiltinValues.ps1", "requires": ["build"] },
-    { "name": "ue-aot", "kind": "script", "script": "TestUEAot.ps1", "requires": ["build"] },
-    { "name": "gas-merge-regression", "kind": "script", "script": "TestGASMergeRegression.ps1" },
-    { "name": "gas-foundation", "kind": "script", "script": "TestGAS.ps1" },
-    { "name": "gas-authoring", "kind": "script", "script": "TestGASAuthored.ps1" },
-    { "name": "gas-scripted-hooks", "kind": "script", "script": "TestGASHooks.ps1" },
-    { "name": "gas-advanced", "kind": "script", "script": "TestGASAdvanced.ps1" },
-    { "name": "gas-targeting", "kind": "script", "script": "TestGASTargeting.ps1" },
-    { "name": "gas-ability-shipping", "kind": "script", "script": "TestGASAbilityShipping.ps1" },
-    { "name": "gas-ability-packaged", "kind": "script", "script": "TestGASAbilityPackaged.ps1" },
-    { "name": "gas-ability-pie", "kind": "automation", "test": "DasForUE.GAS.AbilityPlaygroundPIE", "log": "gas-ability-pie",
-      "minimum": 1, "rendering": true, "marker": "DAS_GAS_ABILITY_PIE_RESULT=PASS" },
-    { "name": "gas-ability-playground", "kind": "commandlet", "run": "DasGASAbilityPlayground", "log": "gas-ability-playground-runtime",
-      "marker": "DAS_GAS_ABILITY_PLAYGROUND_RESULT=PASS", "rendering": true },
-    { "name": "gas-cue-playground", "kind": "commandlet", "run": "DasGASCuePlayground", "log": "gas-cue-playground-runtime",
-      "marker": "DAS_GAS_CUE_PLAYGROUND_RESULT=PASS", "rendering": true },
-    { "name": "gas-native-generate", "kind": "script", "script": "GenerateNativeGameplay.ps1", "switches": ["Check"] },
-    { "name": "gas-native-regenerate", "kind": "script", "script": "GenerateNativeGameplay.ps1",
-      "comment": "Writes the native gameplay artifacts (gas-native-generate only checks them); run it alone, after build, not in a full run." },
-    { "name": "gas-execution", "kind": "commandlet", "run": "DasGASExecution", "log": "gas-execution-runtime",
-      "marker": "DAS_GAS_EXECUTION_RESULT=PASS" },
-    { "name": "gas-cue-hooks", "kind": "commandlet", "run": "DasGASCueHooks", "log": "gas-cue-hooks-runtime",
-      "marker": "DAS_GAS_CUE_HOOKS_RESULT=PASS" },
-    { "name": "gas-cue-assets", "kind": "commandlet", "run": "DasGASCueAssets", "log": "gas-cue-assets-runtime",
-      "marker": "DAS_GAS_CUE_ASSETS_RESULT=PASS" },
-    { "name": "gas-cues", "kind": "commandlet", "run": "DasGASCues", "log": "gas-cues-runtime",
-      "marker": "DAS_GAS_CUES_RESULT=PASS" },
-    { "name": "python", "kind": "python", "log": "combined-python-tests" },
-    { "name": "foundation", "kind": "commandlet", "run": "DasSmoke", "log": "combined-editor-foundation",
-      "marker": "DAS_FOUNDATION_RESULT=PASS failures=0" },
-    { "name": "components-prepare", "kind": "automation", "test": "DasForUE.Components.DynamicPIE",
-      "log": "combined-components-prepare", "minimum": 1,
-      "comment": "ClassReload loads assets that DynamicPIE saves in an earlier process." },
-    { "name": "method-values", "kind": "phases", "run": "DasMethodValues", "log": "combined-method-values",
-      "marker": "DAS_METHOD_VALUES_RESULT=PASS", "phases": ["Create", "Reopen"],
-      "probe": "combined-method-values-probe-id.txt" },
-    { "name": "automation", "kind": "automation", "test": "DasForUE", "log": "combined-all-automation", "minimum": 37,
-      "requires": ["components-prepare", "method-values"], "probeArgs": { "DasMethodValuesProbeId": "method-values" } },
-    { "name": "automation-quick", "kind": "automation", "log": "quick-automation", "minimum": 36,
+    {
+      "kind": "build",
+      "log": "combined-editor-build",
+      "name": "build"
+    },
+    {
+      "name": "actor-host",
+      "kind": "automation",
+      "test": "DasForUE.Hosts.ActorIsolation",
+      "log": "actor-host-isolation",
+      "minimum": 1
+    },
+    {
+      "name": "runtime-isolation-packaged",
+      "kind": "script",
+      "script": "TestRuntimeIsolationPackaged.ps1"
+    },
+    {
+      "name": "runtime-isolation",
+      "kind": "script",
+      "script": "TestRuntimeIsolation.ps1",
+      "comment": "Build ordinary game without test probes and inspect UHT/build inputs."
+    },
+    {
+      "name": "probe-game-build",
+      "kind": "script",
+      "script": "TestProbeGameBuild.ps1",
+      "comment": "Non-editor smoke game links test probes through explicit opt-in."
+    },
+    {
+      "name": "script-staging",
+      "kind": "script",
+      "script": "TestScriptStaging.ps1",
+      "requires": [
+        "build"
+      ],
+      "comment": "Actual C# selector, dependencies and UBT receipt."
+    },
+    {
+      "name": "savegame-compatibility",
+      "kind": "script",
+      "script": "TestSaveGameCompatibility.ps1",
+      "requires": [
+        "build"
+      ]
+    },
+    {
+      "name": "savegame-compatibility-runtime",
+      "kind": "script",
+      "script": "TestSaveGameCompatibilityRuntime.ps1",
+      "requires": [
+        "build"
+      ]
+    },
+    {
+      "name": "dsl-diagnostics",
+      "kind": "script",
+      "script": "TestDSLDiagnostics.ps1",
+      "requires": [
+        "build"
+      ]
+    },
+    {
+      "name": "complete-builtins",
+      "kind": "script",
+      "script": "TestCompleteBuiltinTypes.ps1",
+      "requires": [
+        "build"
+      ]
+    },
+    {
+      "name": "authored-subsystems-packaged",
+      "kind": "script",
+      "script": "TestSubsystemsPackaged.ps1",
+      "requires": [
+        "build"
+      ]
+    },
+    {
+      "name": "authored-subsystems",
+      "kind": "script",
+      "script": "TestSubsystems.ps1"
+    },
+    {
+      "name": "authored-subsystems-pie",
+      "kind": "automation",
+      "test": "DasForUE.Subsystems.PIE",
+      "log": "authored-subsystems-pie",
+      "minimum": 1
+    },
+    {
+      "name": "quat",
+      "kind": "script",
+      "script": "TestQuat.ps1",
+      "requires": [
+        "build"
+      ]
+    },
+    {
+      "name": "builtin-values",
+      "kind": "script",
+      "script": "TestBuiltinValues.ps1",
+      "requires": [
+        "build"
+      ]
+    },
+    {
+      "requires": [
+        "build"
+      ],
+      "kind": "script",
+      "name": "ue-aot",
+      "script": "TestUEAot.ps1"
+    },
+    {
+      "kind": "script",
+      "name": "gas-merge-regression",
+      "script": "TestGASMergeRegression.ps1"
+    },
+    {
+      "kind": "script",
+      "name": "gas-foundation",
+      "script": "TestGAS.ps1"
+    },
+    {
+      "kind": "script",
+      "name": "gas-authoring",
+      "script": "TestGASAuthored.ps1"
+    },
+    {
+      "kind": "script",
+      "name": "gas-scripted-hooks",
+      "script": "TestGASHooks.ps1"
+    },
+    {
+      "kind": "script",
+      "name": "gas-advanced",
+      "script": "TestGASAdvanced.ps1"
+    },
+    {
+      "kind": "script",
+      "name": "gas-targeting",
+      "script": "TestGASTargeting.ps1"
+    },
+    {
+      "kind": "script",
+      "name": "gas-ability-shipping",
+      "script": "TestGASAbilityShipping.ps1"
+    },
+    {
+      "kind": "script",
+      "name": "gas-ability-packaged",
+      "script": "TestGASAbilityPackaged.ps1"
+    },
+    {
+      "kind": "automation",
+      "name": "gas-ability-pie",
+      "marker": "DAS_GAS_ABILITY_PIE_RESULT=PASS",
+      "minimum": 1,
+      "rendering": true,
+      "log": "gas-ability-pie",
+      "test": "DasForUE.GAS.AbilityPlaygroundPIE"
+    },
+    {
+      "kind": "commandlet",
+      "run": "DasGASAbilityPlayground",
+      "name": "gas-ability-playground",
+      "marker": "DAS_GAS_ABILITY_PLAYGROUND_RESULT=PASS",
+      "rendering": true,
+      "log": "gas-ability-playground-runtime"
+    },
+    {
+      "kind": "commandlet",
+      "run": "DasGASCuePlayground",
+      "name": "gas-cue-playground",
+      "marker": "DAS_GAS_CUE_PLAYGROUND_RESULT=PASS",
+      "rendering": true,
+      "log": "gas-cue-playground-runtime"
+    },
+    {
+      "kind": "script",
+      "switches": [
+        "Check"
+      ],
+      "name": "gas-native-generate",
+      "script": "GenerateNativeGameplay.ps1"
+    },
+    {
+      "name": "gas-native-regenerate",
+      "kind": "script",
+      "script": "GenerateNativeGameplay.ps1",
+      "comment": "Writes the native gameplay artifacts (gas-native-generate only checks them); run it alone, after build, not in a full run."
+    },
+    {
+      "kind": "commandlet",
+      "run": "DasGASExecution",
+      "name": "gas-execution",
+      "marker": "DAS_GAS_EXECUTION_RESULT=PASS",
+      "log": "gas-execution-runtime"
+    },
+    {
+      "kind": "commandlet",
+      "run": "DasGASCueHooks",
+      "name": "gas-cue-hooks",
+      "marker": "DAS_GAS_CUE_HOOKS_RESULT=PASS",
+      "log": "gas-cue-hooks-runtime"
+    },
+    {
+      "kind": "commandlet",
+      "run": "DasGASCueAssets",
+      "name": "gas-cue-assets",
+      "marker": "DAS_GAS_CUE_ASSETS_RESULT=PASS",
+      "log": "gas-cue-assets-runtime"
+    },
+    {
+      "kind": "commandlet",
+      "run": "DasGASCues",
+      "name": "gas-cues",
+      "marker": "DAS_GAS_CUES_RESULT=PASS",
+      "log": "gas-cues-runtime"
+    },
+    {
+      "name": "adapter-geometry",
+      "kind": "script",
+      "script": "TestGeometry.ps1",
+      "requires": [
+        "build"
+      ]
+    },
+    {
+      "name": "adapter-input-events",
+      "kind": "script",
+      "script": "TestInputEvents.ps1",
+      "requires": [
+        "build"
+      ]
+    },
+    {
+      "name": "adapter-event-reply",
+      "kind": "script",
+      "script": "TestEventReply.ps1",
+      "requires": [
+        "build"
+      ]
+    },
+    {
+      "name": "adapter-paint",
+      "kind": "script",
+      "script": "TestPaint.ps1",
+      "requires": [
+        "build"
+      ]
+    },
+    {
+      "name": "adapter-widget-animation",
+      "kind": "script",
+      "script": "TestWidgetAnimation.ps1",
+      "requires": [
+        "build"
+      ]
+    },
+    {
+      "name": "adapter-constraints",
+      "kind": "script",
+      "script": "TestConstraintTransport.ps1",
+      "requires": [
+        "build"
+      ]
+    },
+    {
+      "name": "adapter-collision",
+      "kind": "script",
+      "script": "TestCollisionFoundation.ps1",
+      "requires": [
+        "build"
+      ]
+    },
+    {
+      "name": "adapter-widget-events",
+      "kind": "script",
+      "script": "TestWidgetEvents.ps1",
+      "requires": [
+        "build"
+      ]
+    },
+    {
+      "name": "adapter-input-navigation",
+      "kind": "script",
+      "script": "TestInputNavigation.ps1",
+      "requires": [
+        "build"
+      ]
+    },
+    {
+      "name": "type-support-export",
+      "kind": "script",
+      "script": "ExportTypeSupport.ps1",
+      "requires": [
+        "build"
+      ]
+    },
+    {
+      "name": "type-support",
+      "kind": "script",
+      "script": "TestTypeSupport.ps1",
+      "requires": [
+        "type-support-export"
+      ]
+    },
+    {
+      "kind": "python",
+      "log": "combined-python-tests",
+      "name": "python"
+    },
+    {
+      "name": "interface-contracts",
+      "kind": "script",
+      "script": "TestInterfaceContracts.ps1"
+    },
+    {
+      "kind": "commandlet",
+      "run": "DasSmoke",
+      "name": "foundation",
+      "marker": "DAS_FOUNDATION_RESULT=PASS failures=0",
+      "log": "combined-editor-foundation"
+    },
+    {
+      "comment": "ClassReload loads assets that DynamicPIE saves in an earlier process.",
+      "kind": "automation",
+      "name": "components-prepare",
+      "minimum": 1,
+      "log": "combined-components-prepare",
+      "test": "DasForUE.Components.DynamicPIE"
+    },
+    {
+      "kind": "phases",
+      "run": "DasMethodValues",
+      "name": "method-values",
+      "marker": "DAS_METHOD_VALUES_RESULT=PASS",
+      "log": "combined-method-values",
+      "phases": [
+        "Create",
+        "Reopen"
+      ],
+      "probe": "combined-method-values-probe-id.txt"
+    },
+    {
+      "name": "actor-host-regression",
+      "kind": "automation",
+      "test": "DasForUE.Hosts.ActorIsolation+DasForUE.Actors.SpawnPIE+DasForUE.Gameplay.RuntimePIE+DasForUE.MethodValues.PIE",
+      "log": "actor-host-regression",
+      "minimum": 4,
+      "requires": [
+        "method-values"
+      ],
+      "probeArgs": {
+        "DasMethodValuesProbeId": "method-values"
+      }
+    },
+    {
+      "kind": "automation",
+      "name": "automation",
+      "minimum": 37,
+      "log": "combined-all-automation",
+      "probeArgs": {
+        "DasMethodValuesProbeId": "method-values"
+      },
+      "test": "DasForUE",
+      "requires": [
+        "components-prepare",
+        "method-values"
+      ]
+    },
+    {
       "comment": "Every DasForUE automation group except MethodValues.PIE, which needs the method-values assets.",
+      "kind": "automation",
+      "name": "automation-quick",
+      "minimum": 36,
+      "log": "quick-automation",
       "test": "DasForUE.ActorComponent+DasForUE.Actors+DasForUE.Callbacks+DasForUE.Components+DasForUE.Defaults+DasForUE.Delegates+DasForUE.DSL+DasForUE.FunctionLibraries+DasForUE.Gameplay+DasForUE.Lifecycle+DasForUE.MethodDispatch+DasForUE.Objects+DasForUE.Reload+DasForUE.SoftReferences+DasForUE.Types",
-      "requires": ["components-prepare"] },
-    { "name": "native-binds", "kind": "automation", "test": "DasForUE.NativeBinds+DasForUE.NativeTime+DasForUE.NativeEngine+DasForUE.NativeMath+DasForUE.NativeRoutes+DasForUE.NativeBindsExample+DasForUE.ScriptFunction",
-      "log": "native-binds-automation", "minimum": 7, "comment": "Native binds and the plugin native modules (DasNativeBinds.h): the automation tests alone." },
-    { "name": "native-binds-manifest", "kind": "commandlet", "run": "DasNativeBindsManifest", "log": "native-binds-manifest",
-      "marker": "DAS_NATIVE_BINDS_MANIFEST=PASS", "comment": "logs/native-binds-manifest.json for Scripts/NativeBindsCoverage.py; also tries AOT generation of a script with native calls." },
-    { "name": "actor-component", "kind": "automation", "test": "DasForUE.ActorComponent", "log": "actor-component-automation",
-      "minimum": 3, "comment": "Composed actors: PIE lifecycle and declaration reimport in the editor and during PIE." },
-    { "name": "actor-component-assets", "kind": "script", "script": "TestActorComponent.ps1",
-      "comment": "DasActorComponent commandlet: composition import checks, saved assets, Create and Reopen phases." },
-    { "name": "reload-matrix", "kind": "automation", "test": "DasForUE.ReloadMatrix", "log": "reload-matrix",
-      "minimum": 4, "comment": "Every declaration change of every entity kind, editor and PIE, against Tests/ReloadMatrix/expected.json." },
-    { "name": "gameplay-pie", "kind": "automation", "test": "DasForUE.Gameplay.RuntimePIE", "log": "gameplay-pie",
-      "minimum": 1, "comment": "Playable character, native references and their informational benchmark." },
-    { "name": "performance", "kind": "script", "script": "TestPerformance.ps1",
-      "comment": "Informational benchmark (DasPerformance commandlet); writes logs/performance-editor.json." },
-    { "name": "interop-performance", "kind": "script", "script": "TestInteropPerformance.ps1",
-      "comment": "Informational call-cost benchmark C++ <-> daScript, AOT vs interpreter; writes logs/interop-performance-editor.json." },
-    { "name": "ai", "kind": "script", "script": "TestAI.ps1",
-      "comment": "AI enemy in an editor -game process: navmesh pursuit, move requests, script reload during requests." },
-    { "name": "effects", "kind": "script", "script": "TestEffects.ps1",
-      "comment": "Niagara/sound effects in an editor -game process, including script reload." },
-    { "name": "montage", "kind": "script", "script": "TestMontage.ps1",
-      "comment": "Animation montages in an editor -game process, including script reload." },
-    { "name": "native-defaults", "kind": "script", "script": "TestNativeDefaults.ps1",
-      "probe": "native-defaults-probe-id.txt" },
-    { "name": "defaults-merge", "kind": "script", "script": "TestDefaultsMerge.ps1",
-      "comment": "PreserveOverrides merge: Create, Reopen, Recompile, Unopened phases (packaged run only with -Package)." },
-    { "name": "computed-defaults", "kind": "script", "script": "TestComputedDefaults.ps1",
-      "probe": "computed-defaults-probe-id.txt" },
-    { "name": "gameplay-tags", "kind": "script", "script": "TestGameplayTags.ps1",
-      "comment": "GameplayTag fields, map values, VM values and the dictionary checks behind the tag adapter." },
-    { "name": "execution-roles", "kind": "script", "script": "TestExecutionRoles.ps1",
-      "comment": "PhysicsPreSim role and frozen game-thread extern guard, sync and fixed-async." },
-    { "name": "dsl-enum-names", "kind": "script", "script": "TestEnumNames.ps1" },
-    { "name": "dsl-operation-keys", "kind": "script", "script": "TestOperationKeys.ps1" },
-    { "name": "delegate-values", "kind": "phases", "run": "DasDelegate", "log": "handler-delegate-values",
-      "marker": "DAS_AUTHORED_DELEGATES_RESULT=PASS", "phases": ["Create", "Reopen"],
-      "probe": "handler-delegate-values-probe-id.txt" },
-    { "name": "dsl-inherited-handlers", "kind": "script", "script": "TestInheritedHandlers.ps1" },
-    { "name": "dsl-hidden-callbacks", "kind": "script", "script": "TestHiddenCallbacks.ps1" },
-    { "name": "dsl-handler-references", "kind": "script", "script": "TestHandlerReferences.ps1" },
-    { "name": "dsl-event-checks", "kind": "script", "script": "TestEventChecks.ps1" },
-    { "name": "dsl-inline-callbacks", "kind": "script", "script": "TestInlineCallbacks.ps1" },
-    {"name": "dsl-widget-layouts", "kind": "script", "script": "TestWidgetLayouts.ps1"},
-    {"name": "dsl-reflection-macros", "kind": "script", "script": "TestReflectionMacros.ps1"},
-    {"name": "dsl-identity", "kind": "script", "script": "TestIdentityDSL.ps1"},
-    { "name": "packaged", "kind": "packaged", "log": "combined-export",
-      "requires": ["method-values", "native-defaults", "computed-defaults"],
+      "requires": [
+        "components-prepare"
+      ]
+    },
+    {
+      "name": "native-binds",
+      "kind": "automation",
+      "test": "DasForUE.NativeBinds+DasForUE.NativeTime+DasForUE.NativeEngine+DasForUE.NativeMath+DasForUE.NativeRoutes+DasForUE.NativeBindsExample+DasForUE.ScriptFunction",
+      "log": "native-binds-automation",
+      "minimum": 7,
+      "comment": "Native binds and the plugin native modules (DasNativeBinds.h): the automation tests alone."
+    },
+    {
+      "name": "native-binds-manifest",
+      "kind": "commandlet",
+      "run": "DasNativeBindsManifest",
+      "log": "native-binds-manifest",
+      "marker": "DAS_NATIVE_BINDS_MANIFEST=PASS",
+      "comment": "logs/native-binds-manifest.json for Scripts/NativeBindsCoverage.py; also tries AOT generation of a script with native calls."
+    },
+    {
+      "comment": "Composed actors: PIE lifecycle and declaration reimport in the editor and during PIE.",
+      "kind": "automation",
+      "name": "actor-component",
+      "minimum": 3,
+      "log": "actor-component-automation",
+      "test": "DasForUE.ActorComponent"
+    },
+    {
+      "comment": "DasActorComponent commandlet: composition import checks, saved assets, Create and Reopen phases.",
+      "kind": "script",
+      "name": "actor-component-assets",
+      "script": "TestActorComponent.ps1"
+    },
+    {
+      "comment": "Every declaration change of every entity kind, editor and PIE, against Tests/ReloadMatrix/expected.json.",
+      "kind": "automation",
+      "name": "reload-matrix",
+      "minimum": 4,
+      "log": "reload-matrix",
+      "test": "DasForUE.ReloadMatrix"
+    },
+    {
+      "comment": "Playable character, native references and their informational benchmark.",
+      "kind": "automation",
+      "name": "gameplay-pie",
+      "minimum": 1,
+      "log": "gameplay-pie",
+      "test": "DasForUE.Gameplay.RuntimePIE"
+    },
+    {
+      "comment": "Informational benchmark (DasPerformance commandlet); writes logs/performance-editor.json.",
+      "kind": "script",
+      "name": "performance",
+      "script": "TestPerformance.ps1"
+    },
+    {
+      "name": "interop-performance",
+      "kind": "script",
+      "script": "TestInteropPerformance.ps1",
+      "comment": "Informational call-cost benchmark C++ <-> daScript, AOT vs interpreter; writes logs/interop-performance-editor.json."
+    },
+    {
+      "name": "ai",
+      "kind": "script",
+      "script": "TestAI.ps1",
+      "comment": "AI enemy in an editor -game process: navmesh pursuit, move requests, script reload during requests."
+    },
+    {
+      "name": "effects",
+      "kind": "script",
+      "script": "TestEffects.ps1",
+      "comment": "Niagara/sound effects in an editor -game process, including script reload."
+    },
+    {
+      "name": "montage",
+      "kind": "script",
+      "script": "TestMontage.ps1",
+      "comment": "Animation montages in an editor -game process, including script reload."
+    },
+    {
+      "kind": "script",
+      "probe": "native-defaults-probe-id.txt",
+      "name": "native-defaults",
+      "script": "TestNativeDefaults.ps1"
+    },
+    {
+      "comment": "PreserveOverrides merge: Create, Reopen, Recompile, Unopened phases (packaged run only with -Package).",
+      "kind": "script",
+      "name": "defaults-merge",
+      "script": "TestDefaultsMerge.ps1"
+    },
+    {
+      "kind": "script",
+      "probe": "computed-defaults-probe-id.txt",
+      "name": "computed-defaults",
+      "script": "TestComputedDefaults.ps1"
+    },
+    {
+      "comment": "GameplayTag fields, map values, VM values and the dictionary checks behind the tag adapter.",
+      "kind": "script",
+      "name": "gameplay-tags",
+      "script": "TestGameplayTags.ps1"
+    },
+    {
+      "comment": "PhysicsPreSim role and frozen game-thread extern guard, sync and fixed-async.",
+      "kind": "script",
+      "name": "execution-roles",
+      "script": "TestExecutionRoles.ps1"
+    },
+    {
+      "kind": "script",
+      "name": "dsl-enum-names",
+      "script": "TestEnumNames.ps1"
+    },
+    {
+      "kind": "script",
+      "name": "dsl-operation-keys",
+      "script": "TestOperationKeys.ps1"
+    },
+    {
+      "kind": "phases",
+      "run": "DasDelegate",
+      "name": "delegate-values",
+      "marker": "DAS_AUTHORED_DELEGATES_RESULT=PASS",
+      "log": "handler-delegate-values",
+      "phases": [
+        "Create",
+        "Reopen"
+      ],
+      "probe": "handler-delegate-values-probe-id.txt"
+    },
+    {
+      "kind": "script",
+      "name": "dsl-inherited-handlers",
+      "script": "TestInheritedHandlers.ps1"
+    },
+    {
+      "kind": "script",
+      "name": "dsl-hidden-callbacks",
+      "script": "TestHiddenCallbacks.ps1"
+    },
+    {
+      "kind": "script",
+      "name": "dsl-handler-references",
+      "script": "TestHandlerReferences.ps1"
+    },
+    {
+      "kind": "script",
+      "name": "dsl-event-checks",
+      "script": "TestEventChecks.ps1"
+    },
+    {
+      "kind": "script",
+      "name": "dsl-inline-callbacks",
+      "script": "TestInlineCallbacks.ps1"
+    },
+    {
+      "kind": "script",
+      "name": "dsl-widget-layouts",
+      "script": "TestWidgetLayouts.ps1"
+    },
+    {
+      "kind": "script",
+      "name": "dsl-reflection-macros",
+      "script": "TestReflectionMacros.ps1"
+    },
+    {
+      "kind": "script",
+      "name": "dsl-identity",
+      "script": "TestIdentityDSL.ps1"
+    },
+    {
+      "kind": "packaged",
       "maps": [
-        { "name": "gameplay", "map": "/Game/DasCookedGameplay/{export}/Map", "switch": "-DasCookedGameplay",
-          "marker": "DAS_COOKED_GAMEPLAY_RESULT=PASS" },
-        { "name": "playable", "map": "/Game/DasCookedGameplay/{export}/PlayableMap", "switch": "-DasPlayableMap",
-          "marker": "DAS_PLAYABLE_MAP_RESULT=PASS" },
-        { "name": "native", "map": "/Game/DasNativeDefaults/{native-defaults}/Map", "switch": "-DasNativeDefaults",
-          "marker": "DAS_NATIVE_DEFAULTS_PACKAGED=PASS" },
-        { "name": "computed", "map": "/Game/DasComputedDefaults/{computed-defaults}/Map",
-          "switch": "-DasComputedDefaults", "marker": "DAS_COMPUTED_DEFAULTS_PACKAGED=PASS" },
-        { "name": "method-values", "map": "/Game/DasMethodValues/{method-values}/Map", "switch": "-DasMethodValues",
-          "marker": "DAS_METHOD_VALUES_RESULT=PASS" },
-        { "name": "native-binds", "map": "/Game/DasCookedGameplay/{export}/Map", "switch": "-DasNativeBinds",
-          "marker": "DAS_NATIVE_BINDS_RESULT=PASS" }
-      ] }
+        {
+          "map": "/Game/DasCookedGameplay/{export}/Map",
+          "switch": "-DasCookedGameplay",
+          "name": "gameplay",
+          "marker": "DAS_COOKED_GAMEPLAY_RESULT=PASS"
+        },
+        {
+          "map": "/Game/DasCookedGameplay/{export}/PlayableMap",
+          "switch": "-DasPlayableMap",
+          "name": "playable",
+          "marker": "DAS_PLAYABLE_MAP_RESULT=PASS"
+        },
+        {
+          "map": "/Game/DasNativeDefaults/{native-defaults}/Map",
+          "switch": "-DasNativeDefaults",
+          "name": "native",
+          "marker": "DAS_NATIVE_DEFAULTS_PACKAGED=PASS"
+        },
+        {
+          "map": "/Game/DasComputedDefaults/{computed-defaults}/Map",
+          "switch": "-DasComputedDefaults",
+          "name": "computed",
+          "marker": "DAS_COMPUTED_DEFAULTS_PACKAGED=PASS"
+        },
+        {
+          "map": "/Game/DasMethodValues/{method-values}/Map",
+          "switch": "-DasMethodValues",
+          "name": "method-values",
+          "marker": "DAS_METHOD_VALUES_RESULT=PASS"
+        },
+        {
+          "name": "native-binds",
+          "map": "/Game/DasCookedGameplay/{export}/Map",
+          "switch": "-DasNativeBinds",
+          "marker": "DAS_NATIVE_BINDS_RESULT=PASS"
+        }
+      ],
+      "name": "packaged",
+      "log": "combined-export",
+      "requires": [
+        "method-values",
+        "native-defaults",
+        "computed-defaults"
+      ]
+    },
+    {
+      "name": "clean-distribution",
+      "kind": "script",
+      "script": "TestCleanDistribution.ps1"
+    },
+    {
+      "name": "editor-isolation",
+      "kind": "script",
+      "script": "TestEditorIsolation.ps1",
+      "comment": "Build and launch a normal Editor without test extensions. Run last: it builds another Editor project."
+    }
   ],
   "presets": {
-    "quick": ["build", "python", "foundation", "automation-quick"],
-    "editor": ["build", "python", "foundation", "automation"],
-    "full": ["build", "python", "foundation", "automation", "packaged"]
+    "quick": [
+      "build",
+      "python",
+      "foundation",
+      "automation-quick",
+      "type-support"
+    ],
+    "editor": [
+      "build",
+      "python",
+      "foundation",
+      "automation",
+      "type-support"
+    ],
+    "full": [
+      "build",
+      "python",
+      "foundation",
+      "automation",
+      "packaged",
+      "type-support"
+    ]
   }
 }

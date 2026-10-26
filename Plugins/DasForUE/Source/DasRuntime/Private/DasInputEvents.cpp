@@ -1,3 +1,4 @@
+#include "DasTypeAdapters.h"
 #include "DasInputEvents.h"
 #include "DasExecutionRole.h"
 #include "Input/Events.h"
@@ -69,10 +70,7 @@ bool ValidateSource(const UScriptStruct* Type, const void* Data, FString& Error)
 }
 bool DasIsInputEventType(const UScriptStruct* Type)
 {
-    return Type && (Type == FInputEvent::StaticStruct() || Type == FKeyEvent::StaticStruct() ||
-                    Type == FAnalogInputEvent::StaticStruct() || Type == FCharacterEvent::StaticStruct() ||
-                    Type == FPointerEvent::StaticStruct() || Type == FNavigationEvent::StaticStruct() ||
-                    Type == FFocusEvent::StaticStruct());
+    return DasHasNativeRole(Type, EDasNativeTypeRole::InputEvent);
 }
 bool ValidateDasInputEventSnapshot(const FInstancedStruct& Value, FString& Error)
 {

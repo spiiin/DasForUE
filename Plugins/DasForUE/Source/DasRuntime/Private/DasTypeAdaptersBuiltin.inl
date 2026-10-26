@@ -7,6 +7,11 @@ template <class K> class TDasScalarTypeAdapter final : public IDasTypeAdapter
 public:
     explicit TDasScalarTypeAdapter(EDasTypeKind InKind) : Kind(InKind) {}
     virtual EDasTypeKind GetKind() const override { return Kind; }
+    bool CanBeContainerKey(const FDasDeclaredType&) const override
+    {
+        return Kind == EDasTypeKind::Int || Kind == EDasTypeKind::Byte || Kind == EDasTypeKind::String ||
+               Kind == EDasTypeKind::Name;
+    }
     virtual bool MatchesProperty(const FProperty* Property) const override
     {
         const auto* Typed = CastField<typename K::Property>(Property);
@@ -31,9 +36,19 @@ private:
 void RegisterBuiltinTypeAdapters(FDasTypeAdapters& Registry)
 {
 #define DAS_REGISTER_SCALAR_ADAPTER(Suffix, SelfKind, RefKind)                                                         \
-    Registry.Register(MakeShared<TDasScalarTypeAdapter<SelfKind>>(DasTypeKind(TEXT(#Suffix))));
+    Registry.Register(MakeShared<TDasScalarTypeAdapter<SelfKind>>(DasTypeKind(TEXT(#Suffix))),                         \
+                                                                  DasScalarScriptFacet(DasTypeKind(TEXT(#Suffix))));
     DAS_SCALAR_ACCESSOR_KINDS(DAS_REGISTER_SCALAR_ADAPTER)
 #undef DAS_REGISTER_SCALAR_ADAPTER
+    for (auto Kind : {EDasTypeKind::Array, EDasTypeKind::Set, EDasTypeKind::Map})
+        Registry.Register(MakeDasContainerAdapter(Kind));
+    static const FDasObjectClassScriptFacet ObjectScript(false), ClassScript(true);
+    Registry.Register(MakeDasObjectClassAdapter(false), &ObjectScript);
+    Registry.Register(MakeDasObjectClassAdapter(true), &ClassScript);
+    static const FDasEnumScriptFacet EnumScript;
+    Registry.Register(MakeDasEnumAdapter(), &EnumScript);
+    static const FDasSoftReferenceScriptFacet SoftScript;
+    Registry.Register(MakeDasSoftReferenceAdapter(), &SoftScript);
     static const FDasGameplayTagScriptFacet TagScript(false), TagContainerScript(true);
     Registry.Register(MakeDasGameplayTagAdapter(false), &TagScript);
     Registry.Register(MakeDasGameplayTagAdapter(true), &TagContainerScript);
@@ -63,4 +78,5 @@ void RegisterBuiltinTypeAdapters(FDasTypeAdapters& Registry)
                                                  AllMembers);
     Registry.Register(MakeDasColorAdapter(), &ColorScript);
     Registry.Register(MakeDasInputActionValueAdapter(), &InputValueScript);
+    RegisterDasOpaqueTypeAdapters(Registry);
 }

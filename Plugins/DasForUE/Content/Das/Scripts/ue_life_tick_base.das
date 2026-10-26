@@ -1,7 +1,7 @@
 options gen2
 module ue_life_tick_base public
 require ue_dsl public
-[ue_class(module_id="lifetick",parent="Actor",Blueprintable)]
+[ue_class(module_id="lifetick",parent="/Script/DasRuntime.DasProbeActor",Blueprintable)]
 class TickOnlyBase {
     @ue_property=(BlueprintReadWrite)
     BaseSignals:int=0

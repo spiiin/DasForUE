@@ -1,19 +1,55 @@
 // Part of DasDSL.inl: daScript views of adapted value types (DasTypeAdapters.h). Lowering asks these
 // helpers instead of per-type predicates; the facets themselves live next to their adapters.
-const FDasTypeAdapters::FEntry* DSLAdapted(const das::TypeDeclPtr& T)
+const FDasTypeAdapters::FEntry* DSLValueAdapter(const das::TypeDeclPtr& T)
 {
-    if (!T || T->baseType != das::Type::tStructure || !T->structType)
+    if (!T)
         return nullptr;
     for (const auto& Entry : FDasTypeAdapters::Get().Entries())
         if (Entry.Script && Entry.Script->MatchesScriptType(T))
             return &Entry;
     return nullptr;
 }
+bool DSLTypedValue(const das::TypeDeclPtr& T, EDasTypeKind Kind)
+{
+    const auto* Entry = DSLValueAdapter(T);
+    return T && T->baseType != das::Type::tHandle && Entry && Entry->Adapter->GetKind() == Kind;
+}
+bool DSLNativeValue(const das::TypeDeclPtr& T, EDasTypeKind Kind)
+{
+    const auto* Entry = DSLValueAdapter(T);
+    return Entry && Entry->Adapter->GetKind() == Kind && Entry->Script->IsNativeType(T);
+}
+const IDasScriptTypeFacet* DSLKindFacet(EDasTypeKind Kind)
+{
+    FDasDeclaredType Type;
+    Type.Kind = DasTypeKindName(Kind);
+    const auto* Adapter = FDasTypeAdapters::Get().Find(Type);
+    for (const auto& Entry : FDasTypeAdapters::Get().Entries())
+        if (&*Entry.Adapter == Adapter)
+            return Entry.Script;
+    return nullptr;
+}
+const FDasTypeAdapters::FEntry* DSLAdapted(const das::TypeDeclPtr& T)
+{
+    if (!T || T->baseType != das::Type::tStructure || !T->structType)
+        return nullptr;
+    for (const auto& Entry : FDasTypeAdapters::Get().Entries())
+        if (Entry.Adapter->GetKind() == EDasTypeKind::Struct && Entry.Script && Entry.Script->MatchesScriptType(T))
+            return &Entry;
+    return nullptr;
+}
+const FDasTypeAdapters::FEntry* DSLAdaptedReference(const das::TypeDeclPtr& T)
+{
+    const auto* Entry = DSLAdapted(T);
+    return Entry && Entry->Adapter->IsReferenceValue() ? Entry : nullptr;
+}
 // Struct path of an adapted view, or empty.
 FString DSLAdaptedPath(const das::TypeDeclPtr& T)
 {
     const auto* Entry = DSLAdapted(T);
-    return Entry ? Entry->Adapter->GetStruct()->GetPathName() : FString();
+    if (!Entry)
+        return {};
+    return Entry->Adapter->GetStruct() ? Entry->Adapter->GetStruct()->GetPathName() : Entry->Script->GetTypePath(T);
 }
 bool DSLAdaptedImplicitDefault(const das::TypeDeclPtr& T)
 {
@@ -22,7 +58,7 @@ bool DSLAdaptedImplicitDefault(const das::TypeDeclPtr& T)
 }
 das::ExpressionPtr DSLAdaptedPack(const das::LineInfo& At, const das::TypeDeclPtr& T, das::ExpressionPtr V)
 {
-    return DSLAdapted(T)->Script->Pack(At, V);
+    return DSLAdapted(T)->Script->PackTyped(At, T, V);
 }
 das::ExpressionPtr DSLAdaptedUnpack(const das::LineInfo& At, const das::TypeDeclPtr& T, das::ExpressionPtr V)
 {
@@ -34,7 +70,7 @@ const FDasTypeAdapters::FEntry* DSLAdaptedHandle(const das::TypeDeclPtr& T)
     if (!T || T->baseType != das::Type::tHandle || !T->annotation)
         return nullptr;
     for (const auto& Entry : FDasTypeAdapters::Get().Entries())
-        if (Entry.Script && Entry.Script->MatchesScriptType(T))
+        if (Entry.Adapter->GetKind() == EDasTypeKind::Struct && Entry.Script && Entry.Script->MatchesScriptType(T))
             return &Entry;
     return nullptr;
 }
@@ -72,7 +108,7 @@ const IDasScriptTypeFacet* DSLAdaptedFacet(const IDasTypeAdapter* Adapter)
 }
 das::ExpressionPtr DSLAdaptedHandlePack(const das::LineInfo& At, const das::TypeDeclPtr& T, das::ExpressionPtr V)
 {
-    return DSLAdaptedHandle(T)->Script->Pack(At, V);
+    return DSLAdaptedHandle(T)->Script->PackTyped(At, T, V);
 }
 das::ExpressionPtr DSLAdaptedHandleUnpack(const das::LineInfo& At, const das::TypeDeclPtr& T, das::ExpressionPtr V)
 {
@@ -86,10 +122,9 @@ das::TypeDeclPtr DSLAdaptedView(const FString& Path, EDasScriptViewUse Use, das:
     for (const auto& Entry : FDasTypeAdapters::Get().Entries())
         if (&*Entry.Adapter == Adapter && Entry.Script && EnumHasAnyFlags(Entry.Script->GetViewUses(), Use))
         {
-            if (auto View = Entry.Script->MakeView(Group, Module, At))
+            if (auto View = Entry.Script->MakeViewForPath(Path, Group, Module, At))
                 return View;
-            DSLFail(FString::Printf(TEXT("Import %s for native %s properties"), Entry.Script->GetViewModule(),
-                                         *Adapter->GetStruct()->GetName()));
+            DSLFail(FString::Printf(TEXT("Import %s for native %s properties"), Entry.Script->GetViewModule(), *Path));
         }
     return nullptr;
 }

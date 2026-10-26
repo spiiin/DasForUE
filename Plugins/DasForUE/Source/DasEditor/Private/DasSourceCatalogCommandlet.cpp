@@ -1,4 +1,5 @@
 #include "DasSourceCatalogCommandlet.h"
+#include "DasScriptHosts.h"
 #include "DasSourceCatalog.h"
 #include "DasAuthoring.h"
 #include "DasReflectedTypes.h"
@@ -101,8 +102,7 @@ int32 UDasSourceCatalogCommandlet::Main(const FString& Params)
                 return Fail(Issue);
         for (const auto& C : Model.Classes)
         {
-            if (C.NativeParent != TEXT("/Script/Engine.Actor") &&
-                                       C.NativeParent != TEXT("/Script/Engine.ActorComponent"))
+            if (!DasActorNativeParent(C.NativeParent) && C.NativeParent != TEXT("/Script/Engine.ActorComponent"))
                 return Fail(TEXT("Source catalog references require supported Actor/Component hosts"));
             FDasSourceCatalogEntry Entry;
             Entry.Id = C.Id;

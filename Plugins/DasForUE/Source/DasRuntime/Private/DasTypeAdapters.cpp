@@ -1,4 +1,6 @@
 #include "DasTypeAdapters.h"
+#include "DasSchema.h"
+#include "StructUtils/InstancedStruct.h"
 #include "UObject/Class.h"
 #include "UObject/UnrealType.h"
 
@@ -16,6 +18,18 @@ const FDasTypeAdapters& FDasTypeAdapters::Get()
     }();
     return *Registry;
 }
+void IDasTypeAdapter::GetSupportSamples(TArray<FDasDeclaredType>& Out) const
+{
+    FDasDeclaredType Type;
+    Type.Kind = DasTypeKindName(GetKind());
+    if (const auto* Struct = GetStruct())
+        Type.TypePath = Struct->GetPathName();
+    else if (UsesTypeIdentity() || IsStructFamily())
+        return; // Unreported unless the owner supplies a concrete identity.
+    for (const auto& Slot : GetContainerSlots())
+        Type.*Slot.Descriptor = MakeShared<FDasDeclaredType>(); // int child
+    Out.Add(MoveTemp(Type));
+}
 void FDasTypeAdapters::Register(TSharedRef<const IDasTypeAdapter> Adapter, const IDasScriptTypeFacet* Script)
 {
     const int32 Index = EntryList.Add({Adapter, Script});
@@ -24,6 +38,11 @@ void FDasTypeAdapters::Register(TSharedRef<const IDasTypeAdapter> Adapter, const
         check(Adapter->GetKind() == EDasTypeKind::Struct && !ByStruct.Contains(Struct));
         ByStruct.Add(Struct, Index);
         ByPath.Add(Struct->GetPathName(), Index);
+    }
+    else if (Adapter->IsStructFamily())
+    {
+        check(Adapter->GetKind() == EDasTypeKind::Struct);
+        StructFamilies.Add(Index);
     }
     else
     {
@@ -36,18 +55,27 @@ const IDasTypeAdapter* FDasTypeAdapters::Find(const FDasDeclaredType& Type) cons
     const EDasTypeKind Kind = Type.GetKind();
     if (Kind == EDasTypeKind::Struct)
         return FindStructPath(Type.TypePath);
-    const int32* Index = Type.TypePath.IsEmpty() ? ByKind.Find(Kind) : nullptr;
+    const auto* Adapter = FindKind(Kind);
+    return Adapter && (Type.TypePath.IsEmpty() || Adapter->UsesTypeIdentity()) ? Adapter : nullptr;
+}
+const IDasTypeAdapter* FDasTypeAdapters::FindKind(EDasTypeKind Kind) const
+{
+    const int32* Index = ByKind.Find(Kind);
     return Index ? &*EntryList[*Index].Adapter : nullptr;
 }
 const IDasTypeAdapter* FDasTypeAdapters::FindStruct(const UScriptStruct* Type) const
 {
     const int32* Index = Type ? ByStruct.Find(Type) : nullptr;
-    return Index ? &*EntryList[*Index].Adapter : nullptr;
+    return Index ? &*EntryList[*Index].Adapter : Type ? FindStructPath(Type->GetPathName()) : nullptr;
 }
 const IDasTypeAdapter* FDasTypeAdapters::FindStructPath(const FString& Path) const
 {
-    const int32* Index = ByPath.Find(Path);
-    return Index ? &*EntryList[*Index].Adapter : nullptr;
+    if (const int32* Index = ByPath.Find(Path))
+        return &*EntryList[*Index].Adapter;
+    for (int32 Index : StructFamilies)
+        if (EntryList[Index].Adapter->MatchesStructPath(Path))
+            return &*EntryList[Index].Adapter;
+    return nullptr;
 }
 const IDasTypeAdapter* FDasTypeAdapters::FindProperty(const FProperty* Property) const
 {
@@ -83,38 +111,39 @@ const IDasTypeAdapter* DasLeafValueAdapter(const FString& StructPath)
     return Adapter && Adapter->IsLeafValue() ? Adapter : nullptr;
 }
 
-// Every adapter is reachable by its identity, and kind adapters recognise the properties they create.
-bool CheckDasTypeAdapters(FString& Error)
+const FDasNativeTypePolicy* DasNativeTypePolicy(const UScriptStruct* Type)
 {
-    const auto& Registry = FDasTypeAdapters::Get();
-    for (const auto& Entry : Registry.Entries())
+    const auto* A = FDasTypeAdapters::Get().FindStruct(Type);
+    return A ? A->GetNativePolicy() : nullptr;
+}
+bool DasHasNativeRole(const UScriptStruct* Type, EDasNativeTypeRole Role)
+{
+    const auto* P = DasNativeTypePolicy(Type);
+    return P && Role != EDasNativeTypeRole::None && EnumHasAllFlags(P->Roles, Role);
+}
+bool DasHasNativeRolePath(const FString& Path, EDasNativeTypeRole Role)
+{
+    const auto* A = FDasTypeAdapters::Get().FindStructPath(Path);
+    const auto* P = A ? A->GetNativePolicy() : nullptr;
+    return P && Role != EDasNativeTypeRole::None && EnumHasAllFlags(P->Roles, Role);
+}
+FString DasNativeTypePath(EDasNativeTypeRole Role)
+{
+    const UScriptStruct* Found = nullptr;
+    for (const auto& Entry : FDasTypeAdapters::Get().Entries())
     {
-        const IDasTypeAdapter* Adapter = &*Entry.Adapter;
-        const FString Name = DasTypeKindName(Adapter->GetKind());
-        if (const UScriptStruct* Struct = Adapter->GetStruct())
+        const auto* P = Entry.Adapter->GetNativePolicy();
+        if (P && Role != EDasNativeTypeRole::None && EnumHasAllFlags(P->Roles, Role))
         {
-            FDasDeclaredType Declared;
-            Declared.Kind = TEXT("struct");
-            Declared.TypePath = Struct->GetPathName();
-            if (Registry.FindStruct(Struct) != Adapter || Registry.Find(Declared) != Adapter)
-            {
-                Error = TEXT("Struct adapter is not reachable: ")+ Struct->GetPathName();
-                return false;
-            }
-            continue;
-        }
-        FDasDeclaredType Declared;
-        Declared.Kind = Name;
-        FProperty* Property = Adapter->MakeProperty(FFieldVariant(), TEXT("Probe"), Declared, EDasPropertyUsage::Value);
-        const bool Reachable = Registry.Find(Declared) == Adapter && Property &&
-                               Registry.FindProperty(Property) == Adapter &&
-                               DasPropertyKind(Property) == Adapter->GetKind();
-        delete Property;
-        if (!Reachable)
-        {
-            Error = TEXT("Kind adapter is not reachable: ")+ Name;
-            return false;
+            if (Found || !Entry.Adapter->GetStruct())
+                return {};
+            Found = Entry.Adapter->GetStruct();
         }
     }
-    return true;
+    return Found ? Found->GetPathName() : FString();
+}
+bool ValidateDasRegisteredSnapshot(const FInstancedStruct& Value, FString& Error)
+{
+    const auto* P = DasNativeTypePolicy(Value.GetScriptStruct());
+    return P && P->ValidateSnapshot ? P->ValidateSnapshot(Value, Error) : ValidateDasStructSnapshot(Value, Error);
 }

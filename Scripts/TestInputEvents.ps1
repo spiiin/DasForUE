@@ -3,7 +3,7 @@ Import-Module (Join-Path $PSScriptRoot 'DasTest.psm1') -Force
 
 $ErrorActionPreference='Stop';$Repo=Split-Path -Parent $PSScriptRoot
 $Python='C:/Python312/python.exe';$Project="$Repo/Tests/DasForUESmoke/DasForUESmoke.uproject"
-& $Python "$PSScriptRoot/TestInputEventsGenerator.py";if($LASTEXITCODE){throw 'Input event generator tests failed'}
+Invoke-DasPythonTests -Python $Python -Path "$PSScriptRoot/TestInputEventsGenerator.py";if($LASTEXITCODE){throw 'Input event generator tests failed'}
 if(!$SkipBuild){Invoke-DasBuild (Get-DasContext -Engine $Engine) -BuildArguments @(
     'DasForUESmokeEditor', 'Win64', 'Development', "-Project=$Project", '-WaitMutex', '-NoXGE',
     '-MaxParallelActions=8', "-Log=$Repo/logs/input-events-build.log") *> "$Repo/logs/input-events-build-stdout.log";if($LASTEXITCODE){throw 'Input events build failed'}}

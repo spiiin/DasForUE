@@ -5,7 +5,7 @@
 #include "DasTypeRegistry.h"
 #include "DasReflectedTypes.h"
 #include "DasRuntime.h"
-#include "DasProbeActor.h"
+#include "DasActor.h"
 #include "DasBlueprintRollback.h"
 #include "DasNumericGraphMigration.h"
 #include "DasNumericLibrary.h"
@@ -41,7 +41,11 @@
 #include "Misc/ScopeExit.h"
 namespace
 {
+#if DAS_WITH_EDITOR_TESTS
 int32 StructFailStage = 0;
+#else
+constexpr int32 StructFailStage = 0;
+#endif
 FEdGraphPinType ScalarPin(const FString& Kind)
 {
     FDasDeclaredType Type;
@@ -259,10 +263,12 @@ bool FDasTypeService::PlanStructMigration(const FString& Script, const FString& 
         Out.Removed.Sort();
     return true;
 }
+#if DAS_WITH_EDITOR_TESTS
 void DasFailStructMigrationForTesting(int32 Stage)
 {
     StructFailStage = Stage;
 }
+#endif
 bool FDasTypeService::MigrateStructFields(const FString& Script, const FString& RegistryPath, FString& Error,
                                           const FString& RulesFile)
 {
@@ -700,8 +706,7 @@ bool FDasTypeService::MigrateStructFields(const FString& Script, const FString& 
     const bool TableOnly =
         !Root && !Tables.IsEmpty() && Nodes.IsEmpty() &&
         !Scope.ContainsByPredicate([](const TStrongObjectPtr<UObject>& A) { return A->IsA<UBlueprint>(); });
-    if (!TableOnly &&
-        (!Root || !Root->GeneratedClass || !Root->GeneratedClass->IsChildOf(ADasProbeActor::StaticClass())))
+    if (!TableOnly && (!Root || !Root->GeneratedClass || !Root->GeneratedClass->IsChildOf(ADasActor::StaticClass())))
     {
         Error = TEXT("Expected imported DSL Actor root using struct");
         return false;
@@ -953,7 +958,7 @@ bool FDasTypeService::MigrateStructFields(const FString& Script, const FString& 
                 Data.Add(MoveTemp(Image));
             }
     }
-    for (TObjectIterator<ADasProbeActor> It; It; ++It)
+    for (TObjectIterator<ADasActor> It; It; ++It)
         for (const auto& V : It->RetiredDasValues)
             if (V.Value.StructValue.IsValid() &&
                 ContainsTarget(const_cast<UScriptStruct*>(V.Value.StructValue.GetScriptStruct())))

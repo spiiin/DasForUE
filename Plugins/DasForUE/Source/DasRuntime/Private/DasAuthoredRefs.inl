@@ -48,7 +48,7 @@ das::string DSLMethodSourceName(const das::TypeDeclPtr& Type)
                    DSLMethodSourceName(Type->secondType);
         return das::string("@container:") + DSLMethodSourceName(Type->firstType);
     }
-    if (DSLDirectEnum(Type))
+    if (DSLTypedValue(Type, EDasTypeKind::Enum))
         return Type->enumType->module->name + "::" + Type->enumType->name;
     if (DSLDelegate(Type))
         return Type->structType->module->name + "::" + Type->structType->name;
@@ -347,7 +347,7 @@ das::ExpressionPtr DSLReferenceValue(const das::LineInfo& At, const das::TypeDec
 }
 bool DSLClassHandle(const das::TypeDeclPtr& T)
 {
-    return T && T->baseType == das::Type::tHandle && T->annotation && T->annotation->name == "UEClassHandle";
+    return DSLKindFacet(EDasTypeKind::Class)->MatchesCallType(T);
 }
 struct FUEClassLoadedFactory : das::CallMacro
 {
@@ -524,18 +524,10 @@ struct FUEReferenceFactory : das::CallMacro
 };
 das::TypeDeclPtr DSLPropertyType(const FString& Kind, das::ModuleGroup& G, das::Module* M, const das::LineInfo& At)
 {
-    if (Kind == TEXT("class"))
-        return DSLHandleType(G, M, "UEClassHandle");
-    if (Kind == TEXT("object"))
-        return DSLHandleType(G, M, "UObjectHandle");
+    if (const auto* Facet = DSLKindFacet(DasTypeKind(Kind)))
+        return Facet->MakeView(G, M, At);
     if (Kind == TEXT("struct"))
         return DSLHandleType(G, M, "UEStructValue");
-    if (Kind == TEXT("enum"))
-        return DSLHandleType(G, M, "UEEnumValue");
-    if (Kind == TEXT("text"))
-        return DSLHandleType(G, M, "UETextValue");
-    if (Kind == TEXT("name"))
-        return DSLHandleType(G, M, "UENameValue");
     return new das::TypeDecl(
         (Kind == TEXT("int") || Kind == TEXT("byte"))
          ? das::Type::tInt
@@ -546,6 +538,14 @@ das::TypeDeclPtr DSLPropertyType(const FString& Kind, das::ModuleGroup& G, das::
                                                                       : Kind == TEXT("string")? das::Type::tString
                                                                                               : das::Type::tVoid,
                                                                                      At);
+}
+das::TypeDeclPtr DSLReflectedValueABI(const das::TypeDeclPtr& T, das::ModuleGroup& Group, das::Module* Module)
+{
+    if (DSLTypedValue(T, EDasTypeKind::Enum))
+        return DSLKindFacet(EDasTypeKind::Enum)->MakeView(Group, Module, T->at);
+    if (DSLTypedValue(T, EDasTypeKind::Object) || DSLTypedValue(T, EDasTypeKind::Class))
+        return DSLValueAdapter(T)->Script->MakeView(Group, Module, T->at);
+    return DSLHandleType(Group, Module, "UEStructValue");
 }
 das::TypeDeclPtr DSLMethodValueType(das::Program*, das::Module*, const FDasDeclaredType&, const das::string&,
                                     const FDSLTypeScope&, const das::LineInfo&);
@@ -648,8 +648,8 @@ bool DSLEmitProperty(das::Program* P, das::Module* M, const das::TypeDeclPtr& T,
     const FString ValuePath = Container ? DasContainerCarrier(Prop->Type)->GetPathName() : Prop->Type.TypePath;
     const FString RuntimeKind = Container ? TEXT("struct"): Prop->Type.Kind;
     const bool Convert = (ValueType->baseType == das::Type::tUInt8) || DSLTypedClass(ValueType) || Container ||
-                         DSLDirectStruct(ValueType) || DSLDirectEnum(ValueType) || DSLTypedReference(ValueType) ||
-                         !DSLMathPath(ValueType).IsEmpty();
+                         DSLDirectStruct(ValueType) || DSLTypedValue(ValueType, EDasTypeKind::Enum) ||
+                         DSLTypedReference(ValueType) || !DSLMathPath(ValueType).IsEmpty();
     if (DSLDirectStruct(ValueType) || Container)
     {
         das::vector<das::FunctionPtr> Helpers;
@@ -775,7 +775,7 @@ das::TypeDeclPtr DSLMethodValueType(das::Program* Program, das::Module* Module, 
         return Type;
     }
     if (Declared.Kind == TEXT("class") && SourceName.empty())
-        return DSLHandleType(*Program->thisModuleGroup, Module, "UEClassHandle");
+        return DSLPropertyType(Declared.Kind, *Program->thisModuleGroup, Module, At);
     if (Declared.Kind == TEXT("array") || Declared.Kind == TEXT("map") || Declared.Kind == TEXT("set"))
     {
         auto* Container = new das::TypeDecl(Declared.Kind == TEXT("array")? das::Type::tArray : das::Type::tTable, At);
@@ -887,7 +887,7 @@ das::TypeDeclPtr DSLMethodValueType(das::Program* Program, das::Module* Module, 
             DSLFail(TEXT("Authored method object/interface type identity mismatch"));
         return Type;
     }
-    if ((Declared.Kind == TEXT("enum")? !DSLDirectEnum(Type) : !DSLDirectStruct(Type)) ||
+    if ((Declared.Kind == TEXT("enum")? !DSLTypedValue(Type, EDasTypeKind::Enum) : !DSLDirectStruct(Type)) ||
          DSLDirectPath(Type, Scope.Folder, Scope.Registry) != Declared.TypePath)
         DSLFail(TEXT("Authored method source type identity/layout mismatch: ")+ DSLText(SourceName));
     return Type;
@@ -995,9 +995,8 @@ bool DSLEmitRoutedMethod(das::Program* Program, das::Module* Module, const das::
     // A native enum (ue_native_enum, values as in Unreal) passes to the bind as its int32 value.
     auto EnumPath = [](const das::TypeDeclPtr& T)
     {
-        if (!DSLNativeEnum(T))
-            return FString();
-        return DSLString(DSLAnnotation(T->enumType->annotations, "ue_native_enum")->arguments, "path");
+        const auto* Facet = DSLKindFacet(EDasTypeKind::Enum);
+        return Facet && Facet->IsNativeType(T) ? Facet->GetTypePath(T) : FString();
     };
     for (int32 Index = 0; Why.IsEmpty() && Index < Method.Parameters.Num(); ++Index)
         if (Method.Parameters[Index].Direction != TEXT("in") && !EnumPath(Types[size_t(Index) + 1]).IsEmpty())

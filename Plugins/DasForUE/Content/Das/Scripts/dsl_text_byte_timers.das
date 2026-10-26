@@ -1,7 +1,8 @@
 options gen2
+require ue_probe_actor
 require ue_callback_value_signals
 [ue_class(Blueprintable,type_folder="/Game/DasCallbackObjects/Types")]
-class TextByteTimerActor : Actor {
+class TextByteTimerActor : ProbeActor {
     properties=ue_properties(BlueprintReadWrite) {
         var NativeObjectEvents:int=0
         var ObjectNext:int=0

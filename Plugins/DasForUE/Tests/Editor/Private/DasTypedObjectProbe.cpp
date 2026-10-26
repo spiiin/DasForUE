@@ -1,0 +1,94 @@
+#include "DasTypedObjectProbe.h"
+#include "DasDSLService.h"
+#include "DasAuthoring.h"
+#include "Engine/Blueprint.h"
+#include "Engine/Level.h"
+#include "Misc/FileHelper.h"
+#include "Misc/PackageName.h"
+#include "Modules/ModuleManager.h"
+#include "UObject/SavePackage.h"
+namespace
+{
+bool SaveTypedObjectAsset(UObject* O)
+{
+    FSavePackageArgs Args;
+    Args.TopLevelFlags = RF_Public | RF_Standalone;
+    Args.SaveFlags = SAVE_NoError;
+    return UPackage::SavePackage(
+        O->GetOutermost(), O,
+        *FPackageName::LongPackageNameToFilename(O->GetOutermost()->GetName(),
+                                                 O->IsA<UWorld>() ? FPackageName::GetMapPackageExtension()
+                                                                  : FPackageName::GetAssetPackageExtension()),
+        Args);
+}
+}
+int32 RunDasTypedObjectProbe(const FString& Id, const FString& Phase)
+{
+    auto& R = FModuleManager::LoadModuleChecked<FDasRuntimeModule>(TEXT("DasRuntime"));
+    bool Pass = true;
+    FString Error;
+    auto Check = [&](bool V, const TCHAR* Name)
+    {
+        Pass &= V;
+        UE_LOG(LogTemp, Display, TEXT("DAS_TYPED_OBJECT %s %s"), V ? TEXT("PASS"): TEXT("FAIL"), Name);
+        if (!V)
+            UE_LOG(LogTemp, Display, TEXT("Typed object detail: %s"), *Error);
+    };
+    const FString Base = TEXT("/Game/DasFrameAssetProbe/Registered_")+ Id,
+                              Script = TEXT("dsl_registered_")+ Id + TEXT(".das");
+    UBlueprint* BP = nullptr;
+    UWorld* W = nullptr;
+    if (Phase == TEXT("Create"))
+    {
+        FString Source;
+        FFileHelper::LoadFileToString(Source, *R.ScriptPath(TEXT("dsl_typed_objects.das")));
+        Source = Source.Replace(TEXT("class TargetHolder {"),
+            TEXT("class TargetHolder {\n    [ue_function(BlueprintCallable)]\n    def Forged(value:ObjectRef):ActorRef { return ActorRef(handle=value.handle) }"));
+        Check(FFileHelper::SaveStringToFile(Source, *R.ScriptPath(Script),
+                                            FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM),
+              TEXT("write_typed_object_source"));
+        Check(FDasDSLService::Apply(Script, Base + TEXT("/BP_Actor"), TEXT("typedobjects.TargetHolder"), BP, Error),
+                                                TEXT("create_typed_object_Blueprint"));
+        if (!BP)
+            return 1;
+        W = UWorld::CreateWorld(EWorldType::Editor, false, TEXT("Map"), CreatePackage(*(Base + TEXT("/Map"))));
+        W->SetFlags(RF_Public | RF_Standalone);
+        W->GetOutermost()->SetPackageFlags(PKG_ContainsMap);
+        FActorSpawnParameters P;
+        P.Name = TEXT("TypedActor");
+        auto* A = W->SpawnActor<ADasActor>(BP->GeneratedClass, FTransform::Identity, P);
+        P.Name = TEXT("TargetActor");
+        auto* T = W->SpawnActor<ADasActor>(ADasActor::StaticClass(), FTransform::Identity, P);
+        auto* TargetProperty = FindFProperty<FObjectProperty>(A->GetClass(), TEXT("Target"));
+        if (!TargetProperty)
+            return 1;
+        TargetProperty->SetObjectPropertyValue_InContainer(A, T);
+        Check(SaveTypedObjectAsset(BP) && SaveTypedObjectAsset(W), TEXT("save_typed_object_Blueprint_and_reference"));
+    }
+    else
+    {
+        BP = LoadObject<UBlueprint>(nullptr, *(Base + TEXT("/BP_Actor.BP_Actor")));
+        W = LoadObject<UWorld>(nullptr, *(Base + TEXT("/Map.Map")));
+        Check(BP && W, TEXT("reopen_typed_object_assets"));
+        if (!Pass)
+            return 1;
+        Check(FDasDSLService::Reimport(BP, Error), TEXT("reimport_typed_object_class"));
+    }
+    ADasActor* Actor = nullptr;
+    AActor* Target = nullptr;
+    for (const auto& A : W->PersistentLevel->Actors)
+        if (A)
+        {
+            if (A->GetFName() == TEXT("TypedActor"))
+                Actor = Cast<ADasActor>(A.Get());
+            if (A->GetFName() == TEXT("TargetActor"))
+                Target = A.Get();
+        }
+    if (!Actor || !Target)
+        return 1;
+    RunDasTypedObjectValues(R, Actor, Target, Script, Check, true);
+    if (W->IsInitialized())
+        W->DestroyWorld(false);
+    UE_LOG(LogTemp, Display, TEXT("DAS_REGISTERED_TYPES_RESULT=%s"), Pass ? TEXT("PASS"): TEXT("FAIL"));
+    return Pass ? 0 : 1;
+}

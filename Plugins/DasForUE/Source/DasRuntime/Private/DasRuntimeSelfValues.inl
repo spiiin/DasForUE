@@ -136,8 +136,9 @@ FString DasStructStatsLine()
     return FString::Printf(TEXT("DAS_STRUCT_STATS executions=%llu with_snapshots=%llu max_live=%lld "
                                 "max_without_mid=%lld le16=%llu le256=%llu le1024=%llu le4096=%llu over4096=%llu "
                                 "mid_collections=%llu mid_reclaimed=%llu mid_skipped=%llu"),
-                           S.Executions, S.WithSnapshots, S.MaxLive, S.MaxWithoutMid, S.Buckets[0], S.Buckets[1],
-                           S.Buckets[2], S.Buckets[3], S.Buckets[4], S.MidCollections, S.MidReclaimed, S.MidSkipped);
+                                S.Executions, S.WithSnapshots, S.MaxLive, S.MaxWithoutMid, S.Buckets[0], S.Buckets[1],
+                                S.Buckets[2], S.Buckets[3], S.Buckets[4], S.MidCollections, S.MidReclaimed,
+                                S.MidSkipped);
 }
 void RecordStructExecution(FUnrealDasContext& C, bool bAfterCollection); // after NextStructValueToken
 bool CollectStructValuesNow(FUnrealDasContext& C, const das::LineInfo* At, bool Boundary)
@@ -311,15 +312,33 @@ void RecordStructExecution(FUnrealDasContext& C, bool bAfterCollection)
 }
 FDasStructValue StoreGeometry(const UScriptStruct*, const void*, das::Context*, das::LineInfoArg*);
 FDasStructValue StoreInputEvent(const UScriptStruct*, const void*, das::Context*, das::LineInfoArg*);
+// Captured native values keep their own identity and never enter value interning. The caller's
+// adapter has already detached/validated the payload; pool limits and collection are shared.
+FDasStructValue StoreCapturedNativeValue(FInstancedStruct&& Value, das::Context* C, das::LineInfoArg* At)
+{
+    if (!ActiveContext || C != ActiveContext)
+        C->throw_error("native snapshot requires active context");
+    if (At && ActiveContext->StructValues.Num() >= ActiveContext->StructNextCollection)
+        CollectStructValues(*ActiveContext, At);
+    if (ActiveContext->StructValues.Num() >= 4096)
+        C->throw_error("struct value table limit exceeded");
+    const uint64 Token = NextStructValueToken++;
+    ActiveContext->StructValues.Add(Token, MoveTemp(Value));
+    return {Token};
+}
 FDasStructValue StoreStructValueImpl(const FInstancedStruct& V, FInstancedStruct* Owned, das::Context* C,
                                      das::LineInfoArg* At)
 {
     if (C != ActiveContext || !ActiveContext)
         C->throw_error("struct requires active context");
-    if (DasIsGeometryType(V.GetScriptStruct()))
-        return StoreGeometry(V.GetScriptStruct(), V.GetMemory(), C, At);
-    if (DasIsInputEventType(V.GetScriptStruct()))
-        return StoreInputEvent(V.GetScriptStruct(), V.GetMemory(), C, At);
+    if (const auto* Policy = DasNativeTypePolicy(V.GetScriptStruct()); Policy && Policy->Capture)
+    {
+        FInstancedStruct Copy;
+        FString Error;
+        if (!Policy->Capture(V.GetScriptStruct(), V.GetMemory(), Copy, Error))
+            C->throw_error(TCHAR_TO_UTF8(*Error));
+        return StoreCapturedNativeValue(MoveTemp(Copy), C, At);
+    }
     FString Error;
     if (!ValidateDasStructSnapshot(V, Error))
         C->throw_error(TCHAR_TO_UTF8(*Error));

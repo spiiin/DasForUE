@@ -1,5 +1,6 @@
 using UnrealBuildTool;
 using System.IO;
+using EpicGames.Core;
 
 public class DasRuntime : ModuleRules
 {
@@ -11,6 +12,35 @@ public class DasRuntime : ModuleRules
         bool ShippingProbe = Target.Configuration == UnrealTargetConfiguration.Shipping &&
             System.Environment.GetEnvironmentVariable("DAS_GAS_SHIPPING_VALIDATION") == "1";
         PrivateDefinitions.Add("DAS_GAS_SHIPPING_VALIDATION=" + (ShippingProbe ? "1" : "0"));
+        // Test fixtures require an explicit project opt-in, including in the editor.
+        string ProbeOptIn = Target.ProjectFile == null ? null :
+            Path.Combine(Target.ProjectFile.Directory.FullName, "Config", "DasIncludeTestFixtures.txt");
+        string EditorOptIn = Target.ProjectFile == null ? null :
+            Path.Combine(Target.ProjectFile.Directory.FullName, "Config", "DasIncludeEditorTests.txt");
+        bool TestProbes = Target.Type == TargetType.Editor && EditorOptIn != null && File.Exists(EditorOptIn);
+        if (TestProbes)
+        {
+            ExternalDependencies.Add(EditorOptIn);
+            if (File.ReadAllText(EditorOptIn).Trim() != "include-plugin-editor-tests")
+                throw new BuildException("Invalid DAS editor-test opt-in: " + EditorOptIn);
+        }
+        if (ProbeOptIn != null && File.Exists(ProbeOptIn))
+        {
+            ExternalDependencies.Add(ProbeOptIn);
+            if (File.ReadAllText(ProbeOptIn).Trim() != "include-plugin-test-fixtures")
+                throw new BuildException("Invalid DAS test-fixture opt-in: " + ProbeOptIn);
+            TestProbes = true;
+        }
+        PublicDefinitions.Add("DAS_WITH_TEST_PROBES=" + (TestProbes ? "1" : "0"));
+        if (TestProbes)
+        {
+            string Tests = Path.Combine(PluginDirectory, "Tests", "Runtime");
+            if (!ConditionalAddModuleDirectory(new DirectoryReference(Tests)))
+                throw new BuildException("Missing DAS probe sources: " + Tests);
+            PublicIncludePaths.Add(Path.Combine(Tests, "Public"));
+            PrivateIncludePaths.Add(Path.Combine(Tests, "Private"));
+            PrivateIncludePaths.Add(Path.Combine(ModuleDirectory, "Private"));
+        }
         PCHUsage = PCHUsageMode.NoPCHs;
         bUseUnity = false;
         bEnableExceptions = true;
@@ -34,15 +64,83 @@ public class DasRuntime : ModuleRules
         bool ProjectNative = ProjectRoot.Length != 0 && File.Exists(NativeHeader);
         PrivateDefinitions.Add("DAS_PROJECT_NATIVE_GAMEPLAY=" + (ProjectNative ? "1" : "0"));
         if (ProjectNative) { PrivateIncludePaths.Add(GeneratedRoot); ExternalDependencies.Add(NativeHeader); }
-        string ProjectScripts = Path.Combine(ProjectRoot, "Content", "Das", "Scripts");
-        if (ProjectRoot.Length != 0 && Directory.Exists(ProjectScripts))
-            foreach (string File in Directory.GetFiles(ProjectScripts, "*", SearchOption.AllDirectories))
-            { RuntimeDependencies.Add(File, StagedFileType.UFS); ExternalDependencies.Add(File); }
         string Scripts = Path.Combine(PluginDirectory, "Content", "Das");
-        foreach (string File in Directory.GetFiles(Scripts, "*", SearchOption.AllDirectories))
+        string Extras = ProjectRoot.Length == 0 ? null : Path.Combine(ProjectRoot, "Config", "DasPluginScripts.txt");
+        ExternalDependencies.Add(Path.Combine(Scripts, "RuntimeScripts.txt"));
+        if (Extras != null)
+        {
+            if (System.IO.File.Exists(Extras)) ExternalDependencies.Add(Extras);
+            string TestOptIn = Path.Combine(ProjectRoot, "Config", "DasIncludeTestFixtures.txt");
+            if (System.IO.File.Exists(TestOptIn)) ExternalDependencies.Add(TestOptIn);
+        }
+        foreach (string File in DasScriptStaging.SelectPluginFiles(Scripts, Extras))
         {
             RuntimeDependencies.Add(File, StagedFileType.UFS);
             ExternalDependencies.Add(File);
         }
+        // Project-owned scripts are intentional gameplay input; data files require explicit opt-in.
+        string ProjectScripts = Path.Combine(ProjectRoot, "Content", "Das", "Scripts");
+        if (ProjectRoot.Length != 0 && Directory.Exists(ProjectScripts))
+            foreach (string File in Directory.GetFiles(ProjectScripts, "*.das", SearchOption.AllDirectories))
+            { RuntimeDependencies.Add(File, StagedFileType.UFS); ExternalDependencies.Add(File); }
+        string ProjectData = Path.Combine(ProjectRoot, "Config", "DasProjectData.txt");
+        if (ProjectRoot.Length != 0)
+        {
+            if (System.IO.File.Exists(ProjectData)) ExternalDependencies.Add(ProjectData);
+            foreach (string File in DasScriptStaging.ReadManifest(ProjectRoot, ProjectData, false))
+            { RuntimeDependencies.Add(File, StagedFileType.UFS); ExternalDependencies.Add(File); }
+        }
+    }
+}
+
+// Kept free of UBT types so focused tests execute the actual receipt-selection implementation.
+public static class DasScriptStaging
+{
+    public static System.Collections.Generic.IEnumerable<string> ReadManifest(string Root, string Manifest, bool Required)
+    {
+        if (!System.IO.File.Exists(Manifest))
+        {
+            if (Required) throw new System.IO.FileNotFoundException("Missing DAS staging manifest", Manifest);
+            yield break;
+        }
+        string Prefix = Path.GetFullPath(Root).TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)
+            + Path.DirectorySeparatorChar;
+        foreach (string Raw in System.IO.File.ReadAllLines(Manifest))
+        {
+            string Entry = Raw.Trim();
+            if (Entry.Length == 0 || Entry.StartsWith("#")) continue;
+            if (Path.IsPathRooted(Entry) || Entry.IndexOfAny(new[] { '*', '?' }) >= 0)
+                throw new System.IO.InvalidDataException("DAS staging requires an exact relative file: " + Entry);
+            string Full = Path.GetFullPath(Path.Combine(Root, Entry));
+            if (!Full.StartsWith(Prefix, System.StringComparison.OrdinalIgnoreCase) || !System.IO.File.Exists(Full))
+                throw new System.IO.InvalidDataException("Missing or escaping DAS staging file: " + Entry);
+            yield return Full;
+        }
+    }
+
+    public static string[] SelectPluginFiles(string Root, string Extras)
+    {
+        Root = Path.GetFullPath(Root);
+        var Files = new System.Collections.Generic.SortedSet<string>(System.StringComparer.OrdinalIgnoreCase);
+        foreach (string File in ReadManifest(Root, Path.Combine(Root, "RuntimeScripts.txt"), true)) Files.Add(File);
+        // daslib is the compiler/runtime standard library, not our test scripts. Ignore docs and lint artefacts.
+        string Library = Path.Combine(Root, "daslib");
+        if (!Directory.Exists(Library)) throw new System.IO.DirectoryNotFoundException("Missing DAS standard library: " + Library);
+        foreach (string File in Directory.GetFiles(Library, "*.das", SearchOption.AllDirectories)) Files.Add(File);
+        if (Extras != null)
+        {
+            foreach (string File in ReadManifest(Root, Extras, false)) Files.Add(File);
+            // Deliberate opt-in is separate from the runtime manifest and never inferred from configuration.
+            string TestOptIn = Path.Combine(Path.GetDirectoryName(Extras), "DasIncludeTestFixtures.txt");
+            if (System.IO.File.Exists(TestOptIn))
+            {
+                if (System.IO.File.ReadAllText(TestOptIn).Trim() != "include-plugin-test-fixtures")
+                    throw new System.IO.InvalidDataException("Invalid DAS test-fixture opt-in: " + TestOptIn);
+                foreach (string File in Directory.GetFiles(Path.Combine(Root, "Scripts"), "*", SearchOption.AllDirectories))
+                    if (Path.GetExtension(File).Equals(".das", System.StringComparison.OrdinalIgnoreCase)
+                        || Path.GetExtension(File).Equals(".json", System.StringComparison.OrdinalIgnoreCase)) Files.Add(File);
+            }
+        }
+        return System.Linq.Enumerable.ToArray(Files);
     }
 }

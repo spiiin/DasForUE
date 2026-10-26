@@ -413,97 +413,8 @@ uint64 StructMapObjectKey(const FDasStructValue& H, const char* Path, int32 Inde
         Index, C);
     return InternObjectKey(ReadNativePropertyValue(F.Property, F.Memory, C).ObjectValue.Get(), C);
 }
-int32 StructMapGetObjectKeyInt(const FDasStructValue& H, const char* Path, uint64 Token, das::Context* C)
-{
-    return StructScalarMapGet<FIntProperty>(H, Path, ObjectMapKey(H, Path, Token, C), ESnapshotKind::Object, C);
-}
-FDasStructValue StructMapWithObjectKeyInt(const FDasStructValue& H, const char* Path, uint64 Token, int32 Value,
-                                          das::Context* C, das::LineInfoArg* At)
-{
-    return StructScalarMapWith<FIntProperty>(H, Path, ObjectMapKey(H, Path, Token, C), Value, ESnapshotKind::Object, C,
-                                             At);
-}
-float StructMapGetObjectKeyFloat(const FDasStructValue& H, const char* Path, uint64 Token, das::Context* C)
-{
-    return StructScalarMapGet<FFloatProperty>(H, Path, ObjectMapKey(H, Path, Token, C), ESnapshotKind::Object, C);
-}
-FDasStructValue StructMapWithObjectKeyFloat(const FDasStructValue& H, const char* Path, uint64 Token, float Value,
-                                            das::Context* C, das::LineInfoArg* At)
-{
-    return StructScalarMapWith<FFloatProperty>(H, Path, ObjectMapKey(H, Path, Token, C), Value, ESnapshotKind::Object,
-                                               C, At);
-}
-double StructMapGetObjectKeyDouble(const FDasStructValue& H, const char* Path, uint64 Token, das::Context* C)
-{
-    return StructScalarMapGet<FDoubleProperty>(H, Path, ObjectMapKey(H, Path, Token, C), ESnapshotKind::Object, C);
-}
-FDasStructValue StructMapWithObjectKeyDouble(const FDasStructValue& H, const char* Path, uint64 Token, double Value,
-                                             das::Context* C, das::LineInfoArg* At)
-{
-    return StructScalarMapWith<FDoubleProperty>(H, Path, ObjectMapKey(H, Path, Token, C), Value, ESnapshotKind::Object,
-                                                C, At);
-}
-bool StructMapGetObjectKeyBool(const FDasStructValue& H, const char* Path, uint64 Token, das::Context* C)
-{
-    return StructScalarMapGet<FBoolProperty>(H, Path, ObjectMapKey(H, Path, Token, C), ESnapshotKind::Object, C);
-}
-FDasStructValue StructMapWithObjectKeyBool(const FDasStructValue& H, const char* Path, uint64 Token, bool Value,
-                                           das::Context* C, das::LineInfoArg* At)
-{
-    return StructScalarMapWith<FBoolProperty>(H, Path, ObjectMapKey(H, Path, Token, C), Value, ESnapshotKind::Object, C,
-                                              At);
-}
-char* StructMapGetObjectKeyString(const FDasStructValue& H, const char* Path, uint64 Token, das::Context* C)
-{
-    return CopyDSLString(
-        StructScalarMapGet<FStrProperty>(H, Path, ObjectMapKey(H, Path, Token, C), ESnapshotKind::Object, C), C);
-}
-FDasStructValue StructMapWithObjectKeyString(const FDasStructValue& H, const char* Path, uint64 Token,
-                                             const char* Value, das::Context* C, das::LineInfoArg* At)
-{
-    return StructScalarMapWith<FStrProperty>(H, Path, ObjectMapKey(H, Path, Token, C),
-                                             FString(Value ? UTF8_TO_TCHAR(Value) : TEXT("")), ESnapshotKind::Object, C,
-                                                     At);
-}
-FDasNameValue StructMapGetObjectKeyName(const FDasStructValue& H, const char* Path, uint64 Token, das::Context* C)
-{
-    return MakeDSLName(
-        StructScalarMapGet<FNameProperty>(H, Path, ObjectMapKey(H, Path, Token, C), ESnapshotKind::Object, C), C);
-}
-FDasStructValue StructMapWithObjectKeyName(const FDasStructValue& H, const char* Path, uint64 Token,
-                                           FDasNameValue Value, das::Context* C, das::LineInfoArg* At)
-{
-    return StructScalarMapWith<FNameProperty>(H, Path, ObjectMapKey(H, Path, Token, C), ResolveDSLName(Value, C),
-                                              ESnapshotKind::Object, C, At);
-}
-FDasEnumValue StructMapGetObjectKeyEnum(const FDasStructValue& H, const char* Path, uint64 Token, das::Context* C)
-{
-    return StructMapGetEnum(H, Path, ObjectMapKey(H, Path, Token, C), ESnapshotKind::Object, C);
-}
-FDasStructValue StructMapWithObjectKeyEnum(const FDasStructValue& H, const char* Path, uint64 Token,
-                                           FDasEnumValue Value, das::Context* C, das::LineInfoArg* At)
-{
-    return StructMapWithEnum(H, Path, ObjectMapKey(H, Path, Token, C), Value, ESnapshotKind::Object, C, At);
-}
-FDasObjectHandle StructMapGetObjectKeyObject(const FDasStructValue& H, const char* Path, uint64 Token, das::Context* C)
-{
-    return StructMapGetObject(H, Path, ObjectMapKey(H, Path, Token, C), ESnapshotKind::Object, C);
-}
-FDasStructValue StructMapWithObjectKeyObject(const FDasStructValue& H, const char* Path, uint64 Token,
-                                             const FDasObjectHandle& Value, das::Context* C, das::LineInfoArg* At)
-{
-    return StructMapWithObject(H, Path, ObjectMapKey(H, Path, Token, C), Value, ESnapshotKind::Object, C, At);
-}
-FDasStructValue StructMapGetObjectKeyStruct(const FDasStructValue& H, const char* Path, uint64 Token, das::Context* C,
-                                            das::LineInfoArg* At)
-{
-    return StructMapGetStruct(H, Path, ObjectMapKey(H, Path, Token, C), ESnapshotKind::Object, C, At);
-}
-FDasStructValue StructMapWithObjectKeyStruct(const FDasStructValue& H, const char* Path, uint64 Token,
-                                             const FDasStructValue& Value, das::Context* C, das::LineInfoArg* At)
-{
-    return StructMapWithStruct(H, Path, ObjectMapKey(H, Path, Token, C), Value, ESnapshotKind::Object, C, At);
-}
+
+
 uint8 EnumMapKey(const FDasStructValue& H, const char* Path, FDasEnumValue Token, das::Context* C)
 {
     const auto& E = ResolveEnumValue(Token, C);
@@ -523,97 +434,6 @@ FDasEnumValue StructMapEnumKey(const FDasStructValue& H, const char* Path, int32
         Index, C);
     auto* E = DasEnumPropertyType(F.Property);
     return MakeEnumValue(E->GetPathName(), ReadNativeEnumNumber(F.Property, F.Memory, C), C);
-}
-int32 StructMapGetEnumKeyInt(const FDasStructValue& H, const char* Path, FDasEnumValue Token, das::Context* C)
-{
-    return StructScalarMapGet<FIntProperty>(H, Path, EnumMapKey(H, Path, Token, C), ESnapshotKind::Enum, C);
-}
-FDasStructValue StructMapWithEnumKeyInt(const FDasStructValue& H, const char* Path, FDasEnumValue Token, int32 Value,
-                                        das::Context* C, das::LineInfoArg* At)
-{
-    return StructScalarMapWith<FIntProperty>(H, Path, EnumMapKey(H, Path, Token, C), Value, ESnapshotKind::Enum, C, At);
-}
-float StructMapGetEnumKeyFloat(const FDasStructValue& H, const char* Path, FDasEnumValue Token, das::Context* C)
-{
-    return StructScalarMapGet<FFloatProperty>(H, Path, EnumMapKey(H, Path, Token, C), ESnapshotKind::Enum, C);
-}
-FDasStructValue StructMapWithEnumKeyFloat(const FDasStructValue& H, const char* Path, FDasEnumValue Token, float Value,
-                                          das::Context* C, das::LineInfoArg* At)
-{
-    return StructScalarMapWith<FFloatProperty>(H, Path, EnumMapKey(H, Path, Token, C), Value, ESnapshotKind::Enum, C,
-                                               At);
-}
-double StructMapGetEnumKeyDouble(const FDasStructValue& H, const char* Path, FDasEnumValue Token, das::Context* C)
-{
-    return StructScalarMapGet<FDoubleProperty>(H, Path, EnumMapKey(H, Path, Token, C), ESnapshotKind::Enum, C);
-}
-FDasStructValue StructMapWithEnumKeyDouble(const FDasStructValue& H, const char* Path, FDasEnumValue Token,
-                                           double Value, das::Context* C, das::LineInfoArg* At)
-{
-    return StructScalarMapWith<FDoubleProperty>(H, Path, EnumMapKey(H, Path, Token, C), Value, ESnapshotKind::Enum, C,
-                                                At);
-}
-bool StructMapGetEnumKeyBool(const FDasStructValue& H, const char* Path, FDasEnumValue Token, das::Context* C)
-{
-    return StructScalarMapGet<FBoolProperty>(H, Path, EnumMapKey(H, Path, Token, C), ESnapshotKind::Enum, C);
-}
-FDasStructValue StructMapWithEnumKeyBool(const FDasStructValue& H, const char* Path, FDasEnumValue Token, bool Value,
-                                         das::Context* C, das::LineInfoArg* At)
-{
-    return StructScalarMapWith<FBoolProperty>(H, Path, EnumMapKey(H, Path, Token, C), Value, ESnapshotKind::Enum, C,
-                                              At);
-}
-char* StructMapGetEnumKeyString(const FDasStructValue& H, const char* Path, FDasEnumValue Token, das::Context* C)
-{
-    return CopyDSLString(
-        StructScalarMapGet<FStrProperty>(H, Path, EnumMapKey(H, Path, Token, C), ESnapshotKind::Enum, C), C);
-}
-FDasStructValue StructMapWithEnumKeyString(const FDasStructValue& H, const char* Path, FDasEnumValue Token,
-                                           const char* Value, das::Context* C, das::LineInfoArg* At)
-{
-    return StructScalarMapWith<FStrProperty>(H, Path, EnumMapKey(H, Path, Token, C),
-                                             FString(Value ? UTF8_TO_TCHAR(Value) : TEXT("")), ESnapshotKind::Enum, C,
-                                                     At);
-}
-FDasNameValue StructMapGetEnumKeyName(const FDasStructValue& H, const char* Path, FDasEnumValue Token, das::Context* C)
-{
-    return MakeDSLName(
-        StructScalarMapGet<FNameProperty>(H, Path, EnumMapKey(H, Path, Token, C), ESnapshotKind::Enum, C), C);
-}
-FDasStructValue StructMapWithEnumKeyName(const FDasStructValue& H, const char* Path, FDasEnumValue Token,
-                                         FDasNameValue Value, das::Context* C, das::LineInfoArg* At)
-{
-    return StructScalarMapWith<FNameProperty>(H, Path, EnumMapKey(H, Path, Token, C), ResolveDSLName(Value, C),
-                                              ESnapshotKind::Enum, C, At);
-}
-FDasEnumValue StructMapGetEnumKeyEnum(const FDasStructValue& H, const char* Path, FDasEnumValue Token, das::Context* C)
-{
-    return StructMapGetEnum(H, Path, EnumMapKey(H, Path, Token, C), ESnapshotKind::Enum, C);
-}
-FDasStructValue StructMapWithEnumKeyEnum(const FDasStructValue& H, const char* Path, FDasEnumValue Token,
-                                         FDasEnumValue Value, das::Context* C, das::LineInfoArg* At)
-{
-    return StructMapWithEnum(H, Path, EnumMapKey(H, Path, Token, C), Value, ESnapshotKind::Enum, C, At);
-}
-FDasObjectHandle StructMapGetEnumKeyObject(const FDasStructValue& H, const char* Path, FDasEnumValue Token,
-                                           das::Context* C)
-{
-    return StructMapGetObject(H, Path, EnumMapKey(H, Path, Token, C), ESnapshotKind::Enum, C);
-}
-FDasStructValue StructMapWithEnumKeyObject(const FDasStructValue& H, const char* Path, FDasEnumValue Token,
-                                           const FDasObjectHandle& Value, das::Context* C, das::LineInfoArg* At)
-{
-    return StructMapWithObject(H, Path, EnumMapKey(H, Path, Token, C), Value, ESnapshotKind::Enum, C, At);
-}
-FDasStructValue StructMapGetEnumKeyStruct(const FDasStructValue& H, const char* Path, FDasEnumValue Token,
-                                          das::Context* C, das::LineInfoArg* At)
-{
-    return StructMapGetStruct(H, Path, EnumMapKey(H, Path, Token, C), ESnapshotKind::Enum, C, At);
-}
-FDasStructValue StructMapWithEnumKeyStruct(const FDasStructValue& H, const char* Path, FDasEnumValue Token,
-                                           const FDasStructValue& Value, das::Context* C, das::LineInfoArg* At)
-{
-    return StructMapWithStruct(H, Path, EnumMapKey(H, Path, Token, C), Value, ESnapshotKind::Enum, C, At);
 }
 
 
@@ -764,7 +584,7 @@ UClass* CheckedInterface(const char* Path, das::Context* C)
 {
     auto* I = ResolveClass(Path, C);
     if ((!FString(Path).StartsWith(TEXT("/Script/")) && !FString(Path).StartsWith(TEXT("/Game/"))) ||
-          !I->HasAnyClassFlags(CLASS_Interface))
+          !DasInterfaceIdentityMatches(I))
         C->throw_error("expected loaded native UInterface path");
     return I;
 }
@@ -774,7 +594,7 @@ FDasObjectHandle CastInterface(const FDasObjectHandle& Handle, const char* Path,
     if (!Handle.Token)
         return {};
     auto* Object = ResolveObject(Handle, C);
-    if (!Object->GetClass()->ImplementsInterface(Interface))
+    if (!DasImplementsInterface(Object->GetClass(), Interface))
         C->throw_error("object does not implement requested interface");
     return Handle;
 }
@@ -782,21 +602,17 @@ bool ObjectImplementsInterface(const FDasObjectHandle& H, const char* Path, das:
 {
     auto* I = CheckedInterface(Path, C);
     auto* O = TryObject(H, C);
-    return O && O->GetClass()->ImplementsInterface(I);
+    return O && DasImplementsInterface(O->GetClass(), I);
 }
 UFunction* CheckedInterfaceFunction(UObject* O, const char* Path, const char* Name, das::Context* C)
 {
     auto* I = CheckedInterface(Path, C);
-    if (!O->GetClass()->ImplementsInterface(I))
-        C->throw_error("object does not implement requested interface");
     if (!Name || !*Name || FCStringAnsi::Strlen(Name) >= NAME_SIZE)
         C->throw_error("expected bounded interface method name");
-    auto* Declared = I->FindFunctionByName(FName(UTF8_TO_TCHAR(Name)));
-    auto* Actual = O->FindFunction(FName(UTF8_TO_TCHAR(Name)));
-    if (!Declared || !Declared->HasAnyFunctionFlags(FUNC_BlueprintEvent) || !Actual)
-        C->throw_error("reflected interface implementation is unavailable");
-    if (!Actual->IsSignatureCompatibleWith(Declared))
-        C->throw_error("interface dispatch signature mismatch");
+    FString Error;
+    auto* Actual = DasResolveInterfaceFunction(O, I, FName(UTF8_TO_TCHAR(Name)), Error);
+    if (!Actual)
+        C->throw_error(TCHAR_TO_UTF8(*Error));
     return Actual;
 }
 int32 InterfaceCallInt(const FDasObjectHandle& H, const char* Path, const char* Name, int32 Input, das::Context* C);

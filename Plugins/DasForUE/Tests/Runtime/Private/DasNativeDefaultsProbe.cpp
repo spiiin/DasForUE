@@ -1,0 +1,572 @@
+#include "DasNativeDefaultsProbe.h"
+#include "DasNativeDefaults.h"
+#include "DasActor.h"
+#include "DasProbeActor.h"
+#include "DasScriptComponent.h"
+#include "Engine/World.h"
+#include "Engine/Level.h"
+#include "GameFramework/Pawn.h"
+#include "Components/SceneComponent.h"
+#include "UObject/UnrealType.h"
+#include "UObject/StructOnScope.h"
+#include "Misc/ScopeExit.h"
+bool RunDasNativeDefaultsProbe(UWorld* World, FString& Report)
+{
+    if (!World || !World->PersistentLevel)
+        return false;
+    ADasActor* A = nullptr;
+    ADasActor* Manual = nullptr;
+    ADasActor* Child = nullptr;
+    ADasActor* Computed = nullptr;
+    for (const auto& Actor : World->PersistentLevel->Actors)
+        if (auto* P = Cast<ADasActor>(Actor))
+        {
+            if (P->Tags.Contains(TEXT("NativeDefault")))
+                A = P;
+            if (P->Tags.Contains(TEXT("NativeManual")))
+                Manual = P;
+            if (P->Tags.Contains(TEXT("NativeChild")))
+                Child = P;
+            if (P->Tags.Contains(TEXT("NativeComputedChild")))
+                Computed = P;
+        }
+    if (!A || !Manual || !Child || !Computed)
+        return false;
+    bool Good = true;
+    auto Check = [&](bool OK, const TCHAR* N)
+    {
+        Good &= OK;
+        Report += FString::Printf(TEXT("DAS_NATIVE_COOKED %s %s\n"), OK ? TEXT("PASS"): TEXT("FAIL"), N);
+    };
+    auto Life = [](UObject* O)
+    {
+        auto* P = O ? FindFProperty<FFloatProperty>(O->GetClass(), TEXT("InitialLifeSpan")) : nullptr;
+        return P ? P->GetPropertyValue_InContainer(O) : -1.f;
+    };
+    auto Scale = [](UObject* O)
+    {
+        FString Error;
+        auto* Root = Cast<USceneComponent>(
+            DasNativeDefaultTarget(TEXT("/Script/Engine.Actor"), O, TEXT("RootComponent"), Error));
+        return Root ? Root->GetRelativeScale3D() : FVector::ZeroVector;
+    };
+    auto Read = [](UObject* O)
+    {
+        auto* F = O->FindFunction(TEXT("Read"));
+        if (!F)
+            return MIN_int32;
+        FStructOnScope Args(F);
+        auto* In = FindFProperty<FIntProperty>(F, TEXT("input"));
+        auto* Return = CastField<FIntProperty>(F->GetReturnProperty());
+        if (!In || !Return)
+            return MIN_int32;
+        In->SetPropertyValue_InContainer(Args.GetStructMemory(), 0);
+        O->ProcessEvent(F, Args.GetStructMemory());
+        return Return->GetPropertyValue_InContainer(Args.GetStructMemory());
+    };
+    auto NativeCall = [&](UObject* O, const TCHAR* Name, float Input)
+    {
+        auto* F = O->FindFunction(Name);
+        if (!F)
+            return -1000.f;
+        FStructOnScope Args(F);
+        if (auto* In = FindFProperty<FFloatProperty>(F, TEXT("input")))
+            In->SetPropertyValue_InContainer(Args.GetStructMemory(), Input);
+        auto* Result = CastField<FFloatProperty>(F->GetReturnProperty());
+        if (!Result)
+            return -1000.f;
+        O->ProcessEvent(F, Args.GetStructMemory());
+        return Result->GetPropertyValue_InContainer(Args.GetStructMemory());
+    };
+    for (auto* Actor : {A, Child, Computed})
+    {
+        const float Before = Actor->CustomTimeDilation;
+        Check(NativeCall(Actor, TEXT("ChangeNative"), 2.0f) == 2.0f && Actor->CustomTimeDilation == 2.0f &&
+                         NativeCall(Actor, TEXT("NativeLife"), 0) == Life(Actor) && Actor->LastDasError.IsEmpty(),
+                                    TEXT("native_self_read_write_compound_helper_inheritance_const"));
+        Actor->CustomTimeDilation = Before;
+    }
+    {
+        auto* F = A->FindFunction(TEXT("NativeRootValid"));
+        bool Valid = false;
+        if (F)
+        {
+            FStructOnScope Args(F);
+            if (auto* Return = CastField<FBoolProperty>(F->GetReturnProperty()))
+            {
+                A->ProcessEvent(F, Args.GetStructMemory());
+                Valid = Return->GetPropertyValue_InContainer(Args.GetStructMemory());
+            }
+        }
+        Check(Valid && A->LastDasError.IsEmpty(), TEXT("native_self_component_reference"));
+    }
+    auto ObjectCall = [&](ADasActor* Actor, const TCHAR* Name, UObject* Value, UObject*& Result)
+    {
+        auto* F = Actor->FindFunction(Name);
+        if (!F)
+            return false;
+        auto* Return = CastField<FObjectPropertyBase>(F->GetReturnProperty());
+        if (!Return)
+            return false;
+        FStructOnScope Args(F);
+        if (auto* Input = FindFProperty<FObjectPropertyBase>(F, TEXT("value")))
+            Input->SetObjectPropertyValue_InContainer(Args.GetStructMemory(), Value);
+        Actor->ProcessEvent(F, Args.GetStructMemory());
+        Result = Return->GetObjectPropertyValue_InContainer(Args.GetStructMemory());
+        return Actor->LastDasError.IsEmpty();
+    };
+    UObject* NativeResult = nullptr;
+    for (auto* Actor : {A, Child, Computed})
+    {
+        Check(ObjectCall(Actor, TEXT("NativeRoot"), nullptr, NativeResult) && NativeResult == Actor->GetRootComponent(),
+                         TEXT("typed_native_component_return_and_inheritance"));
+        auto* Function = Actor->FindFunction(TEXT("NativeRootScale"));
+        bool Matches = false;
+        if (Function)
+        {
+            FStructOnScope Args(Function);
+            if (auto* Return = CastField<FStructProperty>(Function->GetReturnProperty());
+                Return && Return->Struct == TBaseStructure<FVector>::Get())
+            {
+                Actor->ProcessEvent(Function, Args.GetStructMemory());
+                Matches = *Return->ContainerPtrToValuePtr<FVector>(Args.GetStructMemory()) == Scale(Actor);
+            }
+        }
+        Check(Matches && Actor->LastDasError.IsEmpty(), TEXT("typed_native_component_passed_directly_to_scene_API"));
+    }
+    // Native nominal enums round-trip through real UFunctions and the existing UEnum.
+    for (auto* Actor : {A, Child, Computed})
+    {
+        const auto Saved = Actor->SpawnCollisionHandlingMethod;
+        bool OK = true;
+        for (int64 Number = 0; Number <= 4; ++Number)
+        {
+            auto* Function = Actor->FindFunction(TEXT("SetNativeCollision"));
+            auto* Input = Function ? FindFProperty<FEnumProperty>(Function, TEXT("value")) : nullptr;
+            auto* Return = Function ? CastField<FEnumProperty>(Function->GetReturnProperty()) : nullptr;
+            if (!Input || !Return ||
+                Input->GetEnum()->GetPathName() != TEXT("/Script/Engine.ESpawnActorCollisionHandlingMethod"))
+            {
+                OK = false;
+                break;
+            }
+            FStructOnScope Args(Function);
+            Input->GetUnderlyingProperty()->SetIntPropertyValue(
+                Input->ContainerPtrToValuePtr<void>(Args.GetStructMemory()), Number);
+            Actor->ProcessEvent(Function, Args.GetStructMemory());
+            OK &= Actor->LastDasError.IsEmpty() && int64(Actor->SpawnCollisionHandlingMethod) == Number &&
+                  Return->GetUnderlyingProperty()->GetSignedIntPropertyValue(
+                      Return->ContainerPtrToValuePtr<void>(Args.GetStructMemory())) == Number;
+        }
+        Check(OK, TEXT("native_enum_nominal_parameter_result_and_inheritance"));
+        Actor->SpawnCollisionHandlingMethod = Saved;
+        {
+            auto* F = Actor->FindFunction(TEXT("RejectForgedNativeCollision"));
+            bool Rejected = false;
+            if (F)
+            {
+                FStructOnScope Args(F);
+                Actor->ProcessEvent(F, Args.GetStructMemory());
+                if (auto* Return = CastField<FBoolProperty>(F->GetReturnProperty()))
+                    Rejected = Return->GetPropertyValue_InContainer(Args.GetStructMemory());
+            }
+            Check(Rejected && Actor->SpawnCollisionHandlingMethod == Saved && Actor->LastDasError.IsEmpty(),
+                  TEXT("forged_native_enum_no_partial_write_and_recovery"));
+        }
+        {
+            auto* F = Actor->FindFunction(TEXT("NativeScaleX"));
+            bool Match = false;
+            if (F)
+            {
+                FStructOnScope Args(F);
+                Actor->ProcessEvent(F, Args.GetStructMemory());
+                if (auto* Return = CastField<FDoubleProperty>(F->GetReturnProperty()))
+                    Match = Return->GetPropertyValue_InContainer(Args.GetStructMemory()) ==
+                            Actor->GetRootComponent()->GetRelativeScale3D().X;
+            }
+            Check(Match && Actor->LastDasError.IsEmpty(), TEXT("native_struct_nested_leaf_read"));
+        }
+
+        for (const auto* Method :
+             {TEXT("NativeRelativeLocation"), TEXT("NativeRelativeRotation"), TEXT("NativeRelativeScale"),
+                                                                                   TEXT("NativeTransform")})
+        {
+            auto* Function = Actor->FindFunction(Method);
+            auto* Return = Function ? CastField<FStructProperty>(Function->GetReturnProperty()) : nullptr;
+            bool Match = false;
+            if (Return)
+            {
+                FStructOnScope Args(Function);
+                Actor->ProcessEvent(Function, Args.GetStructMemory());
+                const void* Value = Return->ContainerPtrToValuePtr<void>(Args.GetStructMemory());
+                if (FString(Method) == TEXT("NativeRelativeLocation"))
+                    Match = *static_cast<const FVector*>(Value) == Actor->GetRootComponent()->GetRelativeLocation();
+                if (FString(Method) == TEXT("NativeRelativeRotation"))
+                    Match = *static_cast<const FRotator*>(Value) == Actor->GetRootComponent()->GetRelativeRotation();
+                if (FString(Method) == TEXT("NativeRelativeScale"))
+                    Match = *static_cast<const FVector*>(Value) == Actor->GetRootComponent()->GetRelativeScale3D();
+                if (FString(Method) == TEXT("NativeTransform"))
+                    Match = static_cast<const FTransform*>(Value)->Equals(Actor->GetActorTransform());
+            }
+            Check(Match && Actor->LastDasError.IsEmpty(), Method);
+        }
+        const auto SavedTransform = Actor->GetActorTransform();
+        const FTransform Wanted(FRotator(10, 20, 30), FVector(111, 222, 333), FVector(2, 3, 4));
+        auto* Function = Actor->FindFunction(TEXT("SetNativeTransform"));
+        auto* Input = Function ? FindFProperty<FStructProperty>(Function, TEXT("value")) : nullptr;
+        auto* Return = Function ? CastField<FStructProperty>(Function->GetReturnProperty()) : nullptr;
+        bool Match = false;
+        if (Input && Return)
+        {
+            FStructOnScope Args(Function);
+            *Input->ContainerPtrToValuePtr<FTransform>(Args.GetStructMemory()) = Wanted;
+            Actor->ProcessEvent(Function, Args.GetStructMemory());
+            Match = Return->ContainerPtrToValuePtr<FTransform>(Args.GetStructMemory())->Equals(Wanted) &&
+                    Actor->GetActorTransform().Equals(Wanted);
+        }
+        Check(Match && Actor->LastDasError.IsEmpty(), TEXT("native_transform_checked_whole_value_assignment"));
+        {
+            auto* Rotation = Actor->FindFunction(TEXT("NativeRelativeRotation"));
+            bool Exact = false;
+            if (Rotation)
+            {
+                FStructOnScope Args(Rotation);
+                Actor->ProcessEvent(Rotation, Args.GetStructMemory());
+                if (auto* P = CastField<FStructProperty>(Rotation->GetReturnProperty()))
+                    Exact = *P->ContainerPtrToValuePtr<FRotator>(Args.GetStructMemory()) ==
+                            Actor->GetRootComponent()->GetRelativeRotation();
+            }
+            Check(Exact && Actor->LastDasError.IsEmpty(), TEXT("native_component_rotation_exact_public_getter"));
+        }
+        Actor->SetActorTransform(SavedTransform);
+    }
+    auto* PreviousOwner = A->GetOwner();
+    A->SetOwner(nullptr);
+    Check(ObjectCall(A, TEXT("NativeOwner"), nullptr, NativeResult) && !NativeResult, TEXT("typed_null_native_owner"));
+    A->SetOwner(Manual);
+    Check(ObjectCall(A, TEXT("NativeOwner"), nullptr, NativeResult) && NativeResult == Manual,
+                     TEXT("typed_native_actor_owner"));
+    A->SetOwner(PreviousOwner);
+    auto* PreviousInstigator = A->GetInstigator();
+    auto* Pawn = World->SpawnActor<APawn>();
+    Check(Pawn && ObjectCall(A, TEXT("SetNativeInstigator"), Pawn, NativeResult) && NativeResult == Pawn &&
+                             A->GetInstigator() == Pawn,
+                             TEXT("typed_native_reference_assignment_and_return"));
+    const auto Forged = A->ExecuteDasFrame(TEXT("dsl_native_defaults.das"), TEXT("ue_NativeDefaults_ForgedInstigator"),
+                                                                                 {}, 3, FString());
+    Check(Forged.Kind == -1 && A->LastDasError.Contains(TEXT("does not match requested class")) &&
+                                                        A->GetInstigator() == Pawn,
+                                                        TEXT("forged_native_reference_rejected_before_write"));
+    Check(ObjectCall(A, TEXT("SetNativeInstigator"), nullptr, NativeResult) && !NativeResult && !A->GetInstigator(),
+                     TEXT("typed_native_null_assignment_and_recovery"));
+    A->SetInstigator(PreviousInstigator);
+    if (Pawn)
+        Pawn->Destroy();
+    auto* CDO = A->GetClass()->GetDefaultObject();
+    Check(Life(CDO) == 30 && Life(A) == 30 && Life(Manual) == 77, TEXT("native_actor_CDO_and_manual_instance"));
+    Check(Scale(CDO) == FVector(99, 4, 5) && Scale(Manual) == FVector(99, 88, 5),
+          TEXT("native_subobject_member_merge"));
+    Check(Life(Child) == 20 && Life(Computed) == 31 && Scale(Child) == FVector(1, 2, 3),
+          TEXT("authored_children_native_defaults"));
+    Check(Read(A) == 7 && Read(Child) == 7 && Read(Computed) == 7 && A->LastDasError.IsEmpty() &&
+              Child->LastDasError.IsEmpty() && Computed->LastDasError.IsEmpty(),
+          TEXT("native_source_contracts_in_packaged_runtime"));
+    TArray<UDasScriptComponent*> Components;
+    A->GetComponents(Components);
+    UDasScriptComponent* Component = nullptr;
+    for (auto* C : Components)
+        if (C->ComponentTags.Contains(TEXT("NativeComponent")))
+            Component = C;
+    Check(Component && !Component->bAutoActivate &&
+              !CastChecked<UDasScriptComponent>(Component->GetClass()->GetDefaultObject())->bAutoActivate &&
+              Read(Component) == 1 && Component->LastDasError.IsEmpty(),
+          TEXT("native_ActorComponent_defaults"));
+    // Work with live arrays, then restore the map's actor/component identification tags.
+    auto TagCall = [&](UObject* Object, const TCHAR* Method, int32 Index, FName Name, const TArray<FName>* Values,
+                       int32* Count, FName* Element, TArray<FName>* Snapshot)
+    {
+        auto* Function = Object->FindFunction(Method);
+        if (!Function)
+            return false;
+        FStructOnScope Args(Function);
+        if (auto* P = FindFProperty<FIntProperty>(Function, TEXT("index")))
+            P->SetPropertyValue_InContainer(Args.GetStructMemory(), Index);
+        if (auto* P = FindFProperty<FNameProperty>(Function, TEXT("value")))
+            P->SetPropertyValue_InContainer(Args.GetStructMemory(), Name);
+        if (Values)
+        {
+            auto* P = FindFProperty<FArrayProperty>(Function, TEXT("values"));
+            auto* Inner = P ? CastField<FNameProperty>(P->Inner) : nullptr;
+            if (!Inner)
+                return false;
+            FScriptArrayHelper Array(P, P->ContainerPtrToValuePtr<void>(Args.GetStructMemory()));
+            Array.Resize(Values->Num());
+            for (int32 I = 0; I < Values->Num(); ++I)
+                Inner->SetPropertyValue(Array.GetRawPtr(I), (*Values)[I]);
+        }
+        Object->ProcessEvent(Function, Args.GetStructMemory());
+        const FString LastError = Cast<ADasActor>(Object) ? CastChecked<ADasActor>(Object)->LastDasError
+                                                          : CastChecked<UDasScriptComponent>(Object)->LastDasError;
+        if (!LastError.IsEmpty())
+            return false;
+        auto* Return = Function->GetReturnProperty();
+        if (Count)
+        {
+            auto* P = CastField<FIntProperty>(Return);
+            if (!P)
+                return false;
+            *Count = P->GetPropertyValue_InContainer(Args.GetStructMemory());
+        }
+        if (Element)
+        {
+            auto* P = CastField<FNameProperty>(Return);
+            if (!P)
+                return false;
+            *Element = P->GetPropertyValue_InContainer(Args.GetStructMemory());
+        }
+        if (Snapshot)
+        {
+            auto* P = CastField<FArrayProperty>(Return);
+            auto* Inner = P ? CastField<FNameProperty>(P->Inner) : nullptr;
+            if (!Inner)
+                return false;
+            Snapshot->Reset();
+            FScriptArrayHelper Array(P, P->ContainerPtrToValuePtr<void>(Args.GetStructMemory()));
+            for (int32 I = 0; I < Array.Num(); ++I)
+                Snapshot->Add(Inner->GetPropertyValue(Array.GetRawPtr(I)));
+        }
+        return true;
+    };
+    for (auto* Actor : {A, Child, Computed})
+    {
+        const auto SavedTags = Actor->Tags;
+        int32 Count = -1;
+        FName Element;
+        TArray<FName> Snapshot;
+        Check(TagCall(Actor, TEXT("ClearNativeTags"), 0, NAME_None, nullptr, nullptr, nullptr, nullptr) &&
+                      Actor->Tags.IsEmpty(),
+                      TEXT("native_array_clear"));
+        Check(TagCall(Actor,
+                      TEXT("AppendNativeTag"), 0, TEXT("Alpha"), nullptr, &Count, nullptr, nullptr) && Count == 1 &&
+                           Actor->Tags == TArray<FName>{TEXT("Alpha")}, TEXT("native_array_push_and_live_count"));
+        Check(TagCall(Actor, TEXT("SetNativeTag"), 0, TEXT("Beta"), nullptr, nullptr, nullptr, nullptr) &&
+                                  TagCall(Actor,
+                                          TEXT("NativeTagAt"), 0, NAME_None, nullptr, nullptr, &Element, nullptr) &&
+                                          Element == TEXT("Beta") && Actor->Tags[0] == Element,
+                                                          TEXT("native_array_index_read_write"));
+        Check(TagCall(Actor, TEXT("DetachedNativeTags"), 0, NAME_None, nullptr, &Count, nullptr, nullptr) &&
+                      Count == 2 && Actor->Tags.Num() == 1 &&
+                      TagCall(Actor, TEXT("NativeTagsSnapshot"), 0, NAME_None, nullptr, nullptr, nullptr, &Snapshot) &&
+                              Snapshot == Actor->Tags,
+                              TEXT("native_array_detached_snapshot"));
+        Check(TagCall(Actor, TEXT("SetNativeTagWithSideEffect"), 0, NAME_None, nullptr, nullptr, nullptr, nullptr) &&
+                      Actor->Tags == TArray<FName>{TEXT("Updated"), TEXT("SideEffect")},
+                                                   TEXT("native_index_commit_preserves_RHS_side_effect"));
+        const TArray<FName> Input = {TEXT("One"), TEXT("Two"), TEXT("Three")};
+        Check(TagCall(
+            Actor, TEXT("SetNativeTags"), 0, NAME_None, &Input, nullptr, nullptr, nullptr) && Actor->Tags == Input &&
+            TagCall(Actor, TEXT("EraseNativeTag"), 1, NAME_None, nullptr, nullptr, nullptr, nullptr) &&
+                    Actor->Tags ==
+                        TArray<FName>{TEXT("One"), TEXT("Three")} &&
+                            TagCall(Actor, TEXT("PopNativeTag"), 0, NAME_None, nullptr, nullptr, nullptr, nullptr) &&
+                                    Actor->Tags == TArray<FName>{TEXT("One")},
+                                                                 TEXT("native_array_assignment_erase_pop"));
+        Actor->Tags = SavedTags;
+    }
+    {
+        const auto SavedTags = A->Tags;
+        FDasScalarValue Index;
+        Index.Kind = 0;
+        Index.IntValue = 1000000;
+        FDasScalarValue Value;
+        Value.Kind = 7;
+        Value.NameValue = TEXT("OutOfRange");
+        const auto Failed = A->ExecuteDasFrame(TEXT("dsl_native_defaults.das"), TEXT("ue_NativeDefaults_SetNativeTag"),
+                                                                                     {Index, Value}, 3, FString());
+        Check(Failed.Kind == -1 && !A->LastDasError.IsEmpty() && A->Tags == SavedTags,
+              TEXT("native_array_failed_index_has_no_partial_write"));
+        TArray<FName> Snapshot;
+        Check(TagCall(A, TEXT("NativeTagsSnapshot"), 0, NAME_None, nullptr, nullptr, nullptr, &Snapshot) &&
+                      Snapshot == SavedTags,
+                      TEXT("native_array_recovery_after_error"));
+    }
+    if (Component)
+    {
+        const auto SavedTags = Component->ComponentTags;
+        int32 Count = -1;
+        Check(TagCall(Component, TEXT("ClearNativeTags"), 0, NAME_None, nullptr, nullptr, nullptr, nullptr) &&
+                      TagCall(Component,
+                              TEXT("AppendNativeTag"), 0, TEXT("ComponentAlpha"), nullptr, &Count, nullptr, nullptr) &&
+                                   Count == 1 &&
+                                   TagCall(Component,
+                                           TEXT("SetNativeTag"), 0,
+                                                TEXT("ComponentBeta"), nullptr, nullptr, nullptr, nullptr) &&
+                                                Component->ComponentTags ==
+                                                    TArray<FName>{TEXT("ComponentBeta")},
+                                                                  TEXT("native_ActorComponent_array_mutation"));
+        Component->ComponentTags = SavedTags;
+    }
+    {
+        ADasProbeActor* Arrays = nullptr;
+        for (const auto& Candidate : World->PersistentLevel->Actors)
+            if (auto* P = Cast<ADasProbeActor>(Candidate); P && P->Tags.Contains(TEXT("NativeValueArrays")))
+                Arrays = P;
+        Check(Arrays != nullptr, TEXT("native_value_arrays_host"));
+        if (Arrays)
+        {
+            auto* ArrayPawn = World->SpawnActor<APawn>();
+            Arrays->DasNativeArrayPawns = {ArrayPawn};
+            Arrays->DasNativeArrayEnumKeys.Reset();
+            Arrays->DasNativeArrayEnumKeys.Add(ESpawnActorCollisionHandlingMethod::AlwaysSpawn, 321);
+            Arrays->DasNativeArrayActorSet = {Arrays};
+            Arrays->DasNativeArrayObjectKeys.Reset();
+            Arrays->DasNativeArrayObjectKeys.Add(Arrays, 321);
+            Arrays->DasNativeArrayEnumSet = {ESpawnActorCollisionHandlingMethod::AlwaysSpawn};
+            Arrays->DasNativeArrayNameKeys.Reset();
+            Arrays->DasNativeArrayNameKeys.Add(TEXT("Preset_3"), 321);
+            for (const auto* Name :
+                 {TEXT("Enums"), TEXT("Bytes"),
+                                      TEXT("Vectors"),
+                                           TEXT("Rotators"),
+                                                TEXT("Transforms"),
+                                                     TEXT("Points"),
+                                                          TEXT("Objects"),
+                                                               TEXT("Maps"),
+                                                                    TEXT("MapValues"),
+                                                                         TEXT("Sets"),
+                                                                              TEXT("NameKeys"),
+                                                                                   TEXT("NameValues"),
+                                                                                        TEXT("EnumSets"),
+                                                                                             TEXT("EnumKeys"),
+                                                                                                  TEXT("ObjectHashes")})
+            {
+                auto* F = Arrays->FindFunction(Name);
+                bool Passed = false;
+                if (F)
+                {
+                    FStructOnScope Args(F);
+                    Arrays->ProcessEvent(F, Args.GetStructMemory());
+                    if (auto* Return = CastField<FBoolProperty>(F->GetReturnProperty()))
+                        Passed = Return->GetPropertyValue_InContainer(Args.GetStructMemory());
+                }
+                Check(Passed && Arrays->LastDasError.IsEmpty(), Name);
+            }
+            Check(ArrayPawn && Arrays->DasNativeArrayObjects.Num() == 2 && Arrays->DasNativeArrayObjects[0] == Arrays &&
+                      !Arrays->DasNativeArrayObjects[1] && Arrays->DasNativeArrayPawns.Num() == 2 &&
+                      Arrays->DasNativeArrayPawns[0] == ArrayPawn && !Arrays->DasNativeArrayPawns[1],
+                  TEXT("native_object_array_storage"));
+            Check(Arrays->DasNativeArrayIntMap.Num() == 1 && Arrays->DasNativeArrayIntMap.FindRef(1) == 99 &&
+                  Arrays->DasNativeArrayDoubleMap.FindRef(
+                      TEXT("speed")) == 5.0 &&
+                      Arrays->DasNativeArrayNameMap.FindRef(7) ==
+                          TEXT("Native") && Arrays->DasNativeArrayIntSet.Num() == 2 &&
+                               Arrays->DasNativeArrayIntSet.Contains(10) && Arrays->DasNativeArrayIntSet.Contains(30) &&
+                               Arrays->DasNativeArrayStringSet.Num() == 1 &&
+                               Arrays->DasNativeArrayStringSet.Contains(TEXT("alpha")), TEXT("native_map_set_storage"));
+            Check(Arrays->DasNativeArrayVectorMap.FindRef(
+                TEXT("origin")) == FVector(10, 2, 3) && Arrays->DasNativeArrayPointMap.Num() == 1 &&
+                Arrays->DasNativeArrayPointMap.FindRef(1) == FIntPoint(12, 0) &&
+                Arrays->DasNativeArrayEnumMap.Num() == 1 &&
+                Arrays->DasNativeArrayEnumMap.FindRef(1) == ESpawnActorCollisionHandlingMethod::AlwaysSpawn &&
+                Arrays->DasNativeArrayByteMap.FindRef(
+                    TEXT("mode")) == EComponentMobility::Movable && Arrays->DasNativeArrayPawnMap.Num() == 2 &&
+                    Arrays->DasNativeArrayPawnMap.FindRef(1) == ArrayPawn && !Arrays->DasNativeArrayPawnMap.FindRef(2),
+                    TEXT("native_typed_map_storage_and_atomicity"));
+            const FName K(TEXT("value_1"));
+            Check(
+                Arrays->DasNativeArrayNameKeys.Num() == 5 &&
+                Arrays->DasNativeArrayNameKeys.FindRef(
+                    TEXT("UNIT")) == 9 &&
+                    Arrays->DasNativeArrayNameKeys.FindRef(
+                        TEXT("unit_1")) == 20 &&
+                        Arrays->DasNativeArrayNameKeys.FindRef(
+                            TEXT("Unit_01")) == 30 && Arrays->DasNativeArrayNameKeys.FindRef(NAME_None) == 41 &&
+                            Arrays->DasNativeArrayNameKeys.FindRef(
+                                TEXT("東京_3")) == 50 &&
+                                !Arrays->DasNativeArrayNameKeys.Contains(
+                                    TEXT("Unit_0")) && Arrays->DasNativeArrayNameSet.Num() == 6 &&
+                                    Arrays->DasNativeArrayNameSet.Contains(
+                                        TEXT("unit")) &&
+                                        Arrays->DasNativeArrayNameSet.Contains(
+                                            TEXT("unit_1")) &&
+                                            Arrays->DasNativeArrayNameSet.Contains(
+                                                TEXT("unit_01")) && Arrays->DasNativeArrayNameSet.Contains(NAME_None) &&
+                                                Arrays->DasNativeArrayNameSet.Contains(
+                                                    TEXT("東京_3")) &&
+                                                    Arrays->DasNativeArrayNameSet.Contains(
+                                                        TEXT("extra")),
+                                                        TEXT("native_FName_equality_suffix_None_unicode_and_snapshots"));
+            Check(Arrays->DasNativeArrayNameNames.FindRef(K) ==
+                  FName(TEXT("RESULT_2")) && Arrays->DasNativeArrayNameVectors.FindRef(K) == FVector(10, 2, 3) &&
+                        Arrays->DasNativeArrayNamePoints.Num() == 1 &&
+                        Arrays->DasNativeArrayNamePoints.FindRef(K) == FIntPoint(12, 0) &&
+                        Arrays->DasNativeArrayNameEnums.FindRef(K) == ESpawnActorCollisionHandlingMethod::AlwaysSpawn &&
+                        Arrays->DasNativeArrayNameBytes.FindRef(K) == EComponentMobility::Movable &&
+                        Arrays->DasNativeArrayNameObjects.Num() == 2 &&
+                        Arrays->DasNativeArrayNameObjects.FindRef(K) == ArrayPawn &&
+                        !Arrays->DasNativeArrayNameObjects.FindRef(TEXT("null")),
+                                                                   TEXT("native_FName_map_value_types_and_atomicity"));
+            Check(
+                Arrays->DasNativeArrayEnumSet.Num() == 2 &&
+                    Arrays->DasNativeArrayEnumSet.Contains(ESpawnActorCollisionHandlingMethod::DontSpawnIfColliding) &&
+                    Arrays->DasNativeArrayEnumSet.Contains(
+                        ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn) &&
+                    Arrays->DasNativeArrayByteSet.Num() == 1 &&
+                    Arrays->DasNativeArrayByteSet.Contains(EComponentMobility::Stationary),
+                TEXT("native_enum_set_strong_byte_storage_and_atomicity"));
+            Check(Arrays->DasNativeArrayEnumKeys.FindRef(ESpawnActorCollisionHandlingMethod::AlwaysSpawn) == 322 &&
+                      Arrays->DasNativeArrayEnumKeys.FindRef(
+                          ESpawnActorCollisionHandlingMethod::DontSpawnIfColliding) == 42 &&
+                      Arrays->DasNativeArrayByteKeys.FindRef(EComponentMobility::Movable) == FVector(5, 2, 3) &&
+                      Arrays->DasNativeArrayEnumKeyEnums.FindRef(ESpawnActorCollisionHandlingMethod::AlwaysSpawn) ==
+                          ESpawnActorCollisionHandlingMethod::DontSpawnIfColliding &&
+                      Arrays->DasNativeArrayEnumKeyObjects.FindRef(ESpawnActorCollisionHandlingMethod::AlwaysSpawn) ==
+                          Arrays,
+                  TEXT("native_enum_keys_strong_byte_rich_values_and_atomicity"));
+            Check(Arrays->DasNativeArrayActorSet.Num() == 2 && Arrays->DasNativeArrayActorSet.Contains(Arrays) &&
+                      Arrays->DasNativeArrayActorSet.Contains(nullptr) && Arrays->DasNativeArrayObjectKeys.Num() == 2 &&
+                      Arrays->DasNativeArrayObjectKeys.FindRef(Arrays) == 8 &&
+                      Arrays->DasNativeArrayObjectKeys.FindRef(nullptr) == 42 &&
+                      Arrays->DasNativeArrayObjectVectors.FindRef(Arrays) == FVector(5, 2, 3) &&
+                      Arrays->DasNativeArrayObjectEnums.FindRef(Arrays) ==
+                          ESpawnActorCollisionHandlingMethod::AlwaysSpawn &&
+                      Arrays->DasNativeArrayPawnSet.Contains(ArrayPawn) &&
+                      Arrays->DasNativeArrayPawnKeys.FindRef(ArrayPawn) == ArrayPawn,
+                  TEXT("native_object_set_map_identity_null_value_types_and_atomicity"));
+            if (ArrayPawn)
+                ArrayPawn->Destroy();
+            {
+                auto* F = Arrays->FindFunction(TEXT("ExpiredObjectHashes"));
+                bool Passed = false;
+                if (F)
+                {
+                    FStructOnScope Args(F);
+                    Arrays->ProcessEvent(F, Args.GetStructMemory());
+                    if (auto* Return = CastField<FBoolProperty>(F->GetReturnProperty()))
+                        Passed = Return->GetPropertyValue_InContainer(Args.GetStructMemory());
+                }
+                Check(Passed && Arrays->LastDasError.IsEmpty(),
+                      TEXT("native_object_hash_destroyed_keys_refused_and_empty_assignment_recovers"));
+            }
+
+            Check(Arrays->DasNativeArrayEnums.Num() == 1 &&
+                      Arrays->DasNativeArrayEnums[0] ==
+                          ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn &&
+                      Arrays->DasNativeArrayBytes.Num() == 1 &&
+                      Arrays->DasNativeArrayBytes[0] == EComponentMobility::Stationary,
+                  TEXT("native_enum_array_storage_matches"));
+            Check(Arrays->DasNativeArrayVectors == TArray<FVector>{FVector(10, 77, 3)} &&
+                      Arrays->DasNativeArrayRotators == TArray<FRotator>{FRotator(1, 10, 3)} &&
+                      Arrays->DasNativeArrayTransforms.Num() == 1 &&
+                      Arrays->DasNativeArrayPoints == TArray<FIntPoint>{FIntPoint(12, 0)},
+                  TEXT("native_struct_array_storage_matches"));
+        }
+    }
+    auto* Fresh = World->SpawnActor<ADasActor>(A->GetClass());
+    Check(Fresh && Life(Fresh) == 30 && Scale(Fresh) == FVector(99, 4, 5) && Read(Fresh) == 7 &&
+              Fresh->LastDasError.IsEmpty(),
+          TEXT("fresh_spawn"));
+    if (Fresh)
+        Fresh->Destroy();
+    return Good;
+}

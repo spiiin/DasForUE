@@ -11,7 +11,7 @@ struct FUEDataTableRowFactory : das::CallMacro
                 DSLFail(TEXT("Expected ue_data_table_row(type<Row>, table, name [, type_folder_or_registry])"));
             auto T =
                 DSLObjectNormalize(static_cast<das::ExprTypeDecl*>(E->arguments[0])->typeexpr, *P->thisModuleGroup, M);
-            if (!DSLDirectStruct(T) || DSLSoft(T))
+            if (!DSLDirectStruct(T) || DSLAdaptedReference(T))
                 DSLFail(TEXT("DataTable rows require an authored or canonical native struct"));
             FString Scope;
             if (E->arguments.size() == 4)

@@ -1,8 +1,9 @@
 options gen2
+require ue_probe_actor
 require ue_text_byte_delegates
 require ue_interface_reentry_values
 [ue_class(Blueprintable), ue_implements(interface="/Game/DasTextByteEvents/Types/TextByteContract.TextByteContract_C")]
-class TextByteEvents {
+class TextByteEvents : ProbeActor {
     @ue_property=(BlueprintReadWrite)
     TextCallback:TextQuery
     @ue_property=(BlueprintReadWrite)

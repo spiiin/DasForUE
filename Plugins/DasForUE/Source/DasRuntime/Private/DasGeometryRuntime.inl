@@ -6,13 +6,7 @@ FDasStructValue StoreGeometry(const UScriptStruct* Type, const void* Data, das::
     FString E;
     if (!CaptureDasGeometry(Type, Data, Owned, E))
         C->throw_error(TCHAR_TO_UTF8(*E));
-    if (At && ActiveContext->StructValues.Num() >= ActiveContext->StructNextCollection)
-        CollectStructValues(*ActiveContext, At);
-    if (ActiveContext->StructValues.Num() >= 4096)
-        C->throw_error("struct value table limit exceeded");
-    const uint64 Token = NextStructValueToken++;
-    ActiveContext->StructValues.Add(Token, MoveTemp(Owned));
-    return {Token};
+    return StoreCapturedNativeValue(MoveTemp(Owned), C, At);
 }
 const FInstancedStruct& ResolveGeometry(const FDasStructValue& H, das::Context* C)
 {

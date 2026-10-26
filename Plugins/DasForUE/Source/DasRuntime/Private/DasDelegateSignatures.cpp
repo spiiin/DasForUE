@@ -1,4 +1,5 @@
 #include "DasDelegateSignatures.h"
+#include "DasTypeContracts.h"
 #include "UObject/TextProperty.h"
 #include "DasAuthoring.h"
 #include "DasPropertyTypes.h"
@@ -11,18 +12,8 @@ UFunction* MakeDasDelegateSignature(const FDasDeclaredMethod& M, bool Multicast,
                                     FString& Error)
 {
     Error.Reset();
-    if (M.Parameters.Num() > 16 || (Multicast && M.ReturnType.Kind != TEXT("void")))
-    {
-        Error = TEXT("Delegates support up to 16 inputs; multicast events cannot return a value");
+    if (!ValidateDasSignatureContract(M, Multicast ? EDasSignatureUse::Multicast : EDasSignatureUse::Delegate, Error))
         return nullptr;
-    }
-    for (const auto& P : M.Parameters)
-        if ((P.Direction != TEXT("in") && P.Direction != TEXT("inout") && P.Direction != TEXT("out")) ||
-                                              (Multicast && P.Direction == TEXT("out")))
-        {
-            Error = TEXT("Invalid delegate direction; multicast supports in/ref, not out-only parameters");
-            return nullptr;
-        }
     auto* F = NewObject<UFunction>(Outer, Name, RF_Transient);
     F->FunctionFlags = FUNC_Public | FUNC_Delegate | (Multicast ? FUNC_MulticastDelegate : FUNC_None);
     TArray<TPair<FName, FDasDeclaredType>> Params;

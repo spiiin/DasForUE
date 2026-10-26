@@ -1,0 +1,8383 @@
+{
+	"schema_version": 3,
+	"scope": "registered adapter property ABI, signature, callback and default type gates",
+	"evidence": "ValidateDasPropertyType; QueryDasTypeUse; adapter and script facet queries",
+	"aot_scope": "per binding; not inferred from a type adapter",
+	"not_inferred": [
+		"complete DSL syntax, expression evaluation, literal validity and declaration graph resolution",
+		"source receiver/signature compatibility, payload budgets and delivery liveness",
+		"generated native API and unregistered engine transports"
+	],
+	"contexts": [
+		{
+			"name": "authored_in",
+			"boundary": "authored method lowering ABI"
+		},
+		{
+			"name": "authored_out",
+			"boundary": "authored method lowering ABI"
+		},
+		{
+			"name": "authored_ref",
+			"boundary": "authored method lowering ABI"
+		},
+		{
+			"name": "authored_return",
+			"boundary": "authored method lowering ABI"
+		},
+		{
+			"name": "interface_in",
+			"boundary": "interface method lowering ABI; nominal signature matching remains required"
+		},
+		{
+			"name": "interface_out",
+			"boundary": "interface method lowering ABI; nominal signature matching remains required"
+		},
+		{
+			"name": "interface_ref",
+			"boundary": "interface method lowering ABI; nominal signature matching remains required"
+		},
+		{
+			"name": "interface_return",
+			"boundary": "interface method lowering ABI; nominal signature matching remains required"
+		},
+		{
+			"name": "delegate_in",
+			"boundary": "delegate reflected signature factory"
+		},
+		{
+			"name": "delegate_out",
+			"boundary": "delegate reflected signature factory"
+		},
+		{
+			"name": "delegate_ref",
+			"boundary": "delegate reflected signature factory"
+		},
+		{
+			"name": "delegate_return",
+			"boundary": "delegate reflected signature factory"
+		},
+		{
+			"name": "multicast_in",
+			"boundary": "multicast signature factory; no return or out-only parameters"
+		},
+		{
+			"name": "multicast_ref",
+			"boundary": "synchronous multicast signature; queued subscribers cannot mutate refs"
+		},
+		{
+			"name": "queued_event",
+			"boundary": "owned queued payload; native receiver/signature and delivery value checks remain required"
+		},
+		{
+			"name": "timer",
+			"boundary": "timer payload; scheduling, direction and delivery value checks remain required"
+		},
+		{
+			"name": "property_default",
+			"boundary": "explicit property initializer type gate; literal/path validation follows"
+		},
+		{
+			"name": "struct_member_default",
+			"boundary": "struct member type gate; implicit/explicit and symbol-table checks follow"
+		},
+		{
+			"name": "parameter_default",
+			"boundary": "scalar input literal; ordering/world-context and literal validation follow"
+		},
+		{
+			"name": "computed_default_leaf",
+			"boundary": "scalar evaluator leaf; constructors/containers compose leaves; expression audit follows"
+		},
+		{
+			"name": "synchronous_callback",
+			"boundary": "specialized synchronous callback role; concrete frame and lifetime scope required"
+		},
+		{
+			"name": "native_call",
+			"boundary": "registered native transport; exact FProperty/function/direction/depth required"
+		}
+	],
+	"adapters": [
+		{
+			"id": "array",
+			"kind": "array",
+			"struct_path": "",
+			"family": false,
+			"leaf": false,
+			"reference_value": false,
+			"native_policy": null,
+			"container_value_policy": false,
+			"default_policy": "explicit",
+			"default_kind": "",
+			"container_slots": [
+				{
+					"name": "element",
+					"hash_key": false
+				}
+			],
+			"script":
+			{
+				"registered": false,
+				"module": "",
+				"handle": "",
+				"native_property": false,
+				"self_property": false,
+				"authored_reference": false,
+				"frame_bridge": "",
+				"method_bridge": ""
+			},
+			"samples": [
+				{
+					"id": "array[0]:0:<int[0]:0:>",
+					"type":
+					{
+						"kind": "array",
+						"type_path": "",
+						"weak": false,
+						"enum_storage": 0,
+						"authored_id": "",
+						"delegate_wire": "",
+						"element":
+						{
+							"kind": "int",
+							"type_path": "",
+							"weak": false,
+							"enum_storage": 0,
+							"authored_id": "",
+							"delegate_wire": ""
+						}
+					},
+					"capabilities":
+					{
+						"value_property":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"snapshot_member":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_parameter":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"array_element":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container child type: array "
+						},
+						"map_value":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container child type: map "
+						},
+						"map_key":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container child type: map "
+						},
+						"set_element":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container child type: set "
+						}
+					},
+					"uses":
+					{
+						"authored_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"authored_out":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"authored_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"authored_return":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_out":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_return":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_out":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_return":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"multicast_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"multicast_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"queued_event":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"timer":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"property_default":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"struct_member_default":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"parameter_default":
+						{
+							"state": "unsupported",
+							"reason": "Parameter defaults require scalar input literals"
+						},
+						"computed_default_leaf":
+						{
+							"state": "unsupported",
+							"reason": "Computed evaluator requires a scalar leaf"
+						},
+						"synchronous_callback":
+						{
+							"state": "unsupported",
+							"reason": "No specialized synchronous callback transport; ordinary signatures are separate"
+						},
+						"native_call":
+						{
+							"state": "unsupported",
+							"reason": "No registered native transport gate; generic API validation is separate"
+						}
+					}
+				}
+			]
+		},
+		{
+			"id": "bool",
+			"kind": "bool",
+			"struct_path": "",
+			"family": false,
+			"leaf": false,
+			"reference_value": false,
+			"native_policy": null,
+			"container_value_policy": true,
+			"default_policy": "explicit",
+			"default_kind": "",
+			"container_slots": [],
+			"script":
+			{
+				"registered": false,
+				"module": "",
+				"handle": "",
+				"native_property": false,
+				"self_property": false,
+				"authored_reference": false,
+				"frame_bridge": "",
+				"method_bridge": ""
+			},
+			"samples": [
+				{
+					"id": "bool[0]:0:",
+					"type":
+					{
+						"kind": "bool",
+						"type_path": "",
+						"weak": false,
+						"enum_storage": 0,
+						"authored_id": "",
+						"delegate_wire": ""
+					},
+					"capabilities":
+					{
+						"value_property":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"snapshot_member":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_parameter":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"array_element":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_value":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_key":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container hash key: map "
+						},
+						"set_element":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container hash key: set "
+						}
+					},
+					"uses":
+					{
+						"authored_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"authored_out":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"authored_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"authored_return":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_out":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_return":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_out":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_return":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"multicast_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"multicast_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"queued_event":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"timer":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"property_default":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"struct_member_default":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"parameter_default":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"computed_default_leaf":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"synchronous_callback":
+						{
+							"state": "unsupported",
+							"reason": "No specialized synchronous callback transport; ordinary signatures are separate"
+						},
+						"native_call":
+						{
+							"state": "unsupported",
+							"reason": "No registered native transport gate; generic API validation is separate"
+						}
+					}
+				}
+			]
+		},
+		{
+			"id": "byte",
+			"kind": "byte",
+			"struct_path": "",
+			"family": false,
+			"leaf": false,
+			"reference_value": false,
+			"native_policy": null,
+			"container_value_policy": true,
+			"default_policy": "explicit",
+			"default_kind": "",
+			"container_slots": [],
+			"script":
+			{
+				"registered": false,
+				"module": "",
+				"handle": "",
+				"native_property": false,
+				"self_property": false,
+				"authored_reference": false,
+				"frame_bridge": "",
+				"method_bridge": ""
+			},
+			"samples": [
+				{
+					"id": "byte[0]:0:",
+					"type":
+					{
+						"kind": "byte",
+						"type_path": "",
+						"weak": false,
+						"enum_storage": 0,
+						"authored_id": "",
+						"delegate_wire": ""
+					},
+					"capabilities":
+					{
+						"value_property":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"snapshot_member":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_parameter":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"array_element":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_value":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_key":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"set_element":
+						{
+							"state": "supported",
+							"reason": ""
+						}
+					},
+					"uses":
+					{
+						"authored_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"authored_out":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"authored_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"authored_return":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_out":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_return":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_out":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_return":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"multicast_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"multicast_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"queued_event":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"timer":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"property_default":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"struct_member_default":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"parameter_default":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"computed_default_leaf":
+						{
+							"state": "unsupported",
+							"reason": "Computed evaluator requires a scalar leaf"
+						},
+						"synchronous_callback":
+						{
+							"state": "unsupported",
+							"reason": "No specialized synchronous callback transport; ordinary signatures are separate"
+						},
+						"native_call":
+						{
+							"state": "unsupported",
+							"reason": "No registered native transport gate; generic API validation is separate"
+						}
+					}
+				}
+			]
+		},
+		{
+			"id": "class",
+			"kind": "class",
+			"struct_path": "",
+			"family": false,
+			"leaf": false,
+			"reference_value": false,
+			"native_policy": null,
+			"container_value_policy": false,
+			"default_policy": "explicit",
+			"default_kind": "",
+			"container_slots": [],
+			"script":
+			{
+				"registered": true,
+				"module": "ue_native_gameplay",
+				"handle": "",
+				"native_property": true,
+				"self_property": true,
+				"authored_reference": true,
+				"frame_bridge": "",
+				"method_bridge": ""
+			},
+			"samples": [
+				{
+					"id": "class[0]:26:/Script/CoreUObject.Object",
+					"type":
+					{
+						"kind": "class",
+						"type_path": "/Script/CoreUObject.Object",
+						"weak": false,
+						"enum_storage": 0,
+						"authored_id": "",
+						"delegate_wire": ""
+					},
+					"capabilities":
+					{
+						"value_property":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"snapshot_member":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_parameter":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"array_element":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container child type: array "
+						},
+						"map_value":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container child type: map "
+						},
+						"map_key":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container child type: map "
+						},
+						"set_element":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container child type: set "
+						}
+					},
+					"uses":
+					{
+						"authored_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"authored_out":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"authored_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"authored_return":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_out":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_return":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_out":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_return":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"multicast_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"multicast_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"queued_event":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"timer":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"property_default":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"struct_member_default":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported authored struct member type"
+						},
+						"parameter_default":
+						{
+							"state": "unsupported",
+							"reason": "Parameter defaults require scalar input literals"
+						},
+						"computed_default_leaf":
+						{
+							"state": "unsupported",
+							"reason": "Computed evaluator requires a scalar leaf"
+						},
+						"synchronous_callback":
+						{
+							"state": "unsupported",
+							"reason": "No specialized synchronous callback transport; ordinary signatures are separate"
+						},
+						"native_call":
+						{
+							"state": "unsupported",
+							"reason": "No registered native transport gate; generic API validation is separate"
+						}
+					}
+				}
+			]
+		},
+		{
+			"id": "double",
+			"kind": "double",
+			"struct_path": "",
+			"family": false,
+			"leaf": false,
+			"reference_value": false,
+			"native_policy": null,
+			"container_value_policy": true,
+			"default_policy": "explicit",
+			"default_kind": "",
+			"container_slots": [],
+			"script":
+			{
+				"registered": false,
+				"module": "",
+				"handle": "",
+				"native_property": false,
+				"self_property": false,
+				"authored_reference": false,
+				"frame_bridge": "",
+				"method_bridge": ""
+			},
+			"samples": [
+				{
+					"id": "double[0]:0:",
+					"type":
+					{
+						"kind": "double",
+						"type_path": "",
+						"weak": false,
+						"enum_storage": 0,
+						"authored_id": "",
+						"delegate_wire": ""
+					},
+					"capabilities":
+					{
+						"value_property":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"snapshot_member":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_parameter":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"array_element":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_value":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_key":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container hash key: map "
+						},
+						"set_element":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container hash key: set "
+						}
+					},
+					"uses":
+					{
+						"authored_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"authored_out":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"authored_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"authored_return":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_out":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_return":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_out":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_return":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"multicast_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"multicast_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"queued_event":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"timer":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"property_default":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"struct_member_default":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"parameter_default":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"computed_default_leaf":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"synchronous_callback":
+						{
+							"state": "unsupported",
+							"reason": "No specialized synchronous callback transport; ordinary signatures are separate"
+						},
+						"native_call":
+						{
+							"state": "unsupported",
+							"reason": "No registered native transport gate; generic API validation is separate"
+						}
+					}
+				}
+			]
+		},
+		{
+			"id": "enum",
+			"kind": "enum",
+			"struct_path": "",
+			"family": false,
+			"leaf": false,
+			"reference_value": false,
+			"native_policy": null,
+			"container_value_policy": true,
+			"default_policy": "explicit",
+			"default_kind": "",
+			"container_slots": [],
+			"script":
+			{
+				"registered": true,
+				"module": "ue_native_gameplay",
+				"handle": "",
+				"native_property": true,
+				"self_property": false,
+				"authored_reference": false,
+				"frame_bridge": "",
+				"method_bridge": ""
+			},
+			"samples": [
+				{
+					"id": "enum[0]:32:/Script/Engine.ECollisionChannel",
+					"type":
+					{
+						"kind": "enum",
+						"type_path": "/Script/Engine.ECollisionChannel",
+						"weak": false,
+						"enum_storage": 0,
+						"authored_id": "",
+						"delegate_wire": ""
+					},
+					"capabilities":
+					{
+						"value_property":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"snapshot_member":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_parameter":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"array_element":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_value":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_key":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"set_element":
+						{
+							"state": "supported",
+							"reason": ""
+						}
+					},
+					"uses":
+					{
+						"authored_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"authored_out":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"authored_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"authored_return":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_out":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_return":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_out":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_return":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"multicast_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"multicast_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"queued_event":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"timer":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"property_default":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"struct_member_default":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"parameter_default":
+						{
+							"state": "unsupported",
+							"reason": "Parameter defaults require scalar input literals"
+						},
+						"computed_default_leaf":
+						{
+							"state": "unsupported",
+							"reason": "Computed evaluator requires a scalar leaf"
+						},
+						"synchronous_callback":
+						{
+							"state": "unsupported",
+							"reason": "No specialized synchronous callback transport; ordinary signatures are separate"
+						},
+						"native_call":
+						{
+							"state": "unsupported",
+							"reason": "No registered native transport gate; generic API validation is separate"
+						}
+					}
+				}
+			]
+		},
+		{
+			"id": "float",
+			"kind": "float",
+			"struct_path": "",
+			"family": false,
+			"leaf": false,
+			"reference_value": false,
+			"native_policy": null,
+			"container_value_policy": true,
+			"default_policy": "explicit",
+			"default_kind": "",
+			"container_slots": [],
+			"script":
+			{
+				"registered": false,
+				"module": "",
+				"handle": "",
+				"native_property": false,
+				"self_property": false,
+				"authored_reference": false,
+				"frame_bridge": "",
+				"method_bridge": ""
+			},
+			"samples": [
+				{
+					"id": "float[0]:0:",
+					"type":
+					{
+						"kind": "float",
+						"type_path": "",
+						"weak": false,
+						"enum_storage": 0,
+						"authored_id": "",
+						"delegate_wire": ""
+					},
+					"capabilities":
+					{
+						"value_property":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"snapshot_member":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_parameter":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"array_element":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_value":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_key":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container hash key: map "
+						},
+						"set_element":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container hash key: set "
+						}
+					},
+					"uses":
+					{
+						"authored_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"authored_out":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"authored_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"authored_return":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_out":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_return":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_out":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_return":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"multicast_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"multicast_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"queued_event":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"timer":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"property_default":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"struct_member_default":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"parameter_default":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"computed_default_leaf":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"synchronous_callback":
+						{
+							"state": "unsupported",
+							"reason": "No specialized synchronous callback transport; ordinary signatures are separate"
+						},
+						"native_call":
+						{
+							"state": "unsupported",
+							"reason": "No registered native transport gate; generic API validation is separate"
+						}
+					}
+				}
+			]
+		},
+		{
+			"id": "int",
+			"kind": "int",
+			"struct_path": "",
+			"family": false,
+			"leaf": false,
+			"reference_value": false,
+			"native_policy": null,
+			"container_value_policy": true,
+			"default_policy": "explicit",
+			"default_kind": "",
+			"container_slots": [],
+			"script":
+			{
+				"registered": false,
+				"module": "",
+				"handle": "",
+				"native_property": false,
+				"self_property": false,
+				"authored_reference": false,
+				"frame_bridge": "",
+				"method_bridge": ""
+			},
+			"samples": [
+				{
+					"id": "int[0]:0:",
+					"type":
+					{
+						"kind": "int",
+						"type_path": "",
+						"weak": false,
+						"enum_storage": 0,
+						"authored_id": "",
+						"delegate_wire": ""
+					},
+					"capabilities":
+					{
+						"value_property":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"snapshot_member":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_parameter":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"array_element":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_value":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_key":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"set_element":
+						{
+							"state": "supported",
+							"reason": ""
+						}
+					},
+					"uses":
+					{
+						"authored_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"authored_out":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"authored_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"authored_return":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_out":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_return":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_out":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_return":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"multicast_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"multicast_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"queued_event":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"timer":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"property_default":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"struct_member_default":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"parameter_default":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"computed_default_leaf":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"synchronous_callback":
+						{
+							"state": "unsupported",
+							"reason": "No specialized synchronous callback transport; ordinary signatures are separate"
+						},
+						"native_call":
+						{
+							"state": "unsupported",
+							"reason": "No registered native transport gate; generic API validation is separate"
+						}
+					}
+				}
+			]
+		},
+		{
+			"id": "map",
+			"kind": "map",
+			"struct_path": "",
+			"family": false,
+			"leaf": false,
+			"reference_value": false,
+			"native_policy": null,
+			"container_value_policy": false,
+			"default_policy": "explicit",
+			"default_kind": "",
+			"container_slots": [
+				{
+					"name": "key",
+					"hash_key": true
+				},
+				{
+					"name": "value",
+					"hash_key": false
+				}
+			],
+			"script":
+			{
+				"registered": false,
+				"module": "",
+				"handle": "",
+				"native_property": false,
+				"self_property": false,
+				"authored_reference": false,
+				"frame_bridge": "",
+				"method_bridge": ""
+			},
+			"samples": [
+				{
+					"id": "map[0]:0:{int[0]:0:;int[0]:0:}",
+					"type":
+					{
+						"kind": "map",
+						"type_path": "",
+						"weak": false,
+						"enum_storage": 0,
+						"authored_id": "",
+						"delegate_wire": "",
+						"key":
+						{
+							"kind": "int",
+							"type_path": "",
+							"weak": false,
+							"enum_storage": 0,
+							"authored_id": "",
+							"delegate_wire": ""
+						},
+						"value":
+						{
+							"kind": "int",
+							"type_path": "",
+							"weak": false,
+							"enum_storage": 0,
+							"authored_id": "",
+							"delegate_wire": ""
+						}
+					},
+					"capabilities":
+					{
+						"value_property":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"snapshot_member":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_parameter":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"array_element":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container child type: array "
+						},
+						"map_value":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container child type: map "
+						},
+						"map_key":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container child type: map "
+						},
+						"set_element":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container child type: set "
+						}
+					},
+					"uses":
+					{
+						"authored_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"authored_out":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"authored_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"authored_return":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_out":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_return":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_out":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_return":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"multicast_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"multicast_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"queued_event":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"timer":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"property_default":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"struct_member_default":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"parameter_default":
+						{
+							"state": "unsupported",
+							"reason": "Parameter defaults require scalar input literals"
+						},
+						"computed_default_leaf":
+						{
+							"state": "unsupported",
+							"reason": "Computed evaluator requires a scalar leaf"
+						},
+						"synchronous_callback":
+						{
+							"state": "unsupported",
+							"reason": "No specialized synchronous callback transport; ordinary signatures are separate"
+						},
+						"native_call":
+						{
+							"state": "unsupported",
+							"reason": "No registered native transport gate; generic API validation is separate"
+						}
+					}
+				}
+			]
+		},
+		{
+			"id": "name",
+			"kind": "name",
+			"struct_path": "",
+			"family": false,
+			"leaf": false,
+			"reference_value": false,
+			"native_policy": null,
+			"container_value_policy": true,
+			"default_policy": "explicit",
+			"default_kind": "",
+			"container_slots": [],
+			"script":
+			{
+				"registered": true,
+				"module": "ue_foundation",
+				"handle": "UENameValue",
+				"native_property": true,
+				"self_property": true,
+				"authored_reference": true,
+				"frame_bridge": "",
+				"method_bridge": ""
+			},
+			"samples": [
+				{
+					"id": "name[0]:0:",
+					"type":
+					{
+						"kind": "name",
+						"type_path": "",
+						"weak": false,
+						"enum_storage": 0,
+						"authored_id": "",
+						"delegate_wire": ""
+					},
+					"capabilities":
+					{
+						"value_property":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"snapshot_member":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_parameter":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"array_element":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_value":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_key":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"set_element":
+						{
+							"state": "supported",
+							"reason": ""
+						}
+					},
+					"uses":
+					{
+						"authored_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"authored_out":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"authored_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"authored_return":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_out":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_return":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_out":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_return":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"multicast_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"multicast_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"queued_event":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"timer":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"property_default":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"struct_member_default":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"parameter_default":
+						{
+							"state": "unsupported",
+							"reason": "Parameter defaults require scalar input literals"
+						},
+						"computed_default_leaf":
+						{
+							"state": "unsupported",
+							"reason": "Computed evaluator requires a scalar leaf"
+						},
+						"synchronous_callback":
+						{
+							"state": "unsupported",
+							"reason": "No specialized synchronous callback transport; ordinary signatures are separate"
+						},
+						"native_call":
+						{
+							"state": "unsupported",
+							"reason": "No registered native transport gate; generic API validation is separate"
+						}
+					}
+				}
+			]
+		},
+		{
+			"id": "object",
+			"kind": "object",
+			"struct_path": "",
+			"family": false,
+			"leaf": false,
+			"reference_value": false,
+			"native_policy": null,
+			"container_value_policy": true,
+			"default_policy": "explicit",
+			"default_kind": "",
+			"container_slots": [],
+			"script":
+			{
+				"registered": true,
+				"module": "ue_native_gameplay",
+				"handle": "",
+				"native_property": true,
+				"self_property": true,
+				"authored_reference": true,
+				"frame_bridge": "",
+				"method_bridge": ""
+			},
+			"samples": [
+				{
+					"id": "object[0]:26:/Script/CoreUObject.Object",
+					"type":
+					{
+						"kind": "object",
+						"type_path": "/Script/CoreUObject.Object",
+						"weak": false,
+						"enum_storage": 0,
+						"authored_id": "",
+						"delegate_wire": ""
+					},
+					"capabilities":
+					{
+						"value_property":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"snapshot_member":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_parameter":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"array_element":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_value":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_key":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"set_element":
+						{
+							"state": "supported",
+							"reason": ""
+						}
+					},
+					"uses":
+					{
+						"authored_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"authored_out":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"authored_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"authored_return":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_out":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_return":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_out":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_return":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"multicast_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"multicast_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"queued_event":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"timer":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"property_default":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"struct_member_default":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"parameter_default":
+						{
+							"state": "unsupported",
+							"reason": "Parameter defaults require scalar input literals"
+						},
+						"computed_default_leaf":
+						{
+							"state": "unsupported",
+							"reason": "Computed evaluator requires a scalar leaf"
+						},
+						"synchronous_callback":
+						{
+							"state": "unsupported",
+							"reason": "No specialized synchronous callback transport; ordinary signatures are separate"
+						},
+						"native_call":
+						{
+							"state": "unsupported",
+							"reason": "No registered native transport gate; generic API validation is separate"
+						}
+					}
+				},
+				{
+					"id": "object[0]:26:/Script/CoreUObject.Object#weak",
+					"type":
+					{
+						"kind": "object",
+						"type_path": "/Script/CoreUObject.Object",
+						"weak": true,
+						"enum_storage": 0,
+						"authored_id": "",
+						"delegate_wire": ""
+					},
+					"capabilities":
+					{
+						"value_property":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"snapshot_member":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_parameter":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"array_element":
+						{
+							"state": "unsupported",
+							"reason": "Direct weak-reference containers need a storage-preserving carrier: array "
+						},
+						"map_value":
+						{
+							"state": "unsupported",
+							"reason": "Direct weak-reference containers need a storage-preserving carrier: map "
+						},
+						"map_key":
+						{
+							"state": "unsupported",
+							"reason": "Direct weak-reference containers need a storage-preserving carrier: map "
+						},
+						"set_element":
+						{
+							"state": "unsupported",
+							"reason": "Direct weak-reference containers need a storage-preserving carrier: set "
+						}
+					},
+					"uses":
+					{
+						"authored_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"authored_out":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"authored_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"authored_return":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_out":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_return":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_out":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_return":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"multicast_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"multicast_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"queued_event":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"timer":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"property_default":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"struct_member_default":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"parameter_default":
+						{
+							"state": "unsupported",
+							"reason": "Parameter defaults require scalar input literals"
+						},
+						"computed_default_leaf":
+						{
+							"state": "unsupported",
+							"reason": "Computed evaluator requires a scalar leaf"
+						},
+						"synchronous_callback":
+						{
+							"state": "unsupported",
+							"reason": "No specialized synchronous callback transport; ordinary signatures are separate"
+						},
+						"native_call":
+						{
+							"state": "unsupported",
+							"reason": "No registered native transport gate; generic API validation is separate"
+						}
+					}
+				},
+				{
+					"id": "object[0]:29:/Script/CoreUObject.Interface",
+					"type":
+					{
+						"kind": "object",
+						"type_path": "/Script/CoreUObject.Interface",
+						"weak": false,
+						"enum_storage": 0,
+						"authored_id": "",
+						"delegate_wire": ""
+					},
+					"capabilities":
+					{
+						"value_property":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"snapshot_member":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_parameter":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"array_element":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_value":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_key":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container hash key: map "
+						},
+						"set_element":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container hash key: set "
+						}
+					},
+					"uses":
+					{
+						"authored_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"authored_out":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"authored_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"authored_return":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_out":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_return":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_out":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_return":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"multicast_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"multicast_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"queued_event":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"timer":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"property_default":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"struct_member_default":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"parameter_default":
+						{
+							"state": "unsupported",
+							"reason": "Parameter defaults require scalar input literals"
+						},
+						"computed_default_leaf":
+						{
+							"state": "unsupported",
+							"reason": "Computed evaluator requires a scalar leaf"
+						},
+						"synchronous_callback":
+						{
+							"state": "unsupported",
+							"reason": "No specialized synchronous callback transport; ordinary signatures are separate"
+						},
+						"native_call":
+						{
+							"state": "unsupported",
+							"reason": "No registered native transport gate; generic API validation is separate"
+						}
+					}
+				}
+			]
+		},
+		{
+			"id": "set",
+			"kind": "set",
+			"struct_path": "",
+			"family": false,
+			"leaf": false,
+			"reference_value": false,
+			"native_policy": null,
+			"container_value_policy": false,
+			"default_policy": "explicit",
+			"default_kind": "",
+			"container_slots": [
+				{
+					"name": "element",
+					"hash_key": true
+				}
+			],
+			"script":
+			{
+				"registered": false,
+				"module": "",
+				"handle": "",
+				"native_property": false,
+				"self_property": false,
+				"authored_reference": false,
+				"frame_bridge": "",
+				"method_bridge": ""
+			},
+			"samples": [
+				{
+					"id": "set[0]:0:<int[0]:0:>",
+					"type":
+					{
+						"kind": "set",
+						"type_path": "",
+						"weak": false,
+						"enum_storage": 0,
+						"authored_id": "",
+						"delegate_wire": "",
+						"element":
+						{
+							"kind": "int",
+							"type_path": "",
+							"weak": false,
+							"enum_storage": 0,
+							"authored_id": "",
+							"delegate_wire": ""
+						}
+					},
+					"capabilities":
+					{
+						"value_property":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"snapshot_member":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_parameter":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"array_element":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container child type: array "
+						},
+						"map_value":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container child type: map "
+						},
+						"map_key":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container child type: map "
+						},
+						"set_element":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container child type: set "
+						}
+					},
+					"uses":
+					{
+						"authored_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"authored_out":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"authored_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"authored_return":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_out":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_return":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_out":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_return":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"multicast_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"multicast_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"queued_event":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"timer":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"property_default":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"struct_member_default":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"parameter_default":
+						{
+							"state": "unsupported",
+							"reason": "Parameter defaults require scalar input literals"
+						},
+						"computed_default_leaf":
+						{
+							"state": "unsupported",
+							"reason": "Computed evaluator requires a scalar leaf"
+						},
+						"synchronous_callback":
+						{
+							"state": "unsupported",
+							"reason": "No specialized synchronous callback transport; ordinary signatures are separate"
+						},
+						"native_call":
+						{
+							"state": "unsupported",
+							"reason": "No registered native transport gate; generic API validation is separate"
+						}
+					}
+				}
+			]
+		},
+		{
+			"id": "string",
+			"kind": "string",
+			"struct_path": "",
+			"family": false,
+			"leaf": false,
+			"reference_value": false,
+			"native_policy": null,
+			"container_value_policy": true,
+			"default_policy": "explicit",
+			"default_kind": "",
+			"container_slots": [],
+			"script":
+			{
+				"registered": false,
+				"module": "",
+				"handle": "",
+				"native_property": false,
+				"self_property": false,
+				"authored_reference": false,
+				"frame_bridge": "",
+				"method_bridge": ""
+			},
+			"samples": [
+				{
+					"id": "string[0]:0:",
+					"type":
+					{
+						"kind": "string",
+						"type_path": "",
+						"weak": false,
+						"enum_storage": 0,
+						"authored_id": "",
+						"delegate_wire": ""
+					},
+					"capabilities":
+					{
+						"value_property":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"snapshot_member":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_parameter":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"array_element":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_value":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_key":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"set_element":
+						{
+							"state": "supported",
+							"reason": ""
+						}
+					},
+					"uses":
+					{
+						"authored_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"authored_out":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"authored_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"authored_return":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_out":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_return":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_out":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_return":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"multicast_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"multicast_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"queued_event":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"timer":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"property_default":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"struct_member_default":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"parameter_default":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"computed_default_leaf":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"synchronous_callback":
+						{
+							"state": "unsupported",
+							"reason": "No specialized synchronous callback transport; ordinary signatures are separate"
+						},
+						"native_call":
+						{
+							"state": "unsupported",
+							"reason": "No registered native transport gate; generic API validation is separate"
+						}
+					}
+				}
+			]
+		},
+		{
+			"id": "struct:/Script/CoreUObject.Color",
+			"kind": "struct",
+			"struct_path": "/Script/CoreUObject.Color",
+			"family": false,
+			"leaf": true,
+			"reference_value": false,
+			"native_policy": null,
+			"container_value_policy": true,
+			"default_policy": "explicit",
+			"default_kind": "color",
+			"container_slots": [],
+			"script":
+			{
+				"registered": true,
+				"module": "ue_foundation",
+				"handle": "UEColor",
+				"native_property": true,
+				"self_property": true,
+				"authored_reference": true,
+				"frame_bridge": "",
+				"method_bridge": ""
+			},
+			"samples": [
+				{
+					"id": "struct[0]:25:/Script/CoreUObject.Color",
+					"type":
+					{
+						"kind": "struct",
+						"type_path": "/Script/CoreUObject.Color",
+						"weak": false,
+						"enum_storage": 0,
+						"authored_id": "",
+						"delegate_wire": ""
+					},
+					"capabilities":
+					{
+						"value_property":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"snapshot_member":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_parameter":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"array_element":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_value":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_key":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container hash key: map "
+						},
+						"set_element":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container hash key: set "
+						}
+					},
+					"uses":
+					{
+						"authored_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"authored_out":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"authored_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"authored_return":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_out":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_return":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_out":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_return":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"multicast_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"multicast_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"queued_event":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"timer":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"property_default":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"struct_member_default":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"parameter_default":
+						{
+							"state": "unsupported",
+							"reason": "Parameter defaults require scalar input literals"
+						},
+						"computed_default_leaf":
+						{
+							"state": "unsupported",
+							"reason": "Computed evaluator requires a scalar leaf"
+						},
+						"synchronous_callback":
+						{
+							"state": "unsupported",
+							"reason": "No specialized synchronous callback transport; ordinary signatures are separate"
+						},
+						"native_call":
+						{
+							"state": "unsupported",
+							"reason": "No registered native transport gate; generic API validation is separate"
+						}
+					}
+				}
+			]
+		},
+		{
+			"id": "struct:/Script/CoreUObject.LinearColor",
+			"kind": "struct",
+			"struct_path": "/Script/CoreUObject.LinearColor",
+			"family": false,
+			"leaf": true,
+			"reference_value": false,
+			"native_policy": null,
+			"container_value_policy": true,
+			"default_policy": "explicit",
+			"default_kind": "linear_color",
+			"container_slots": [],
+			"script":
+			{
+				"registered": true,
+				"module": "ue_foundation",
+				"handle": "UELinearColor",
+				"native_property": true,
+				"self_property": true,
+				"authored_reference": true,
+				"frame_bridge": "",
+				"method_bridge": ""
+			},
+			"samples": [
+				{
+					"id": "struct[0]:31:/Script/CoreUObject.LinearColor",
+					"type":
+					{
+						"kind": "struct",
+						"type_path": "/Script/CoreUObject.LinearColor",
+						"weak": false,
+						"enum_storage": 0,
+						"authored_id": "",
+						"delegate_wire": ""
+					},
+					"capabilities":
+					{
+						"value_property":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"snapshot_member":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_parameter":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"array_element":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_value":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_key":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container hash key: map "
+						},
+						"set_element":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container hash key: set "
+						}
+					},
+					"uses":
+					{
+						"authored_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"authored_out":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"authored_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"authored_return":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_out":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_return":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_out":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_return":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"multicast_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"multicast_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"queued_event":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"timer":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"property_default":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"struct_member_default":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"parameter_default":
+						{
+							"state": "unsupported",
+							"reason": "Parameter defaults require scalar input literals"
+						},
+						"computed_default_leaf":
+						{
+							"state": "unsupported",
+							"reason": "Computed evaluator requires a scalar leaf"
+						},
+						"synchronous_callback":
+						{
+							"state": "unsupported",
+							"reason": "No specialized synchronous callback transport; ordinary signatures are separate"
+						},
+						"native_call":
+						{
+							"state": "unsupported",
+							"reason": "No registered native transport gate; generic API validation is separate"
+						}
+					}
+				}
+			]
+		},
+		{
+			"id": "struct:/Script/CoreUObject.Quat",
+			"kind": "struct",
+			"struct_path": "/Script/CoreUObject.Quat",
+			"family": false,
+			"leaf": true,
+			"reference_value": false,
+			"native_policy": null,
+			"container_value_policy": true,
+			"default_policy": "explicit",
+			"default_kind": "quat",
+			"container_slots": [],
+			"script":
+			{
+				"registered": true,
+				"module": "ue_foundation",
+				"handle": "UEQuat",
+				"native_property": true,
+				"self_property": true,
+				"authored_reference": true,
+				"frame_bridge": "",
+				"method_bridge": ""
+			},
+			"samples": [
+				{
+					"id": "struct[0]:24:/Script/CoreUObject.Quat",
+					"type":
+					{
+						"kind": "struct",
+						"type_path": "/Script/CoreUObject.Quat",
+						"weak": false,
+						"enum_storage": 0,
+						"authored_id": "",
+						"delegate_wire": ""
+					},
+					"capabilities":
+					{
+						"value_property":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"snapshot_member":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_parameter":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"array_element":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_value":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_key":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container hash key: map "
+						},
+						"set_element":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container hash key: set "
+						}
+					},
+					"uses":
+					{
+						"authored_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"authored_out":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"authored_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"authored_return":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_out":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_return":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_out":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_return":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"multicast_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"multicast_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"queued_event":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"timer":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"property_default":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"struct_member_default":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"parameter_default":
+						{
+							"state": "unsupported",
+							"reason": "Parameter defaults require scalar input literals"
+						},
+						"computed_default_leaf":
+						{
+							"state": "unsupported",
+							"reason": "Computed evaluator requires a scalar leaf"
+						},
+						"synchronous_callback":
+						{
+							"state": "unsupported",
+							"reason": "No specialized synchronous callback transport; ordinary signatures are separate"
+						},
+						"native_call":
+						{
+							"state": "unsupported",
+							"reason": "No registered native transport gate; generic API validation is separate"
+						}
+					}
+				}
+			]
+		},
+		{
+			"id": "struct:/Script/CoreUObject.Rotator",
+			"kind": "struct",
+			"struct_path": "/Script/CoreUObject.Rotator",
+			"family": false,
+			"leaf": true,
+			"reference_value": false,
+			"native_policy": null,
+			"container_value_policy": true,
+			"default_policy": "explicit",
+			"default_kind": "rotator",
+			"container_slots": [],
+			"script":
+			{
+				"registered": true,
+				"module": "ue_foundation",
+				"handle": "UERotator",
+				"native_property": true,
+				"self_property": true,
+				"authored_reference": true,
+				"frame_bridge": "rotator",
+				"method_bridge": "rotator"
+			},
+			"samples": [
+				{
+					"id": "struct[0]:27:/Script/CoreUObject.Rotator",
+					"type":
+					{
+						"kind": "struct",
+						"type_path": "/Script/CoreUObject.Rotator",
+						"weak": false,
+						"enum_storage": 0,
+						"authored_id": "",
+						"delegate_wire": ""
+					},
+					"capabilities":
+					{
+						"value_property":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"snapshot_member":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_parameter":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"array_element":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_value":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_key":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container hash key: map "
+						},
+						"set_element":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container hash key: set "
+						}
+					},
+					"uses":
+					{
+						"authored_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"authored_out":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"authored_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"authored_return":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_out":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_return":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_out":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_return":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"multicast_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"multicast_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"queued_event":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"timer":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"property_default":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"struct_member_default":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"parameter_default":
+						{
+							"state": "unsupported",
+							"reason": "Parameter defaults require scalar input literals"
+						},
+						"computed_default_leaf":
+						{
+							"state": "unsupported",
+							"reason": "Computed evaluator requires a scalar leaf"
+						},
+						"synchronous_callback":
+						{
+							"state": "unsupported",
+							"reason": "No specialized synchronous callback transport; ordinary signatures are separate"
+						},
+						"native_call":
+						{
+							"state": "unsupported",
+							"reason": "No registered native transport gate; generic API validation is separate"
+						}
+					}
+				}
+			]
+		},
+		{
+			"id": "struct:/Script/CoreUObject.Transform",
+			"kind": "struct",
+			"struct_path": "/Script/CoreUObject.Transform",
+			"family": false,
+			"leaf": true,
+			"reference_value": false,
+			"native_policy": null,
+			"container_value_policy": true,
+			"default_policy": "explicit",
+			"default_kind": "transform",
+			"container_slots": [],
+			"script":
+			{
+				"registered": true,
+				"module": "ue_foundation",
+				"handle": "UETransform",
+				"native_property": true,
+				"self_property": true,
+				"authored_reference": true,
+				"frame_bridge": "transform",
+				"method_bridge": "transform"
+			},
+			"samples": [
+				{
+					"id": "struct[0]:29:/Script/CoreUObject.Transform",
+					"type":
+					{
+						"kind": "struct",
+						"type_path": "/Script/CoreUObject.Transform",
+						"weak": false,
+						"enum_storage": 0,
+						"authored_id": "",
+						"delegate_wire": ""
+					},
+					"capabilities":
+					{
+						"value_property":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"snapshot_member":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_parameter":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"array_element":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_value":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_key":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container hash key: map "
+						},
+						"set_element":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container hash key: set "
+						}
+					},
+					"uses":
+					{
+						"authored_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"authored_out":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"authored_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"authored_return":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_out":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_return":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_out":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_return":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"multicast_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"multicast_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"queued_event":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"timer":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"property_default":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"struct_member_default":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"parameter_default":
+						{
+							"state": "unsupported",
+							"reason": "Parameter defaults require scalar input literals"
+						},
+						"computed_default_leaf":
+						{
+							"state": "unsupported",
+							"reason": "Computed evaluator requires a scalar leaf"
+						},
+						"synchronous_callback":
+						{
+							"state": "unsupported",
+							"reason": "No specialized synchronous callback transport; ordinary signatures are separate"
+						},
+						"native_call":
+						{
+							"state": "unsupported",
+							"reason": "No registered native transport gate; generic API validation is separate"
+						}
+					}
+				}
+			]
+		},
+		{
+			"id": "struct:/Script/CoreUObject.Vector",
+			"kind": "struct",
+			"struct_path": "/Script/CoreUObject.Vector",
+			"family": false,
+			"leaf": true,
+			"reference_value": false,
+			"native_policy": null,
+			"container_value_policy": true,
+			"default_policy": "explicit",
+			"default_kind": "vector",
+			"container_slots": [],
+			"script":
+			{
+				"registered": true,
+				"module": "ue_foundation",
+				"handle": "UEVector",
+				"native_property": true,
+				"self_property": true,
+				"authored_reference": true,
+				"frame_bridge": "vector",
+				"method_bridge": "vector"
+			},
+			"samples": [
+				{
+					"id": "struct[0]:26:/Script/CoreUObject.Vector",
+					"type":
+					{
+						"kind": "struct",
+						"type_path": "/Script/CoreUObject.Vector",
+						"weak": false,
+						"enum_storage": 0,
+						"authored_id": "",
+						"delegate_wire": ""
+					},
+					"capabilities":
+					{
+						"value_property":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"snapshot_member":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_parameter":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"array_element":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_value":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_key":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container hash key: map "
+						},
+						"set_element":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container hash key: set "
+						}
+					},
+					"uses":
+					{
+						"authored_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"authored_out":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"authored_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"authored_return":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_out":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_return":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_out":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_return":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"multicast_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"multicast_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"queued_event":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"timer":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"property_default":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"struct_member_default":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"parameter_default":
+						{
+							"state": "unsupported",
+							"reason": "Parameter defaults require scalar input literals"
+						},
+						"computed_default_leaf":
+						{
+							"state": "unsupported",
+							"reason": "Computed evaluator requires a scalar leaf"
+						},
+						"synchronous_callback":
+						{
+							"state": "unsupported",
+							"reason": "No specialized synchronous callback transport; ordinary signatures are separate"
+						},
+						"native_call":
+						{
+							"state": "unsupported",
+							"reason": "No registered native transport gate; generic API validation is separate"
+						}
+					}
+				}
+			]
+		},
+		{
+			"id": "struct:/Script/CoreUObject.Vector2D",
+			"kind": "struct",
+			"struct_path": "/Script/CoreUObject.Vector2D",
+			"family": false,
+			"leaf": true,
+			"reference_value": false,
+			"native_policy": null,
+			"container_value_policy": true,
+			"default_policy": "explicit",
+			"default_kind": "vector2d",
+			"container_slots": [],
+			"script":
+			{
+				"registered": true,
+				"module": "ue_foundation",
+				"handle": "UEVector2D",
+				"native_property": true,
+				"self_property": true,
+				"authored_reference": true,
+				"frame_bridge": "",
+				"method_bridge": ""
+			},
+			"samples": [
+				{
+					"id": "struct[0]:28:/Script/CoreUObject.Vector2D",
+					"type":
+					{
+						"kind": "struct",
+						"type_path": "/Script/CoreUObject.Vector2D",
+						"weak": false,
+						"enum_storage": 0,
+						"authored_id": "",
+						"delegate_wire": ""
+					},
+					"capabilities":
+					{
+						"value_property":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"snapshot_member":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_parameter":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"array_element":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_value":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_key":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container hash key: map "
+						},
+						"set_element":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container hash key: set "
+						}
+					},
+					"uses":
+					{
+						"authored_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"authored_out":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"authored_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"authored_return":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_out":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_return":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_out":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_return":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"multicast_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"multicast_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"queued_event":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"timer":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"property_default":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"struct_member_default":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"parameter_default":
+						{
+							"state": "unsupported",
+							"reason": "Parameter defaults require scalar input literals"
+						},
+						"computed_default_leaf":
+						{
+							"state": "unsupported",
+							"reason": "Computed evaluator requires a scalar leaf"
+						},
+						"synchronous_callback":
+						{
+							"state": "unsupported",
+							"reason": "No specialized synchronous callback transport; ordinary signatures are separate"
+						},
+						"native_call":
+						{
+							"state": "unsupported",
+							"reason": "No registered native transport gate; generic API validation is separate"
+						}
+					}
+				}
+			]
+		},
+		{
+			"id": "struct:/Script/Engine.ActorInstanceHandle",
+			"kind": "struct",
+			"struct_path": "/Script/Engine.ActorInstanceHandle",
+			"family": false,
+			"leaf": false,
+			"reference_value": false,
+			"native_policy":
+			{
+				"roles": 2048,
+				"transport": "",
+				"handle": "",
+				"lifetime": "rejected_internal_handle",
+				"storage_error": "Actor instance handles require the collision result adapter",
+				"call_constraint": "Actor instance handles require the collision result adapter",
+				"call_gate": true,
+				"capture_snapshot": false,
+				"validate_snapshot": false
+			},
+			"container_value_policy": true,
+			"default_policy": "explicit",
+			"default_kind": "",
+			"container_slots": [],
+			"script":
+			{
+				"registered": false,
+				"module": "",
+				"handle": "",
+				"native_property": false,
+				"self_property": false,
+				"authored_reference": false,
+				"frame_bridge": "",
+				"method_bridge": ""
+			},
+			"samples": [
+				{
+					"id": "struct[0]:34:/Script/Engine.ActorInstanceHandle",
+					"type":
+					{
+						"kind": "struct",
+						"type_path": "/Script/Engine.ActorInstanceHandle",
+						"weak": false,
+						"enum_storage": 0,
+						"authored_id": "",
+						"delegate_wire": ""
+					},
+					"capabilities":
+					{
+						"value_property":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"snapshot_member":
+						{
+							"state": "unsupported",
+							"reason": "Actor instance handles require the collision result adapter"
+						},
+						"delegate_parameter":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"array_element":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_value":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_key":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container hash key: map "
+						},
+						"set_element":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container hash key: set "
+						}
+					},
+					"uses":
+					{
+						"authored_in":
+						{
+							"state": "unsupported",
+							"reason": "Actor instance handles require the collision result adapter"
+						},
+						"authored_out":
+						{
+							"state": "unsupported",
+							"reason": "Actor instance handles require the collision result adapter"
+						},
+						"authored_ref":
+						{
+							"state": "unsupported",
+							"reason": "Actor instance handles require the collision result adapter"
+						},
+						"authored_return":
+						{
+							"state": "unsupported",
+							"reason": "Actor instance handles require the collision result adapter"
+						},
+						"interface_in":
+						{
+							"state": "unsupported",
+							"reason": "Actor instance handles require the collision result adapter"
+						},
+						"interface_out":
+						{
+							"state": "unsupported",
+							"reason": "Actor instance handles require the collision result adapter"
+						},
+						"interface_ref":
+						{
+							"state": "unsupported",
+							"reason": "Actor instance handles require the collision result adapter"
+						},
+						"interface_return":
+						{
+							"state": "unsupported",
+							"reason": "Actor instance handles require the collision result adapter"
+						},
+						"delegate_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_out":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_return":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"multicast_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"multicast_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"queued_event":
+						{
+							"state": "unsupported",
+							"reason": "Actor instance handles require the collision result adapter"
+						},
+						"timer":
+						{
+							"state": "unsupported",
+							"reason": "Actor instance handles require the collision result adapter"
+						},
+						"property_default":
+						{
+							"state": "unsupported",
+							"reason": "Actor instance handles require the collision result adapter"
+						},
+						"struct_member_default":
+						{
+							"state": "unsupported",
+							"reason": "Actor instance handles require the collision result adapter"
+						},
+						"parameter_default":
+						{
+							"state": "unsupported",
+							"reason": "Parameter defaults require scalar input literals"
+						},
+						"computed_default_leaf":
+						{
+							"state": "unsupported",
+							"reason": "Computed evaluator requires a scalar leaf"
+						},
+						"synchronous_callback":
+						{
+							"state": "unsupported",
+							"reason": "No specialized synchronous callback transport; ordinary signatures are separate"
+						},
+						"native_call":
+						{
+							"state": "unsupported",
+							"reason": "Actor instance handles require the collision result adapter"
+						}
+					}
+				}
+			]
+		},
+		{
+			"id": "struct:/Script/Engine.BodyInstanceAsyncPhysicsTickHandle",
+			"kind": "struct",
+			"struct_path": "/Script/Engine.BodyInstanceAsyncPhysicsTickHandle",
+			"family": false,
+			"leaf": false,
+			"reference_value": false,
+			"native_policy":
+			{
+				"roles": 2048,
+				"transport": "",
+				"handle": "",
+				"lifetime": "rejected_internal_handle",
+				"storage_error": "",
+				"call_constraint": "async physics handles require a scoped frozen-game-thread physics callback adapter",
+				"call_gate": true,
+				"capture_snapshot": false,
+				"validate_snapshot": false
+			},
+			"container_value_policy": true,
+			"default_policy": "explicit",
+			"default_kind": "",
+			"container_slots": [],
+			"script":
+			{
+				"registered": false,
+				"module": "",
+				"handle": "",
+				"native_property": false,
+				"self_property": false,
+				"authored_reference": false,
+				"frame_bridge": "",
+				"method_bridge": ""
+			},
+			"samples": [
+				{
+					"id": "struct[0]:49:/Script/Engine.BodyInstanceAsyncPhysicsTickHandle",
+					"type":
+					{
+						"kind": "struct",
+						"type_path": "/Script/Engine.BodyInstanceAsyncPhysicsTickHandle",
+						"weak": false,
+						"enum_storage": 0,
+						"authored_id": "",
+						"delegate_wire": ""
+					},
+					"capabilities":
+					{
+						"value_property":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"snapshot_member":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_parameter":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"array_element":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_value":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_key":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container hash key: map "
+						},
+						"set_element":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container hash key: set "
+						}
+					},
+					"uses":
+					{
+						"authored_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"authored_out":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"authored_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"authored_return":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_out":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_return":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_out":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_return":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"multicast_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"multicast_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"queued_event":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"timer":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"property_default":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"struct_member_default":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"parameter_default":
+						{
+							"state": "unsupported",
+							"reason": "Parameter defaults require scalar input literals"
+						},
+						"computed_default_leaf":
+						{
+							"state": "unsupported",
+							"reason": "Computed evaluator requires a scalar leaf"
+						},
+						"synchronous_callback":
+						{
+							"state": "unsupported",
+							"reason": "No specialized synchronous callback transport; ordinary signatures are separate"
+						},
+						"native_call":
+						{
+							"state": "unsupported",
+							"reason": "async physics handles require a scoped frozen-game-thread physics callback adapter"
+						}
+					}
+				}
+			]
+		},
+		{
+			"id": "struct:/Script/Engine.ConstraintInstanceAccessor",
+			"kind": "struct",
+			"struct_path": "/Script/Engine.ConstraintInstanceAccessor",
+			"family": false,
+			"leaf": false,
+			"reference_value": false,
+			"native_policy":
+			{
+				"roles": 512,
+				"transport": "constraint_component_v1",
+				"handle": "UEConstraintHandle",
+				"lifetime": "component_owned_capability",
+				"storage_error": "",
+				"call_constraint": "constraint accessors require scalar component-owned getter/library contract",
+				"call_gate": true,
+				"capture_snapshot": false,
+				"validate_snapshot": false
+			},
+			"container_value_policy": true,
+			"default_policy": "explicit",
+			"default_kind": "",
+			"container_slots": [],
+			"script":
+			{
+				"registered": false,
+				"module": "",
+				"handle": "",
+				"native_property": false,
+				"self_property": false,
+				"authored_reference": false,
+				"frame_bridge": "",
+				"method_bridge": ""
+			},
+			"samples": [
+				{
+					"id": "struct[0]:41:/Script/Engine.ConstraintInstanceAccessor",
+					"type":
+					{
+						"kind": "struct",
+						"type_path": "/Script/Engine.ConstraintInstanceAccessor",
+						"weak": false,
+						"enum_storage": 0,
+						"authored_id": "",
+						"delegate_wire": ""
+					},
+					"capabilities":
+					{
+						"value_property":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"snapshot_member":
+						{
+							"state": "unsupported",
+							"reason": "Struct supports scalar leaves; object/container/other fields unsupported"
+						},
+						"delegate_parameter":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"array_element":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_value":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_key":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container hash key: map "
+						},
+						"set_element":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container hash key: set "
+						}
+					},
+					"uses":
+					{
+						"authored_in":
+						{
+							"state": "unsupported",
+							"reason": "Struct supports scalar leaves; object/container/other fields unsupported"
+						},
+						"authored_out":
+						{
+							"state": "unsupported",
+							"reason": "Struct supports scalar leaves; object/container/other fields unsupported"
+						},
+						"authored_ref":
+						{
+							"state": "unsupported",
+							"reason": "Struct supports scalar leaves; object/container/other fields unsupported"
+						},
+						"authored_return":
+						{
+							"state": "unsupported",
+							"reason": "Struct supports scalar leaves; object/container/other fields unsupported"
+						},
+						"interface_in":
+						{
+							"state": "unsupported",
+							"reason": "Struct supports scalar leaves; object/container/other fields unsupported"
+						},
+						"interface_out":
+						{
+							"state": "unsupported",
+							"reason": "Struct supports scalar leaves; object/container/other fields unsupported"
+						},
+						"interface_ref":
+						{
+							"state": "unsupported",
+							"reason": "Struct supports scalar leaves; object/container/other fields unsupported"
+						},
+						"interface_return":
+						{
+							"state": "unsupported",
+							"reason": "Struct supports scalar leaves; object/container/other fields unsupported"
+						},
+						"delegate_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_out":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_return":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"multicast_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"multicast_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"queued_event":
+						{
+							"state": "unsupported",
+							"reason": "Struct supports scalar leaves; object/container/other fields unsupported"
+						},
+						"timer":
+						{
+							"state": "unsupported",
+							"reason": "Struct supports scalar leaves; object/container/other fields unsupported"
+						},
+						"property_default":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"struct_member_default":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"parameter_default":
+						{
+							"state": "unsupported",
+							"reason": "Parameter defaults require scalar input literals"
+						},
+						"computed_default_leaf":
+						{
+							"state": "unsupported",
+							"reason": "Computed evaluator requires a scalar leaf"
+						},
+						"synchronous_callback":
+						{
+							"state": "unsupported",
+							"reason": "No specialized synchronous callback transport; ordinary signatures are separate"
+						},
+						"native_call":
+						{
+							"state": "requires_context",
+							"reason": "constraint accessors require scalar component-owned getter/library contract"
+						}
+					}
+				}
+			]
+		},
+		{
+			"id": "struct:/Script/Engine.HitResult",
+			"kind": "struct",
+			"struct_path": "/Script/Engine.HitResult",
+			"family": false,
+			"leaf": false,
+			"reference_value": false,
+			"native_policy":
+			{
+				"roles": 256,
+				"transport": "hit_result_v1",
+				"handle": "UEHitResult",
+				"lifetime": "owned_collision_snapshot",
+				"storage_error": "",
+				"call_constraint": "fixed hit result arrays need an adapter",
+				"call_gate": true,
+				"capture_snapshot": false,
+				"validate_snapshot": false
+			},
+			"container_value_policy": true,
+			"default_policy": "explicit",
+			"default_kind": "",
+			"container_slots": [],
+			"script":
+			{
+				"registered": false,
+				"module": "",
+				"handle": "",
+				"native_property": false,
+				"self_property": false,
+				"authored_reference": false,
+				"frame_bridge": "",
+				"method_bridge": ""
+			},
+			"samples": [
+				{
+					"id": "struct[0]:24:/Script/Engine.HitResult",
+					"type":
+					{
+						"kind": "struct",
+						"type_path": "/Script/Engine.HitResult",
+						"weak": false,
+						"enum_storage": 0,
+						"authored_id": "",
+						"delegate_wire": ""
+					},
+					"capabilities":
+					{
+						"value_property":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"snapshot_member":
+						{
+							"state": "unsupported",
+							"reason": "Actor instance handles require the collision result adapter"
+						},
+						"delegate_parameter":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"array_element":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_value":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_key":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container hash key: map "
+						},
+						"set_element":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container hash key: set "
+						}
+					},
+					"uses":
+					{
+						"authored_in":
+						{
+							"state": "unsupported",
+							"reason": "Actor instance handles require the collision result adapter"
+						},
+						"authored_out":
+						{
+							"state": "unsupported",
+							"reason": "Actor instance handles require the collision result adapter"
+						},
+						"authored_ref":
+						{
+							"state": "unsupported",
+							"reason": "Actor instance handles require the collision result adapter"
+						},
+						"authored_return":
+						{
+							"state": "unsupported",
+							"reason": "Actor instance handles require the collision result adapter"
+						},
+						"interface_in":
+						{
+							"state": "unsupported",
+							"reason": "Actor instance handles require the collision result adapter"
+						},
+						"interface_out":
+						{
+							"state": "unsupported",
+							"reason": "Actor instance handles require the collision result adapter"
+						},
+						"interface_ref":
+						{
+							"state": "unsupported",
+							"reason": "Actor instance handles require the collision result adapter"
+						},
+						"interface_return":
+						{
+							"state": "unsupported",
+							"reason": "Actor instance handles require the collision result adapter"
+						},
+						"delegate_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_out":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_return":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"multicast_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"multicast_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"queued_event":
+						{
+							"state": "unsupported",
+							"reason": "Actor instance handles require the collision result adapter"
+						},
+						"timer":
+						{
+							"state": "unsupported",
+							"reason": "Actor instance handles require the collision result adapter"
+						},
+						"property_default":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"struct_member_default":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"parameter_default":
+						{
+							"state": "unsupported",
+							"reason": "Parameter defaults require scalar input literals"
+						},
+						"computed_default_leaf":
+						{
+							"state": "unsupported",
+							"reason": "Computed evaluator requires a scalar leaf"
+						},
+						"synchronous_callback":
+						{
+							"state": "unsupported",
+							"reason": "No specialized synchronous callback transport; ordinary signatures are separate"
+						},
+						"native_call":
+						{
+							"state": "requires_context",
+							"reason": "fixed hit result arrays need an adapter"
+						}
+					}
+				}
+			]
+		},
+		{
+			"id": "struct:/Script/EnhancedInput.InputActionValue",
+			"kind": "struct",
+			"struct_path": "/Script/EnhancedInput.InputActionValue",
+			"family": false,
+			"leaf": false,
+			"reference_value": false,
+			"native_policy":
+			{
+				"roles": 1024,
+				"transport": "input_action_value_v1",
+				"handle": "InputActionValue",
+				"lifetime": "owned_input_value",
+				"storage_error": "",
+				"call_constraint": "fixed InputActionValue arrays need an adapter",
+				"call_gate": true,
+				"capture_snapshot": false,
+				"validate_snapshot": false
+			},
+			"container_value_policy": true,
+			"default_policy": "explicit",
+			"default_kind": "",
+			"container_slots": [],
+			"script":
+			{
+				"registered": true,
+				"module": "ue_foundation",
+				"handle": "InputActionValue",
+				"native_property": false,
+				"self_property": false,
+				"authored_reference": false,
+				"frame_bridge": "",
+				"method_bridge": "input_value"
+			},
+			"samples": [
+				{
+					"id": "struct[0]:38:/Script/EnhancedInput.InputActionValue",
+					"type":
+					{
+						"kind": "struct",
+						"type_path": "/Script/EnhancedInput.InputActionValue",
+						"weak": false,
+						"enum_storage": 0,
+						"authored_id": "",
+						"delegate_wire": ""
+					},
+					"capabilities":
+					{
+						"value_property":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"snapshot_member":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_parameter":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"array_element":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_value":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_key":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container hash key: map "
+						},
+						"set_element":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container hash key: set "
+						}
+					},
+					"uses":
+					{
+						"authored_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"authored_out":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"authored_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"authored_return":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_out":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_return":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_out":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_return":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"multicast_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"multicast_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"queued_event":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"timer":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"property_default":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"struct_member_default":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"parameter_default":
+						{
+							"state": "unsupported",
+							"reason": "Parameter defaults require scalar input literals"
+						},
+						"computed_default_leaf":
+						{
+							"state": "unsupported",
+							"reason": "Computed evaluator requires a scalar leaf"
+						},
+						"synchronous_callback":
+						{
+							"state": "requires_context",
+							"reason": "Concrete callback role, complete frame and transport lifetime scope required"
+						},
+						"native_call":
+						{
+							"state": "requires_context",
+							"reason": "fixed InputActionValue arrays need an adapter"
+						}
+					}
+				}
+			]
+		},
+		{
+			"id": "struct:/Script/GameplayTags.GameplayTag",
+			"kind": "struct",
+			"struct_path": "/Script/GameplayTags.GameplayTag",
+			"family": false,
+			"leaf": true,
+			"reference_value": false,
+			"native_policy": null,
+			"container_value_policy": true,
+			"default_policy": "implicit_empty",
+			"default_kind": "",
+			"container_slots": [],
+			"script":
+			{
+				"registered": true,
+				"module": "ue_gameplay_tags",
+				"handle": "",
+				"native_property": true,
+				"self_property": false,
+				"authored_reference": false,
+				"frame_bridge": "",
+				"method_bridge": ""
+			},
+			"samples": [
+				{
+					"id": "struct[0]:32:/Script/GameplayTags.GameplayTag",
+					"type":
+					{
+						"kind": "struct",
+						"type_path": "/Script/GameplayTags.GameplayTag",
+						"weak": false,
+						"enum_storage": 0,
+						"authored_id": "",
+						"delegate_wire": ""
+					},
+					"capabilities":
+					{
+						"value_property":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"snapshot_member":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_parameter":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"array_element":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_value":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_key":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container hash key: map "
+						},
+						"set_element":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container hash key: set "
+						}
+					},
+					"uses":
+					{
+						"authored_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"authored_out":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"authored_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"authored_return":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_out":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_return":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_out":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_return":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"multicast_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"multicast_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"queued_event":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"timer":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"property_default":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"struct_member_default":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"parameter_default":
+						{
+							"state": "unsupported",
+							"reason": "Parameter defaults require scalar input literals"
+						},
+						"computed_default_leaf":
+						{
+							"state": "unsupported",
+							"reason": "Computed evaluator requires a scalar leaf"
+						},
+						"synchronous_callback":
+						{
+							"state": "unsupported",
+							"reason": "No specialized synchronous callback transport; ordinary signatures are separate"
+						},
+						"native_call":
+						{
+							"state": "unsupported",
+							"reason": "No registered native transport gate; generic API validation is separate"
+						}
+					}
+				}
+			]
+		},
+		{
+			"id": "struct:/Script/GameplayTags.GameplayTagContainer",
+			"kind": "struct",
+			"struct_path": "/Script/GameplayTags.GameplayTagContainer",
+			"family": false,
+			"leaf": true,
+			"reference_value": false,
+			"native_policy": null,
+			"container_value_policy": true,
+			"default_policy": "implicit_empty",
+			"default_kind": "",
+			"container_slots": [],
+			"script":
+			{
+				"registered": true,
+				"module": "ue_gameplay_tags",
+				"handle": "",
+				"native_property": true,
+				"self_property": false,
+				"authored_reference": false,
+				"frame_bridge": "",
+				"method_bridge": ""
+			},
+			"samples": [
+				{
+					"id": "struct[0]:41:/Script/GameplayTags.GameplayTagContainer",
+					"type":
+					{
+						"kind": "struct",
+						"type_path": "/Script/GameplayTags.GameplayTagContainer",
+						"weak": false,
+						"enum_storage": 0,
+						"authored_id": "",
+						"delegate_wire": ""
+					},
+					"capabilities":
+					{
+						"value_property":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"snapshot_member":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_parameter":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"array_element":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_value":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_key":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container hash key: map "
+						},
+						"set_element":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container hash key: set "
+						}
+					},
+					"uses":
+					{
+						"authored_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"authored_out":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"authored_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"authored_return":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_out":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_return":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_out":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_return":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"multicast_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"multicast_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"queued_event":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"timer":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"property_default":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"struct_member_default":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"parameter_default":
+						{
+							"state": "unsupported",
+							"reason": "Parameter defaults require scalar input literals"
+						},
+						"computed_default_leaf":
+						{
+							"state": "unsupported",
+							"reason": "Computed evaluator requires a scalar leaf"
+						},
+						"synchronous_callback":
+						{
+							"state": "unsupported",
+							"reason": "No specialized synchronous callback transport; ordinary signatures are separate"
+						},
+						"native_call":
+						{
+							"state": "unsupported",
+							"reason": "No registered native transport gate; generic API validation is separate"
+						}
+					}
+				}
+			]
+		},
+		{
+			"id": "struct:/Script/SlateCore.AnalogInputEvent",
+			"kind": "struct",
+			"struct_path": "/Script/SlateCore.AnalogInputEvent",
+			"family": false,
+			"leaf": false,
+			"reference_value": false,
+			"native_policy":
+			{
+				"roles": 6,
+				"transport": "slate_input_event_snapshot_v1",
+				"handle": "UEAnalogInputEvent",
+				"lifetime": "detached_snapshot",
+				"storage_error": "Input events require detached snapshot transport, not reflected storage/defaults",
+				"call_constraint": "input events require exact scalar snapshot function allowlist; navigation/reply need live adapters",
+				"call_gate": true,
+				"capture_snapshot": true,
+				"validate_snapshot": true
+			},
+			"container_value_policy": true,
+			"default_policy": "explicit",
+			"default_kind": "",
+			"container_slots": [],
+			"script":
+			{
+				"registered": false,
+				"module": "",
+				"handle": "",
+				"native_property": false,
+				"self_property": false,
+				"authored_reference": false,
+				"frame_bridge": "",
+				"method_bridge": ""
+			},
+			"samples": [
+				{
+					"id": "struct[0]:34:/Script/SlateCore.AnalogInputEvent",
+					"type":
+					{
+						"kind": "struct",
+						"type_path": "/Script/SlateCore.AnalogInputEvent",
+						"weak": false,
+						"enum_storage": 0,
+						"authored_id": "",
+						"delegate_wire": ""
+					},
+					"capabilities":
+					{
+						"value_property":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"snapshot_member":
+						{
+							"state": "unsupported",
+							"reason": "Input events require detached snapshot transport, not reflected storage/defaults"
+						},
+						"delegate_parameter":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"array_element":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_value":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_key":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container hash key: map "
+						},
+						"set_element":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container hash key: set "
+						}
+					},
+					"uses":
+					{
+						"authored_in":
+						{
+							"state": "unsupported",
+							"reason": "Input events require detached snapshot transport, not reflected storage/defaults"
+						},
+						"authored_out":
+						{
+							"state": "unsupported",
+							"reason": "Input events require detached snapshot transport, not reflected storage/defaults"
+						},
+						"authored_ref":
+						{
+							"state": "unsupported",
+							"reason": "Input events require detached snapshot transport, not reflected storage/defaults"
+						},
+						"authored_return":
+						{
+							"state": "unsupported",
+							"reason": "Input events require detached snapshot transport, not reflected storage/defaults"
+						},
+						"interface_in":
+						{
+							"state": "unsupported",
+							"reason": "Input events require detached snapshot transport, not reflected storage/defaults"
+						},
+						"interface_out":
+						{
+							"state": "unsupported",
+							"reason": "Input events require detached snapshot transport, not reflected storage/defaults"
+						},
+						"interface_ref":
+						{
+							"state": "unsupported",
+							"reason": "Input events require detached snapshot transport, not reflected storage/defaults"
+						},
+						"interface_return":
+						{
+							"state": "unsupported",
+							"reason": "Input events require detached snapshot transport, not reflected storage/defaults"
+						},
+						"delegate_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_out":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_return":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"multicast_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"multicast_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"queued_event":
+						{
+							"state": "unsupported",
+							"reason": "Input events require detached snapshot transport, not reflected storage/defaults"
+						},
+						"timer":
+						{
+							"state": "unsupported",
+							"reason": "Input events require detached snapshot transport, not reflected storage/defaults"
+						},
+						"property_default":
+						{
+							"state": "unsupported",
+							"reason": "Input events require detached snapshot transport, not reflected storage/defaults"
+						},
+						"struct_member_default":
+						{
+							"state": "unsupported",
+							"reason": "Input events require detached snapshot transport, not reflected storage/defaults"
+						},
+						"parameter_default":
+						{
+							"state": "unsupported",
+							"reason": "Parameter defaults require scalar input literals"
+						},
+						"computed_default_leaf":
+						{
+							"state": "unsupported",
+							"reason": "Computed evaluator requires a scalar leaf"
+						},
+						"synchronous_callback":
+						{
+							"state": "requires_context",
+							"reason": "Concrete callback role, complete frame and transport lifetime scope required"
+						},
+						"native_call":
+						{
+							"state": "requires_context",
+							"reason": "input events require exact scalar snapshot function allowlist; navigation/reply need live adapters"
+						}
+					}
+				}
+			]
+		},
+		{
+			"id": "struct:/Script/SlateCore.CharacterEvent",
+			"kind": "struct",
+			"struct_path": "/Script/SlateCore.CharacterEvent",
+			"family": false,
+			"leaf": false,
+			"reference_value": false,
+			"native_policy":
+			{
+				"roles": 6,
+				"transport": "slate_input_event_snapshot_v1",
+				"handle": "UECharacterEvent",
+				"lifetime": "detached_snapshot",
+				"storage_error": "Input events require detached snapshot transport, not reflected storage/defaults",
+				"call_constraint": "input events require exact scalar snapshot function allowlist; navigation/reply need live adapters",
+				"call_gate": true,
+				"capture_snapshot": true,
+				"validate_snapshot": true
+			},
+			"container_value_policy": true,
+			"default_policy": "explicit",
+			"default_kind": "",
+			"container_slots": [],
+			"script":
+			{
+				"registered": false,
+				"module": "",
+				"handle": "",
+				"native_property": false,
+				"self_property": false,
+				"authored_reference": false,
+				"frame_bridge": "",
+				"method_bridge": ""
+			},
+			"samples": [
+				{
+					"id": "struct[0]:32:/Script/SlateCore.CharacterEvent",
+					"type":
+					{
+						"kind": "struct",
+						"type_path": "/Script/SlateCore.CharacterEvent",
+						"weak": false,
+						"enum_storage": 0,
+						"authored_id": "",
+						"delegate_wire": ""
+					},
+					"capabilities":
+					{
+						"value_property":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"snapshot_member":
+						{
+							"state": "unsupported",
+							"reason": "Input events require detached snapshot transport, not reflected storage/defaults"
+						},
+						"delegate_parameter":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"array_element":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_value":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_key":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container hash key: map "
+						},
+						"set_element":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container hash key: set "
+						}
+					},
+					"uses":
+					{
+						"authored_in":
+						{
+							"state": "unsupported",
+							"reason": "Input events require detached snapshot transport, not reflected storage/defaults"
+						},
+						"authored_out":
+						{
+							"state": "unsupported",
+							"reason": "Input events require detached snapshot transport, not reflected storage/defaults"
+						},
+						"authored_ref":
+						{
+							"state": "unsupported",
+							"reason": "Input events require detached snapshot transport, not reflected storage/defaults"
+						},
+						"authored_return":
+						{
+							"state": "unsupported",
+							"reason": "Input events require detached snapshot transport, not reflected storage/defaults"
+						},
+						"interface_in":
+						{
+							"state": "unsupported",
+							"reason": "Input events require detached snapshot transport, not reflected storage/defaults"
+						},
+						"interface_out":
+						{
+							"state": "unsupported",
+							"reason": "Input events require detached snapshot transport, not reflected storage/defaults"
+						},
+						"interface_ref":
+						{
+							"state": "unsupported",
+							"reason": "Input events require detached snapshot transport, not reflected storage/defaults"
+						},
+						"interface_return":
+						{
+							"state": "unsupported",
+							"reason": "Input events require detached snapshot transport, not reflected storage/defaults"
+						},
+						"delegate_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_out":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_return":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"multicast_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"multicast_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"queued_event":
+						{
+							"state": "unsupported",
+							"reason": "Input events require detached snapshot transport, not reflected storage/defaults"
+						},
+						"timer":
+						{
+							"state": "unsupported",
+							"reason": "Input events require detached snapshot transport, not reflected storage/defaults"
+						},
+						"property_default":
+						{
+							"state": "unsupported",
+							"reason": "Input events require detached snapshot transport, not reflected storage/defaults"
+						},
+						"struct_member_default":
+						{
+							"state": "unsupported",
+							"reason": "Input events require detached snapshot transport, not reflected storage/defaults"
+						},
+						"parameter_default":
+						{
+							"state": "unsupported",
+							"reason": "Parameter defaults require scalar input literals"
+						},
+						"computed_default_leaf":
+						{
+							"state": "unsupported",
+							"reason": "Computed evaluator requires a scalar leaf"
+						},
+						"synchronous_callback":
+						{
+							"state": "requires_context",
+							"reason": "Concrete callback role, complete frame and transport lifetime scope required"
+						},
+						"native_call":
+						{
+							"state": "requires_context",
+							"reason": "input events require exact scalar snapshot function allowlist; navigation/reply need live adapters"
+						}
+					}
+				}
+			]
+		},
+		{
+			"id": "struct:/Script/SlateCore.FocusEvent",
+			"kind": "struct",
+			"struct_path": "/Script/SlateCore.FocusEvent",
+			"family": false,
+			"leaf": false,
+			"reference_value": false,
+			"native_policy":
+			{
+				"roles": 14,
+				"transport": "slate_input_event_snapshot_v1",
+				"handle": "UEFocusEvent",
+				"lifetime": "detached_snapshot",
+				"storage_error": "Input events require detached snapshot transport, not reflected storage/defaults",
+				"call_constraint": "input events require exact scalar snapshot function allowlist; navigation/reply need live adapters",
+				"call_gate": true,
+				"capture_snapshot": true,
+				"validate_snapshot": true
+			},
+			"container_value_policy": true,
+			"default_policy": "explicit",
+			"default_kind": "",
+			"container_slots": [],
+			"script":
+			{
+				"registered": false,
+				"module": "",
+				"handle": "",
+				"native_property": false,
+				"self_property": false,
+				"authored_reference": false,
+				"frame_bridge": "",
+				"method_bridge": ""
+			},
+			"samples": [
+				{
+					"id": "struct[0]:28:/Script/SlateCore.FocusEvent",
+					"type":
+					{
+						"kind": "struct",
+						"type_path": "/Script/SlateCore.FocusEvent",
+						"weak": false,
+						"enum_storage": 0,
+						"authored_id": "",
+						"delegate_wire": ""
+					},
+					"capabilities":
+					{
+						"value_property":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"snapshot_member":
+						{
+							"state": "unsupported",
+							"reason": "Input events require detached snapshot transport, not reflected storage/defaults"
+						},
+						"delegate_parameter":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"array_element":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_value":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_key":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container hash key: map "
+						},
+						"set_element":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container hash key: set "
+						}
+					},
+					"uses":
+					{
+						"authored_in":
+						{
+							"state": "unsupported",
+							"reason": "Input events require detached snapshot transport, not reflected storage/defaults"
+						},
+						"authored_out":
+						{
+							"state": "unsupported",
+							"reason": "Input events require detached snapshot transport, not reflected storage/defaults"
+						},
+						"authored_ref":
+						{
+							"state": "unsupported",
+							"reason": "Input events require detached snapshot transport, not reflected storage/defaults"
+						},
+						"authored_return":
+						{
+							"state": "unsupported",
+							"reason": "Input events require detached snapshot transport, not reflected storage/defaults"
+						},
+						"interface_in":
+						{
+							"state": "unsupported",
+							"reason": "Input events require detached snapshot transport, not reflected storage/defaults"
+						},
+						"interface_out":
+						{
+							"state": "unsupported",
+							"reason": "Input events require detached snapshot transport, not reflected storage/defaults"
+						},
+						"interface_ref":
+						{
+							"state": "unsupported",
+							"reason": "Input events require detached snapshot transport, not reflected storage/defaults"
+						},
+						"interface_return":
+						{
+							"state": "unsupported",
+							"reason": "Input events require detached snapshot transport, not reflected storage/defaults"
+						},
+						"delegate_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_out":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_return":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"multicast_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"multicast_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"queued_event":
+						{
+							"state": "unsupported",
+							"reason": "Input events require detached snapshot transport, not reflected storage/defaults"
+						},
+						"timer":
+						{
+							"state": "unsupported",
+							"reason": "Input events require detached snapshot transport, not reflected storage/defaults"
+						},
+						"property_default":
+						{
+							"state": "unsupported",
+							"reason": "Input events require detached snapshot transport, not reflected storage/defaults"
+						},
+						"struct_member_default":
+						{
+							"state": "unsupported",
+							"reason": "Input events require detached snapshot transport, not reflected storage/defaults"
+						},
+						"parameter_default":
+						{
+							"state": "unsupported",
+							"reason": "Parameter defaults require scalar input literals"
+						},
+						"computed_default_leaf":
+						{
+							"state": "unsupported",
+							"reason": "Computed evaluator requires a scalar leaf"
+						},
+						"synchronous_callback":
+						{
+							"state": "requires_context",
+							"reason": "Concrete callback role, complete frame and transport lifetime scope required"
+						},
+						"native_call":
+						{
+							"state": "requires_context",
+							"reason": "input events require exact scalar snapshot function allowlist; navigation/reply need live adapters"
+						}
+					}
+				}
+			]
+		},
+		{
+			"id": "struct:/Script/SlateCore.Geometry",
+			"kind": "struct",
+			"struct_path": "/Script/SlateCore.Geometry",
+			"family": false,
+			"leaf": false,
+			"reference_value": false,
+			"native_policy":
+			{
+				"roles": 1,
+				"transport": "slate_geometry_snapshot_v1",
+				"handle": "UEGeometry",
+				"lifetime": "owned_snapshot",
+				"storage_error": "Geometry requires owned snapshot transport, not reflected storage/defaults",
+				"call_constraint": "Geometry requires exact scalar snapshot function allowlist",
+				"call_gate": true,
+				"capture_snapshot": true,
+				"validate_snapshot": true
+			},
+			"container_value_policy": true,
+			"default_policy": "explicit",
+			"default_kind": "",
+			"container_slots": [],
+			"script":
+			{
+				"registered": false,
+				"module": "",
+				"handle": "",
+				"native_property": false,
+				"self_property": false,
+				"authored_reference": false,
+				"frame_bridge": "",
+				"method_bridge": ""
+			},
+			"samples": [
+				{
+					"id": "struct[0]:26:/Script/SlateCore.Geometry",
+					"type":
+					{
+						"kind": "struct",
+						"type_path": "/Script/SlateCore.Geometry",
+						"weak": false,
+						"enum_storage": 0,
+						"authored_id": "",
+						"delegate_wire": ""
+					},
+					"capabilities":
+					{
+						"value_property":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"snapshot_member":
+						{
+							"state": "unsupported",
+							"reason": "Geometry requires owned snapshot transport, not reflected storage/defaults"
+						},
+						"delegate_parameter":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"array_element":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_value":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_key":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container hash key: map "
+						},
+						"set_element":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container hash key: set "
+						}
+					},
+					"uses":
+					{
+						"authored_in":
+						{
+							"state": "unsupported",
+							"reason": "Geometry requires owned snapshot transport, not reflected storage/defaults"
+						},
+						"authored_out":
+						{
+							"state": "unsupported",
+							"reason": "Geometry requires owned snapshot transport, not reflected storage/defaults"
+						},
+						"authored_ref":
+						{
+							"state": "unsupported",
+							"reason": "Geometry requires owned snapshot transport, not reflected storage/defaults"
+						},
+						"authored_return":
+						{
+							"state": "unsupported",
+							"reason": "Geometry requires owned snapshot transport, not reflected storage/defaults"
+						},
+						"interface_in":
+						{
+							"state": "unsupported",
+							"reason": "Geometry requires owned snapshot transport, not reflected storage/defaults"
+						},
+						"interface_out":
+						{
+							"state": "unsupported",
+							"reason": "Geometry requires owned snapshot transport, not reflected storage/defaults"
+						},
+						"interface_ref":
+						{
+							"state": "unsupported",
+							"reason": "Geometry requires owned snapshot transport, not reflected storage/defaults"
+						},
+						"interface_return":
+						{
+							"state": "unsupported",
+							"reason": "Geometry requires owned snapshot transport, not reflected storage/defaults"
+						},
+						"delegate_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_out":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_return":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"multicast_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"multicast_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"queued_event":
+						{
+							"state": "unsupported",
+							"reason": "Geometry requires owned snapshot transport, not reflected storage/defaults"
+						},
+						"timer":
+						{
+							"state": "unsupported",
+							"reason": "Geometry requires owned snapshot transport, not reflected storage/defaults"
+						},
+						"property_default":
+						{
+							"state": "unsupported",
+							"reason": "Geometry requires owned snapshot transport, not reflected storage/defaults"
+						},
+						"struct_member_default":
+						{
+							"state": "unsupported",
+							"reason": "Geometry requires owned snapshot transport, not reflected storage/defaults"
+						},
+						"parameter_default":
+						{
+							"state": "unsupported",
+							"reason": "Parameter defaults require scalar input literals"
+						},
+						"computed_default_leaf":
+						{
+							"state": "unsupported",
+							"reason": "Computed evaluator requires a scalar leaf"
+						},
+						"synchronous_callback":
+						{
+							"state": "requires_context",
+							"reason": "Concrete callback role, complete frame and transport lifetime scope required"
+						},
+						"native_call":
+						{
+							"state": "requires_context",
+							"reason": "Geometry requires exact scalar snapshot function allowlist"
+						}
+					}
+				}
+			]
+		},
+		{
+			"id": "struct:/Script/SlateCore.InputEvent",
+			"kind": "struct",
+			"struct_path": "/Script/SlateCore.InputEvent",
+			"family": false,
+			"leaf": false,
+			"reference_value": false,
+			"native_policy":
+			{
+				"roles": 2,
+				"transport": "slate_input_event_snapshot_v1",
+				"handle": "UEInputEvent",
+				"lifetime": "detached_snapshot",
+				"storage_error": "Input events require detached snapshot transport, not reflected storage/defaults",
+				"call_constraint": "input events require exact scalar snapshot function allowlist; navigation/reply need live adapters",
+				"call_gate": true,
+				"capture_snapshot": true,
+				"validate_snapshot": true
+			},
+			"container_value_policy": true,
+			"default_policy": "explicit",
+			"default_kind": "",
+			"container_slots": [],
+			"script":
+			{
+				"registered": false,
+				"module": "",
+				"handle": "",
+				"native_property": false,
+				"self_property": false,
+				"authored_reference": false,
+				"frame_bridge": "",
+				"method_bridge": ""
+			},
+			"samples": [
+				{
+					"id": "struct[0]:28:/Script/SlateCore.InputEvent",
+					"type":
+					{
+						"kind": "struct",
+						"type_path": "/Script/SlateCore.InputEvent",
+						"weak": false,
+						"enum_storage": 0,
+						"authored_id": "",
+						"delegate_wire": ""
+					},
+					"capabilities":
+					{
+						"value_property":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"snapshot_member":
+						{
+							"state": "unsupported",
+							"reason": "Input events require detached snapshot transport, not reflected storage/defaults"
+						},
+						"delegate_parameter":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"array_element":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_value":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_key":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container hash key: map "
+						},
+						"set_element":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container hash key: set "
+						}
+					},
+					"uses":
+					{
+						"authored_in":
+						{
+							"state": "unsupported",
+							"reason": "Input events require detached snapshot transport, not reflected storage/defaults"
+						},
+						"authored_out":
+						{
+							"state": "unsupported",
+							"reason": "Input events require detached snapshot transport, not reflected storage/defaults"
+						},
+						"authored_ref":
+						{
+							"state": "unsupported",
+							"reason": "Input events require detached snapshot transport, not reflected storage/defaults"
+						},
+						"authored_return":
+						{
+							"state": "unsupported",
+							"reason": "Input events require detached snapshot transport, not reflected storage/defaults"
+						},
+						"interface_in":
+						{
+							"state": "unsupported",
+							"reason": "Input events require detached snapshot transport, not reflected storage/defaults"
+						},
+						"interface_out":
+						{
+							"state": "unsupported",
+							"reason": "Input events require detached snapshot transport, not reflected storage/defaults"
+						},
+						"interface_ref":
+						{
+							"state": "unsupported",
+							"reason": "Input events require detached snapshot transport, not reflected storage/defaults"
+						},
+						"interface_return":
+						{
+							"state": "unsupported",
+							"reason": "Input events require detached snapshot transport, not reflected storage/defaults"
+						},
+						"delegate_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_out":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_return":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"multicast_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"multicast_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"queued_event":
+						{
+							"state": "unsupported",
+							"reason": "Input events require detached snapshot transport, not reflected storage/defaults"
+						},
+						"timer":
+						{
+							"state": "unsupported",
+							"reason": "Input events require detached snapshot transport, not reflected storage/defaults"
+						},
+						"property_default":
+						{
+							"state": "unsupported",
+							"reason": "Input events require detached snapshot transport, not reflected storage/defaults"
+						},
+						"struct_member_default":
+						{
+							"state": "unsupported",
+							"reason": "Input events require detached snapshot transport, not reflected storage/defaults"
+						},
+						"parameter_default":
+						{
+							"state": "unsupported",
+							"reason": "Parameter defaults require scalar input literals"
+						},
+						"computed_default_leaf":
+						{
+							"state": "unsupported",
+							"reason": "Computed evaluator requires a scalar leaf"
+						},
+						"synchronous_callback":
+						{
+							"state": "requires_context",
+							"reason": "Concrete callback role, complete frame and transport lifetime scope required"
+						},
+						"native_call":
+						{
+							"state": "requires_context",
+							"reason": "input events require exact scalar snapshot function allowlist; navigation/reply need live adapters"
+						}
+					}
+				}
+			]
+		},
+		{
+			"id": "struct:/Script/SlateCore.KeyEvent",
+			"kind": "struct",
+			"struct_path": "/Script/SlateCore.KeyEvent",
+			"family": false,
+			"leaf": false,
+			"reference_value": false,
+			"native_policy":
+			{
+				"roles": 6,
+				"transport": "slate_input_event_snapshot_v1",
+				"handle": "UEKeyEvent",
+				"lifetime": "detached_snapshot",
+				"storage_error": "Input events require detached snapshot transport, not reflected storage/defaults",
+				"call_constraint": "input events require exact scalar snapshot function allowlist; navigation/reply need live adapters",
+				"call_gate": true,
+				"capture_snapshot": true,
+				"validate_snapshot": true
+			},
+			"container_value_policy": true,
+			"default_policy": "explicit",
+			"default_kind": "",
+			"container_slots": [],
+			"script":
+			{
+				"registered": false,
+				"module": "",
+				"handle": "",
+				"native_property": false,
+				"self_property": false,
+				"authored_reference": false,
+				"frame_bridge": "",
+				"method_bridge": ""
+			},
+			"samples": [
+				{
+					"id": "struct[0]:26:/Script/SlateCore.KeyEvent",
+					"type":
+					{
+						"kind": "struct",
+						"type_path": "/Script/SlateCore.KeyEvent",
+						"weak": false,
+						"enum_storage": 0,
+						"authored_id": "",
+						"delegate_wire": ""
+					},
+					"capabilities":
+					{
+						"value_property":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"snapshot_member":
+						{
+							"state": "unsupported",
+							"reason": "Input events require detached snapshot transport, not reflected storage/defaults"
+						},
+						"delegate_parameter":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"array_element":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_value":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_key":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container hash key: map "
+						},
+						"set_element":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container hash key: set "
+						}
+					},
+					"uses":
+					{
+						"authored_in":
+						{
+							"state": "unsupported",
+							"reason": "Input events require detached snapshot transport, not reflected storage/defaults"
+						},
+						"authored_out":
+						{
+							"state": "unsupported",
+							"reason": "Input events require detached snapshot transport, not reflected storage/defaults"
+						},
+						"authored_ref":
+						{
+							"state": "unsupported",
+							"reason": "Input events require detached snapshot transport, not reflected storage/defaults"
+						},
+						"authored_return":
+						{
+							"state": "unsupported",
+							"reason": "Input events require detached snapshot transport, not reflected storage/defaults"
+						},
+						"interface_in":
+						{
+							"state": "unsupported",
+							"reason": "Input events require detached snapshot transport, not reflected storage/defaults"
+						},
+						"interface_out":
+						{
+							"state": "unsupported",
+							"reason": "Input events require detached snapshot transport, not reflected storage/defaults"
+						},
+						"interface_ref":
+						{
+							"state": "unsupported",
+							"reason": "Input events require detached snapshot transport, not reflected storage/defaults"
+						},
+						"interface_return":
+						{
+							"state": "unsupported",
+							"reason": "Input events require detached snapshot transport, not reflected storage/defaults"
+						},
+						"delegate_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_out":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_return":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"multicast_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"multicast_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"queued_event":
+						{
+							"state": "unsupported",
+							"reason": "Input events require detached snapshot transport, not reflected storage/defaults"
+						},
+						"timer":
+						{
+							"state": "unsupported",
+							"reason": "Input events require detached snapshot transport, not reflected storage/defaults"
+						},
+						"property_default":
+						{
+							"state": "unsupported",
+							"reason": "Input events require detached snapshot transport, not reflected storage/defaults"
+						},
+						"struct_member_default":
+						{
+							"state": "unsupported",
+							"reason": "Input events require detached snapshot transport, not reflected storage/defaults"
+						},
+						"parameter_default":
+						{
+							"state": "unsupported",
+							"reason": "Parameter defaults require scalar input literals"
+						},
+						"computed_default_leaf":
+						{
+							"state": "unsupported",
+							"reason": "Computed evaluator requires a scalar leaf"
+						},
+						"synchronous_callback":
+						{
+							"state": "requires_context",
+							"reason": "Concrete callback role, complete frame and transport lifetime scope required"
+						},
+						"native_call":
+						{
+							"state": "requires_context",
+							"reason": "input events require exact scalar snapshot function allowlist; navigation/reply need live adapters"
+						}
+					}
+				}
+			]
+		},
+		{
+			"id": "struct:/Script/SlateCore.NavigationEvent",
+			"kind": "struct",
+			"struct_path": "/Script/SlateCore.NavigationEvent",
+			"family": false,
+			"leaf": false,
+			"reference_value": false,
+			"native_policy":
+			{
+				"roles": 2,
+				"transport": "slate_input_event_snapshot_v1",
+				"handle": "UENavigationEvent",
+				"lifetime": "detached_snapshot",
+				"storage_error": "Input events require detached snapshot transport, not reflected storage/defaults",
+				"call_constraint": "input events require exact scalar snapshot function allowlist; navigation/reply need live adapters",
+				"call_gate": true,
+				"capture_snapshot": true,
+				"validate_snapshot": true
+			},
+			"container_value_policy": true,
+			"default_policy": "explicit",
+			"default_kind": "",
+			"container_slots": [],
+			"script":
+			{
+				"registered": false,
+				"module": "",
+				"handle": "",
+				"native_property": false,
+				"self_property": false,
+				"authored_reference": false,
+				"frame_bridge": "",
+				"method_bridge": ""
+			},
+			"samples": [
+				{
+					"id": "struct[0]:33:/Script/SlateCore.NavigationEvent",
+					"type":
+					{
+						"kind": "struct",
+						"type_path": "/Script/SlateCore.NavigationEvent",
+						"weak": false,
+						"enum_storage": 0,
+						"authored_id": "",
+						"delegate_wire": ""
+					},
+					"capabilities":
+					{
+						"value_property":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"snapshot_member":
+						{
+							"state": "unsupported",
+							"reason": "Input events require detached snapshot transport, not reflected storage/defaults"
+						},
+						"delegate_parameter":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"array_element":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_value":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_key":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container hash key: map "
+						},
+						"set_element":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container hash key: set "
+						}
+					},
+					"uses":
+					{
+						"authored_in":
+						{
+							"state": "unsupported",
+							"reason": "Input events require detached snapshot transport, not reflected storage/defaults"
+						},
+						"authored_out":
+						{
+							"state": "unsupported",
+							"reason": "Input events require detached snapshot transport, not reflected storage/defaults"
+						},
+						"authored_ref":
+						{
+							"state": "unsupported",
+							"reason": "Input events require detached snapshot transport, not reflected storage/defaults"
+						},
+						"authored_return":
+						{
+							"state": "unsupported",
+							"reason": "Input events require detached snapshot transport, not reflected storage/defaults"
+						},
+						"interface_in":
+						{
+							"state": "unsupported",
+							"reason": "Input events require detached snapshot transport, not reflected storage/defaults"
+						},
+						"interface_out":
+						{
+							"state": "unsupported",
+							"reason": "Input events require detached snapshot transport, not reflected storage/defaults"
+						},
+						"interface_ref":
+						{
+							"state": "unsupported",
+							"reason": "Input events require detached snapshot transport, not reflected storage/defaults"
+						},
+						"interface_return":
+						{
+							"state": "unsupported",
+							"reason": "Input events require detached snapshot transport, not reflected storage/defaults"
+						},
+						"delegate_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_out":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_return":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"multicast_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"multicast_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"queued_event":
+						{
+							"state": "unsupported",
+							"reason": "Input events require detached snapshot transport, not reflected storage/defaults"
+						},
+						"timer":
+						{
+							"state": "unsupported",
+							"reason": "Input events require detached snapshot transport, not reflected storage/defaults"
+						},
+						"property_default":
+						{
+							"state": "unsupported",
+							"reason": "Input events require detached snapshot transport, not reflected storage/defaults"
+						},
+						"struct_member_default":
+						{
+							"state": "unsupported",
+							"reason": "Input events require detached snapshot transport, not reflected storage/defaults"
+						},
+						"parameter_default":
+						{
+							"state": "unsupported",
+							"reason": "Parameter defaults require scalar input literals"
+						},
+						"computed_default_leaf":
+						{
+							"state": "unsupported",
+							"reason": "Computed evaluator requires a scalar leaf"
+						},
+						"synchronous_callback":
+						{
+							"state": "requires_context",
+							"reason": "Concrete callback role, complete frame and transport lifetime scope required"
+						},
+						"native_call":
+						{
+							"state": "requires_context",
+							"reason": "input events require exact scalar snapshot function allowlist; navigation/reply need live adapters"
+						}
+					}
+				}
+			]
+		},
+		{
+			"id": "struct:/Script/SlateCore.PointerEvent",
+			"kind": "struct",
+			"struct_path": "/Script/SlateCore.PointerEvent",
+			"family": false,
+			"leaf": false,
+			"reference_value": false,
+			"native_policy":
+			{
+				"roles": 22,
+				"transport": "slate_input_event_snapshot_v1",
+				"handle": "UEPointerEvent",
+				"lifetime": "detached_snapshot",
+				"storage_error": "Input events require detached snapshot transport, not reflected storage/defaults",
+				"call_constraint": "input events require exact scalar snapshot function allowlist; navigation/reply need live adapters",
+				"call_gate": true,
+				"capture_snapshot": true,
+				"validate_snapshot": true
+			},
+			"container_value_policy": true,
+			"default_policy": "explicit",
+			"default_kind": "",
+			"container_slots": [],
+			"script":
+			{
+				"registered": false,
+				"module": "",
+				"handle": "",
+				"native_property": false,
+				"self_property": false,
+				"authored_reference": false,
+				"frame_bridge": "",
+				"method_bridge": ""
+			},
+			"samples": [
+				{
+					"id": "struct[0]:30:/Script/SlateCore.PointerEvent",
+					"type":
+					{
+						"kind": "struct",
+						"type_path": "/Script/SlateCore.PointerEvent",
+						"weak": false,
+						"enum_storage": 0,
+						"authored_id": "",
+						"delegate_wire": ""
+					},
+					"capabilities":
+					{
+						"value_property":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"snapshot_member":
+						{
+							"state": "unsupported",
+							"reason": "Input events require detached snapshot transport, not reflected storage/defaults"
+						},
+						"delegate_parameter":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"array_element":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_value":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_key":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container hash key: map "
+						},
+						"set_element":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container hash key: set "
+						}
+					},
+					"uses":
+					{
+						"authored_in":
+						{
+							"state": "unsupported",
+							"reason": "Input events require detached snapshot transport, not reflected storage/defaults"
+						},
+						"authored_out":
+						{
+							"state": "unsupported",
+							"reason": "Input events require detached snapshot transport, not reflected storage/defaults"
+						},
+						"authored_ref":
+						{
+							"state": "unsupported",
+							"reason": "Input events require detached snapshot transport, not reflected storage/defaults"
+						},
+						"authored_return":
+						{
+							"state": "unsupported",
+							"reason": "Input events require detached snapshot transport, not reflected storage/defaults"
+						},
+						"interface_in":
+						{
+							"state": "unsupported",
+							"reason": "Input events require detached snapshot transport, not reflected storage/defaults"
+						},
+						"interface_out":
+						{
+							"state": "unsupported",
+							"reason": "Input events require detached snapshot transport, not reflected storage/defaults"
+						},
+						"interface_ref":
+						{
+							"state": "unsupported",
+							"reason": "Input events require detached snapshot transport, not reflected storage/defaults"
+						},
+						"interface_return":
+						{
+							"state": "unsupported",
+							"reason": "Input events require detached snapshot transport, not reflected storage/defaults"
+						},
+						"delegate_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_out":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_return":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"multicast_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"multicast_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"queued_event":
+						{
+							"state": "unsupported",
+							"reason": "Input events require detached snapshot transport, not reflected storage/defaults"
+						},
+						"timer":
+						{
+							"state": "unsupported",
+							"reason": "Input events require detached snapshot transport, not reflected storage/defaults"
+						},
+						"property_default":
+						{
+							"state": "unsupported",
+							"reason": "Input events require detached snapshot transport, not reflected storage/defaults"
+						},
+						"struct_member_default":
+						{
+							"state": "unsupported",
+							"reason": "Input events require detached snapshot transport, not reflected storage/defaults"
+						},
+						"parameter_default":
+						{
+							"state": "unsupported",
+							"reason": "Parameter defaults require scalar input literals"
+						},
+						"computed_default_leaf":
+						{
+							"state": "unsupported",
+							"reason": "Computed evaluator requires a scalar leaf"
+						},
+						"synchronous_callback":
+						{
+							"state": "requires_context",
+							"reason": "Concrete callback role, complete frame and transport lifetime scope required"
+						},
+						"native_call":
+						{
+							"state": "requires_context",
+							"reason": "input events require exact scalar snapshot function allowlist; navigation/reply need live adapters"
+						}
+					}
+				}
+			]
+		},
+		{
+			"id": "struct:/Script/UMG.EventReply",
+			"kind": "struct",
+			"struct_path": "/Script/UMG.EventReply",
+			"family": false,
+			"leaf": false,
+			"reference_value": false,
+			"native_policy":
+			{
+				"roles": 64,
+				"transport": "scoped_event_reply_v1",
+				"handle": "UEEventReply",
+				"lifetime": "synchronous_callback_scope",
+				"storage_error": "EventReply requires a synchronous callback, not reflected storage/defaults",
+				"call_constraint": "EventReply requires exact scalar synchronous callback adapter",
+				"call_gate": true,
+				"capture_snapshot": false,
+				"validate_snapshot": false
+			},
+			"container_value_policy": true,
+			"default_policy": "explicit",
+			"default_kind": "",
+			"container_slots": [],
+			"script":
+			{
+				"registered": false,
+				"module": "",
+				"handle": "",
+				"native_property": false,
+				"self_property": false,
+				"authored_reference": false,
+				"frame_bridge": "",
+				"method_bridge": ""
+			},
+			"samples": [
+				{
+					"id": "struct[0]:22:/Script/UMG.EventReply",
+					"type":
+					{
+						"kind": "struct",
+						"type_path": "/Script/UMG.EventReply",
+						"weak": false,
+						"enum_storage": 0,
+						"authored_id": "",
+						"delegate_wire": ""
+					},
+					"capabilities":
+					{
+						"value_property":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"snapshot_member":
+						{
+							"state": "unsupported",
+							"reason": "EventReply requires a synchronous callback, not reflected storage/defaults"
+						},
+						"delegate_parameter":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"array_element":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_value":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_key":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container hash key: map "
+						},
+						"set_element":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container hash key: set "
+						}
+					},
+					"uses":
+					{
+						"authored_in":
+						{
+							"state": "unsupported",
+							"reason": "EventReply requires a synchronous callback, not reflected storage/defaults"
+						},
+						"authored_out":
+						{
+							"state": "unsupported",
+							"reason": "EventReply requires a synchronous callback, not reflected storage/defaults"
+						},
+						"authored_ref":
+						{
+							"state": "unsupported",
+							"reason": "EventReply requires a synchronous callback, not reflected storage/defaults"
+						},
+						"authored_return":
+						{
+							"state": "unsupported",
+							"reason": "EventReply requires a synchronous callback, not reflected storage/defaults"
+						},
+						"interface_in":
+						{
+							"state": "unsupported",
+							"reason": "EventReply requires a synchronous callback, not reflected storage/defaults"
+						},
+						"interface_out":
+						{
+							"state": "unsupported",
+							"reason": "EventReply requires a synchronous callback, not reflected storage/defaults"
+						},
+						"interface_ref":
+						{
+							"state": "unsupported",
+							"reason": "EventReply requires a synchronous callback, not reflected storage/defaults"
+						},
+						"interface_return":
+						{
+							"state": "unsupported",
+							"reason": "EventReply requires a synchronous callback, not reflected storage/defaults"
+						},
+						"delegate_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_out":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_return":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"multicast_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"multicast_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"queued_event":
+						{
+							"state": "unsupported",
+							"reason": "EventReply requires a synchronous callback, not reflected storage/defaults"
+						},
+						"timer":
+						{
+							"state": "unsupported",
+							"reason": "EventReply requires a synchronous callback, not reflected storage/defaults"
+						},
+						"property_default":
+						{
+							"state": "unsupported",
+							"reason": "EventReply requires a synchronous callback, not reflected storage/defaults"
+						},
+						"struct_member_default":
+						{
+							"state": "unsupported",
+							"reason": "EventReply requires a synchronous callback, not reflected storage/defaults"
+						},
+						"parameter_default":
+						{
+							"state": "unsupported",
+							"reason": "Parameter defaults require scalar input literals"
+						},
+						"computed_default_leaf":
+						{
+							"state": "unsupported",
+							"reason": "Computed evaluator requires a scalar leaf"
+						},
+						"synchronous_callback":
+						{
+							"state": "requires_context",
+							"reason": "Concrete callback role, complete frame and transport lifetime scope required"
+						},
+						"native_call":
+						{
+							"state": "requires_context",
+							"reason": "EventReply requires exact scalar synchronous callback adapter"
+						}
+					}
+				}
+			]
+		},
+		{
+			"id": "struct:/Script/UMG.PaintContext",
+			"kind": "struct",
+			"struct_path": "/Script/UMG.PaintContext",
+			"family": false,
+			"leaf": false,
+			"reference_value": false,
+			"native_policy":
+			{
+				"roles": 32,
+				"transport": "scoped_paint_context_v1",
+				"handle": "UEPaintContext",
+				"lifetime": "synchronous_paint_scope",
+				"storage_error": "PaintContext requires synchronous OnPaint, not reflected storage/defaults",
+				"call_constraint": "PaintContext requires exact scalar synchronous OnPaint adapter",
+				"call_gate": true,
+				"capture_snapshot": false,
+				"validate_snapshot": false
+			},
+			"container_value_policy": true,
+			"default_policy": "explicit",
+			"default_kind": "",
+			"container_slots": [],
+			"script":
+			{
+				"registered": false,
+				"module": "",
+				"handle": "",
+				"native_property": false,
+				"self_property": false,
+				"authored_reference": false,
+				"frame_bridge": "",
+				"method_bridge": ""
+			},
+			"samples": [
+				{
+					"id": "struct[0]:24:/Script/UMG.PaintContext",
+					"type":
+					{
+						"kind": "struct",
+						"type_path": "/Script/UMG.PaintContext",
+						"weak": false,
+						"enum_storage": 0,
+						"authored_id": "",
+						"delegate_wire": ""
+					},
+					"capabilities":
+					{
+						"value_property":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"snapshot_member":
+						{
+							"state": "unsupported",
+							"reason": "PaintContext requires synchronous OnPaint, not reflected storage/defaults"
+						},
+						"delegate_parameter":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"array_element":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_value":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_key":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container hash key: map "
+						},
+						"set_element":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container hash key: set "
+						}
+					},
+					"uses":
+					{
+						"authored_in":
+						{
+							"state": "unsupported",
+							"reason": "PaintContext requires synchronous OnPaint, not reflected storage/defaults"
+						},
+						"authored_out":
+						{
+							"state": "unsupported",
+							"reason": "PaintContext requires synchronous OnPaint, not reflected storage/defaults"
+						},
+						"authored_ref":
+						{
+							"state": "unsupported",
+							"reason": "PaintContext requires synchronous OnPaint, not reflected storage/defaults"
+						},
+						"authored_return":
+						{
+							"state": "unsupported",
+							"reason": "PaintContext requires synchronous OnPaint, not reflected storage/defaults"
+						},
+						"interface_in":
+						{
+							"state": "unsupported",
+							"reason": "PaintContext requires synchronous OnPaint, not reflected storage/defaults"
+						},
+						"interface_out":
+						{
+							"state": "unsupported",
+							"reason": "PaintContext requires synchronous OnPaint, not reflected storage/defaults"
+						},
+						"interface_ref":
+						{
+							"state": "unsupported",
+							"reason": "PaintContext requires synchronous OnPaint, not reflected storage/defaults"
+						},
+						"interface_return":
+						{
+							"state": "unsupported",
+							"reason": "PaintContext requires synchronous OnPaint, not reflected storage/defaults"
+						},
+						"delegate_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_out":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_return":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"multicast_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"multicast_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"queued_event":
+						{
+							"state": "unsupported",
+							"reason": "PaintContext requires synchronous OnPaint, not reflected storage/defaults"
+						},
+						"timer":
+						{
+							"state": "unsupported",
+							"reason": "PaintContext requires synchronous OnPaint, not reflected storage/defaults"
+						},
+						"property_default":
+						{
+							"state": "unsupported",
+							"reason": "PaintContext requires synchronous OnPaint, not reflected storage/defaults"
+						},
+						"struct_member_default":
+						{
+							"state": "unsupported",
+							"reason": "PaintContext requires synchronous OnPaint, not reflected storage/defaults"
+						},
+						"parameter_default":
+						{
+							"state": "unsupported",
+							"reason": "Parameter defaults require scalar input literals"
+						},
+						"computed_default_leaf":
+						{
+							"state": "unsupported",
+							"reason": "Computed evaluator requires a scalar leaf"
+						},
+						"synchronous_callback":
+						{
+							"state": "requires_context",
+							"reason": "Concrete callback role, complete frame and transport lifetime scope required"
+						},
+						"native_call":
+						{
+							"state": "requires_context",
+							"reason": "PaintContext requires exact scalar synchronous OnPaint adapter"
+						}
+					}
+				}
+			]
+		},
+		{
+			"id": "struct:/Script/UMG.WidgetAnimationHandle",
+			"kind": "struct",
+			"struct_path": "/Script/UMG.WidgetAnimationHandle",
+			"family": false,
+			"leaf": false,
+			"reference_value": false,
+			"native_policy":
+			{
+				"roles": 128,
+				"transport": "weak_widget_animation_v1",
+				"handle": "UEWidgetAnimationHandle",
+				"lifetime": "weak_widget_context_capability",
+				"storage_error": "WidgetAnimation requires a weak context capability, not reflected storage/defaults",
+				"call_constraint": "WidgetAnimation requires exact scalar producer result",
+				"call_gate": true,
+				"capture_snapshot": false,
+				"validate_snapshot": false
+			},
+			"container_value_policy": true,
+			"default_policy": "explicit",
+			"default_kind": "",
+			"container_slots": [],
+			"script":
+			{
+				"registered": false,
+				"module": "",
+				"handle": "",
+				"native_property": false,
+				"self_property": false,
+				"authored_reference": false,
+				"frame_bridge": "",
+				"method_bridge": ""
+			},
+			"samples": [
+				{
+					"id": "struct[0]:33:/Script/UMG.WidgetAnimationHandle",
+					"type":
+					{
+						"kind": "struct",
+						"type_path": "/Script/UMG.WidgetAnimationHandle",
+						"weak": false,
+						"enum_storage": 0,
+						"authored_id": "",
+						"delegate_wire": ""
+					},
+					"capabilities":
+					{
+						"value_property":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"snapshot_member":
+						{
+							"state": "unsupported",
+							"reason": "WidgetAnimation requires a weak context capability, not reflected storage/defaults"
+						},
+						"delegate_parameter":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"array_element":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_value":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_key":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container hash key: map "
+						},
+						"set_element":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container hash key: set "
+						}
+					},
+					"uses":
+					{
+						"authored_in":
+						{
+							"state": "unsupported",
+							"reason": "WidgetAnimation requires a weak context capability, not reflected storage/defaults"
+						},
+						"authored_out":
+						{
+							"state": "unsupported",
+							"reason": "WidgetAnimation requires a weak context capability, not reflected storage/defaults"
+						},
+						"authored_ref":
+						{
+							"state": "unsupported",
+							"reason": "WidgetAnimation requires a weak context capability, not reflected storage/defaults"
+						},
+						"authored_return":
+						{
+							"state": "unsupported",
+							"reason": "WidgetAnimation requires a weak context capability, not reflected storage/defaults"
+						},
+						"interface_in":
+						{
+							"state": "unsupported",
+							"reason": "WidgetAnimation requires a weak context capability, not reflected storage/defaults"
+						},
+						"interface_out":
+						{
+							"state": "unsupported",
+							"reason": "WidgetAnimation requires a weak context capability, not reflected storage/defaults"
+						},
+						"interface_ref":
+						{
+							"state": "unsupported",
+							"reason": "WidgetAnimation requires a weak context capability, not reflected storage/defaults"
+						},
+						"interface_return":
+						{
+							"state": "unsupported",
+							"reason": "WidgetAnimation requires a weak context capability, not reflected storage/defaults"
+						},
+						"delegate_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_out":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_return":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"multicast_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"multicast_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"queued_event":
+						{
+							"state": "unsupported",
+							"reason": "WidgetAnimation requires a weak context capability, not reflected storage/defaults"
+						},
+						"timer":
+						{
+							"state": "unsupported",
+							"reason": "WidgetAnimation requires a weak context capability, not reflected storage/defaults"
+						},
+						"property_default":
+						{
+							"state": "unsupported",
+							"reason": "WidgetAnimation requires a weak context capability, not reflected storage/defaults"
+						},
+						"struct_member_default":
+						{
+							"state": "unsupported",
+							"reason": "WidgetAnimation requires a weak context capability, not reflected storage/defaults"
+						},
+						"parameter_default":
+						{
+							"state": "unsupported",
+							"reason": "Parameter defaults require scalar input literals"
+						},
+						"computed_default_leaf":
+						{
+							"state": "unsupported",
+							"reason": "Computed evaluator requires a scalar leaf"
+						},
+						"synchronous_callback":
+						{
+							"state": "unsupported",
+							"reason": "No specialized synchronous callback transport; ordinary signatures are separate"
+						},
+						"native_call":
+						{
+							"state": "requires_context",
+							"reason": "WidgetAnimation requires exact scalar producer result"
+						}
+					}
+				}
+			]
+		},
+		{
+			"id": "struct:family",
+			"kind": "struct",
+			"struct_path": "",
+			"family": true,
+			"leaf": true,
+			"reference_value": true,
+			"native_policy": null,
+			"container_value_policy": true,
+			"default_policy": "implicit_empty",
+			"default_kind": "",
+			"container_slots": [],
+			"script":
+			{
+				"registered": true,
+				"module": "ue_native_gameplay",
+				"handle": "",
+				"native_property": true,
+				"self_property": false,
+				"authored_reference": false,
+				"frame_bridge": "",
+				"method_bridge": ""
+			},
+			"samples": [
+				{
+					"id": "struct[0]:64:/Script/DasRuntime.DasSoftClass_f6005a7380ac4daaf37e8e855ef43965",
+					"type":
+					{
+						"kind": "struct",
+						"type_path": "/Script/DasRuntime.DasSoftClass_f6005a7380ac4daaf37e8e855ef43965",
+						"weak": false,
+						"enum_storage": 0,
+						"authored_id": "",
+						"delegate_wire": ""
+					},
+					"capabilities":
+					{
+						"value_property":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"snapshot_member":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_parameter":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"array_element":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_value":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_key":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container hash key: map "
+						},
+						"set_element":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container hash key: set "
+						}
+					},
+					"uses":
+					{
+						"authored_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"authored_out":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"authored_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"authored_return":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_out":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_return":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_out":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_return":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"multicast_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"multicast_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"queued_event":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"timer":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"property_default":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"struct_member_default":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"parameter_default":
+						{
+							"state": "unsupported",
+							"reason": "Parameter defaults require scalar input literals"
+						},
+						"computed_default_leaf":
+						{
+							"state": "unsupported",
+							"reason": "Computed evaluator requires a scalar leaf"
+						},
+						"synchronous_callback":
+						{
+							"state": "unsupported",
+							"reason": "No specialized synchronous callback transport; ordinary signatures are separate"
+						},
+						"native_call":
+						{
+							"state": "unsupported",
+							"reason": "No registered native transport gate; generic API validation is separate"
+						}
+					}
+				},
+				{
+					"id": "struct[0]:65:/Script/DasRuntime.DasSoftObject_f6005a7380ac4daaf37e8e855ef43965",
+					"type":
+					{
+						"kind": "struct",
+						"type_path": "/Script/DasRuntime.DasSoftObject_f6005a7380ac4daaf37e8e855ef43965",
+						"weak": false,
+						"enum_storage": 0,
+						"authored_id": "",
+						"delegate_wire": ""
+					},
+					"capabilities":
+					{
+						"value_property":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"snapshot_member":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_parameter":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"array_element":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_value":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_key":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container hash key: map "
+						},
+						"set_element":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container hash key: set "
+						}
+					},
+					"uses":
+					{
+						"authored_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"authored_out":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"authored_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"authored_return":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_out":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_return":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_out":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_return":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"multicast_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"multicast_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"queued_event":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"timer":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"property_default":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"struct_member_default":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"parameter_default":
+						{
+							"state": "unsupported",
+							"reason": "Parameter defaults require scalar input literals"
+						},
+						"computed_default_leaf":
+						{
+							"state": "unsupported",
+							"reason": "Computed evaluator requires a scalar leaf"
+						},
+						"synchronous_callback":
+						{
+							"state": "unsupported",
+							"reason": "No specialized synchronous callback transport; ordinary signatures are separate"
+						},
+						"native_call":
+						{
+							"state": "unsupported",
+							"reason": "No registered native transport gate; generic API validation is separate"
+						}
+					}
+				}
+			]
+		},
+		{
+			"id": "text",
+			"kind": "text",
+			"struct_path": "",
+			"family": false,
+			"leaf": false,
+			"reference_value": false,
+			"native_policy": null,
+			"container_value_policy": true,
+			"default_policy": "explicit",
+			"default_kind": "",
+			"container_slots": [],
+			"script":
+			{
+				"registered": true,
+				"module": "ue_foundation",
+				"handle": "UETextValue",
+				"native_property": true,
+				"self_property": true,
+				"authored_reference": true,
+				"frame_bridge": "",
+				"method_bridge": ""
+			},
+			"samples": [
+				{
+					"id": "text[0]:0:",
+					"type":
+					{
+						"kind": "text",
+						"type_path": "",
+						"weak": false,
+						"enum_storage": 0,
+						"authored_id": "",
+						"delegate_wire": ""
+					},
+					"capabilities":
+					{
+						"value_property":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"snapshot_member":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_parameter":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"array_element":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_value":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_key":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container hash key: map "
+						},
+						"set_element":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container hash key: set "
+						}
+					},
+					"uses":
+					{
+						"authored_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"authored_out":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"authored_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"authored_return":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_out":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_return":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_out":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_return":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"multicast_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"multicast_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"queued_event":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"timer":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"property_default":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"struct_member_default":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"parameter_default":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"computed_default_leaf":
+						{
+							"state": "unsupported",
+							"reason": "Computed evaluator requires a scalar leaf"
+						},
+						"synchronous_callback":
+						{
+							"state": "unsupported",
+							"reason": "No specialized synchronous callback transport; ordinary signatures are separate"
+						},
+						"native_call":
+						{
+							"state": "unsupported",
+							"reason": "No registered native transport gate; generic API validation is separate"
+						}
+					}
+				}
+			]
+		}
+	]
+}

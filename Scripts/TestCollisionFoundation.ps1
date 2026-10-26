@@ -13,7 +13,7 @@ if(!$SkipBuild){
 }
 $RuntimeDll=Join-Path (Split-Path -Parent $Project) 'Binaries/Win64/UnrealEditor-DasRuntime.dll'
 $RuntimeHash=(Get-FileHash -LiteralPath $RuntimeDll).Hash
-& C:/Python312/python.exe "$PSScriptRoot/TestCollisionFoundationGenerator.py" *> "$Logs/collision-foundation-generator.log"
+Invoke-DasPythonTests -Path "$PSScriptRoot/TestCollisionFoundationGenerator.py" -Log "$Logs/collision-foundation-generator.log"
 if($LASTEXITCODE){throw 'Weak metadata generator checks failed'}
 & "$Engine/Engine/Binaries/Win64/UnrealEditor-Cmd.exe" $Project -run=DasExport -Modules=Engine "-Selection=$Repo/Bindings/CollisionFoundation.selection.json" "-Output=$Repo/Bindings/CollisionFoundation.json" -Multiprocess -unattended -NullRHI -nosplash -stdout "-abslog=$Logs/collision-foundation-export.log" -ddc=NoZenLocalFallback -NoZenAutoLaunch *> "$Logs/collision-foundation-export-stdout.log"
 if($LASTEXITCODE){throw 'Weak fixture export failed'}

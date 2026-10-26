@@ -7,7 +7,7 @@ struct FUEAotEntry
 {
     void* Function;
     FString Identity;
-    FString Label;               // the script name, for errors
+    FString Label;                // the script name, for errors
     const bool* Loaded = nullptr; // native binds: false once the code module is unloaded
 };
 TMap<uint64, FUEAotEntry> UEAotEntries;
@@ -38,7 +38,7 @@ template <class F, F Fn> bool ConfigureUEAot(das::BuiltInFunction* Bound, const 
         AddUEAotEntry(Key, {Pointer, Identity, FString(UTF8_TO_TCHAR(Name))});
         Bound->cppName =
             TCHAR_TO_UTF8(*(bOperator ? FString::Printf(TEXT("dasue::aot::CallOp<%lluULL,%s>"), Key,
-                                                        *dasue::aot::Signature<F>::OperandTypes())
+                                                             *dasue::aot::Signature<F>::OperandTypes())
                                       : FString::Printf(TEXT("dasue::aot::Call<%lluULL,%s>"), Key, *Types)));
         return true;
     }
@@ -88,5 +88,48 @@ auto AddPhysicsDataExtern(das::Module& Module, const das::ModuleLibrary& Library
     auto* Bound = das::addExtern<F, &TCheckedPhysicsDataExtern<F>::template Invoke<Fn>>(
         Module, Library, Name, das::SideEffects::accessExternal | das::SideEffects::modifyExternal);
     Bound->noAot = true;
+    return Bound;
+}
+
+void GuardUEInteropContext(das::Context* C);
+
+template <das::InteropFunction Fn> vec4f CheckedUEInterop(das::Context& C, das::SimNode_CallBase* Node, vec4f* Args)
+{
+    GuardUEExtern();
+    GuardUEInteropContext(&C);
+    return Fn(C, Node, Args);
+}
+// Interop's erased ABI remains narrower than ordinary native-call AOT: expanding Type<T> for
+// native binds must not implicitly open context-bound handle/snapshot overloads here.
+template <class T>
+inline constexpr bool UEInteropScalar =
+    std::is_arithmetic_v<T> || std::is_same_v<T, char*> || std::is_same_v<T, const char*>;
+
+template <das::InteropFunction Fn, class Ret, class... Args>
+auto AddUEInterop(das::Module& Module, const das::ModuleLibrary& Library, const char* Name, das::SideEffects Effects)
+{
+    auto* Bound = das::addInterop<CheckedUEInterop<Fn>, Ret, Args...>(Module, Library, Name,
+                                                                      Effects | das::SideEffects::accessExternal);
+    // Only scalar C++ spellings and the erased anyArgument are visible to the AOT emitter.
+    // Snapshot/handle signatures keep their existing closed AOT boundary.
+    constexpr bool CanAot = (std::is_void_v<Ret> || UEInteropScalar<Ret>) && dasue::aot::Type<Ret>::Name &&
+                            !std::is_same_v<Ret, das::Context*> &&
+                            ((UEInteropScalar<Args> || std::is_same_v<Args, vec4f>) && ...);
+    Bound->noAot = !CanAot;
+    if constexpr (CanAot)
+    {
+        // daScript overload names omit the return type. Include it in the native ABI key.
+        const FString Types = TEXT("interop:v1:") + FString(UTF8_TO_TCHAR(Bound->result->getMangledName().c_str())) +
+                                   TEXT(":") + FString(UTF8_TO_TCHAR(Bound->getMangledName().c_str()));
+        const uint64 Key = dasue::aot::Key(Name, TCHAR_TO_UTF8(*Types));
+        const FString Identity = FString(UTF8_TO_TCHAR(Name)) + TEXT(":") + Types;
+        void* Pointer = reinterpret_cast<void*>(&CheckedUEInterop<Fn>);
+        if (const auto* Existing = UEAotEntries.Find(Key);
+            Existing && (Existing->Identity != Identity || Existing->Function != Pointer))
+            throw std::runtime_error("UE AOT interop identity collision");
+        AddUEAotEntry(Key, {Pointer, Identity, FString(UTF8_TO_TCHAR(Name))});
+        Bound->cppName = TCHAR_TO_UTF8(*FString::Printf(TEXT("dasue::aot::Interop<%lluULL>"), Key));
+    }
+    ++UEExternRegistrationCount;
     return Bound;
 }

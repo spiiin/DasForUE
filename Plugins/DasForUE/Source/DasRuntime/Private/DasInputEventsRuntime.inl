@@ -7,13 +7,7 @@ FDasStructValue StoreInputEvent(const UScriptStruct* Type, const void* Source, d
     FString Error;
     if (!CaptureDasInputEvent(Type, Source, Copy, Error))
         C->throw_error(TCHAR_TO_UTF8(*Error));
-    if (At && ActiveContext->StructValues.Num() >= ActiveContext->StructNextCollection)
-        CollectStructValues(*ActiveContext, At);
-    if (ActiveContext->StructValues.Num() >= 4096)
-        C->throw_error("struct value table limit exceeded");
-    const uint64 Token = NextStructValueToken++;
-    ActiveContext->StructValues.Add(Token, MoveTemp(Copy));
-    return {Token};
+    return StoreCapturedNativeValue(MoveTemp(Copy), C, At);
 }
 template <class V> const FInstancedStruct& ResolveInputEvent(const V& Value, UScriptStruct* Type, das::Context* C)
 {

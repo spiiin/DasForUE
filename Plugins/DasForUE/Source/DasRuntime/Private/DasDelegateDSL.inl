@@ -12,7 +12,7 @@ FDasDeclaredType DSLDelegateDeclaredType(const das::TypeDeclPtr& T, const FStrin
         D.TypePath = TEXT("/Script/CoreUObject.Object");
     else if (DSLContainer(T))
         D = DSLContainerType(T, Folder, Registry);
-    else if (DSLDirectEnum(T) || DSLDirectStruct(T))
+    else if (DSLTypedValue(T, EDasTypeKind::Enum) || DSLDirectStruct(T))
         D.TypePath = DSLDirectPath(T, Folder, Registry);
     else if (!DSLMathPath(T).IsEmpty())
         D.TypePath = DSLMathPath(T);
@@ -431,8 +431,8 @@ struct FUEDelegateAnnotation : das::StructureAnnotation
                         DSLCall(S->at, Bridge,
                                 {Handle(), Str(D.Name),
                                  T->baseType == das::Type::tUInt8 || DSLTypedClass(T) || DSLTypedReference(T) ||
-                                         DSLDirectEnum(T) || DSLDirectStruct(T) || DSLContainer(T) ||
-                                         DSLAdaptedSnapshot(T, EDasCallBridge::MethodBridge)
+                                         DSLTypedValue(T, EDasTypeKind::Enum) || DSLDirectStruct(T) ||
+                                         DSLContainer(T) || DSLAdaptedSnapshot(T, EDasCallBridge::MethodBridge)
                                      ? DSLDirectPack(S->at, T, V, DSLMethodValuePath(D.Type))
                                      : static_cast<das::ExpressionPtr>(V)}));
                 }
@@ -445,7 +445,7 @@ struct FUEDelegateAnnotation : das::StructureAnnotation
                     const das::string Bridge = DSLMethodBridge(Kind, true);
                     das::ExpressionPtr Value = DSLCall(S->at, Bridge, {Handle(), Str(TEXT("ReturnValue"))});
                     if (T->baseType == das::Type::tUInt8 || DSLTypedClass(T) || DSLTypedReference(T) ||
-                        DSLDirectEnum(T) || DSLDirectStruct(T) || DSLContainer(T) ||
+                        DSLTypedValue(T, EDasTypeKind::Enum) || DSLDirectStruct(T) || DSLContainer(T) ||
                         DSLAdaptedSnapshot(T, EDasCallBridge::MethodBridge))
                         Value = DSLDirectUnpack(S->at, T, Value, DSLMethodValuePath(Method.ReturnType));
                     Local("result", T, Value);
@@ -460,7 +460,7 @@ struct FUEDelegateAnnotation : das::StructureAnnotation
                     const das::string Bridge = DSLMethodBridge(Kind, true);
                     das::ExpressionPtr Value = DSLCall(S->at, Bridge, {Handle(), Str(D.Name)});
                     if (T->baseType == das::Type::tUInt8 || DSLTypedClass(T) || DSLTypedReference(T) ||
-                        DSLDirectEnum(T) || DSLDirectStruct(T) || DSLContainer(T) ||
+                        DSLTypedValue(T, EDasTypeKind::Enum) || DSLDirectStruct(T) || DSLContainer(T) ||
                         DSLAdaptedSnapshot(T, EDasCallBridge::MethodBridge))
                         Value = DSLDirectUnpack(S->at, T, Value, DSLMethodValuePath(D.Type));
                     Local("out_" + das::to_string(I), T, Value);

@@ -100,10 +100,11 @@ struct FUEInterfaceAnnotation : das::StructureAnnotation
                 }
                 else if (D.GetKind() == EDasTypeKind::Enum)
                 {
-                    D.TypePath = DSLConstraint(
-                        Constraints, Prefix + TEXT("enum"), EDSLTypeKind::Enum,
-                                                   DSLDirectEnum(T) ? DSLDirectPath(T, Folder, Registry) : FString(),
-                                                   TypeScope);
+                    D.TypePath = DSLConstraint(Constraints, Prefix + TEXT("enum"), EDSLTypeKind::Enum,
+                                                                          DSLTypedValue(T, EDasTypeKind::Enum)
+                                                                              ? DSLDirectPath(T, Folder, Registry)
+                                                                              : FString(),
+                                                                          TypeScope);
                     if (D.TypePath.IsEmpty())
                         DSLFail(TEXT("Interface enum requires an explicit type constraint"));
                 }
@@ -331,7 +332,7 @@ struct FUEInterfaceAnnotation : das::StructureAnnotation
                         das::ExpressionPtr Placeholder = Default;
                         if (DSLDirectStruct(Return))
                             Placeholder = DSLCall(Function->at, Return->structType->name, {});
-                        if (DSLDirectEnum(Return))
+                        if (DSLTypedValue(Return, EDasTypeKind::Enum))
                         {
                             if (Return->enumType->list.empty())
                                 DSLFail(TEXT("Empty interface enum declaration"));

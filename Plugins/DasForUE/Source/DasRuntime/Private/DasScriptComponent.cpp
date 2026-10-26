@@ -1,6 +1,6 @@
 #include "DasScriptComponent.h"
 #include "DasRuntime.h"
-#include "DasProbeActor.h"
+#include "DasActor.h"
 #include "Engine/World.h"
 #include "Blueprint/BlueprintExceptionInfo.h"
 #include "UObject/Stack.h"
@@ -63,7 +63,7 @@ void UDasScriptComponent::OnRegister()
     }
     // The authored Actor bridge delivers a complete SCS pass before its own hook.
     // A component dynamically registered after Actor BeginPlay instead needs its own pass.
-    if (Owner->IsA<ADasProbeActor>() && !Owner->HasActorBegunPlay())
+    if (Owner->IsA<ADasActor>() && !Owner->HasActorBegunPlay())
         return;
     RunDasConstruction();
 }

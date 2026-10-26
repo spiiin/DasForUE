@@ -11,6 +11,51 @@ ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'Plugins',
 
 # Ported type -> (patterns, files allowed to contain them).
 PORTED = {
+    'OpaqueNativePolicies': (
+        [r'\bDasIs(?:Geometry|InputEvent|PaintContext|WidgetAnimation|EventReply)Type\b'],
+        {'DasGeometry.h', 'DasGeometry.cpp', 'DasGeometryRuntime.inl',
+         'DasInputEvents.h', 'DasInputEvents.cpp', 'DasInputEventsRuntime.inl',
+         'DasEventReplyTransport.h', 'DasEventReplyTransport.cpp', 'DasEventReplyCalls.inl',
+         'DasPaintTransport.h', 'DasPaintTransport.cpp', 'DasPaintRuntime.inl',
+         'DasWidgetAnimationTransport.h', 'DasWidgetAnimationTransport.cpp', 'DasWidgetAnimationRuntime.inl'},
+    ),
+    'OpaqueNativeIdentity': (
+        [r'"/Script/(?:SlateCore\.(?:Geometry|InputEvent|KeyEvent|AnalogInputEvent|CharacterEvent|PointerEvent|NavigationEvent|FocusEvent)|UMG\.(?:EventReply|PaintContext|WidgetAnimationHandle)|Engine\.(?:ActorInstanceHandle|BodyInstanceAsyncPhysicsTickHandle))"'],
+        {'DasOpaqueTypeAdapters.cpp'},
+    ),
+    'ContainerPropertyFactory': (
+        [r'\bnew F(?:Array|Set|Map)Property\b'],
+        {'DasContainerAdapters.cpp'},
+    ),
+    'InterfaceMembership': (
+        [r'->ImplementsInterface\('],
+        {'DasInterfaceContracts.cpp'},
+    ),
+    'ReferencePropertyFactory': (
+        [r'\bnew F(?:Object|Class|WeakObject|Interface)Property\b'],
+        {'DasObjectClassAdapters.cpp'},
+    ),
+    'ReferenceDefaults': (
+        [r'\bDSLReferencePropertyDefault\b'],
+        {'DasReferenceDefaultsDSL.inl'},
+    ),
+    'EnumStorage': (
+        [r'\bGetCppForm\('],
+        {'DasEnumAdapter.cpp', 'DasContainerRegistry.cpp'},
+    ),
+    'Enum': (
+        [r'\bDSLDirectEnum', r'\bDSLNativeEnum', r'\bDSLStructEnumDefault', r'"UEEnumValue"'],
+        {'DasEnumTypesDSL.inl', 'DasEnumAnnotations.inl', 'DasRuntimeTypeAnnotations.inl'},
+    ),
+    'TextName': (
+        [r'\bDSLTextDefault', r'"UE(?:Text|Name)Value"'],
+        {'DasTextNameTypesDSL.inl', 'DasRuntimeTypeAnnotations.inl'},
+    ),
+    'SoftReference': (
+        [r'\bDSLSoft', r'\bDasSoftProperty\b', r'\bCreateDasSoftProperty\b'],
+        {'DasSoftReferences.cpp', 'DasSoftReferences.h', 'DasSoftTypes.inl',
+         'DasSoftNativeView.inl', 'DasSoftRuntime.inl', 'DasRuntimeInputSessions.inl'},
+    ),
     'GameplayTag': (
         [r'/Script/GameplayTags\.', r'\bDSLGameplay', r'\bIsDasGameplayTagPath\b', r'\bDasIsGameplayTagType\b'],
         {'DasGameplayTags.cpp', 'DasGameplayTagsDSL.inl', 'DasGameplayTagsRuntime.inl', 'DasGameplayTags.h'},
@@ -33,17 +78,25 @@ def sources():
 
 
 class TypeAdapterGateTest(unittest.TestCase):
+    def test_reference_dispatch_stays_generic(self):
+        for name in ['DasDSL.inl', 'DasDirectTypes.inl', 'DasNativeGameplayDSL.inl',
+                     'DasRuntimeFramesWidgets.inl', 'DasPropertyTypes.cpp']:
+            path = os.path.join(ROOT, 'DasRuntime', 'Private', name)
+            with open(path, encoding='utf-8') as stream:
+                code = stream.read()
+            self.assertNotRegex(code, r'"(?:UObjectHandle|UEClassHandle)"', name)
+
     def test_ported_types_stay_inside_their_adapters(self):
         offenders = []
         for kind, (patterns, allowed) in PORTED.items():
             regex = re.compile('|'.join(patterns))
             for name, path in sources():
-                # Test drivers spell types as script source text (the reload matrix generates DSL scenarios).
+                relative = os.path.relpath(path, ROOT).replace(os.sep, '/')
                 if name in allowed or re.search(r'Tests?\.|Probe|Commandlet|ReloadMatrix', name):
                     continue
                 # Reflection registry data must retain native identifiers, including
                 # nested struct paths. It contains no hand-written type dispatch.
-                if os.path.relpath(path, ROOT).replace(os.sep, '/') == 'DasRuntime/Private/Generated/DasNativeGameplay.generated.h':
+                if relative == 'DasRuntime/Private/Generated/DasNativeGameplayRuntime.generated.h':
                     continue
                 with open(path, encoding='utf-8', errors='replace') as f:
                     for number, line in enumerate(f, 1):

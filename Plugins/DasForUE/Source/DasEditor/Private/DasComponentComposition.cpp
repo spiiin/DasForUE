@@ -5,7 +5,7 @@
 #include "DasDSLService.h"
 #include "DasRuntime.h"
 #include "DasScriptComponent.h"
-#include "DasProbeActor.h"
+#include "DasActor.h"
 #include "Engine/Blueprint.h"
 #include "Engine/SimpleConstructionScript.h"
 #include "Engine/SCS_Node.h"

@@ -550,7 +550,7 @@ bool FDasRuntimeModule::DispatchWidgetPaint(const FString& Path, const FString& 
     TGuardValue<bool> ContractScope(WidgetPaintContract, true);
     FDasScalarValue Arg;
     Arg.Kind = 12;
-    Arg.ObjectClass = TEXT("/Script/UMG.PaintContext");
+    Arg.ObjectClass = DasNativeTypePath(EDasNativeTypeRole::Paint);
     const auto Result = RunNamedFramePersistent(Path, Entry, {Arg}, EDasMethodSignature::Void, Widget);
     if (!Result.bSucceeded || !Scope.Succeeded)
     {
@@ -684,7 +684,7 @@ bool FDasRuntimeModule::DispatchWidgetInput(const FString& Path, const FString& 
     if (FSlateApplication::IsInitialized())
         Scope.NavigationUser = FSlateApplication::Get().GetUser(int32(Scope.NavigationUserIndex));
     const auto Result = RunNamedFramePersistent(Path, Entry, {GeometryArg, Arg}, EDasMethodSignature::Struct, Widget,
-                                                TEXT("/Script/UMG.EventReply"));
+                                                DasNativeTypePath(EDasNativeTypeRole::EventReply));
     if (!Result.bSucceeded || !Scope.Produced)
     {
         Error = Result.Error.IsEmpty() ? TEXT("Widget handler did not produce an EventReply"): Result.Error;

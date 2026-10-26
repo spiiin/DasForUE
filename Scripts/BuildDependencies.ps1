@@ -32,7 +32,7 @@ Invoke-Native 'daScript build failed' { cmake --build $Build --config Release --
 $Content = Join-Path $Repo 'Plugins\DasForUE\Content\Das'
 New-Item -ItemType Directory -Path (Join-Path $Content 'daslib') -Force | Out-Null
 Copy-Item -Path (Join-Path $Source 'daslib\*') -Destination (Join-Path $Content 'daslib') -Recurse -Force
-$Generated = Join-Path $Repo 'Plugins\DasForUE\Source\DasRuntime\Private\Generated'
+$Generated = Join-Path $Repo 'Plugins\DasForUE\Tests\Runtime\Private\Generated'
 New-Item -ItemType Directory -Path $Generated -Force | Out-Null
 Push-Location $Source
 try {

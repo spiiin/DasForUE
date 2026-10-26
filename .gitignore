@@ -64,3 +64,17 @@ __pycache__/
 /Tests/DasForUESmoke/Content/DasSubsystems/
 
 /Tests/DasForUESmoke/Content/Tests/DasSaveGameCompatibility/
+
+/Tests/DasForUESmoke/Content/Tests/ActorHost/
+
+/Tests/DasRuntimeIsolation/Content/RuntimeIsolation/
+
+/Tests/DasRuntimeIsolation/Build/Windows/FileOpenOrder/
+/Tests/DasRuntimeIsolation/Config/DefaultInput.ini
+
+/Tests/DasEditorIsolation/Build/Windows/FileOpenOrder/
+/Tests/DasEditorIsolation/Config/DefaultInput.ini
+
+/Examples/CleanGameplay/Content/CleanGameplay/
+/Examples/CleanGameplay/Build/Windows/FileOpenOrder/
+/Examples/CleanGameplay/Config/DefaultInput.ini

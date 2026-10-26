@@ -23,7 +23,7 @@
 #include "DasBlueprintService.h"
 #include "DasRuntime.h"
 #include "DasAsyncPhysicsVM.h"
-#include "DasProbeActor.h"
+#include "DasActor.h"
 #include "DasScriptComponent.h"
 #include "DasPropertyValues.h"
 #include "Engine/Blueprint.h"
@@ -52,7 +52,7 @@
 #include "DasNumericGraphMigration.h"
 #include "DasBlueprintRollback.h"
 #include "Misc/SecureHash.h"
-#if WITH_DEV_AUTOMATION_TESTS
+#if WITH_DEV_AUTOMATION_TESTS && DAS_WITH_EDITOR_TESTS
 static bool GDasFailWidenAfterCompile = false;
 static int32 GDasFailStructuralStage = 0, GDasFailRenameStage = 0;
 void DasFailStructuralForTesting(int32 Stage)
@@ -596,7 +596,7 @@ bool ApplyDeclaration(const FString& Script, const FString& Package, const FStri
         }
         return false;
     }
-#if WITH_DEV_AUTOMATION_TESTS
+#if WITH_DEV_AUTOMATION_TESTS && DAS_WITH_EDITOR_TESTS
     if (Rollback && GDasFailStructuralStage == 1)
         return Restore(TEXT("Injected post-compile development failure"));
 #endif
@@ -626,7 +626,7 @@ bool ApplyDeclaration(const FString& Script, const FString& Package, const FStri
     BP->MarkPackageDirty();
     if (Created)
         FAssetRegistryModule::AssetCreated(BP);
-#if WITH_DEV_AUTOMATION_TESTS
+#if WITH_DEV_AUTOMATION_TESTS && DAS_WITH_EDITOR_TESTS
     if (Rollback && GDasFailStructuralStage == 2)
         return Restore(TEXT("Injected post-metadata development failure"));
 #endif
@@ -1493,7 +1493,7 @@ bool FDasDSLService::ReimportRenamedFields(UBlueprint* BP, FString& Error, bool 
     BP->Modify();
     for (const auto& R : Renames)
         FBlueprintEditorUtils::RenameMemberVariable(BP, R.OldName, R.NewName);
-#if WITH_DEV_AUTOMATION_TESTS
+#if WITH_DEV_AUTOMATION_TESTS && DAS_WITH_EDITOR_TESTS
     if (GDasFailRenameStage == 1)
         return Restore(TEXT("Injected post-rename development failure"));
 #endif
@@ -1510,7 +1510,7 @@ bool FDasDSLService::ReimportRenamedFields(UBlueprint* BP, FString& Error, bool 
     {
         return Restore(TEXT("Rename compilation failed"));
     }
-#if WITH_DEV_AUTOMATION_TESTS
+#if WITH_DEV_AUTOMATION_TESTS && DAS_WITH_EDITOR_TESTS
     if (GDasFailRenameStage == 2)
         return Restore(TEXT("Injected post-compile development failure"));
 #endif
@@ -1533,7 +1533,7 @@ bool FDasDSLService::ReimportRenamedFields(UBlueprint* BP, FString& Error, bool 
     }
     BP->GetOutermost()->GetMetaData().SetValue(BP, TEXT("DasDSLModel"), *Json);
     BP->MarkPackageDirty();
-#if WITH_DEV_AUTOMATION_TESTS
+#if WITH_DEV_AUTOMATION_TESTS && DAS_WITH_EDITOR_TESTS
     if (GDasFailRenameStage == 3)
         return Restore(TEXT("Injected post-metadata development failure"));
 #endif
@@ -2011,7 +2011,7 @@ bool FDasDSLService::ReimportConvertedNumericFields(UBlueprint* BP, const FDasNu
     }
     if (!CompileScope())
         return Rollback(TEXT("Blueprint compilation failed"));
-#if WITH_DEV_AUTOMATION_TESTS
+#if WITH_DEV_AUTOMATION_TESTS && DAS_WITH_EDITOR_TESTS
     if (GDasFailWidenAfterCompile)
         return Rollback(TEXT("Injected development test failure"));
 #endif
@@ -2037,7 +2037,7 @@ bool FDasDSLService::ReimportConvertedNumericFields(UBlueprint* BP, const FDasNu
     return true;
 }
 
-#if WITH_DEV_AUTOMATION_TESTS
+#if WITH_DEV_AUTOMATION_TESTS && DAS_WITH_EDITOR_TESTS
 static bool GDasFailArchiveAfterCompile = false;
 void DasFailArchiveAfterCompileForTesting(bool Enabled)
 {
@@ -2049,7 +2049,7 @@ namespace
 // Retired values of any actor host (Actor, Pawn, Character); null for other objects.
 TMap<FString, FDasScalarValue>* RetiredValues(UObject* O)
 {
-    if (auto* A = Cast<ADasProbeActor>(O))
+    if (auto* A = Cast<ADasActor>(O))
         return &A->RetiredDasValues;
     if (auto* P = Cast<ADasPawn>(O))
         return &P->RetiredDasValues;
@@ -2612,7 +2612,7 @@ bool FDasDSLService::ReimportArchivedFields(UBlueprint* BP, bool Restore, bool I
     FBlueprintEditorUtils::MarkBlueprintAsStructurallyModified(BP);
     if (!Compile())
         return Rollback(TEXT("Compilation failed"));
-#if WITH_DEV_AUTOMATION_TESTS
+#if WITH_DEV_AUTOMATION_TESTS && DAS_WITH_EDITOR_TESTS
     if (GDasFailArchiveAfterCompile)
         return Rollback(TEXT("Injected development test failure"));
 #endif

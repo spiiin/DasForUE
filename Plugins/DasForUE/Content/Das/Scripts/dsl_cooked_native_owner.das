@@ -2,7 +2,7 @@ options gen2
 require ue_scene_components
 [ue_object_ref(script="dsl_cooked_component.das",type="CookedBehavior")]
 struct CookedComponentRef { handle:UObjectHandle }
-[ue_class(module_id="cookednative",Blueprintable)]
+[ue_class(parent="/Script/DasRuntime.DasProbeActor",module_id="cookednative",Blueprintable)]
 class CookedNativeOwner {
     @ue_component
     @RootComponent

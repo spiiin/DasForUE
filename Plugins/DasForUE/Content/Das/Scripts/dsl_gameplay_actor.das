@@ -5,6 +5,8 @@ require ue_scene_components
 
 [ue_class(module_id="gameplaydemo",Blueprintable)]
 class GameplayActor : Actor {
+    @ue_property=(BlueprintAssignable)
+    OnDasSignal:GameplayScoreSignal
     properties = ue_properties(EditAnywhere, BlueprintReadWrite) {
         // Текущие очки игрока.
         var Score:int=0
@@ -45,13 +47,13 @@ class GameplayActor : Actor {
         if (!ue_enhanced_has_context(self.Player,self.Controls)) {
             ue_enhanced_add_context(self.Player,self.Controls,0)
         }
-        ue_enhanced_bind(self.JumpAction,"Started","OnJump")
-        ue_enhanced_bind(self.JumpAction,"Completed","OnJump")
-        ue_enhanced_bind(self.MoveAction,"Triggered","OnMove")
-        ue_enhanced_bind(self.MoveAction,"Completed","OnMove")
+        ue_enhanced_bind(self.JumpAction,TriggerEvent.Started,"OnJump")
+        ue_enhanced_bind(self.JumpAction,TriggerEvent.Completed,"OnJump")
+        ue_enhanced_bind(self.MoveAction,TriggerEvent.Triggered,"OnMove")
+        ue_enhanced_bind(self.MoveAction,TriggerEvent.Completed,"OnMove")
     }
     [ue_function(BlueprintCallable)]
-    def OnJump(value:bool):void { if (value) { ue_emit_signal(1) } }
+    def OnJump(value:bool):void { if (value) { self.OnDasSignal.Broadcast(1) } }
     [ue_function(BlueprintCallable)]
     def OnMove(value:UEVector2D):void { self.Move = value }
     [ue_function(BlueprintCallable)]

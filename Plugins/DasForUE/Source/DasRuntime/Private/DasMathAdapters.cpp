@@ -1,6 +1,7 @@
 #include "DasMathAdapters.h"
 #include "InputActionValue.h"
 #include "UObject/Class.h"
+#include "UObject/UnrealType.h"
 
 namespace
 {
@@ -51,6 +52,24 @@ class FDasInputActionValueAdapter final : public IDasTypeAdapter
 public:
     virtual EDasTypeKind GetKind() const override { return EDasTypeKind::Struct; }
     virtual const UScriptStruct* GetStruct() const override { return FInputActionValue::StaticStruct(); }
+    const FDasNativeTypePolicy* GetNativePolicy() const override
+    {
+        static const FDasNativeTypePolicy P = []
+        {
+            FDasNativeTypePolicy V;
+            V.Roles = EDasNativeTypeRole::InputActionValue;
+            V.Transport = TEXT("input_action_value_v1");
+            V.Handle = "InputActionValue";
+            V.Lifetime = TEXT("owned_input_value");
+            V.CallError = "fixed InputActionValue arrays need an adapter";
+            V.AllowCall = [](const FProperty* Field, bool, bool, int32)
+            {
+                return Field && Field->ArrayDim == 1;
+            };
+            return V;
+        }();
+        return &P;
+    }
 };
 }
 

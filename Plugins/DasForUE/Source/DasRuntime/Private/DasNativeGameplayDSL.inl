@@ -1,3 +1,6 @@
+#include "DasObjectNativeView.inl"
+#include "DasEnumNativeView.inl"
+#include "DasSoftNativeView.inl"
 das::TypeDeclPtr DSLNativeValueType(das::Program* Program, das::Module* Module, const FDasDeclaredType& Type,
                                     const das::LineInfo& At)
 {
@@ -23,60 +26,10 @@ das::TypeDeclPtr DSLNativeValueType(das::Program* Program, das::Module* Module, 
         T->firstType = DSLNativeValueType(Program, Module, *Type.Element, At);
         return T;
     }
-    if (Type.GetKind() == EDasTypeKind::Object)
-    {
-        const TCHAR* Source = nullptr;
-        for (const auto& V : DasNativeGameplayViews)
-            if (Type.TypePath == V.Class)
-            {
-                Source = V.Source;
-                break;
-            }
-        if (!Source)
-            DSLFail(TEXT("Native object type is not in generated registry: ")+ Type.TypePath);
-        auto Types = Program->thisModuleGroup->findStructure(DSLUtf8(Source), Module);
-        if (Types.size() != 1)
-            DSLFail(TEXT("Import ue_native_gameplay for native view: ")+ FString(Source));
-        auto* T = new das::TypeDecl(das::Type::tStructure, At);
-        T->structType = Types[0];
-        return T;
-    }
+    if (Type.GetKind() == EDasTypeKind::Object || Type.GetKind() == EDasTypeKind::Class)
+        return DSLKindFacet(Type.GetKind())->MakeViewForPath(Type.TypePath, *Program->thisModuleGroup, Module, At);
     if (Type.GetKind() == EDasTypeKind::Enum)
-    {
-        const TCHAR* Source = nullptr;
-        for (const auto& V : DasNativeGameplayEnums)
-            if (Type.TypePath == V.Path)
-            {
-                Source = V.Source;
-                break;
-            }
-        if (!Source)
-            DSLFail(TEXT("Enum not in generated native registry"));
-        auto Types = Program->thisModuleGroup->findEnum(DSLUtf8(Source), Module);
-        if (Types.size() != 1)
-            DSLFail(TEXT("Import ue_native_gameplay for native enum: ")+ Type.TypePath);
-        auto* T = new das::TypeDecl(das::Type::tEnumeration, At);
-        T->enumType = Types[0];
-        return T;
-    }
-    if (Type.GetKind() == EDasTypeKind::Struct && DasSoftProperty(Type.TypePath))
-    {
-        const TCHAR* Source = nullptr;
-        for (const auto& V : DasNativeGameplaySoftTypes)
-            if (Type.TypePath == V.Path)
-            {
-                Source = V.Source;
-                break;
-            }
-        if (!Source)
-            DSLFail(TEXT("Soft type not in generated native registry"));
-        auto* Alias = new das::TypeDecl(das::Type::alias, At);
-        Alias->alias = DSLUtf8(Source);
-        auto T = DSLObjectNormalize(Alias, *Program->thisModuleGroup, Module);
-        if (!DSLSoft(T) || DSLSoftPath(T) != Type.TypePath)
-            DSLFail(TEXT("Import ue_native_gameplay for native soft type: ")+ Type.TypePath);
-        return T;
-    }
+        return DSLKindFacet(Type.GetKind())->MakeViewForPath(Type.TypePath, *Program->thisModuleGroup, Module, At);
     if (Type.GetKind() == EDasTypeKind::Struct)
     {
         const auto& Path = Type.TypePath;

@@ -155,6 +155,21 @@ __ue_image_soft_status	@ue_foundation::__ue_image_soft_status CIH<ue_foundation:
 __ue_input_kind	@ue_foundation::__ue_input_kind CIH<ue_foundation::InputActionValue> C_c	int const	4
 __ue_input_make	@ue_foundation::__ue_input_make Ci Cd Cd Cd C_c	ue_foundation::InputActionValue	4
 __ue_library_scope	@ue_foundation::__ue_library_scope CIH<ue_foundation::UObjectHandle> Cb CI1<v>$ C_c	void	4
+__ue_map_get_token_object	@ue_foundation::__ue_map_get_token_object CH<ue_foundation::UEStructValue> Cs *	uint64 const	4
+__ue_map_get_token_struct	@ue_foundation::__ue_map_get_token_struct CH<ue_foundation::UEStructValue> Cs *	uint64 const	4
+__ue_map_object_token	@ue_foundation::__ue_map_object_token Cu64 C_c	ue_foundation::UObjectHandle	4
+__ue_map_struct_token	@ue_foundation::__ue_map_struct_token Cu64 C_c	ue_foundation::UEStructValue	4
+__ue_map_with_token_bool	@ue_foundation::__ue_map_with_token_bool CH<ue_foundation::UEStructValue> Cs * Cb	uint64 const	4
+__ue_map_with_token_byte	@ue_foundation::__ue_map_with_token_byte CH<ue_foundation::UEStructValue> Cs * Cu8	uint64 const	4
+__ue_map_with_token_double	@ue_foundation::__ue_map_with_token_double CH<ue_foundation::UEStructValue> Cs * Cd	uint64 const	4
+__ue_map_with_token_enum	@ue_foundation::__ue_map_with_token_enum CH<ue_foundation::UEStructValue> Cs * CH<ue_foundation::UEEnumValue>	uint64 const	4
+__ue_map_with_token_float	@ue_foundation::__ue_map_with_token_float CH<ue_foundation::UEStructValue> Cs * Cf	uint64 const	4
+__ue_map_with_token_int	@ue_foundation::__ue_map_with_token_int CH<ue_foundation::UEStructValue> Cs * Ci	uint64 const	4
+__ue_map_with_token_name	@ue_foundation::__ue_map_with_token_name CH<ue_foundation::UEStructValue> Cs * CH<ue_foundation::UENameValue>	uint64 const	4
+__ue_map_with_token_object	@ue_foundation::__ue_map_with_token_object CH<ue_foundation::UEStructValue> Cs * CH<ue_foundation::UObjectHandle>	uint64 const	4
+__ue_map_with_token_string	@ue_foundation::__ue_map_with_token_string CH<ue_foundation::UEStructValue> Cs * Cs	uint64 const	4
+__ue_map_with_token_struct	@ue_foundation::__ue_map_with_token_struct CH<ue_foundation::UEStructValue> Cs * CH<ue_foundation::UEStructValue>	uint64 const	4
+__ue_map_with_token_text	@ue_foundation::__ue_map_with_token_text CH<ue_foundation::UEStructValue> Cs * CH<ue_foundation::UETextValue>	uint64 const	4
 __ue_math_pack_color	@ue_foundation::__ue_math_pack_color CIH<ue_foundation::UEColor> C_c C_l	ue_foundation::UEStructValue	4
 __ue_math_pack_input_value	@ue_foundation::__ue_math_pack_input_value CIH<ue_foundation::InputActionValue> C_c C_l	ue_foundation::UEStructValue	4
 __ue_math_pack_linear_color	@ue_foundation::__ue_math_pack_linear_color CIH<ue_foundation::UELinearColor> C_c C_l	ue_foundation::UEStructValue	4
@@ -244,6 +259,9 @@ __ue_primary_query_count	@ue_foundation::__ue_primary_query_count Cu64 C_c	int c
 __ue_primary_query_name	@ue_foundation::__ue_primary_query_name Cu64 Ci C_c	string const	4
 __ue_primary_query_release	@ue_foundation::__ue_primary_query_release Cu64 C_c	void	4
 __ue_primary_unload	@ue_foundation::__ue_primary_unload CIs CIs C_c	bool const	4
+__ue_probe_map_binding_count	@ue_foundation::__ue_probe_map_binding_count	int const	4
+__ue_probe_typed_map_get_int	@ue_foundation::__ue_probe_typed_map_get_int CIs Ci C_c	int const	4
+__ue_probe_typed_map_set_int	@ue_foundation::__ue_probe_typed_map_set_int CIs Ci Ci C_c	void	4
 __ue_query_begin	@ue_foundation::__ue_query_begin CIH<ue_foundation::UObjectHandle> CIs CIs Cb C_c	uint64 const	4
 __ue_query_count	@ue_foundation::__ue_query_count Cu64 C_c	int const	4
 __ue_query_get	@ue_foundation::__ue_query_get Cu64 Ci C_c	ue_foundation::UObjectHandle	4
@@ -331,70 +349,38 @@ __ue_self_map_erase_byte	@ue_foundation::__ue_self_map_erase_byte CIs Cu8 C_c	bo
 __ue_self_map_erase_int	@ue_foundation::__ue_self_map_erase_int CIs Ci C_c	bool const	4
 __ue_self_map_erase_name	@ue_foundation::__ue_self_map_erase_name CIs CH<ue_foundation::UENameValue> C_c	bool const	4
 __ue_self_map_erase_string	@ue_foundation::__ue_self_map_erase_string CIs CIs C_c	bool const	4
-__ue_self_map_get_byte_bool	@ue_foundation::__ue_self_map_get_byte_bool CIs Cu8 C_c	bool const	4
-__ue_self_map_get_byte_byte	@ue_foundation::__ue_self_map_get_byte_byte CIs Cu8 C_c	uint8 const	4
-__ue_self_map_get_byte_double	@ue_foundation::__ue_self_map_get_byte_double CIs Cu8 C_c	double const	4
-__ue_self_map_get_byte_float	@ue_foundation::__ue_self_map_get_byte_float CIs Cu8 C_c	float const	4
-__ue_self_map_get_byte_int	@ue_foundation::__ue_self_map_get_byte_int CIs Cu8 C_c	int const	4
-__ue_self_map_get_byte_name	@ue_foundation::__ue_self_map_get_byte_name CIs Cu8 C_c	ue_foundation::UENameValue	4
-__ue_self_map_get_byte_string	@ue_foundation::__ue_self_map_get_byte_string CIs Cu8 C_c	string const	4
-__ue_self_map_get_byte_text	@ue_foundation::__ue_self_map_get_byte_text CIs Cu8 C_c	ue_foundation::UETextValue	4
-__ue_self_map_get_int_bool	@ue_foundation::__ue_self_map_get_int_bool CIs Ci C_c	bool const	4
-__ue_self_map_get_int_byte	@ue_foundation::__ue_self_map_get_int_byte CIs Ci C_c	uint8 const	4
-__ue_self_map_get_int_double	@ue_foundation::__ue_self_map_get_int_double CIs Ci C_c	double const	4
-__ue_self_map_get_int_float	@ue_foundation::__ue_self_map_get_int_float CIs Ci C_c	float const	4
-__ue_self_map_get_int_int	@ue_foundation::__ue_self_map_get_int_int CIs Ci C_c	int const	4
-__ue_self_map_get_int_name	@ue_foundation::__ue_self_map_get_int_name CIs Ci C_c	ue_foundation::UENameValue	4
-__ue_self_map_get_int_string	@ue_foundation::__ue_self_map_get_int_string CIs Ci C_c	string const	4
-__ue_self_map_get_int_text	@ue_foundation::__ue_self_map_get_int_text CIs Ci C_c	ue_foundation::UETextValue	4
-__ue_self_map_get_name_bool	@ue_foundation::__ue_self_map_get_name_bool CIs CH<ue_foundation::UENameValue> C_c	bool const	4
-__ue_self_map_get_name_byte	@ue_foundation::__ue_self_map_get_name_byte CIs CH<ue_foundation::UENameValue> C_c	uint8 const	4
-__ue_self_map_get_name_double	@ue_foundation::__ue_self_map_get_name_double CIs CH<ue_foundation::UENameValue> C_c	double const	4
-__ue_self_map_get_name_float	@ue_foundation::__ue_self_map_get_name_float CIs CH<ue_foundation::UENameValue> C_c	float const	4
-__ue_self_map_get_name_int	@ue_foundation::__ue_self_map_get_name_int CIs CH<ue_foundation::UENameValue> C_c	int const	4
-__ue_self_map_get_name_name	@ue_foundation::__ue_self_map_get_name_name CIs CH<ue_foundation::UENameValue> C_c	ue_foundation::UENameValue	4
-__ue_self_map_get_name_string	@ue_foundation::__ue_self_map_get_name_string CIs CH<ue_foundation::UENameValue> C_c	string const	4
-__ue_self_map_get_name_text	@ue_foundation::__ue_self_map_get_name_text CIs CH<ue_foundation::UENameValue> C_c	ue_foundation::UETextValue	4
-__ue_self_map_get_string_bool	@ue_foundation::__ue_self_map_get_string_bool CIs CIs C_c	bool const	4
-__ue_self_map_get_string_byte	@ue_foundation::__ue_self_map_get_string_byte CIs CIs C_c	uint8 const	4
-__ue_self_map_get_string_double	@ue_foundation::__ue_self_map_get_string_double CIs CIs C_c	double const	4
-__ue_self_map_get_string_float	@ue_foundation::__ue_self_map_get_string_float CIs CIs C_c	float const	4
-__ue_self_map_get_string_int	@ue_foundation::__ue_self_map_get_string_int CIs CIs C_c	int const	4
-__ue_self_map_get_string_name	@ue_foundation::__ue_self_map_get_string_name CIs CIs C_c	ue_foundation::UENameValue	4
-__ue_self_map_get_string_string	@ue_foundation::__ue_self_map_get_string_string CIs CIs C_c	string const	4
-__ue_self_map_get_string_text	@ue_foundation::__ue_self_map_get_string_text CIs CIs C_c	ue_foundation::UETextValue	4
-__ue_self_map_set_byte_bool	@ue_foundation::__ue_self_map_set_byte_bool CIs Cu8 Cb C_c	void	4
-__ue_self_map_set_byte_byte	@ue_foundation::__ue_self_map_set_byte_byte CIs Cu8 Cu8 C_c	void	4
-__ue_self_map_set_byte_double	@ue_foundation::__ue_self_map_set_byte_double CIs Cu8 Cd C_c	void	4
-__ue_self_map_set_byte_float	@ue_foundation::__ue_self_map_set_byte_float CIs Cu8 Cf C_c	void	4
-__ue_self_map_set_byte_int	@ue_foundation::__ue_self_map_set_byte_int CIs Cu8 Ci C_c	void	4
-__ue_self_map_set_byte_name	@ue_foundation::__ue_self_map_set_byte_name CIs Cu8 CH<ue_foundation::UENameValue> C_c	void	4
-__ue_self_map_set_byte_string	@ue_foundation::__ue_self_map_set_byte_string CIs Cu8 CIs C_c	void	4
-__ue_self_map_set_byte_text	@ue_foundation::__ue_self_map_set_byte_text CIs Cu8 CH<ue_foundation::UETextValue> C_c	void	4
-__ue_self_map_set_int_bool	@ue_foundation::__ue_self_map_set_int_bool CIs Ci Cb C_c	void	4
-__ue_self_map_set_int_byte	@ue_foundation::__ue_self_map_set_int_byte CIs Ci Cu8 C_c	void	4
-__ue_self_map_set_int_double	@ue_foundation::__ue_self_map_set_int_double CIs Ci Cd C_c	void	4
-__ue_self_map_set_int_float	@ue_foundation::__ue_self_map_set_int_float CIs Ci Cf C_c	void	4
-__ue_self_map_set_int_int	@ue_foundation::__ue_self_map_set_int_int CIs Ci Ci C_c	void	4
-__ue_self_map_set_int_name	@ue_foundation::__ue_self_map_set_int_name CIs Ci CH<ue_foundation::UENameValue> C_c	void	4
-__ue_self_map_set_int_string	@ue_foundation::__ue_self_map_set_int_string CIs Ci CIs C_c	void	4
-__ue_self_map_set_int_text	@ue_foundation::__ue_self_map_set_int_text CIs Ci CH<ue_foundation::UETextValue> C_c	void	4
-__ue_self_map_set_name_bool	@ue_foundation::__ue_self_map_set_name_bool CIs CH<ue_foundation::UENameValue> Cb C_c	void	4
-__ue_self_map_set_name_byte	@ue_foundation::__ue_self_map_set_name_byte CIs CH<ue_foundation::UENameValue> Cu8 C_c	void	4
-__ue_self_map_set_name_double	@ue_foundation::__ue_self_map_set_name_double CIs CH<ue_foundation::UENameValue> Cd C_c	void	4
-__ue_self_map_set_name_float	@ue_foundation::__ue_self_map_set_name_float CIs CH<ue_foundation::UENameValue> Cf C_c	void	4
-__ue_self_map_set_name_int	@ue_foundation::__ue_self_map_set_name_int CIs CH<ue_foundation::UENameValue> Ci C_c	void	4
-__ue_self_map_set_name_name	@ue_foundation::__ue_self_map_set_name_name CIs CH<ue_foundation::UENameValue> CH<ue_foundation::UENameValue> C_c	void	4
-__ue_self_map_set_name_string	@ue_foundation::__ue_self_map_set_name_string CIs CH<ue_foundation::UENameValue> CIs C_c	void	4
-__ue_self_map_set_name_text	@ue_foundation::__ue_self_map_set_name_text CIs CH<ue_foundation::UENameValue> CH<ue_foundation::UETextValue> C_c	void	4
-__ue_self_map_set_string_bool	@ue_foundation::__ue_self_map_set_string_bool CIs CIs Cb C_c	void	4
-__ue_self_map_set_string_byte	@ue_foundation::__ue_self_map_set_string_byte CIs CIs Cu8 C_c	void	4
-__ue_self_map_set_string_double	@ue_foundation::__ue_self_map_set_string_double CIs CIs Cd C_c	void	4
-__ue_self_map_set_string_float	@ue_foundation::__ue_self_map_set_string_float CIs CIs Cf C_c	void	4
-__ue_self_map_set_string_int	@ue_foundation::__ue_self_map_set_string_int CIs CIs Ci C_c	void	4
-__ue_self_map_set_string_name	@ue_foundation::__ue_self_map_set_string_name CIs CIs CH<ue_foundation::UENameValue> C_c	void	4
-__ue_self_map_set_string_string	@ue_foundation::__ue_self_map_set_string_string CIs CIs CIs C_c	void	4
-__ue_self_map_set_string_text	@ue_foundation::__ue_self_map_set_string_text CIs CIs CH<ue_foundation::UETextValue> C_c	void	4
+__ue_self_map_get_bool	@ue_foundation::__ue_self_map_get_bool Cs *	bool const	4
+__ue_self_map_get_bool	@ue_foundation::__ue_self_map_get_bool Cs CH<ue_foundation::UENameValue>	bool const	4
+__ue_self_map_get_byte	@ue_foundation::__ue_self_map_get_byte Cs *	uint8 const	4
+__ue_self_map_get_byte	@ue_foundation::__ue_self_map_get_byte Cs CH<ue_foundation::UENameValue>	uint8 const	4
+__ue_self_map_get_double	@ue_foundation::__ue_self_map_get_double Cs *	double const	4
+__ue_self_map_get_double	@ue_foundation::__ue_self_map_get_double Cs CH<ue_foundation::UENameValue>	double const	4
+__ue_self_map_get_float	@ue_foundation::__ue_self_map_get_float Cs *	float const	4
+__ue_self_map_get_float	@ue_foundation::__ue_self_map_get_float Cs CH<ue_foundation::UENameValue>	float const	4
+__ue_self_map_get_int	@ue_foundation::__ue_self_map_get_int Cs *	int const	4
+__ue_self_map_get_int	@ue_foundation::__ue_self_map_get_int Cs CH<ue_foundation::UENameValue>	int const	4
+__ue_self_map_get_name	@ue_foundation::__ue_self_map_get_name Cs *	ue_foundation::UENameValue	4
+__ue_self_map_get_name	@ue_foundation::__ue_self_map_get_name Cs CH<ue_foundation::UENameValue>	ue_foundation::UENameValue	4
+__ue_self_map_get_string	@ue_foundation::__ue_self_map_get_string Cs *	string const	4
+__ue_self_map_get_string	@ue_foundation::__ue_self_map_get_string Cs CH<ue_foundation::UENameValue>	string const	4
+__ue_self_map_get_text	@ue_foundation::__ue_self_map_get_text Cs *	ue_foundation::UETextValue	4
+__ue_self_map_get_text	@ue_foundation::__ue_self_map_get_text Cs CH<ue_foundation::UENameValue>	ue_foundation::UETextValue	4
+__ue_self_map_set_bool	@ue_foundation::__ue_self_map_set_bool Cs * Cb	void	4
+__ue_self_map_set_bool	@ue_foundation::__ue_self_map_set_bool Cs CH<ue_foundation::UENameValue> Cb	void	4
+__ue_self_map_set_byte	@ue_foundation::__ue_self_map_set_byte Cs * Cu8	void	4
+__ue_self_map_set_byte	@ue_foundation::__ue_self_map_set_byte Cs CH<ue_foundation::UENameValue> Cu8	void	4
+__ue_self_map_set_double	@ue_foundation::__ue_self_map_set_double Cs * Cd	void	4
+__ue_self_map_set_double	@ue_foundation::__ue_self_map_set_double Cs CH<ue_foundation::UENameValue> Cd	void	4
+__ue_self_map_set_float	@ue_foundation::__ue_self_map_set_float Cs * Cf	void	4
+__ue_self_map_set_float	@ue_foundation::__ue_self_map_set_float Cs CH<ue_foundation::UENameValue> Cf	void	4
+__ue_self_map_set_int	@ue_foundation::__ue_self_map_set_int Cs * Ci	void	4
+__ue_self_map_set_int	@ue_foundation::__ue_self_map_set_int Cs CH<ue_foundation::UENameValue> Ci	void	4
+__ue_self_map_set_name	@ue_foundation::__ue_self_map_set_name Cs * CH<ue_foundation::UENameValue>	void	4
+__ue_self_map_set_name	@ue_foundation::__ue_self_map_set_name Cs CH<ue_foundation::UENameValue> CH<ue_foundation::UENameValue>	void	4
+__ue_self_map_set_string	@ue_foundation::__ue_self_map_set_string Cs * Cs	void	4
+__ue_self_map_set_string	@ue_foundation::__ue_self_map_set_string Cs CH<ue_foundation::UENameValue> Cs	void	4
+__ue_self_map_set_text	@ue_foundation::__ue_self_map_set_text Cs * CH<ue_foundation::UETextValue>	void	4
+__ue_self_map_set_text	@ue_foundation::__ue_self_map_set_text Cs CH<ue_foundation::UENameValue> CH<ue_foundation::UETextValue>	void	4
 __ue_self_set_erase_byte	@ue_foundation::__ue_self_set_erase_byte CIs Cu8 C_c	bool const	4
 __ue_self_set_erase_int	@ue_foundation::__ue_self_set_erase_int CIs Ci C_c	bool const	4
 __ue_self_set_erase_name	@ue_foundation::__ue_self_set_erase_name CIs CH<ue_foundation::UENameValue> C_c	bool const	4
@@ -435,76 +421,8 @@ __ue_state_init_int	@ue_foundation::__ue_state_init_int CIs Ci C_c	int const	4
 __ue_state_init_string	@ue_foundation::__ue_state_init_string CIs CIs C_c	string const	4
 __ue_struct_get_class	@ue_foundation::__ue_struct_get_class CIH<ue_foundation::UEStructValue> CIs C_c	ue_foundation::UEClassHandle	4
 __ue_struct_get_enum_value	@ue_foundation::__ue_struct_get_enum_value CIH<ue_foundation::UEStructValue> CIs CIs C_c	ue_foundation::UEEnumValue	4
-__ue_struct_map_get_byte_enum	@ue_foundation::__ue_struct_map_get_byte_enum CIH<ue_foundation::UEStructValue> CIs Cu8 C_c	ue_foundation::UEEnumValue	4
-__ue_struct_map_get_byte_object	@ue_foundation::__ue_struct_map_get_byte_object CIH<ue_foundation::UEStructValue> CIs Cu8 C_c	ue_foundation::UObjectHandle	4
-__ue_struct_map_get_byte_struct	@ue_foundation::__ue_struct_map_get_byte_struct CIH<ue_foundation::UEStructValue> CIs Cu8 C_c C_l	ue_foundation::UEStructValue	4
-__ue_struct_map_get_enum_bool	@ue_foundation::__ue_struct_map_get_enum_bool CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UEEnumValue> C_c	bool const	4
-__ue_struct_map_get_enum_byte	@ue_foundation::__ue_struct_map_get_enum_byte CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UEEnumValue> C_c	uint8 const	4
-__ue_struct_map_get_enum_double	@ue_foundation::__ue_struct_map_get_enum_double CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UEEnumValue> C_c	double const	4
-__ue_struct_map_get_enum_enum	@ue_foundation::__ue_struct_map_get_enum_enum CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UEEnumValue> C_c	ue_foundation::UEEnumValue	4
-__ue_struct_map_get_enum_float	@ue_foundation::__ue_struct_map_get_enum_float CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UEEnumValue> C_c	float const	4
-__ue_struct_map_get_enum_int	@ue_foundation::__ue_struct_map_get_enum_int CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UEEnumValue> C_c	int const	4
-__ue_struct_map_get_enum_name	@ue_foundation::__ue_struct_map_get_enum_name CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UEEnumValue> C_c	ue_foundation::UENameValue	4
-__ue_struct_map_get_enum_object	@ue_foundation::__ue_struct_map_get_enum_object CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UEEnumValue> C_c	ue_foundation::UObjectHandle	4
-__ue_struct_map_get_enum_string	@ue_foundation::__ue_struct_map_get_enum_string CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UEEnumValue> C_c	string const	4
-__ue_struct_map_get_enum_struct	@ue_foundation::__ue_struct_map_get_enum_struct CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UEEnumValue> C_c C_l	ue_foundation::UEStructValue	4
-__ue_struct_map_get_enum_text	@ue_foundation::__ue_struct_map_get_enum_text CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UEEnumValue> C_c	ue_foundation::UETextValue	4
-__ue_struct_map_get_int_enum	@ue_foundation::__ue_struct_map_get_int_enum CIH<ue_foundation::UEStructValue> CIs Ci C_c	ue_foundation::UEEnumValue	4
-__ue_struct_map_get_int_object	@ue_foundation::__ue_struct_map_get_int_object CIH<ue_foundation::UEStructValue> CIs Ci C_c	ue_foundation::UObjectHandle	4
-__ue_struct_map_get_int_struct	@ue_foundation::__ue_struct_map_get_int_struct CIH<ue_foundation::UEStructValue> CIs Ci C_c C_l	ue_foundation::UEStructValue	4
-__ue_struct_map_get_name_enum	@ue_foundation::__ue_struct_map_get_name_enum CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UENameValue> C_c	ue_foundation::UEEnumValue	4
-__ue_struct_map_get_name_object	@ue_foundation::__ue_struct_map_get_name_object CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UENameValue> C_c	ue_foundation::UObjectHandle	4
-__ue_struct_map_get_name_struct	@ue_foundation::__ue_struct_map_get_name_struct CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UENameValue> C_c C_l	ue_foundation::UEStructValue	4
-__ue_struct_map_get_object_bool	@ue_foundation::__ue_struct_map_get_object_bool CIH<ue_foundation::UEStructValue> CIs Cu64 C_c	bool const	4
-__ue_struct_map_get_object_byte	@ue_foundation::__ue_struct_map_get_object_byte CIH<ue_foundation::UEStructValue> CIs Cu64 C_c	uint8 const	4
-__ue_struct_map_get_object_double	@ue_foundation::__ue_struct_map_get_object_double CIH<ue_foundation::UEStructValue> CIs Cu64 C_c	double const	4
-__ue_struct_map_get_object_enum	@ue_foundation::__ue_struct_map_get_object_enum CIH<ue_foundation::UEStructValue> CIs Cu64 C_c	ue_foundation::UEEnumValue	4
-__ue_struct_map_get_object_float	@ue_foundation::__ue_struct_map_get_object_float CIH<ue_foundation::UEStructValue> CIs Cu64 C_c	float const	4
-__ue_struct_map_get_object_int	@ue_foundation::__ue_struct_map_get_object_int CIH<ue_foundation::UEStructValue> CIs Cu64 C_c	int const	4
-__ue_struct_map_get_object_name	@ue_foundation::__ue_struct_map_get_object_name CIH<ue_foundation::UEStructValue> CIs Cu64 C_c	ue_foundation::UENameValue	4
-__ue_struct_map_get_object_object	@ue_foundation::__ue_struct_map_get_object_object CIH<ue_foundation::UEStructValue> CIs Cu64 C_c	ue_foundation::UObjectHandle	4
-__ue_struct_map_get_object_string	@ue_foundation::__ue_struct_map_get_object_string CIH<ue_foundation::UEStructValue> CIs Cu64 C_c	string const	4
-__ue_struct_map_get_object_struct	@ue_foundation::__ue_struct_map_get_object_struct CIH<ue_foundation::UEStructValue> CIs Cu64 C_c C_l	ue_foundation::UEStructValue	4
-__ue_struct_map_get_object_text	@ue_foundation::__ue_struct_map_get_object_text CIH<ue_foundation::UEStructValue> CIs Cu64 C_c	ue_foundation::UETextValue	4
-__ue_struct_map_get_string_enum	@ue_foundation::__ue_struct_map_get_string_enum CIH<ue_foundation::UEStructValue> CIs CIs C_c	ue_foundation::UEEnumValue	4
-__ue_struct_map_get_string_object	@ue_foundation::__ue_struct_map_get_string_object CIH<ue_foundation::UEStructValue> CIs CIs C_c	ue_foundation::UObjectHandle	4
-__ue_struct_map_get_string_struct	@ue_foundation::__ue_struct_map_get_string_struct CIH<ue_foundation::UEStructValue> CIs CIs C_c C_l	ue_foundation::UEStructValue	4
 __ue_struct_map_key_enum	@ue_foundation::__ue_struct_map_key_enum CIH<ue_foundation::UEStructValue> CIs Ci C_c	ue_foundation::UEEnumValue	4
 __ue_struct_map_key_object	@ue_foundation::__ue_struct_map_key_object CIH<ue_foundation::UEStructValue> CIs Ci C_c	uint64 const	4
-__ue_struct_map_with_byte_enum	@ue_foundation::__ue_struct_map_with_byte_enum CIH<ue_foundation::UEStructValue> CIs Cu8 CH<ue_foundation::UEEnumValue> C_c C_l	ue_foundation::UEStructValue	4
-__ue_struct_map_with_byte_object	@ue_foundation::__ue_struct_map_with_byte_object CIH<ue_foundation::UEStructValue> CIs Cu8 CIH<ue_foundation::UObjectHandle> C_c C_l	ue_foundation::UEStructValue	4
-__ue_struct_map_with_byte_struct	@ue_foundation::__ue_struct_map_with_byte_struct CIH<ue_foundation::UEStructValue> CIs Cu8 CIH<ue_foundation::UEStructValue> C_c C_l	ue_foundation::UEStructValue	4
-__ue_struct_map_with_enum_bool	@ue_foundation::__ue_struct_map_with_enum_bool CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UEEnumValue> Cb C_c C_l	ue_foundation::UEStructValue	4
-__ue_struct_map_with_enum_byte	@ue_foundation::__ue_struct_map_with_enum_byte CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UEEnumValue> Cu8 C_c C_l	ue_foundation::UEStructValue	4
-__ue_struct_map_with_enum_double	@ue_foundation::__ue_struct_map_with_enum_double CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UEEnumValue> Cd C_c C_l	ue_foundation::UEStructValue	4
-__ue_struct_map_with_enum_enum	@ue_foundation::__ue_struct_map_with_enum_enum CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UEEnumValue> CH<ue_foundation::UEEnumValue> C_c C_l	ue_foundation::UEStructValue	4
-__ue_struct_map_with_enum_float	@ue_foundation::__ue_struct_map_with_enum_float CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UEEnumValue> Cf C_c C_l	ue_foundation::UEStructValue	4
-__ue_struct_map_with_enum_int	@ue_foundation::__ue_struct_map_with_enum_int CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UEEnumValue> Ci C_c C_l	ue_foundation::UEStructValue	4
-__ue_struct_map_with_enum_name	@ue_foundation::__ue_struct_map_with_enum_name CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UEEnumValue> CH<ue_foundation::UENameValue> C_c C_l	ue_foundation::UEStructValue	4
-__ue_struct_map_with_enum_object	@ue_foundation::__ue_struct_map_with_enum_object CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UEEnumValue> CIH<ue_foundation::UObjectHandle> C_c C_l	ue_foundation::UEStructValue	4
-__ue_struct_map_with_enum_string	@ue_foundation::__ue_struct_map_with_enum_string CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UEEnumValue> CIs C_c C_l	ue_foundation::UEStructValue	4
-__ue_struct_map_with_enum_struct	@ue_foundation::__ue_struct_map_with_enum_struct CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UEEnumValue> CIH<ue_foundation::UEStructValue> C_c C_l	ue_foundation::UEStructValue	4
-__ue_struct_map_with_enum_text	@ue_foundation::__ue_struct_map_with_enum_text CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UEEnumValue> CH<ue_foundation::UETextValue> C_c C_l	ue_foundation::UEStructValue	4
-__ue_struct_map_with_int_enum	@ue_foundation::__ue_struct_map_with_int_enum CIH<ue_foundation::UEStructValue> CIs Ci CH<ue_foundation::UEEnumValue> C_c C_l	ue_foundation::UEStructValue	4
-__ue_struct_map_with_int_object	@ue_foundation::__ue_struct_map_with_int_object CIH<ue_foundation::UEStructValue> CIs Ci CIH<ue_foundation::UObjectHandle> C_c C_l	ue_foundation::UEStructValue	4
-__ue_struct_map_with_int_struct	@ue_foundation::__ue_struct_map_with_int_struct CIH<ue_foundation::UEStructValue> CIs Ci CIH<ue_foundation::UEStructValue> C_c C_l	ue_foundation::UEStructValue	4
-__ue_struct_map_with_name_enum	@ue_foundation::__ue_struct_map_with_name_enum CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UENameValue> CH<ue_foundation::UEEnumValue> C_c C_l	ue_foundation::UEStructValue	4
-__ue_struct_map_with_name_object	@ue_foundation::__ue_struct_map_with_name_object CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UENameValue> CIH<ue_foundation::UObjectHandle> C_c C_l	ue_foundation::UEStructValue	4
-__ue_struct_map_with_name_struct	@ue_foundation::__ue_struct_map_with_name_struct CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UENameValue> CIH<ue_foundation::UEStructValue> C_c C_l	ue_foundation::UEStructValue	4
-__ue_struct_map_with_object_bool	@ue_foundation::__ue_struct_map_with_object_bool CIH<ue_foundation::UEStructValue> CIs Cu64 Cb C_c C_l	ue_foundation::UEStructValue	4
-__ue_struct_map_with_object_byte	@ue_foundation::__ue_struct_map_with_object_byte CIH<ue_foundation::UEStructValue> CIs Cu64 Cu8 C_c C_l	ue_foundation::UEStructValue	4
-__ue_struct_map_with_object_double	@ue_foundation::__ue_struct_map_with_object_double CIH<ue_foundation::UEStructValue> CIs Cu64 Cd C_c C_l	ue_foundation::UEStructValue	4
-__ue_struct_map_with_object_enum	@ue_foundation::__ue_struct_map_with_object_enum CIH<ue_foundation::UEStructValue> CIs Cu64 CH<ue_foundation::UEEnumValue> C_c C_l	ue_foundation::UEStructValue	4
-__ue_struct_map_with_object_float	@ue_foundation::__ue_struct_map_with_object_float CIH<ue_foundation::UEStructValue> CIs Cu64 Cf C_c C_l	ue_foundation::UEStructValue	4
-__ue_struct_map_with_object_int	@ue_foundation::__ue_struct_map_with_object_int CIH<ue_foundation::UEStructValue> CIs Cu64 Ci C_c C_l	ue_foundation::UEStructValue	4
-__ue_struct_map_with_object_name	@ue_foundation::__ue_struct_map_with_object_name CIH<ue_foundation::UEStructValue> CIs Cu64 CH<ue_foundation::UENameValue> C_c C_l	ue_foundation::UEStructValue	4
-__ue_struct_map_with_object_object	@ue_foundation::__ue_struct_map_with_object_object CIH<ue_foundation::UEStructValue> CIs Cu64 CIH<ue_foundation::UObjectHandle> C_c C_l	ue_foundation::UEStructValue	4
-__ue_struct_map_with_object_string	@ue_foundation::__ue_struct_map_with_object_string CIH<ue_foundation::UEStructValue> CIs Cu64 CIs C_c C_l	ue_foundation::UEStructValue	4
-__ue_struct_map_with_object_struct	@ue_foundation::__ue_struct_map_with_object_struct CIH<ue_foundation::UEStructValue> CIs Cu64 CIH<ue_foundation::UEStructValue> C_c C_l	ue_foundation::UEStructValue	4
-__ue_struct_map_with_object_text	@ue_foundation::__ue_struct_map_with_object_text CIH<ue_foundation::UEStructValue> CIs Cu64 CH<ue_foundation::UETextValue> C_c C_l	ue_foundation::UEStructValue	4
-__ue_struct_map_with_string_enum	@ue_foundation::__ue_struct_map_with_string_enum CIH<ue_foundation::UEStructValue> CIs CIs CH<ue_foundation::UEEnumValue> C_c C_l	ue_foundation::UEStructValue	4
-__ue_struct_map_with_string_object	@ue_foundation::__ue_struct_map_with_string_object CIH<ue_foundation::UEStructValue> CIs CIs CIH<ue_foundation::UObjectHandle> C_c C_l	ue_foundation::UEStructValue	4
-__ue_struct_map_with_string_struct	@ue_foundation::__ue_struct_map_with_string_struct CIH<ue_foundation::UEStructValue> CIs CIs CIH<ue_foundation::UEStructValue> C_c C_l	ue_foundation::UEStructValue	4
 __ue_struct_set_element_enum	@ue_foundation::__ue_struct_set_element_enum CIH<ue_foundation::UEStructValue> CIs Ci C_c	ue_foundation::UEEnumValue	4
 __ue_struct_set_element_object_key	@ue_foundation::__ue_struct_set_element_object_key CIH<ue_foundation::UEStructValue> CIs Ci C_c	uint64 const	4
 __ue_struct_set_with_enum	@ue_foundation::__ue_struct_set_with_enum CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UEEnumValue> Cb C_c C_l	ue_foundation::UEStructValue	4
@@ -772,75 +690,20 @@ ue_struct_get_name	@ue_foundation::ue_struct_get_name CIH<ue_foundation::UEStruc
 ue_struct_get_object	@ue_foundation::ue_struct_get_object CIH<ue_foundation::UEStructValue> CIs C_c	ue_foundation::UObjectHandle	4
 ue_struct_get_string	@ue_foundation::ue_struct_get_string CIH<ue_foundation::UEStructValue> CIs C_c	string const	4
 ue_struct_get_text	@ue_foundation::ue_struct_get_text CIH<ue_foundation::UEStructValue> CIs C_c	ue_foundation::UETextValue	4
-ue_struct_map_get_byte_bool	@ue_foundation::ue_struct_map_get_byte_bool CIH<ue_foundation::UEStructValue> CIs Cu8 C_c	bool const	4
-ue_struct_map_get_byte_byte	@ue_foundation::ue_struct_map_get_byte_byte CIH<ue_foundation::UEStructValue> CIs Cu8 C_c	uint8 const	4
-ue_struct_map_get_byte_double	@ue_foundation::ue_struct_map_get_byte_double CIH<ue_foundation::UEStructValue> CIs Cu8 C_c	double const	4
-ue_struct_map_get_byte_float	@ue_foundation::ue_struct_map_get_byte_float CIH<ue_foundation::UEStructValue> CIs Cu8 C_c	float const	4
-ue_struct_map_get_byte_int	@ue_foundation::ue_struct_map_get_byte_int CIH<ue_foundation::UEStructValue> CIs Cu8 C_c	int const	4
-ue_struct_map_get_byte_name	@ue_foundation::ue_struct_map_get_byte_name CIH<ue_foundation::UEStructValue> CIs Cu8 C_c	ue_foundation::UENameValue	4
-ue_struct_map_get_byte_string	@ue_foundation::ue_struct_map_get_byte_string CIH<ue_foundation::UEStructValue> CIs Cu8 C_c	string const	4
-ue_struct_map_get_byte_text	@ue_foundation::ue_struct_map_get_byte_text CIH<ue_foundation::UEStructValue> CIs Cu8 C_c	ue_foundation::UETextValue	4
-ue_struct_map_get_int	@ue_foundation::ue_struct_map_get_int CIH<ue_foundation::UEStructValue> CIs Ci C_c	int const	4
-ue_struct_map_get_int_bool	@ue_foundation::ue_struct_map_get_int_bool CIH<ue_foundation::UEStructValue> CIs Ci C_c	bool const	4
-ue_struct_map_get_int_byte	@ue_foundation::ue_struct_map_get_int_byte CIH<ue_foundation::UEStructValue> CIs Ci C_c	uint8 const	4
-ue_struct_map_get_int_double	@ue_foundation::ue_struct_map_get_int_double CIH<ue_foundation::UEStructValue> CIs Ci C_c	double const	4
-ue_struct_map_get_int_float	@ue_foundation::ue_struct_map_get_int_float CIH<ue_foundation::UEStructValue> CIs Ci C_c	float const	4
-ue_struct_map_get_int_name	@ue_foundation::ue_struct_map_get_int_name CIH<ue_foundation::UEStructValue> CIs Ci C_c	ue_foundation::UENameValue	4
-ue_struct_map_get_int_string	@ue_foundation::ue_struct_map_get_int_string CIH<ue_foundation::UEStructValue> CIs Ci C_c	string const	4
-ue_struct_map_get_int_text	@ue_foundation::ue_struct_map_get_int_text CIH<ue_foundation::UEStructValue> CIs Ci C_c	ue_foundation::UETextValue	4
-ue_struct_map_get_name_bool	@ue_foundation::ue_struct_map_get_name_bool CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UENameValue> C_c	bool const	4
-ue_struct_map_get_name_byte	@ue_foundation::ue_struct_map_get_name_byte CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UENameValue> C_c	uint8 const	4
-ue_struct_map_get_name_double	@ue_foundation::ue_struct_map_get_name_double CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UENameValue> C_c	double const	4
-ue_struct_map_get_name_float	@ue_foundation::ue_struct_map_get_name_float CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UENameValue> C_c	float const	4
-ue_struct_map_get_name_int	@ue_foundation::ue_struct_map_get_name_int CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UENameValue> C_c	int const	4
-ue_struct_map_get_name_name	@ue_foundation::ue_struct_map_get_name_name CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UENameValue> C_c	ue_foundation::UENameValue	4
-ue_struct_map_get_name_string	@ue_foundation::ue_struct_map_get_name_string CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UENameValue> C_c	string const	4
-ue_struct_map_get_name_text	@ue_foundation::ue_struct_map_get_name_text CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UENameValue> C_c	ue_foundation::UETextValue	4
-ue_struct_map_get_string_bool	@ue_foundation::ue_struct_map_get_string_bool CIH<ue_foundation::UEStructValue> CIs CIs C_c	bool const	4
-ue_struct_map_get_string_byte	@ue_foundation::ue_struct_map_get_string_byte CIH<ue_foundation::UEStructValue> CIs CIs C_c	uint8 const	4
-ue_struct_map_get_string_double	@ue_foundation::ue_struct_map_get_string_double CIH<ue_foundation::UEStructValue> CIs CIs C_c	double const	4
-ue_struct_map_get_string_float	@ue_foundation::ue_struct_map_get_string_float CIH<ue_foundation::UEStructValue> CIs CIs C_c	float const	4
-ue_struct_map_get_string_int	@ue_foundation::ue_struct_map_get_string_int CIH<ue_foundation::UEStructValue> CIs CIs C_c	int const	4
-ue_struct_map_get_string_name	@ue_foundation::ue_struct_map_get_string_name CIH<ue_foundation::UEStructValue> CIs CIs C_c	ue_foundation::UENameValue	4
-ue_struct_map_get_string_string	@ue_foundation::ue_struct_map_get_string_string CIH<ue_foundation::UEStructValue> CIs CIs C_c	string const	4
-ue_struct_map_get_string_text	@ue_foundation::ue_struct_map_get_string_text CIH<ue_foundation::UEStructValue> CIs CIs C_c	ue_foundation::UETextValue	4
+ue_struct_map_get_bool	@ue_foundation::ue_struct_map_get_bool CH<ue_foundation::UEStructValue> Cs *	bool const	4
+ue_struct_map_get_byte	@ue_foundation::ue_struct_map_get_byte CH<ue_foundation::UEStructValue> Cs *	uint8 const	4
+ue_struct_map_get_double	@ue_foundation::ue_struct_map_get_double CH<ue_foundation::UEStructValue> Cs *	double const	4
+ue_struct_map_get_enum	@ue_foundation::ue_struct_map_get_enum CH<ue_foundation::UEStructValue> Cs *	ue_foundation::UEEnumValue	4
+ue_struct_map_get_float	@ue_foundation::ue_struct_map_get_float CH<ue_foundation::UEStructValue> Cs *	float const	4
+ue_struct_map_get_int	@ue_foundation::ue_struct_map_get_int CH<ue_foundation::UEStructValue> Cs *	int const	4
+ue_struct_map_get_name	@ue_foundation::ue_struct_map_get_name CH<ue_foundation::UEStructValue> Cs *	ue_foundation::UENameValue	4
+ue_struct_map_get_string	@ue_foundation::ue_struct_map_get_string CH<ue_foundation::UEStructValue> Cs *	string const	4
+ue_struct_map_get_text	@ue_foundation::ue_struct_map_get_text CH<ue_foundation::UEStructValue> Cs *	ue_foundation::UETextValue	4
 ue_struct_map_key	@ue_foundation::ue_struct_map_key CIH<ue_foundation::UEStructValue> CIs Ci C_c	int const	4
 ue_struct_map_key_byte	@ue_foundation::ue_struct_map_key_byte CIH<ue_foundation::UEStructValue> CIs Ci C_c	uint8 const	4
 ue_struct_map_key_name	@ue_foundation::ue_struct_map_key_name CIH<ue_foundation::UEStructValue> CIs Ci C_c	ue_foundation::UENameValue	4
 ue_struct_map_key_string	@ue_foundation::ue_struct_map_key_string CIH<ue_foundation::UEStructValue> CIs Ci C_c	string const	4
 ue_struct_map_size	@ue_foundation::ue_struct_map_size CIH<ue_foundation::UEStructValue> CIs C_c	int const	4
-ue_struct_map_with_byte_bool	@ue_foundation::ue_struct_map_with_byte_bool CIH<ue_foundation::UEStructValue> CIs Cu8 Cb C_c C_l	ue_foundation::UEStructValue	4
-ue_struct_map_with_byte_byte	@ue_foundation::ue_struct_map_with_byte_byte CIH<ue_foundation::UEStructValue> CIs Cu8 Cu8 C_c C_l	ue_foundation::UEStructValue	4
-ue_struct_map_with_byte_double	@ue_foundation::ue_struct_map_with_byte_double CIH<ue_foundation::UEStructValue> CIs Cu8 Cd C_c C_l	ue_foundation::UEStructValue	4
-ue_struct_map_with_byte_float	@ue_foundation::ue_struct_map_with_byte_float CIH<ue_foundation::UEStructValue> CIs Cu8 Cf C_c C_l	ue_foundation::UEStructValue	4
-ue_struct_map_with_byte_int	@ue_foundation::ue_struct_map_with_byte_int CIH<ue_foundation::UEStructValue> CIs Cu8 Ci C_c C_l	ue_foundation::UEStructValue	4
-ue_struct_map_with_byte_name	@ue_foundation::ue_struct_map_with_byte_name CIH<ue_foundation::UEStructValue> CIs Cu8 CH<ue_foundation::UENameValue> C_c C_l	ue_foundation::UEStructValue	4
-ue_struct_map_with_byte_string	@ue_foundation::ue_struct_map_with_byte_string CIH<ue_foundation::UEStructValue> CIs Cu8 CIs C_c C_l	ue_foundation::UEStructValue	4
-ue_struct_map_with_byte_text	@ue_foundation::ue_struct_map_with_byte_text CIH<ue_foundation::UEStructValue> CIs Cu8 CH<ue_foundation::UETextValue> C_c C_l	ue_foundation::UEStructValue	4
-ue_struct_map_with_int	@ue_foundation::ue_struct_map_with_int CIH<ue_foundation::UEStructValue> CIs Ci Ci C_c C_l	ue_foundation::UEStructValue	4
-ue_struct_map_with_int_bool	@ue_foundation::ue_struct_map_with_int_bool CIH<ue_foundation::UEStructValue> CIs Ci Cb C_c C_l	ue_foundation::UEStructValue	4
-ue_struct_map_with_int_byte	@ue_foundation::ue_struct_map_with_int_byte CIH<ue_foundation::UEStructValue> CIs Ci Cu8 C_c C_l	ue_foundation::UEStructValue	4
-ue_struct_map_with_int_double	@ue_foundation::ue_struct_map_with_int_double CIH<ue_foundation::UEStructValue> CIs Ci Cd C_c C_l	ue_foundation::UEStructValue	4
-ue_struct_map_with_int_float	@ue_foundation::ue_struct_map_with_int_float CIH<ue_foundation::UEStructValue> CIs Ci Cf C_c C_l	ue_foundation::UEStructValue	4
-ue_struct_map_with_int_name	@ue_foundation::ue_struct_map_with_int_name CIH<ue_foundation::UEStructValue> CIs Ci CH<ue_foundation::UENameValue> C_c C_l	ue_foundation::UEStructValue	4
-ue_struct_map_with_int_string	@ue_foundation::ue_struct_map_with_int_string CIH<ue_foundation::UEStructValue> CIs Ci CIs C_c C_l	ue_foundation::UEStructValue	4
-ue_struct_map_with_int_text	@ue_foundation::ue_struct_map_with_int_text CIH<ue_foundation::UEStructValue> CIs Ci CH<ue_foundation::UETextValue> C_c C_l	ue_foundation::UEStructValue	4
-ue_struct_map_with_name_bool	@ue_foundation::ue_struct_map_with_name_bool CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UENameValue> Cb C_c C_l	ue_foundation::UEStructValue	4
-ue_struct_map_with_name_byte	@ue_foundation::ue_struct_map_with_name_byte CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UENameValue> Cu8 C_c C_l	ue_foundation::UEStructValue	4
-ue_struct_map_with_name_double	@ue_foundation::ue_struct_map_with_name_double CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UENameValue> Cd C_c C_l	ue_foundation::UEStructValue	4
-ue_struct_map_with_name_float	@ue_foundation::ue_struct_map_with_name_float CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UENameValue> Cf C_c C_l	ue_foundation::UEStructValue	4
-ue_struct_map_with_name_int	@ue_foundation::ue_struct_map_with_name_int CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UENameValue> Ci C_c C_l	ue_foundation::UEStructValue	4
-ue_struct_map_with_name_name	@ue_foundation::ue_struct_map_with_name_name CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UENameValue> CH<ue_foundation::UENameValue> C_c C_l	ue_foundation::UEStructValue	4
-ue_struct_map_with_name_string	@ue_foundation::ue_struct_map_with_name_string CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UENameValue> CIs C_c C_l	ue_foundation::UEStructValue	4
-ue_struct_map_with_name_text	@ue_foundation::ue_struct_map_with_name_text CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UENameValue> CH<ue_foundation::UETextValue> C_c C_l	ue_foundation::UEStructValue	4
-ue_struct_map_with_string_bool	@ue_foundation::ue_struct_map_with_string_bool CIH<ue_foundation::UEStructValue> CIs CIs Cb C_c C_l	ue_foundation::UEStructValue	4
-ue_struct_map_with_string_byte	@ue_foundation::ue_struct_map_with_string_byte CIH<ue_foundation::UEStructValue> CIs CIs Cu8 C_c C_l	ue_foundation::UEStructValue	4
-ue_struct_map_with_string_double	@ue_foundation::ue_struct_map_with_string_double CIH<ue_foundation::UEStructValue> CIs CIs Cd C_c C_l	ue_foundation::UEStructValue	4
-ue_struct_map_with_string_float	@ue_foundation::ue_struct_map_with_string_float CIH<ue_foundation::UEStructValue> CIs CIs Cf C_c C_l	ue_foundation::UEStructValue	4
-ue_struct_map_with_string_int	@ue_foundation::ue_struct_map_with_string_int CIH<ue_foundation::UEStructValue> CIs CIs Ci C_c C_l	ue_foundation::UEStructValue	4
-ue_struct_map_with_string_name	@ue_foundation::ue_struct_map_with_string_name CIH<ue_foundation::UEStructValue> CIs CIs CH<ue_foundation::UENameValue> C_c C_l	ue_foundation::UEStructValue	4
-ue_struct_map_with_string_string	@ue_foundation::ue_struct_map_with_string_string CIH<ue_foundation::UEStructValue> CIs CIs CIs C_c C_l	ue_foundation::UEStructValue	4
-ue_struct_map_with_string_text	@ue_foundation::ue_struct_map_with_string_text CIH<ue_foundation::UEStructValue> CIs CIs CH<ue_foundation::UETextValue> C_c C_l	ue_foundation::UEStructValue	4
 ue_struct_nested_get	@ue_foundation::ue_struct_nested_get CIH<ue_foundation::UEStructValue> CIs Ci C_c C_l	ue_foundation::UEStructValue	4
 ue_struct_nested_with	@ue_foundation::ue_struct_nested_with CIH<ue_foundation::UEStructValue> CIs Ci CIH<ue_foundation::UEStructValue> C_c C_l	ue_foundation::UEStructValue	4
 ue_struct_set_contains_int	@ue_foundation::ue_struct_set_contains_int CIH<ue_foundation::UEStructValue> CIs Ci C_c	bool const	4

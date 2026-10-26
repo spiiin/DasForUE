@@ -1,9 +1,10 @@
 options gen2
+require ue_probe_actor
 require ue_dsl
 require ue_struct_map_actor_refs
 
 // Import the existing StructMapActor sample and its type assets first.
-[ue_class(module_id="authoredevents",Blueprintable)]
+[ue_class(module_id="authoredevents",Blueprintable,parent="/Script/DasRuntime.DasProbeActor")]
 class AuthoredEventActor {
     @ue_property=(EditAnywhere,BlueprintReadWrite)
     Target:StructMapActorRef

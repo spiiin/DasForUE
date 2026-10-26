@@ -1,8 +1,9 @@
 options gen2
+require ue_probe_actor
 require ue_dsl
 require ue_object_types
 
-[ue_class(module_id="valueevents",Blueprintable)]
+[ue_class(module_id="valueevents",Blueprintable,parent="/Script/DasRuntime.DasProbeActor")]
 class ValueEventActor {
     @ue_property=(EditAnywhere,BlueprintReadWrite)
     Total:double=0.0lf

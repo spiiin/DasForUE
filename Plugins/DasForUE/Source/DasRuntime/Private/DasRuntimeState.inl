@@ -167,6 +167,7 @@ struct FMarshalledCall
     TWeakObjectPtr<UClass> RequiredInterface;
     TWeakObjectPtr<UClass> FunctionScopeClass;
     FString InterfaceSignatureKey;
+    FString InterfaceStableId;
     TMap<FString, TSharedPtr<FPendingHash>> PendingHashes;
     TMap<FString, TArray<int32>> HashIndices;
     TFunction<void(void*)> DelegateInvoke;
@@ -371,6 +372,11 @@ void GuardUEExtern()
             ActiveContext->throw_error("UE extern is forbidden in PhysicsPreSim execution role");
         throw std::runtime_error("UE extern is forbidden in PhysicsPreSim execution role");
     }
+}
+void GuardUEInteropContext(das::Context* C)
+{
+    if (!IsInGameThread() || !ActiveContext || C != ActiveContext)
+        C->throw_error("UE interop requires the active game-thread context");
 }
 thread_local const FString* LibraryInvocationContract = nullptr;
 thread_local FString LibraryInvocationScript;

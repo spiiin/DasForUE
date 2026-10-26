@@ -1,4 +1,5 @@
 options gen2
+require ue_probe_actor
 module dsl_native_array_self public
 require ue_native_engine_values public
 require ue_native_self_refs public
@@ -9,7 +10,7 @@ enum NativeMobility {
     Movable=2
 }
 [ue_class(module_id="nativearrays",Blueprintable)]
-class NativeArraySelf : Actor {
+class NativeArraySelf : ProbeActor {
     [ue_function(BlueprintCallable)]
     def EnumKeys():bool {
         if (self.DasNativeArrayEnumKeys[SpawnCollision.AlwaysSpawn]!=321) { return false }
@@ -28,7 +29,7 @@ class NativeArraySelf : Actor {
         var rejected=false
         try { self.DasNativeArrayEnumKeys := invalid } recover { rejected=true }
         var wrong=false
-        try { __ue_struct_map_with_enum_int(ue_get_self_struct("DasNativeArrayEnumKeys"),"Values",ue_enum_from_number("/Script/Engine.EComponentMobility",2),5) } recover { wrong=true }
+        try { ue_struct_map_with_int(ue_get_self_struct("DasNativeArrayEnumKeys"),"Values",ue_enum_from_number("/Script/Engine.EComponentMobility",2),5) } recover { wrong=true }
         return rejected && wrong && length(self.DasNativeArrayEnumKeys)==2 && self.DasNativeArrayEnumKeys[SpawnCollision.AlwaysSpawn]==322 && self.DasNativeArrayByteKeys[NativeMobility.Movable].x==5.0lf && self.DasNativeArrayEnumKeyEnums[SpawnCollision.AlwaysSpawn]==SpawnCollision.DontSpawnIfColliding && ue_object_valid(self.DasNativeArrayEnumKeyObjects[SpawnCollision.AlwaysSpawn].handle)
     }
 

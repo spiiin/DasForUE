@@ -1,6 +1,6 @@
-# Адаптеры типов (фаза 2, шаг 2.1): эскиз
+# Адаптеры типов
 
-Статус: шаг 2.1 и перенос GameplayTag реализованы (2026-10-20). План: [ImprovementPlan](../Plans/ImprovementPlan.md), фаза 2.
+Статус (2026-10-26): реестр, переносы основных семейств, контейнерные комбинаторы, map interop и генерация контрактов поддержки реализованы. Перенос текущих специальных UI/collision/constraint-типов завершён; lifetime и native-call ограничения сохранены. План: [ImprovementPlan](../Plans/ImprovementPlan.md), фаза 2.
 
 Отличия реализации от эскиза ниже:
 - скриптовый фасет передаётся при регистрации (`Register(Adapter, &Facet)`), а не через метод адаптера:
@@ -188,3 +188,415 @@ handle-типы `ue_foundation`, поэтому фасет узнаёт и handl
 Остались как предметная логика (не решения по типу): разбор конструктора `ue_transform`, свойство `ActorTransform`,
 контракты Enhanced Input, ObjectClass payload Vector2D, текстовые грамматики дефолтов в редакторе. Python-генераторы
 (`CANONICAL_MATH`) — фаза 6.
+
+
+## Перенос soft references (2026-10-25)
+
+Soft object/class references используют один адаптер семейства `FDasSoftReferenceAdapter`.
+В отличие от math-структур их carrier зависит от native base class и создаётся по требованию.
+Реестр хранит неизменный список семейств: точный поиск статических структур остаётся прежним,
+а семейство проверяет путь через реестр реально созданных carriers. Само сходство имени не
+означает принадлежность типу. Создание нового carrier не добавляет элементы в реестр адаптеров
+и не инвалидирует указатели на его записи. Сброс carriers не оставляет в адаптере указателей на них.
+
+Адаптер отвечает за native FSoftObjectProperty/FSoftClassProperty, ограничение класса,
+CPF_UObjectWrapper, листовую политику авторских структур и их пустой default (`None`).
+GetCarrierProperty подключает soft-значения к существующему owned-snapshot transport.
+Пути и wire-формат carriers не изменены.
+
+`FDasSoftReferenceScriptFacet` владеет идентификацией `ue_soft_ref`, получением carrier path,
+pack/unpack, литеральными defaults полей и контейнеров, выбором generated native view и
+преобразованием к родительскому ограничению. Общий DSL вызывает фасет вместо `DSLSoft*`.
+Непустые defaults внутри `ue_struct` по-прежнему запрещены; defaults обычных классов и
+контейнеров по-прежнему проходят проверку literal path и точного типа.
+
+Предметные операции остаются в soft-модуле: проверка asset paths и resolved objects,
+resolve/load, ограничения на преобразования object/class, отмена асинхронных запросов.
+Они используют тот же carrier и существующие проверки времени жизни, без eager loading.
+`DasRuntimeInputSessions.inl` сохраняет доступ к soft property для реализации async load.
+
+Регрессии: foundation проверяет четыре комбинации native base × object/class, создание
+свойства и обратное описание, отказ для незарегистрированных путей и неизменность реестра.
+`TestTypeAdapterGate.py` запрещает возврат soft-предикатов в общий DSL и property builder.
+Существующие soft-reference foundation/PIE tests покрывают defaults, GC, generated native
+views, upcasts, загрузку и отмену запросов; общий automation-набор проверяет соседние типы.
+
+
+## Перенос Text/Name (2026-10-25)
+
+Name и Text остаются scalar-адаптерами, использующими FNameProperty/FTextProperty и
+общие FDasKindName/FDasKindText accessor traits. К ним подключён
+`FDasTextNameScriptFacet` из `DasTextNameTypesDSL.inl`:
+
+- распознавание UENameValue/UETextValue и выбор view для native/authored свойств;
+- разбор литеральных defaults обычных классов и контейнеров;
+- FText defaults в ue_struct и параметрах методов, восстановление default AST;
+- проверка runtime-сигнатуры через тот же фасет.
+
+`DSLValueAdapter` ищет все представления; существующие `DSLAdapted` и
+`DSLAdaptedHandle` ограничены Struct kind. Поэтому scalar handles Name/Text не
+попадают в struct snapshot pack/unpack и не требуют UScriptStruct или TypePath.
+
+Сайт defaults передаётся явно (`Property`, `StructField`, `Parameter`). Это сохраняет
+существующие различия синтаксиса: ue_name_value принимается как default обычного поля
+и элемента контейнера, но не становится новым default параметра или ue_struct-поля.
+FText сохраняет wire с namespace/key/source либо признак culture-invariant; он не
+превращается в обычную строку. Локализационные операции, владение runtime-снимками и
+грамматика сериализации остаются в существующих runtime/scalar helpers.
+
+Foundation дополнительно проверяет scalar ABI и точный локализационный default поля
+и параметра, а также nominal Name default. Архитектурный gate запрещает отдельные
+UETextValue/UENameValue predicates и DSLTextDefault вне фасета и объявления аннотаций.
+
+
+## Перенос Enum (2026-10-25)
+
+`FDasEnumAdapter` — адаптер вида Enum с обязательной номинальной идентичностью UEnum.
+`UsesTypeIdentity` позволяет искать такой адаптер по виду, сохраняя TypePath в дескрипторе.
+Наличие адаптера не означает валидность пути: `ValidateDeclared` проверяет загруженный UEnum
+и прежний диапазон значений 0..254. Общие ограничения формы дескриптора остаются в validator.
+
+Адаптер владеет созданием и описанием FByteProperty с Enum и FEnumProperty с byte underlying.
+`DasResolvedEnumStorage` расположен рядом с ним и сохраняет существующую политику Automatic:
+native enum class использует Enum8, UDasDefinedEnum — Byte; явное storage сохраняется.
+Описание чужого свойства с широким underlying type отклоняется. Byte без Enum остаётся
+обычным uint8 scalar и не становится enum. Идентичность не выводится из набора чисел.
+
+`FDasEnumScriptFacet` владеет распознаванием ue_enum/ue_native_enum, разрешением авторского
+пути и проверкой member IDs, native view, checked pack/unpack и именованными defaults полей
+и контейнеров. Declaration annotations вынесены в `DasEnumAnnotations.inl`; формат IR,
+пути assets и имена generated entry points сохранены. Общие DSL-участки спрашивают
+`DSLTypedValue`/`DSLNativeValue` и фасет вместо собственных enum-предикатов.
+
+Разделены source type и call type: daScript enumeration в пользовательском коде и
+UEEnumValue token в экспортируемом ABI. `MatchesCallType` не позволяет принять source enum
+с integer layout за token. Native и авторские значения продолжают проходить
+ue_enum_from_number / __ue_checked_enum_number с проверкой конкретного UEnum.
+
+Foundation расширен проверками native/authored × Automatic/Byte/Enum8, обратного описания,
+неизвестного пути и недопустимого значения. Существующий property factory probe проверяет
+оба enum storage в array/map/set, широкие underlying types и сохранение StorageIdentity.
+Method-values и automation покрывают typed values, несовпадающие enum с одинаковыми числами,
+параметры/результаты/ref/out, defaults, сохранение/открытие assets, delegates и reload.
+
+Транспорт контейнеров и предметные операции над enum tokens используют прежние shared
+runtime helpers. Новые формы enum, числовые диапазоны и defaults параметров не добавлены.
+
+
+## Перенос Object/Class (2026-10-25)
+
+`FDasObjectClassAdapter` регистрируется для двух видов с TypePath: Object и Class.
+Создание FObjectProperty, FWeakObjectProperty, FClassProperty и совместимое существующее
+представление FInterfaceProperty теперь принадлежат адаптеру. Сохранены ограничения:
+weak применим только к конкретному object, class не принимает interface base, direct weak
+containers и containers class references остаются закрыты. Container shape/depth/node
+проверяет общий validator, существование класса и reference-specific ограничения — адаптер.
+Обратное описание сохраняет PropertyClass/MetaClass и WeakReference, не объединяя storage.
+
+`FDasObjectClassScriptFacet` выбирает source view и raw ABI для обоих видов. Strong/weak
+object capability, native/interface casts, authored nullable/stable-ID check и class-base
+check продолжают использовать прежние runtime codecs. Изменены выбор и размещение правил,
+а не обработка GC, Destroy, proxy cancellation или lease lifetime. Source wrappers и raw
+UObjectHandle/UEClassHandle различаются через MatchesScriptType/MatchesCallType.
+
+Declaration/default policy вынесена в `DasReferenceDefaultsDSL.inl`: typed class constraint,
+authored reference ID, legacy ue_object_value, ue_asset_default/ue_class_default и object
+container asset defaults. Field initializer очищается и PendingReferences проверяется тем же
+кодом, что и раньше. Private scope FDasScriptTypeScope хранит прежние ModuleId/Folder/Registry
+и Group/Module; FDSLTypeScope — его alias, чтобы передать declaration facet полный scope.
+
+Existing interface reference representation остаётся совместимой частью Object. Отдельные
+контракты interface dispatch, ImplementsInterface и authored interface definitions остаются
+следующим шагом; этот перенос не добавляет новые interface-возможности.
+
+Foundation проверяет object/class × UObject/Actor/Interface × strong/weak: реальный класс
+FProperty, base constraint, StorageIdentity после описания и отказы для weak class/interface
+и неизвестного base. Существующие weak/GC/lifecycle и method-values/PIE tests проверяют
+время жизни, неверные native/authored типы, параметры/результаты/ref/out и callbacks.
+Native/computed-default suites проверяют сохранённую обработку reference defaults.
+Архитектурный gate запрещает reference property construction вне адаптера и raw ABI names
+в общих builder/conversion/signature участках DSL.
+
+
+## Interface-контракты (2026-10-25)
+
+Interface references сохраняют Object kind и FInterfaceProperty. Нового value kind или
+второго реестра типов нет. `DasPropertyMatchesContract` использует адаптеры для nominal
+matching параметров/результатов: точный UEnum, PropertyClass/MetaClass, scalar kind и
+зарегистрированный math signature. Byte и Enum8 одного UEnum совместимы как контракт;
+их физическое storage по-прежнему различает property descriptor. Native fixed arrays и
+wide enum underlying отклоняются. Carrier SameType и точный UScriptStruct сохраняют
+существующие правила struct/container ABI. Направления in/out/ref и purity/const остаются
+в interface preflight: это правила метода, а не отдельного типа значения.
+
+`DasInterfaceContracts` предоставляет общие проверки identity, ImplementsInterface и
+разрешение UFunction реализации. Они используются typed interface annotations, preflight,
+runtime cast/membership и dispatch. Эти helpers работают только с уже загруженным UClass.
+Ограничения /Script/ и /Game/ сохраняются на соответствующих входах. Native/обычный
+Blueprint interface не имеет authored ID; UDasAuthoredInterfaceClass требует непустой
+StableId. Generated authored reference обязан совпадать с этим ID.
+
+Interface call frame запоминает StableId отдельно от ключа сигнатуры. Перед ProcessEvent
+проверяются исходная identity, сигнатура объявления, membership и текущая UFunction.
+Изменившийся контракт требует нового frame; формат generated signature key остаётся прежним.
+Время жизни frame ограничено активным вызовом VM, как и раньше: это не долгоживущий handle.
+
+Проверки: foundation покрывает object/class constraints, оба enum storage, scalar contracts,
+fixed/wide rejection и смену/утрату identity. Suite `interface-contracts` запускает существующий
+AuthoredInterface Create/Reopen probe: реальные assets, generated wrappers и reflected calls,
+дополненные проверками общего resolver. Reopen создаёт frame, меняет identity через тестовую native-функцию и проверяет отказ без изменения Score; после восстановления ID новый frame выполняет AddScore. Временный скрипт хранится в Saved, mutation helper — только в test probes. Method-values и automation остаются общей регрессией.
+Физическое хранение/GC interface references и контейнерные правила не менялись. Container
+combinators остаются следующим шагом переноса адаптеров.
+
+
+## Container combinators: структура и DSL (2026-10-25)
+
+Array, Set и Map зарегистрированы в том же `FDasTypeAdapters`, как kind adapters.
+`FDasContainerAdapter` задаёт неизменяемые slots: Element для array/set, Key/Value для map.
+Slot связывает поле FDasDeclaredType с reader дочернего FProperty и ролью hash key.
+Дополнительного реестра или нового persisted type descriptor нет. FindKind позволяет
+проверить форму даже у descriptor с ошибочным TypePath; Find сохраняет прежние правила identity.
+
+Общий validator проверяет точный набор slots и затем рекурсивно валидирует их с единым
+depth/node budget. Leaf adapter отвечает за SupportsContainerValue и CanBeContainerKey:
+int/byte/string/name и enum могут быть ключами, object — только concrete class;
+class references и прямые вложенные containers не принимаются. Direct weak containers
+по-прежнему отклоняются до создания свойства. Эти capabilities не заменяют полную
+валидацию identity, storage и контекста использования дочернего типа.
+
+Создание FArrayProperty/FSetProperty/FMapProperty перенесено из общего builder в комбинатор.
+Дети создаются существующей фабрикой через свои адаптеры, без присоединения root к owner.
+Имена Values/Inner (delegate array), Element, Key, Value и CPF_HasGetValueTypeHash сохранены.
+Обратное описание использует slots с общими ограничителями глубины и числа узлов; при
+ошибке наружу не публикуется частичный descriptor. Та же схема используется проверкой
+direct weak references и reflection-частью layout fingerprint carrier registry.
+
+DSLContainerType теперь обходит slots и один раз реализует разрешение типа ребёнка:
+scalar, enum, adapted/native/authored struct и object/interface reference. Специфика
+UEObjectKey сохраняется у hash-слотов. Carrier names, StorageIdentity, static UHT carriers
+и существующая lifetime/layout validation не меняются; runtime codecs остаются прежними.
+
+Foundation проверяет registry roundtrip всех комбинаторов и существующую матрицу leaf/key/value,
+hash flags, missing/extra slots, direct calls с ошибочным descriptor, недопустимые ключи,
+цикл descriptor, а также depth/node limits на reflection trees. Архитектурный gate запрещает
+создание container properties вне файла комбинаторов.
+
+На структурном шаге 2.3 матрица typed map externs оставалась ABI-фасетом; её сокращение
+требовало отдельного выбора общего транспорта ключа с проверкой lifetime/GC и измерением
+in-place access. Замена на boxed values ради числа символов не считается выполнением
+этого пункта. Валидация ещё не зарегистрированных авторских типов и backend schemas также
+сохраняет собственные правила разрешения ссылок, поверх общего property contract.
+
+Выбранный транспорт следующего ABI-шага (реализация ниже): daScript addInterop передаёт vec4f arguments вместе с
+call->types для anyArgument (так реализован builtin hash). Это позволяет стереть тип ключа без boxed-value
+и без хранения raw string pointer между вызовами. Перед применением к UE map access нужны
+GuardUEExtern, отдельная совместимость с текущим checked AOT bridge и замеры hot path.
+
+
+## Map addInterop ABI (2026-10-26)
+
+Map get/upsert больше не регистрируются как key × value. Новый DasMapInterop.inl читает
+borrowed vec4f и call->types для anyArgument, проверяет тип ключа и передаёт native key memory прежним
+snapshot views / FScriptMapHelper. Поддерживаются int, byte, string, FName, а для snapshots
+также nominal enum и object-key tokens. String преобразуется в локальный FString ровно
+на время вызова; TypeInfo, VM pointers и native key memory не сохраняются. Enum identity,
+object class/liveness и context-owned handles проверяются до обращения к map.
+
+Get/with snapshot имеют суффикс только типа значения (int/float/double/bool/string/name/
+byte/text/enum/object/struct); self get/set — только scalar value suffix. Измерение ключа
+общее. Scalar value codecs берутся из прежних traits, а enum/object/struct используют
+существующие read/write/snapshot services. Readonly, growth limits, default-on-missing
+для self и error-on-missing для snapshot сохранены. Snapshot upsert сохраняет
+FStructMutation, draft lifetime, rollback и caller-frame requirements.
+
+CMRES handles возвращаются через краткий uint64 token и немедленную call-macro конверсию
+в UEStructValue/UObjectHandle. Конверсия повторно проверяет context ownership; нового
+snapshot или boxed key не создаёт. Legacy key-specific names удалены, DSL helpers
+генерируют новые имена. Синтаксис вызова ue_struct_map_with_int(...) сохранён, но это
+теперь call macro; taking address старого low-level helper не является совместимым ABI.
+
+AddUEInterop — единственная фабрика interop-регистрации. Native address и AOT registry
+хранят CheckedUEInterop thunk: общий role/frozen-physics guard и явная проверка активного
+game-thread context выполняются до чтения Node/Args. Null Node/Args, отсутствующая metadata erased key slot и неподдерживаемые
+типы/размерности отклоняются. Аннотация функции закрывает неподдерживаемые source key types.
+
+Checked AOT bridge поддерживает Interop<Id> с ABI-versioned identity, включающей тип результата, имя и
+mangled signature (daScript overload name сам по себе не включает результат). Сгенерированный SimNode_AotInterop содержит metadata текущего call site,
+Resolve проверяет контекст/роль/ABI, затем вызывается тот же checked thunk. Scalar signatures
+и anyArgument доступны AOT; snapshot/opaque handle signatures сохраняют прежний closed
+boundary. Exact FName-key overloads используют общий SelfMap с известным ABI ключа, но закрыты AOT,
+чтобы generic anyArgument не открыл private FDasNameValue C++ ABI.
+
+Набор map get/upsert/self get/set сокращён с 196 регистраций до 56 (32 self overloads,
+22 snapshot interops и 2 общие handle conversions). 16 self overloads — FName AOT boundary,
+а не отдельная native реализация. Erase/set-element/key enumeration уже линейны по ключу
+и сохраняют прежний ABI. Удалены 78 старых C++ map wrappers, а также template products.
+Точная новая inventory проверяется foundation; typed reference для замера горячего пути
+находится только в test probes. Аудитор проверяет обе guarded factories.
+
+VM TypeInfo sparse: metadata нужна только erased key slot, фиксированные параметры читаются
+по ABI объявления (скаляры by-value, snapshot/ObjectRef через reference). Exact Name overload
+не требует TypeInfo; runtime всё равно проверяет native key property и context-owned Name.
+Генерируемый DSL AST строит token/conversion calls явно; parser call macros обслуживают
+эквивалентные вызовы из исходного .das. Оба пути используют одни и те же native handlers.
+
+
+Проверка реализации: общий build-agent job `map-interop-6` завершился с кодом 0.
+Сборка editor, генерация/линковка AOT, 23 linked-AOT guard checks, 361 Python tests,
+Foundation (failures=0), components-prepare, MethodValues Create/Reopen, все 51 editor/PIE
+automation tests и performance suite — PASS. Source guard audit — 494 guarded source sites.
+Runtime inventory — 56 map registrations вместо 196. Informational VM benchmark:
+200000 get/set pairs, typed reference 337.46 ns/op, interop 328.53 ns/op (ratio 0.974).
+Это один локальный прогон с вычитанием compile/setup baseline, а не обещание ускорения;
+наблюдаемой регрессии горячего пути в нём нет.
+
+После включения return type в ABI identity и переноса тестового литерала без изменения
+его содержимого job `map-interop-final` повторил editor build, AOT generation/link,
+23 linked-AOT checks и Foundation — PASS, код 0. Повторный informational benchmark:
+typed 329.37 ns/op, interop 359.95 ns/op (ratio 1.093). Разброс двух локальных прогонов
+от -3% до +9% не позволяет заявлять ускорение или отсутствие небольшой стоимости
+динамического разбора ключа. Измерение включает VM и вычитает отдельно измеренный setup;
+это ограничение замера, а не performance guarantee. Формат staged C++ и diff check — PASS.
+
+
+## Registry-derived support export (step 2.4)
+
+`IDasTypeAdapter::GetSupportSamples` supplies representative descriptors beside each identity owner.
+Scalars, structs and container slots get generic samples; enum, object/class (including weak/interface)
+and dynamic soft-reference carriers provide concrete identities in their own adapter files.
+This is sample selection, not a second per-kind capability table.
+
+`DasTypeAdapterSupportManifest()` walks the live registry and script facets. For each sample it calls
+`ValidateDasPropertyType` for Value/Container/DelegateParameter usages and for fully composed
+array/map/set descriptors. The versioned JSON retains negative validator reasons, identity,
+child slots, specialized view flags, call bridges and default policy. The export is a game-thread
+diagnostic; soft samples use the normal transient carrier cache and never load assets or save files.
+The public `DasExport -TypeSupport=<path>` mode does not depend on test-probe opt-in.
+
+`Scripts/ExportTypeSupport.ps1` exports to `logs/type-support-live.json` through the shared test helper.
+`GenerateTypeSupport.py --manifest logs/type-support-live.json` deliberately refreshes
+`Bindings/TypeSupport.json` and the marked section of `Docs/Reference/TypeSupport.md`.
+`--check` is read-only and rejects both live/baseline drift and stale generated documentation.
+Suite `type-support` requires `type-support-export`; Python tests check schema and renderer contracts;
+Foundation checks the live baseline and materializes positive/negative samples through the real factory.
+
+Scope is explicit: property ABI validation does not prove authored DSL parsing, concrete signatures,
+default-expression syntax, native generators or event/timer payload acceptance. Existing contextual
+tables and notes remain human guidance until those policies expose queries. AOT eligibility belongs
+to each checked binding/signature; the generator never promotes it to a type-wide Yes. Missing samples
+render Unreported, not supported. Schema additions require a generator update; new registered types
+using existing contracts require no Python per-type branch.
+
+
+Validation (2026-10-26): agent jobs `type-support-bootstrap` and `type-support-check` exited 0.
+The production export contains 22 registered adapters and 25 concrete sample descriptors: 175
+property-context results (127 supported, 48 rejected with reasons). Export from a second process
+matches the baseline; generated documentation is current. All 377 Python tests passed (16 new
+support/schema/renderer tests); Foundation passed with zero failures, including live manifest
+comparison and positive/negative property materialization. Staged C++ formatting and guard audit pass.
+
+
+## Opaque native types (remaining step 2.2 ports)
+
+`DasOpaqueTypeAdapters.cpp` owns Geometry, the seven Slate input event identities, EventReply,
+PaintContext, WidgetAnimationHandle, HitResult and ConstraintInstanceAccessor policies. Internal
+ActorInstanceHandle and BodyInstanceAsyncPhysicsTickHandle register explicit rejected call contracts.
+InputActionValue's existing adapter now owns its native call/export policy as well.
+
+`FDasNativeTypePolicy` contains native transport ID, script handle metadata, lifetime, storage
+rejection, exact native-call gate and optional capture/validation hooks. Shared marshalling,
+binding export, storage validation and snapshot publication query it. Geometry/input remain owned,
+detached snapshots; reply/paint epochs, weak animation leases, hit GC roots and component-owned
+constraint services stay in their existing codecs. No generic script facet or authoring leaf is
+added for scoped handles, so registration cannot expose unrestricted fields/defaults or callbacks.
+Widget contracts use adapter role membership and handle names; the five input types admitted by
+widget callbacks remain distinct from base InputEvent and NavigationEvent.
+
+Support JSON schema 2 includes native transport/lifetime/gate metadata. Property ABI evidence stays
+separate from native-call and authored-storage constraints. Architecture gates forbid opaque type
+path literals and legacy selectors in generic layers; codec-local compatibility helpers delegate
+identity to the registry. Existing transports/allowlists retain their IDs and semantics.
+
+
+Validation of the opaque ports (2026-10-26): `opaque-adapters-bootstrap2` built/exported
+successfully; `opaque-adapters-core` passed fresh support export/drift, Foundation, 379 Python
+tests and 23 linked-AOT checks. The new native contract probe verifies function ownership,
+direction, depth/fixed-array limits, seven detached input identities, five widget-input identities,
+rejected internal types and absence of generic capture on scoped/weak/dedicated capabilities.
+Registry export: 37 adapters, 40 samples, 16 native policies.
+
+All nine transport suites passed across `opaque-adapters-transports2`,
+`opaque-adapters-remaining` and `opaque-adapters-ui`: Geometry, input events, reply, paint,
+widget animation, constraints, collision, widget events and navigation (24 runtime checks).
+MethodValues Create/Reopen and all 51 editor/PIE automation tests passed in `opaque-adapters-ui`.
+The final local Python rerun also passed all 379 tests. No new arbitrary reflected storage,
+generic authoring views or type-wide AOT permission is granted by opaque registration.
+
+The old published UMG baseline and fresh export have identical statuses for all 517 functions:
+409 ready, 108 blocked, zero generation blockers. Navigation's obsolete 407/110 literal was
+replaced by exact package/engine/count comparison with the tracked published summary.
+Legacy runners now use the shared `Invoke-DasPythonTests` helper so Windows PowerShell's
+stderr handling cannot mistake normal unittest progress for failure; exit 0/stderr and exit 7
+with restored caller error policy were verified. Constraint's optional cross-package comparison
+uses only present baselines and writes diagnostic reports into staging, not delivered docs.
+
+
+## Contextual contracts (signature / callbacks / defaults follow-up)
+
+`DasTypeContracts.h` exposes named `EDasTypeUse` boundaries and `QueryDasTypeUse`.
+The query composes the existing registry, property ABI, callback and authoring rules; it is
+also used by the production validators. It does not keep a parallel table of per-type Yes flags.
+
+- Authored method lowering and the lowered `FDasClassSchema` preflight use the same
+  signature type query. Enum, class and object/interface identities, value-struct layouts,
+  container carriers and delegate-valued in/out/return restrictions are checked there.
+  `ValidateDasSignatureContract` owns count/direction rules for methods, interfaces,
+  single delegates and multicast delegates. Interface Apply checks before creating graphs;
+  native interface name, purity, const and exact signature matching stay in their resolver.
+- Queued events and timers query `ValidateDasCallbackType`; frame preflight uses that gate and delivery
+  payload admission shares its callback ABI gate (without a duplicate descriptor walk). The callback table retains wire/proxy/timer facts.
+  Exact receiver compatibility, native const-ref rules, finite values, budgets, snapshot
+  identity and object lifetime remain checked at their existing boundaries.
+- Explicit property, struct-member and parameter defaults share `ValidateDasAuthoredDefault`.
+  Struct symbol resolution, enum membership, recursive graph/leaf limits and native CDO
+  editability remain separate checks. Parameter input/world-context/ordering checks remain
+  declaration-level. The computed-default query covers evaluator scalar leaves; constructor
+  markers and container elements compose those leaves, and the evaluator still audits the
+  call graph and execution limits. This does not add arbitrary computed struct evaluation.
+- Opaque native calls use `ValidateDasNativeCallContract` with the real `FProperty`, owning
+  function, directions and depth. Without these inputs the query reports `requires_context`,
+  never a blanket permission. Scoped reply/paint and weak/component-owned capabilities
+  retain their existing transport lifetime checks and cannot enter generic queued payloads.
+
+Support JSON schema 3 exports the C++ context names and their validation boundary, then
+queries each representative descriptor in every context. The renderer has no per-type
+or per-context policy branches. `supported` means that named type gate passed; complete
+DSL syntax, expression/literal validity, graph resolution, receiver compatibility and
+delivery checks are explicitly outside that result. Native API generation and per-binding
+AOT eligibility remain separately validated. `requires_context` always includes a reason.
+
+The extra context tables are generated beside the original property ABI matrix. The
+manual authored/native summaries describe end-to-end public surfaces and can be narrower
+than a runtime type gate (for example class references in an interface source parser).
+
+Delegate signature factories can project existing methods, so source defaults do not participate
+in their ABI signature comparison. The delegate DSL declaration parser still rejects defaults;
+interface definitions reject them before Apply. This separation preserves method-reference binding.
+
+
+Validation (2026-10-26): `type-contracts-bootstrap` produced the schema 3 live export.
+`type-contracts-core` rebuilt successfully and exited 0: all 383 Python tests (22 support/schema
+tests), fresh export/drift check, Foundation with zero failures, 23 linked AOT checks,
+authored interface contracts, native defaults, defaults merge, computed defaults,
+execution roles, delegate values and event checks passed.
+
+The baseline contains 37 adapters, 40 representative descriptors and 22 contextual gates:
+880 contextual results (567 supported, 288 unsupported with reasons, 25 requiring concrete
+context), in addition to the 280 original property ABI/composition results. The scoped/native
+results do not grant general reflected storage, queued callbacks or type-wide AOT eligibility.
+
+
+`type-contracts-runtime` also exited 0: Geometry, input events, EventReply, Paint and widget-event
+transport suites passed; MethodValues Create/Reopen and all 51 editor/PIE automation tests
+passed with zero failures or skipped tests. Formatting, whitespace and the guarded-extern audit
+(494 source sites) pass. All changes and verification belong to `refactor/soft-type-adapters`.

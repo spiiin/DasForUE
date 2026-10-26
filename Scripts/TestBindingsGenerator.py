@@ -116,9 +116,9 @@ class GeneratorTests(unittest.TestCase):
         self.assertEqual(sorted(native_type_names([NATIVE_BINDS_SOURCE])),
                          ['AActor', 'APawn', 'UActorComponent', 'UGameInstance', 'USceneComponent', 'UWorld'])
         self.assertEqual(dsl_base_names(PLUGIN_SCRIPTS),
-                         {name: 'ue_dsl' for name in ('Actor', 'Pawn', 'Character', 'ActorComponent', 'SaveGame',
+                         dict(ProbeActor='ue_probe_actor', **{name: 'ue_dsl' for name in ('Actor', 'Pawn', 'Character', 'ActorComponent', 'SaveGame',
                                                       'DataAsset', 'PrimaryDataAsset', 'WorldSubsystem',
-                                                      'GameInstanceSubsystem')})
+                                                      'GameInstanceSubsystem')}))
         text = generate(self.ir)
         self.assertEqual(skipped_aliases(text), ['Actor'])
         self.assertIn('the name belongs to the DSL base class ue_dsl::Actor', text)

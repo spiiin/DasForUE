@@ -9,8 +9,7 @@ const TCHAR* DasNativeNameArgument(FDasNameValue Value, das::Context* Context, F
     Out = NAME_None;
     if (!Value.Token)
         return nullptr;
-    const FName* Name =
-        ActiveContext && ActiveContext == Context ? ActiveContext->DSLNames.Find(Value.Token) : nullptr;
+    const FName* Name = ActiveContext && ActiveContext == Context ? ActiveContext->DSLNames.Find(Value.Token) : nullptr;
     if (!Name)
         return TEXT("name belongs to another context");
     Out = *Name;
@@ -167,9 +166,9 @@ FString DasNativeScriptTypeName(const FDasNativeParam& Param, const FDasNativeRe
     case EDasNativeType::String:
         return TEXT("string");
     case EDasNativeType::Name:
-        return TEXT("UENameValue");
+        return TDasScriptType<FName>::Name();
     case EDasNativeType::Text:
-        return TEXT("UETextValue");
+        return TDasScriptType<FText>::Name();
     case EDasNativeType::DateTime:
         return TEXT("UEDateTime");
     case EDasNativeType::Timespan:
@@ -179,8 +178,7 @@ FString DasNativeScriptTypeName(const FDasNativeParam& Param, const FDasNativeRe
     case EDasNativeType::Class:
         return TEXT("UEClassHandle");
     case EDasNativeType::ObjectArray:
-        return TEXT("array<") + (Resolved.Script ? Resolved.Script->Name : FString(TEXT("UObjectHandle"))) +
-               TEXT(">");
+        return TEXT("array<") + (Resolved.Script ? Resolved.Script->Name : FString(TEXT("UObjectHandle"))) + TEXT(">");
     default:
     {
         // Engine values: the name of the type annotation ue_foundation registered (math handle names live in
@@ -351,8 +349,8 @@ struct FDasNativeValues
     }
 };
 static_assert(sizeof(TArray<UObject*>) <= sizeof(FTransform) && sizeof(FString) <= sizeof(FTransform) &&
-              sizeof(FText) <= sizeof(FTransform) &&
-              sizeof(FLinearColor) <= sizeof(FTransform) && sizeof(FQuat) <= sizeof(FTransform));
+              sizeof(FText) <= sizeof(FTransform) && sizeof(FLinearColor) <= sizeof(FTransform) &&
+              sizeof(FQuat) <= sizeof(FTransform));
 
 // A reference argument (FDasNativeParam::bRef): the VM passes the address of the script's variable. The call works
 // on a copy in its slot, written back only when the call succeeds.
@@ -483,8 +481,8 @@ struct SimNode_DasNative : das::SimNode_ExtFuncCallBase
         das::builtin_array_resize(*Array, Values.Num(), sizeof(FDasObjectHandle), &Context, nullptr);
         auto* Handles = reinterpret_cast<FDasObjectHandle*>(Array->data);
         for (int32 I = 0; I < Values.Num(); ++I)
-            Handles[I] = Values[I] && Values[I]->IsA(Class) ? MakeObjectHandle(Values[I], Class, &Context)
-                                                            : FDasObjectHandle();
+            Handles[I] =
+                Values[I] && Values[I]->IsA(Class) ? MakeObjectHandle(Values[I], Class, &Context) : FDasObjectHandle();
         return das::cast<void*>::from(Array);
     }
     vec4f ReturnObject(das::Context& Context, UObject* Object)
@@ -758,7 +756,7 @@ public:
     {
         const char* FnName = Context.code->allocateName(this->name);
         return Context.code->makeNode<TDasDiagnosticNode<SimNode_DasNativeRoute>>(at, FnName, Module, Function,
-                                                                                 Label.c_str());
+                                                                                  Label.c_str());
     }
 };
 
@@ -788,8 +786,8 @@ FString DasNativeRouteTypes(const FDasNativeRoute& Route, const das::ModuleLibra
         return TEXT("the bind has no route");
     if (Types.size() != size_t(F.Arguments.Num()))
         return TEXT("the number of parameters differs");
-    auto Same = [&](const das::TypeDeclPtr& Script, const FDasNativeParam& P, const FDasNativeResolvedParam& R,
-                    bool bArgument)
+    auto Same =
+        [&](const das::TypeDeclPtr& Script, const FDasNativeParam& P, const FDasNativeResolvedParam& R, bool bArgument)
     {
         if (P.Type == EDasNativeType::Object)
             return R.Class && ObjectPath(Script) == R.Class->GetPathName();

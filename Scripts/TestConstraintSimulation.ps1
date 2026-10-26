@@ -31,7 +31,7 @@ function GetConstraintSimulationHashes {
  foreach($Name in @('UnrealEditor-DasRuntime.dll','UnrealEditor-DasEditor.dll')){
   $Result[$Name]=(Get-FileHash -LiteralPath "$Repo/Tests/DasForUESmoke/Binaries/Win64/$Name" -Algorithm SHA256).Hash
  }
- foreach($Name in @('Plugins/DasForUE/Source/DasEditor/Private/DasConstraintSimulationCommandlet.cpp','Plugins/DasForUE/Source/DasEditor/Public/DasConstraintSimulationCommandlet.h','Tests/ConstraintSimulation/probe.template.das')){
+ foreach($Name in @('Plugins/DasForUE/Tests/Editor/Private/DasConstraintSimulationCommandlet.cpp','Plugins/DasForUE/Tests/Editor/Public/DasConstraintSimulationCommandlet.h','Tests/ConstraintSimulation/probe.template.das')){
   $Result[$Name]=(Get-FileHash -LiteralPath "$Repo/$Name" -Algorithm SHA256).Hash
  }
  $Result['generated_module']=(Get-FileHash -LiteralPath (Join-Path $Validation ($Definition.staged_module+'.das')) -Algorithm SHA256).Hash

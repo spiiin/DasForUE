@@ -5,7 +5,7 @@
 #include "DasBlueprintRollback.h"
 #include "DasComponentDefaults.h"
 #include "DasContainerTypes.h"
-#include "DasProbeActor.h"
+#include "DasActor.h"
 #include "DasScriptComponent.h"
 #include "DasRuntime.h"
 #include "Engine/Blueprint.h"
@@ -24,7 +24,7 @@
 #include "Modules/ModuleManager.h"
 #include "Misc/ScopeExit.h"
 
-#if WITH_DEV_AUTOMATION_TESTS
+#if WITH_DEV_AUTOMATION_TESTS && DAS_WITH_EDITOR_TESTS
 static int32 GDasDefaultsFailure = 0;
 void DasFailDefaultsMergeForTesting(int32 Stage)
 {
@@ -875,7 +875,7 @@ bool DasMergeDefaults(UBlueprint* BP, const FDasAuthoringModule& Next, const FSt
         if (!P->Identical(P->ContainerPtrToValuePtr<void>(O),
                           P->ContainerPtrToValuePtr<void>(Change.Image->After->GetStructMemory())))
             return Restore(TEXT("Native property handling changed a staged value"));
-#if WITH_DEV_AUTOMATION_TESTS
+#if WITH_DEV_AUTOMATION_TESTS && DAS_WITH_EDITOR_TESTS
         if (GDasDefaultsFailure == 1)
             return Restore(TEXT("Injected value-stage failure"));
 #endif
@@ -921,7 +921,7 @@ bool DasMergeDefaults(UBlueprint* BP, const FDasAuthoringModule& Next, const FSt
         return Restore(Error);
     BP->Modify();
     BP->GetOutermost()->GetMetaData().SetValue(BP, TEXT("DasDSLModel"), *Wire);
-#if WITH_DEV_AUTOMATION_TESTS
+#if WITH_DEV_AUTOMATION_TESTS && DAS_WITH_EDITOR_TESTS
     if (GDasDefaultsFailure == 2)
         return Restore(TEXT("Injected metadata-stage failure"));
 #endif

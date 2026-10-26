@@ -1,0 +1,20 @@
+{
+  "FileVersion": 3,
+  "AdditionalPluginDirectories": [
+    "../../Plugins"
+  ],
+  "Modules": [
+    {
+      "Name": "DasRuntimeIsolation",
+      "Type": "Runtime",
+      "LoadingPhase": "Default"
+    }
+  ],
+  "Plugins": [
+    {
+      "Name": "DasForUE",
+      "Enabled": true
+    }
+  ],
+  "DisableEnginePluginsByDefault": true
+}

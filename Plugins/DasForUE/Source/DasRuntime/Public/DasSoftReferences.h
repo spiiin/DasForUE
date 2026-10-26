@@ -1,5 +1,7 @@
 #pragma once
 #include "CoreMinimal.h"
+#include "DasTypeAdapters.h"
+TSharedRef<const IDasTypeAdapter> MakeDasSoftReferenceAdapter();
 #include "UObject/UnrealType.h"
 #include "UObject/SoftObjectPath.h"
 // Soft properties use the shared owned-snapshot ABI, retaining native soft pins.
@@ -14,7 +16,11 @@ DASRUNTIME_API bool DasSoftTargetMatches(const UObject* Object, const UClass* Ba
 struct FInstancedStruct;
 DASRUNTIME_API bool UpcastDasSoftValue(const FInstancedStruct& Source, const FString& TargetPath, FInstancedStruct& Out,
                                        FString& Error);
+#if DAS_WITH_TEST_PROBES
 DASRUNTIME_API bool CheckDasSoftUpcasts(FString& Error);
+#endif
 DASRUNTIME_API void ResetDasSoftCarriers();
 
+#if DAS_WITH_TEST_PROBES
 DASRUNTIME_API bool CheckDasSoftReferences(FString& Error);
+#endif

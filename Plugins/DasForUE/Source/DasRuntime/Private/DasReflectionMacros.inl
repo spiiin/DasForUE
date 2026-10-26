@@ -62,7 +62,8 @@ struct FUEReflectionMacro : das::CallMacro
                     DSLFail(TEXT("Expected ue_struct_get(value, Field)"));
                 const auto T = DSLObjectNormalize(Args[0]->type, *P->thisModuleGroup, M);
                 const auto Name = static_cast<das::ExprVar*>(Args[1])->name;
-                if (!DSLDirectStruct(T) || DSLSoft(T) || T->baseType != das::Type::tStructure || !T->structType)
+                if (!DSLDirectStruct(T) || DSLAdaptedReference(T) || T->baseType != das::Type::tStructure ||
+                    !T->structType)
                     DSLFail(TEXT("ue_struct_get requires a typed Unreal value struct; use a native/ue_struct type instead of UEStructValue"));
                 const auto* Field = T->structType->findField(Name);
                 if (!Field || Field->classMethod || Field->generated)

@@ -10,7 +10,7 @@ def main(input:int):int {
     let finish=ue_vector(800.0lf,0.0lf,0.0lf)
     let channel=@COLLISION@::E_ETraceTypeQuery_c61871df.v_TraceTypeQuery1
     let debug=@COLLISION@::E_EDrawDebugTrace_59edfe33.v_None
-    let color=@COLLISION@::S_LinearColor_f4abb14b(f_r=1.0,f_g=0.0,f_b=0.0,f_a=1.0)
+    let color=ue_linear_color(1.0f,0.0f,0.0f,1.0f)
     var ignored:array<@COLLISION@::C_Actor_adf65d5b>
     let line <- @COLLISION@::ue_collision_LineTraceSingle(start,finish,channel,false,ignored,debug,true,color,color,0.0)
     let hit=ue_hit_result_view(line.out_outhit)

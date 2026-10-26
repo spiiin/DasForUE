@@ -60,132 +60,7 @@ struct FUENativeStructAnnotation : das::StructureAnnotation
         }
     }
 };
-struct FUENativeEnumAnnotation : das::EnumerationAnnotation
-{
-    FUENativeEnumAnnotation() : EnumerationAnnotation("ue_native_enum") {}
-    virtual bool touch(const das::EnumerationPtr& E, das::ModuleGroup& Group, das::AnnotationArgumentList& Args,
-                       das::string& Error) override
-    {
-        FDSLDiagnosticLocationScope SourceDiagnostic(E->at, UTF8_TO_TCHAR(E->name.c_str()));
-        try
-        {
-            DSLAnnotationArguments(Args);
-            if (Args.size() != 1 || Args[0].name != "path" || Args[0].type != das::Type::tString ||
-                DSLAnnotation(E->annotations, "ue_enum"))
-                DSLFail(TEXT("ue_native_enum requires a single native path and no ue_enum"));
-            const FString Path = DSLString(Args, "path");
-            FString Issue;
-            auto* Native = Path.StartsWith(TEXT("/Script/")) ? ResolveDasEnum(Path, Issue) : nullptr;
-            if (!Native)
-                DSLFail(TEXT("Expected loaded native enum path"));
-            TSet<int64> Values;
-            for (const auto& V : E->list)
-            {
-                if (!V.value || V.value->__rtti != das::string("ExprConstInt"))
-                    DSLFail(TEXT("Native enum declarations require explicit integer values"));
-                const int64 Number = static_cast<das::ExprConstInt*>(V.value)->getValue();
-                const int64 Actual = Native->GetValueByNameString(DSLText(V.name));
-                const int32 Index = Native->GetIndexByValue(Actual);
-                if (Number < 0 || Number > 254 || Index == INDEX_NONE || Actual != Number ||
-                    !Native->GetNameStringByIndex(Index).Equals(DSLText(V.name), ESearchCase::CaseSensitive) ||
-                    Values.Contains(Number) || Native->GetNameStringByIndex(Index).EndsWith(TEXT("_MAX")))
-                    DSLFail(TEXT("Native enum member name/value differs from Unreal"));
-                Values.Add(Number);
-            }
-            for (int32 I = 0; I < Native->NumEnums(); ++I)
-            {
-                const int64 Number = Native->GetValueByIndex(I);
-                if (Number >= 0 && Number <= 254 &&
-                    !Native->GetNameStringByIndex(I).EndsWith(TEXT("_MAX")) && !Values.Contains(Number))
-                    DSLFail(TEXT("Native enum declaration omits a native value"));
-            }
-            auto* F = new das::Function();
-            F->at = E->at;
-            F->name = "__ue_pack_native_enum_" + E->name;
-            F->generated = true;
-            F->privateFunction = false;
-            F->result = DSLHandleType(Group, E->module, "UEEnumValue");
-            auto* Arg = new das::Variable();
-            Arg->at = E->at;
-            Arg->name = "value";
-            Arg->type = new das::TypeDecl(das::Type::tEnumeration, E->at);
-            Arg->type->enumType = E;
-            Arg->type->constant = true;
-            F->arguments.push_back(Arg);
-            auto* Body = new das::ExprBlock();
-            Body->at = E->at;
-            Body->list.push_back(
-                new das::ExprReturn(E->at, DSLCall(E->at, "ue_enum_from_number",
-                                                   {new das::ExprConstString(E->at, DSLUtf8(Path)),
-                                                    DSLCall(E->at, "int", {new das::ExprVar(E->at, "value")})})));
-            F->body = Body;
-            if (!E->module->addFunction(F, true))
-                DSLFail(TEXT("Native enum pack helper collision"));
-            return true;
-        }
-        catch (const std::exception& X)
-        {
-            Error = X.what();
-            return false;
-        }
-    }
-};
-struct FUEEnumAnnotation : das::EnumerationAnnotation
-{
-    FUEEnumAnnotation() : EnumerationAnnotation("ue_enum") {}
-    virtual bool touch(const das::EnumerationPtr& E, das::ModuleGroup& Group, das::AnnotationArgumentList& Args,
-                       das::string& Error) override
-    {
-        FDSLDiagnosticLocationScope Diagnostic(E->at, DSLText(E->name));
-        try
-        {
-            if (const auto* Wire = Args.find(DSLTypesKey, das::Type::tString))
-            {
-                if (Wire->at.fileInfo)
-                    DSLFail(TEXT("Reserved type annotation argument"));
-                return true;
-            }
-            DSLCommentTooltip(E->at, Args);
-            FDasReflectedTypes M;
-            M.Id = DSLString(Args, "module_id", FPaths::GetBaseFilename(DSLText(E->at.fileInfo->name)));
-            FDasEnumDeclaration D;
-            D.Name = DSLText(E->name);
-            D.Id = DSLString(Args, "id", M.Id + TEXT(".")+ D.Name);
-            das::AnnotationArgumentList TypeArgs;
-            for (const auto& A : Args)
-                if (A.name.find("member_id_") != 0)
-                    TypeArgs.push_back(A);
-            DSLTypeArgs(TypeArgs, D.Metadata);
-            for (const auto& A : Args)
-                if (A.name.find("member_id_") == 0)
-                {
-                    bool Found = false;
-                    for (const auto& V : E->list)
-                        Found |= A.name == "member_id_" + V.name;
-                    if (!Found || A.type != das::Type::tString)
-                        DSLFail(TEXT("Unknown member or invalid member ID annotation"));
-                }
-            for (const auto& V : E->list)
-            {
-                if (!V.value || V.value->__rtti != das::string("ExprConstInt"))
-                    DSLFail(TEXT("ue_enum requires explicit int literal values"));
-                D.Entries.Add({DSLText(V.name), static_cast<das::ExprConstInt*>(V.value)->getValue(),
-                               DSLString(Args, ("member_id_" + V.name).c_str(), D.Id + TEXT(".")+ DSLText(V.name))});
-            }
-            M.Enums.Add(D);
-            FString Wire, Issue;
-            if (!M.ToJson(Wire, Issue))
-                DSLFail(Issue);
-            Args.push_back(das::AnnotationArgument(DSLTypesKey, DSLUtf8(Wire)));
-            return true;
-        }
-        catch (const std::exception& X)
-        {
-            Error = X.what();
-            return false;
-        }
-    }
-};
+#include "DasEnumAnnotations.inl"
 struct FUEStructAnnotation : das::StructureAnnotation
 {
     FUEStructAnnotation() : StructureAnnotation("ue_struct") {}
@@ -238,8 +113,9 @@ struct FUEStructAnnotation : das::StructureAnnotation
                 if (DSLNativeStruct(F.type) ||
                     (F.type && (DSLNativeStruct(F.type->firstType) || DSLNativeStruct(F.type->secondType))))
                     DSLFail(TEXT("Native structs inside authored struct declarations require a separate adapter"));
-                if (DSLNativeEnum(F.type) ||
-                    (F.type && (DSLNativeEnum(F.type->firstType) || DSLNativeEnum(F.type->secondType))))
+                if (DSLNativeValue(F.type, EDasTypeKind::Enum) ||
+                    (F.type && (DSLNativeValue(F.type->firstType, EDasTypeKind::Enum) ||
+                                DSLNativeValue(F.type->secondType, EDasTypeKind::Enum))))
                     DSLFail(TEXT("Native enum fields inside authored structs require a separate adapter"));
                 if (F.classMethod)
                     DSLFail(TEXT("Reflected struct methods require separate support"));
@@ -253,13 +129,7 @@ struct FUEStructAnnotation : das::StructureAnnotation
                         DSLFail(DSLText(F.type->structType->name) + TEXT(" struct fields use implicit empty defaults"));
                     P.Type.TypePath = DSLAdaptedPath(F.type);
                 }
-                if (DSLSoft(F.type))
-                {
-                    if (F.init)
-                        DSLFail(TEXT("Authored struct soft fields require implicit null defaults"));
-                    P.Type.TypePath = DSLSoftPath(F.type);
-                }
-                if (DSLDirectEnum(F.type))
+                if (DSLTypedValue(F.type, EDasTypeKind::Enum))
                 {
                     const auto* A = DSLAnnotation(F.type->enumType->annotations, "ue_enum");
                     const FString Module =
@@ -269,7 +139,6 @@ struct FUEStructAnnotation : das::StructureAnnotation
                         DSLString(A->arguments, "id", Module + TEXT(".")+ DSLText(F.type->enumType->name));
                     P.Type.TypePath = TEXT("/DasTypes/")+ FMD5::HashAnsiString(*Id) + TEXT(".Type");
                     P.Default.Kind = TEXT("string");
-                    P.Default.String = DSLStructEnumDefault(F);
                 }
                 if (DSLAuthoredView(F.type))
                     DSLFail(TEXT("Authored reference struct fields require a separate ownership adapter"));
@@ -326,7 +195,7 @@ struct FUEStructAnnotation : das::StructureAnnotation
                     V->Kind = Value;
                     if (Value == TEXT("enum"))
                     {
-                        if (!DSLDirectEnum(F.type->secondType))
+                        if (!DSLTypedValue(F.type->secondType, EDasTypeKind::Enum))
                             DSLFail(TEXT("Enum maps require authored ue_enum values"));
                         const auto* A = DSLAnnotation(F.type->secondType->enumType->annotations, "ue_enum");
                         const FString Module = DSLString(
@@ -346,9 +215,7 @@ struct FUEStructAnnotation : das::StructureAnnotation
                     }
                     if (Value == TEXT("struct"))
                     {
-                        if (DSLSoft(F.type->secondType))
-                            V->TypePath = DSLSoftPath(F.type->secondType);
-                        else if (DSLAdapted(F.type->secondType))
+                        if (DSLAdapted(F.type->secondType))
                             V->TypePath = DSLAdaptedPath(F.type->secondType);
                         else if (!DSLMathPath(F.type->secondType).IsEmpty())
                             V->TypePath = DSLMathPath(F.type->secondType);
@@ -374,7 +241,7 @@ struct FUEStructAnnotation : das::StructureAnnotation
                 if (F.type && F.type->baseType == das::Type::tArray)
                 {
                     const FString K = DSLTypeName(F.type->firstType);
-                    if ((!DSLDirectStruct(F.type->firstType) && !DSLDirectEnum(F.type->firstType) &&
+                    if ((!DSLDirectStruct(F.type->firstType) && !DSLTypedValue(F.type->firstType, EDasTypeKind::Enum) &&
                          !DSLTypedReference(F.type->firstType) && DSLMathPath(F.type->firstType).IsEmpty() &&
                          K != TEXT("byte") &&
                                    K != TEXT("text") &&
@@ -397,7 +264,7 @@ struct FUEStructAnnotation : das::StructureAnnotation
                         if (!E->TypePath.StartsWith(TEXT("/Script/")))
                             DSLFail(TEXT("Reference array fields require native object/interface types"));
                     }
-                    else if (DSLDirectEnum(F.type->firstType))
+                    else if (DSLTypedValue(F.type->firstType, EDasTypeKind::Enum))
                     {
                         const auto* A = DSLAnnotation(F.type->firstType->enumType->annotations, "ue_enum");
                         const FString Module =
@@ -409,8 +276,6 @@ struct FUEStructAnnotation : das::StructureAnnotation
                     }
                     else if (DSLAdapted(F.type->firstType))
                         E->TypePath = DSLAdaptedPath(F.type->firstType);
-                    else if (DSLSoft(F.type->firstType))
-                        E->TypePath = DSLSoftPath(F.type->firstType);
                     else if (!DSLMathPath(F.type->firstType).IsEmpty())
                         E->TypePath = DSLMathPath(F.type->firstType);
                     else if (DSLDirectStruct(F.type->firstType))
@@ -426,7 +291,7 @@ struct FUEStructAnnotation : das::StructureAnnotation
                     P.Type.Kind = TEXT("array");
                     P.Type.Element = E;
                 }
-                if (DSLDirectStruct(F.type) && !DSLSoft(F.type) && !DSLAdapted(F.type))
+                if (DSLDirectStruct(F.type) && !DSLAdapted(F.type))
                 {
                     const auto* Child = DSLAnnotation(F.type->structType->annotations, "ue_struct");
                     const FString Module =
@@ -484,8 +349,11 @@ struct FUEStructAnnotation : das::StructureAnnotation
                 }
                 if (!Marked || !F.type || F.type->ref)
                     DSLFail(TEXT("Struct fields require ue_property and by-value scalar type"));
-                if (P.Type.GetKind() == EDasTypeKind::Text)
-                    P.Default = DSLTextDefault(F.init);
+                const auto* DefaultAdapter = DSLValueAdapter(F.type);
+                if (DefaultAdapter && DefaultAdapter->Script->ParseDefault(EDasScriptDefaultUse::StructField, F.type,
+                                                                           F.init, Group, S->module, P.Default))
+                {
+                }
                 else if (P.Type.GetKind() == EDasTypeKind::Byte)
                     P.Default = DSLByteDefault(F.init);
                 else if (F.init && P.Type.GetKind() != EDasTypeKind::Struct && P.Type.GetKind() != EDasTypeKind::Enum)

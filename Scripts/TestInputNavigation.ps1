@@ -2,11 +2,11 @@ param([string]$Engine='C:/src/unreal/UnrealEngine',[switch]$SkipBuild,[switch]$P
 Import-Module (Join-Path $PSScriptRoot 'DasTest.psm1') -Force
 
 $ErrorActionPreference='Stop';$Repo=Split-Path -Parent $PSScriptRoot;$Python='C:/Python312/python.exe';$Project="$Repo/Tests/DasForUESmoke/DasForUESmoke.uproject"
-& $Python "$PSScriptRoot/TestNavigationGenerator.py";if($LASTEXITCODE){throw 'Navigation generator tests failed'}
+Invoke-DasPythonTests -Python $Python -Path "$PSScriptRoot/TestNavigationGenerator.py";if($LASTEXITCODE){throw 'Navigation generator tests failed'}
 if(!$SkipBuild){Invoke-DasBuild (Get-DasContext -Engine $Engine) -BuildArguments @(
     'DasForUESmokeEditor', 'Win64', 'Development', "-Project=$Project", '-WaitMutex', '-NoXGE',
     '-MaxParallelActions=8', "-Log=$Repo/logs/navigation-build.log") *> "$Repo/logs/navigation-build-stdout.log";if($LASTEXITCODE){throw 'Navigation build failed'}}
-$Sources=@{};foreach($File in @('Plugins/DasForUE/Source/DasRuntime/Private/DasRuntime.cpp','Plugins/DasForUE/Source/DasRuntime/Private/DasInputNavigation.inl','Plugins/DasForUE/Source/DasRuntime/Private/DasInputEvents.cpp','Plugins/DasForUE/Source/DasRuntime/Private/DasInputEventsRuntime.inl','Plugins/DasForUE/Source/DasRuntime/Private/DasWidgetEventsRuntime.inl','Plugins/DasForUE/Source/DasRuntime/Private/DasEventReplyCalls.inl','Plugins/DasForUE/Source/DasRuntime/Private/DasMarshalling.inl','Plugins/DasForUE/Source/DasRuntime/Private/DasBindingExport.inl','Plugins/DasForUE/Source/DasRuntime/Private/DasScriptUserWidget.cpp','Plugins/DasForUE/Source/DasRuntime/Public/DasInputEvents.h','Plugins/DasForUE/Source/DasEditor/Private/DasInputNavigationCommandlet.cpp','Plugins/DasForUE/Source/DasEditor/Public/DasInputNavigationCommandlet.h','Scripts/GenerateBindings.py','Bindings/InputNavigation.contract.json','Tests/InputNavigation/probe.das')){$Sources[$File]=(Get-FileHash "$Repo/$File" -Algorithm SHA256).Hash}
+$Sources=@{};foreach($File in @('Plugins/DasForUE/Source/DasRuntime/Private/DasRuntime.cpp','Plugins/DasForUE/Source/DasRuntime/Private/DasInputNavigation.inl','Plugins/DasForUE/Source/DasRuntime/Private/DasInputEvents.cpp','Plugins/DasForUE/Source/DasRuntime/Private/DasInputEventsRuntime.inl','Plugins/DasForUE/Source/DasRuntime/Private/DasWidgetEventsRuntime.inl','Plugins/DasForUE/Source/DasRuntime/Private/DasEventReplyCalls.inl','Plugins/DasForUE/Source/DasRuntime/Private/DasMarshalling.inl','Plugins/DasForUE/Source/DasRuntime/Private/DasBindingExport.inl','Plugins/DasForUE/Source/DasRuntime/Private/DasScriptUserWidget.cpp','Plugins/DasForUE/Source/DasRuntime/Public/DasInputEvents.h','Plugins/DasForUE/Tests/Editor/Private/DasInputNavigationCommandlet.cpp','Plugins/DasForUE/Tests/Editor/Public/DasInputNavigationCommandlet.h','Scripts/GenerateBindings.py','Bindings/InputNavigation.contract.json','Tests/InputNavigation/probe.das')){$Sources[$File]=(Get-FileHash "$Repo/$File" -Algorithm SHA256).Hash}
 $Dlls=@{};foreach($Name in @('DasRuntime','DasEditor')){$Path="$Repo/Tests/DasForUESmoke/Binaries/Win64/UnrealEditor-$Name.dll";$Dlls[$Path]=(Get-FileHash $Path -Algorithm SHA256).Hash}
 $Manifest="$Engine/Engine/Binaries/Win64/UnrealEditor.modules";$BuildId=(Get-Content $Manifest -Raw|ConvertFrom-Json).BuildId
 & "$PSScriptRoot/GenerateApiPackage.ps1" -Engine $Engine -Profile "$Repo/Bindings/Packages/UMGInput.profile.json" -SkipBuild -Publish:$Publish|Tee-Object -Variable Output
@@ -16,7 +16,11 @@ $ReportPath=$Match.Groups[1].Value.Trim();$Stage=Split-Path -Parent $ReportPath;
 $Contract=Get-Content "$Repo/Bindings/InputNavigation.contract.json" -Raw|ConvertFrom-Json
 $Opened=@($Report.members|Where-Object {$_.status -eq 'generation_ready'}|ForEach-Object {$_.class+'.'+$_.function})
 foreach($Function in $Contract.functions){if($Function -notin $Opened){throw "Navigation function not opened: $Function"}}
-if($Report.counts.generation_ready -ne 407 -or $Report.counts.export_blocked -ne 110 -or $Report.counts.generation_blocked -ne 0){throw 'Unexpected Navigation coverage'}
+$CoverageBaseline=Get-Content "$Repo/Bindings/Packages/ue_api_umg_input.summary.json" -Raw|ConvertFrom-Json
+if($CoverageBaseline.package -ne $Report.package -or $CoverageBaseline.engine_version -ne $Report.engine_version){throw 'Navigation coverage baseline targets a different package/engine'}
+foreach($Counter in @('generation_ready','export_blocked','generation_blocked','policy_excluded')) {
+ if($Report.counts.$Counter -ne $CoverageBaseline.counts.$Counter){throw "Unexpected Navigation coverage: $Counter"}
+}
 $Scripts="$Repo/Plugins/DasForUE/Content/Das/Scripts";$Name='navigation_probe_'+[guid]::NewGuid().ToString('N')+'.das';$Probe="$Scripts/$Name";$Source=Get-Content "$Repo/Tests/InputNavigation/probe.das" -Raw;$TemporaryModule=$null
 if(!$Publish){
  $Source=$Source.Replace('require ue_api_umg_input','require '+$Report.staged_module);$ModulePath="$Scripts/$($Report.staged_module).das"

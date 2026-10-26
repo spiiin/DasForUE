@@ -55,7 +55,7 @@ if($ProjectMode){
     foreach($File in @($HeaderOutput,$ModuleOutput,$IROutput)){New-Item -ItemType Directory -Path (Split-Path -Parent $File) -Force|Out-Null}
     $Pairs=@(@($IR,$IROutput),@($Header,$HeaderOutput),@($Module,$ModuleOutput))
 }else{
-$Pairs=@(@($IR,"$Repo\Bindings\NativeGameplay.json"),@($Header,"$Repo\Plugins\DasForUE\Source\DasRuntime\Private\Generated\DasNativeGameplay.generated.h"),@($Module,"$Repo\Plugins\DasForUE\Content\Das\Scripts\ue_native_gameplay.das"))
+$Pairs=@(@($IR,"$Repo\Bindings\NativeGameplay.json"),@($Header,"$Repo\Plugins\DasForUE\Tests\Runtime\Private\Generated\DasNativeGameplay.generated.h"),@($Module,"$Repo\Plugins\DasForUE\Content\Das\Scripts\ue_native_gameplay.das"))
 }
 # Artifacts are written with LF, as the repository stores them (.gitattributes eol=lf): Python and the
 # engine's JSON writer produce CRLF on Windows.
@@ -67,3 +67,10 @@ foreach($Pair in $Pairs){
 }
 if(!$SkipBuild -and !$Check){Build-NativeRegistry 'registry'}
 Write-Output 'DAS_NATIVE_GAMEPLAY_ARTIFACTS=PASS'
+
+if(!$ProjectMode){
+    $RuntimeArguments=@()
+    if($Check){$RuntimeArguments+='--check'}
+    & C:\Python312\python.exe (Join-Path $PSScriptRoot 'GenerateRuntimeBindings.py') @RuntimeArguments
+    if($LASTEXITCODE){throw 'Runtime binding generation failed'}
+}

@@ -17,6 +17,7 @@ import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SOURCE = os.path.join(ROOT, "Plugins", "DasForUE", "Source")
+TEST_SOURCE = os.path.join(ROOT, "Plugins", "DasForUE", "Tests")
 MAX_LINE = 400  # limit for new lines; string literals may exceed ColumnLimit
 
 
@@ -46,10 +47,10 @@ def source_files(staged):
             cwd=ROOT, capture_output=True, text=True, check=True).stdout.split()
         files = [os.path.join(ROOT, f) for f in out]
     else:
-        files = [os.path.join(r, f) for r, _, fs in os.walk(SOURCE) for f in fs]
+        files = [os.path.join(r, f) for base in (SOURCE, TEST_SOURCE) for r, _, fs in os.walk(base) for f in fs]
     return [f for f in files
             if f.endswith((".cpp", ".h", ".inl")) and not is_generated(f)
-            and os.path.abspath(f).startswith(SOURCE)]
+            and any(os.path.abspath(f).startswith(base + os.sep) for base in (SOURCE, TEST_SOURCE))]
 
 
 def main():

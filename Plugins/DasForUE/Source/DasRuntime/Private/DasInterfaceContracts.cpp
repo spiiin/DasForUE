@@ -1,4 +1,4 @@
-#include "UObject/TextProperty.h"
+#include "DasAuthoredInterfaceClass.h"
 #include "DasTypeAdapters.h"
 #include "DasInterfaceContracts.h"
 #include "DasSchema.h"
@@ -6,49 +6,44 @@
 #include "UObject/Class.h"
 #include "UObject/UnrealType.h"
 #include "UObject/NoExportTypes.h"
-namespace
+FString DasInterfaceStableId(const UClass* Interface)
 {
-bool InterfacePropertyMatches(FProperty* P, EDasMethodSignature K, const FString& Path)
-{
-    if (!P)
-        return false;
-    if (K == EDasMethodSignature::Struct)
-    {
-        if (auto* C = DasContainerProperty(Path))
-            return C->SameType(P);
-        auto* S = CastField<FStructProperty>(P);
-        return S && S->Struct->GetPathName() == Path;
-    }
-    if (K == EDasMethodSignature::Class)
-    {
-        auto* C = CastField<FClassProperty>(P);
-        return C && C->MetaClass && C->MetaClass->GetPathName() == Path;
-    }
-    if (K == EDasMethodSignature::Object)
-    {
-        auto* C = DasReferencePropertyClass(P);
-        return C && C->GetPathName() == Path;
-    }
-    if (K == EDasMethodSignature::Enum)
-    {
-        auto* E = DasEnumPropertyType(P);
-        return E && E->GetPathName() == Path;
-    }
-    if (const auto* Adapter = FDasTypeAdapters::Get().FindSignature(K))
-    {
-        auto* S = CastField<FStructProperty>(P);
-        return S && S->Struct == Adapter->GetStruct();
-    }
-    return K == EDasMethodSignature::Byte     ? (P->IsA<FByteProperty>() && !DasEnumPropertyType(P))
-           : K == EDasMethodSignature::Text   ? P->IsA<FTextProperty>()
-           : K == EDasMethodSignature::Int    ? P->IsA<FIntProperty>()
-           : K == EDasMethodSignature::Float  ? P->IsA<FFloatProperty>()
-           : K == EDasMethodSignature::Double ? P->IsA<FDoubleProperty>()
-           : K == EDasMethodSignature::Bool   ? P->IsA<FBoolProperty>()
-           : K == EDasMethodSignature::String ? P->IsA<FStrProperty>()
-           : K == EDasMethodSignature::Name   ? P->IsA<FNameProperty>()
-                                              : false;
+    const auto* Authored = Cast<UDasAuthoredInterfaceClass>(Interface);
+    return Authored ? Authored->StableId : FString();
 }
+bool DasInterfaceIdentityMatches(const UClass* Interface, const FString* ExpectedStableId)
+{
+    if (!Interface || !Interface->HasAnyClassFlags(CLASS_Interface))
+        return false;
+    const auto* Authored = Cast<UDasAuthoredInterfaceClass>(Interface);
+    if (Authored)
+        return !Authored->StableId.IsEmpty() && (!ExpectedStableId || *ExpectedStableId == Authored->StableId);
+    return !ExpectedStableId || ExpectedStableId->IsEmpty();
+}
+bool DasImplementsInterface(const UClass* Class, const UClass* Interface)
+{
+    return Class && DasInterfaceIdentityMatches(Interface) && Class->ImplementsInterface(Interface);
+}
+UFunction* DasResolveInterfaceFunction(UObject* Object, UClass* Interface, FName Name, FString& Error)
+{
+    if (!Object || !DasImplementsInterface(Object->GetClass(), Interface))
+    {
+        Error = TEXT("object does not implement requested interface");
+        return nullptr;
+    }
+    auto* Declared = Interface->FindFunctionByName(Name);
+    auto* Actual = Object->FindFunction(Name);
+    if (!Declared || !Declared->HasAnyFunctionFlags(FUNC_BlueprintEvent) || !Actual)
+    {
+        Error = TEXT("reflected interface implementation is unavailable");
+        return nullptr;
+    }
+    if (!Actual->IsSignatureCompatibleWith(Declared))
+    {
+        Error = TEXT("interface dispatch signature mismatch");
+        return nullptr;
+    }
+    return Actual;
 }
 bool ValidateDasInterfaceContracts(const FDasClassSchema& Schema, FString& Error)
 {
@@ -59,7 +54,7 @@ bool ValidateDasInterfaceContracts(const FDasClassSchema& Schema, FString& Error
     {
         auto* I = FindObject<UClass>(nullptr, *Path);
         if ((!Path.StartsWith(TEXT("/Script/")) && !Path.StartsWith(TEXT("/Game/"))) || !I ||
-              !I->HasAnyClassFlags(CLASS_Interface) || Seen.Contains(Path))
+              !DasInterfaceIdentityMatches(I) || Seen.Contains(Path))
         {
             Error = TEXT("Expected unique loaded native UInterface: ")+ Path;
             return false;
@@ -107,11 +102,10 @@ bool ValidateDasInterfaceContracts(const FDasClassSchema& Schema, FString& Error
                 Error = TEXT("Interface parameter count mismatch: ")+ F->GetName();
                 return false;
             }
-            bool HasOutput = F->GetReturnProperty() != nullptr;
             for (const auto& P : Params)
             {
                 auto* Actual = F->FindPropertyByName(P.Name);
-                if (!InterfacePropertyMatches(Actual, P.Kind, P.ClassPath))
+                if (!DasPropertyMatchesContract(Actual, P.Kind, P.ClassPath))
                 {
                     Error =
                         TEXT("Interface parameter type/name mismatch: ")+ F->GetName() + TEXT(".")+ P.Name.ToString();
@@ -126,11 +120,10 @@ bool ValidateDasInterfaceContracts(const FDasClassSchema& Schema, FString& Error
                     Error = TEXT("Interface parameter direction mismatch: ")+ F->GetName();
                     return false;
                 }
-                HasOutput |= Direction != TEXT("in");
             }
             if (M->Contract().ReturnKind == EDasMethodSignature::Void
                     ? F->GetReturnProperty() != nullptr
-                    : !InterfacePropertyMatches(F->GetReturnProperty(), M->Contract().ReturnKind, M->ReturnClass))
+                    : !DasPropertyMatchesContract(F->GetReturnProperty(), M->Contract().ReturnKind, M->ReturnClass))
             {
                 Error = TEXT("Interface return type mismatch: ")+ F->GetName();
                 return false;

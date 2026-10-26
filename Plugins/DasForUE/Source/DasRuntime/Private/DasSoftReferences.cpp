@@ -169,3 +169,46 @@ void ResetDasSoftCarriers()
         Pair.Value->RemoveFromRoot();
     SoftCarriers.Empty();
 }
+
+// A family owns all dynamically constrained soft object/class carriers. Only carriers created by
+// DasSoftCarrier are recognised; a matching-looking name or arbitrary one-field struct is insufficient.
+class FDasSoftReferenceAdapter final : public IDasTypeAdapter
+{
+public:
+    EDasTypeKind GetKind() const override { return EDasTypeKind::Struct; }
+    void GetSupportSamples(TArray<FDasDeclaredType>& Out) const override
+    {
+        for (bool ClassReference : {false, true})
+        {
+            FString Error;
+            if (const auto* Carrier = DasSoftCarrier(UObject::StaticClass(), ClassReference, Error))
+            {
+                FDasDeclaredType Type;
+                Type.Kind = TEXT("struct");
+                Type.TypePath = Carrier->GetPathName();
+                Out.Add(MoveTemp(Type));
+            }
+        }
+    }
+    bool IsReferenceValue() const override { return true; }
+    bool IsStructFamily() const override { return true; }
+    bool MatchesStructPath(const FString& Path) const override { return DasSoftProperty(Path) != nullptr; }
+    bool MatchesProperty(const FProperty* Property) const override
+    {
+        return CastField<FSoftObjectProperty>(Property) != nullptr;
+    }
+    bool IsLeafValue() const override { return true; }
+    EDasAdapterDefault GetDefaultPolicy() const override { return EDasAdapterDefault::ImplicitEmpty; }
+    const TCHAR* GetStructFieldDefault() const override { return TEXT("None"); }
+    FProperty* GetCarrierProperty(const FString& Path) const override { return DasSoftProperty(Path); }
+    FProperty* MakeProperty(FFieldVariant Owner, FName Name, const FDasDeclaredType& Type,
+                            EDasPropertyUsage) const override
+    {
+        const auto* Prototype = DasSoftProperty(Type.TypePath);
+        return Prototype ? CreateDasSoftProperty(Owner, Name, Prototype) : nullptr;
+    }
+};
+TSharedRef<const IDasTypeAdapter> MakeDasSoftReferenceAdapter()
+{
+    return MakeShared<FDasSoftReferenceAdapter>();
+}

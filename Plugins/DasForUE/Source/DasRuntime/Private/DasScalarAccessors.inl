@@ -352,18 +352,7 @@ FDasStructValue StructWithScalar(const FDasStructValue& H, const char* Path, typ
 }
 
 // Struct snapshot maps with scalar keys and values.
-template <class KK, class VK>
-typename VK::Out StructMapGetScalar(const FDasStructValue& H, const char* Path, typename KK::In Key, das::Context* C)
-{
-    return VK::ToDas(StructScalarMapGet<typename VK::Property>(H, Path, KK::FromDas(Key, C), KK::SnapshotKind, C), C);
-}
-template <class KK, class VK>
-FDasStructValue StructMapWithScalar(const FDasStructValue& H, const char* Path, typename KK::In Key,
-                                    typename VK::In Value, das::Context* C, das::LineInfoArg* At)
-{
-    return StructScalarMapWith<typename VK::Property>(H, Path, KK::FromDas(Key, C), VK::FromDas(Value, C),
-                                                      KK::SnapshotKind, C, At);
-}
+
 
 // Scalar members of self struct properties, read and written in place. The former lowering copied the
 // whole struct into a snapshot, changed one leaf and wrote the snapshot back.
@@ -515,33 +504,6 @@ inline void SelfContainerClear(const char* Name, das::Context* C)
     else
         C->throw_error("self property is not a container");
 }
-// A missing key reads as the default value: daScript adds it on a compound assignment, which then writes it.
-template <class KK, class VK> typename VK::Out SelfMapGet(const char* Name, typename KK::In Key, das::Context* C)
-{
-    UObject* Self = nullptr;
-    auto* M = SelfContainer<FMapProperty>(Self, Name, false, C);
-    SelfContainerElement<KK>(M->KeyProp, C);
-    auto* V = SelfContainerElement<VK>(M->ValueProp, C);
-    const TDasKindNative<KK> NativeKey = KK::FromDas(Key, C);
-    FScriptMapHelper H(M, M->ContainerPtrToValuePtr<void>(Self));
-    if (const uint8* Found = H.FindValueFromHash(&NativeKey))
-        return VK::ToDas(V->GetPropertyValue(Found), C);
-    return VK::ToDas(TDasKindNative<VK>(), C);
-}
-template <class KK, class VK>
-void SelfMapSet(const char* Name, typename KK::In Key, typename VK::In Value, das::Context* C)
-{
-    UObject* Self = nullptr;
-    auto* M = SelfContainer<FMapProperty>(Self, Name, true, C);
-    SelfContainerElement<KK>(M->KeyProp, C);
-    SelfContainerElement<VK>(M->ValueProp, C);
-    const TDasKindNative<KK> NativeKey = KK::FromDas(Key, C);
-    const TDasKindNative<VK> NativeValue = VK::FromDas(Value, C);
-    FScriptMapHelper H(M, M->ContainerPtrToValuePtr<void>(Self));
-    if (!H.FindValueFromHash(&NativeKey))
-        SelfContainerGrow(H.Num(), false, C);
-    H.AddPair(&NativeKey, &NativeValue);
-}
 template <class KK> bool SelfMapErase(const char* Name, typename KK::In Key, das::Context* C)
 {
     UObject* Self = nullptr;
@@ -648,23 +610,6 @@ struct FDasKindCallByte : FDasKindByteInt
     X(string, FDasKindString)                                                                                          \
     X(name, FDasKindName)                                                                                              \
     X(byte, FDasKindByte)
-// ", Kind" per scalar kind, to list the kinds as template arguments.
-#define DAS_SCALAR_KIND_TYPE(Suffix, SelfKind, RefKind) , SelfKind
-
-// __ue_self_map_get/set_<key>_<value> for every scalar value kind.
-template <class KK, class... VK>
-void AddSelfMapAccessors(das::Module& Module, const das::ModuleLibrary& Library, const char* Key)
-{
-    (AddUEExtern<DAS_BIND_FUN((SelfMapGet<KK, VK>))>(
-         Module, Library, (das::string("__ue_self_map_get_") + Key + "_" + TCHAR_TO_UTF8(VK::Name)).c_str(),
-         das::SideEffects::modifyExternal, "SelfMapGet"),
-                 ...);
-    (AddUEExtern<DAS_BIND_FUN((SelfMapSet<KK, VK>))>(
-         Module, Library, (das::string("__ue_self_map_set_") + Key + "_" + TCHAR_TO_UTF8(VK::Name)).c_str(),
-         das::SideEffects::modifyExternal, "SelfMapSet"),
-                 ...);
-}
-
 // DSL lowering looks kinds up by declared type name ("int", "text", ...).
 // Suffix of a scalar kind with struct-leaf accessors, or nullptr.
 inline const char* DasScalarKindSuffix(const FString& Kind)

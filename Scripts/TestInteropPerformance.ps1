@@ -7,7 +7,7 @@ Import-Module (Join-Path $PSScriptRoot 'DasTest.psm1') -Force
 $Das=Get-DasContext -Engine $Engine
 if (!$SkipAotGeneration) {
     if (!$SkipBuild) {Invoke-DasBuild $Das -Name 'Interop AOT generator'}
-    $Generated=Join-Path $Das.Repo 'Plugins\DasForUE\Source\DasRuntime\Private\Generated\InteropAot.cpp'
+    $Generated=Join-Path $Das.Repo 'Plugins\DasForUE\Tests\Runtime\Private\Generated\InteropAot.cpp'
     Invoke-DasCommandlet $Das -Run DasUEAot -Name 'interop-aot-generate' -Marker 'DAS_UE_AOT_GENERATED=PASS' `
         -Arguments @('-Script=interop_aot.das',"-Output=$Generated") | Out-Null
     Invoke-DasBuild $Das -Name 'Link interop AOT' -Log (Join-Path $Das.Logs 'interop-aot-link.log')

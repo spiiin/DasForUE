@@ -5,7 +5,7 @@
 #include "GameFramework/Pawn.h"
 #include "GameFramework/Character.h"
 #include "DasAuthoring.h"
-#include "DasProbeActor.h"
+#include "DasActor.h"
 #include "DasScriptComponent.h"
 #include "Components/SceneComponent.h"
 #include "UObject/UnrealType.h"
@@ -16,6 +16,11 @@ UClass* DasNativeDefaultBase(const FString& Parent)
         return UWorldSubsystem::StaticClass();
     if (Parent == TEXT("/Script/Engine.GameInstanceSubsystem"))
         return UGameInstanceSubsystem::StaticClass();
+
+#if DAS_WITH_TEST_PROBES
+    if (Parent == TEXT("/Script/DasRuntime.DasProbeActor"))
+        return DasNativeScriptHost(Parent);
+#endif
     return Parent == TEXT("/Script/Engine.Actor")
                           ? AActor::StaticClass()
                           : Parent == TEXT("/Script/Engine.Pawn")

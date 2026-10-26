@@ -1,9 +1,10 @@
+#include "DasTypeAdapters.h"
 #include "DasEventReplyTransport.h"
 #include "Components/SlateWrapperTypes.h"
 #include "UObject/Class.h"
 bool DasIsEventReplyType(const UScriptStruct* Type)
 {
-    return Type == FEventReply::StaticStruct();
+    return DasHasNativeRole(Type, EDasNativeTypeRole::EventReply);
 }
 bool DasEventReplyFunctionAllowed(const UFunction* F)
 {

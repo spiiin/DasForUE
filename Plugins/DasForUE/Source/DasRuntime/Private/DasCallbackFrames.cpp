@@ -1,6 +1,8 @@
+#include "DasInterfaceContracts.h"
 #include "DasCallbackFrames.h"
 #include "DasPerceptionTypes.h"
 #include "DasCallbackTypes.h"
+#include "DasTypeContracts.h"
 #include "DasDelegateSignatures.h"
 #include "UObject/StrongObjectPtr.h"
 #include "DasContainerRegistry.h"
@@ -39,7 +41,7 @@ bool Compatible(FProperty* Source, FProperty* Target)
     {
         auto* Actual = DasReferencePropertyClass(Source);
         return Actual && (Actual == Expected ||
-                          (Expected->HasAnyClassFlags(CLASS_Interface) ? Actual->ImplementsInterface(Expected)
+                          (Expected->HasAnyClassFlags(CLASS_Interface) ? DasImplementsInterface(Actual, Expected)
                                                                        : Actual->IsChildOf(Expected)));
     }
     if (auto* Expected = DasEnumPropertyType(Target))
@@ -221,6 +223,8 @@ bool ValidateDasCallbackSignature(UFunction* Signature, const TArray<FDasDeclare
         FDasDeclaredParameter P;
         P.Name = FString::Printf(TEXT("arg_%d"), I);
         P.Type = Arguments[I];
+        if (!ValidateDasTypeUse(P.Type, EDasTypeUse::QueuedEvent, Error))
+            return false;
         M.Parameters.Add(P);
     }
     TStrongObjectPtr<UFunction> Expected(MakeDasDelegateSignature(M, false, GetTransientPackage(), NAME_None, Error));

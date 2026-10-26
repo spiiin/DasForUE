@@ -12,8 +12,8 @@
 
 TAutoConsoleVariable<int32> CVarScriptFunctionFastPath(
     TEXT("das.ScriptFunctionFastPath"), 1,
-    TEXT("1: a TDasFunction calls its function directly while its owner's session and script are unchanged; ")
-        TEXT("0: every call takes the full persistent call path (for comparisons)."));
+         TEXT("1: a TDasFunction calls its function directly while its owner's session and script are unchanged; ")
+             TEXT("0: every call takes the full persistent call path (for comparisons)."));
 
 uint64 GDasScriptFunctionFastCalls = 0;
 uint64 DasScriptFunctionFastCalls()
@@ -25,8 +25,12 @@ uint64 DasScriptFunctionFastCalls()
 FString DasScriptTypeName(EDasMethodSignature Kind)
 {
     const IDasScriptTypeFacet* Facet = DasTypedCallFacet(Kind);
-    if (const auto* Adapter = FDasTypeAdapters::Get().FindSignature(Kind))
-        for (const auto& Entry : FDasTypeAdapters::Get().Entries())
+    const auto& Registry = FDasTypeAdapters::Get();
+    const auto* Adapter = Registry.FindSignature(Kind);
+    if (!Adapter)
+        Adapter = Registry.FindKind(DasTypeKindOf(Kind));
+    if (Adapter)
+        for (const auto& Entry : Registry.Entries())
             if (&*Entry.Adapter == Adapter)
                 Facet = Entry.Script;
     return Facet && Facet->GetHandleName() ? FString(UTF8_TO_TCHAR(Facet->GetHandleName())) : FString(TEXT("?"));
@@ -223,8 +227,8 @@ bool Eval(das::Context& Context, das::SimFunction* Function, TArrayView<const FD
     alignas(16) uint8 ReturnedMath[MathSlot] = {};
     const int32 ResultMathSize = MathSize(Result.Kind);
     void* Cmres = Result.Kind == EDasMethodSignature::Object ? static_cast<void*>(&ReturnedObject)
-                  : ResultMathSize                          ? static_cast<void*>(ReturnedMath)
-                                                            : nullptr;
+                  : ResultMathSize                           ? static_cast<void*>(ReturnedMath)
+                                                             : nullptr;
     const vec4f Value = Context.evalWithCatch(Function, Arguments.Num() ? Packed : nullptr, Cmres);
     if (Context.getException())
         return false;
@@ -296,8 +300,8 @@ bool Eval(das::Context& Context, das::SimFunction* Function, TArrayView<const FD
 
 // The fast path: false when it does not apply (the caller takes the full path), otherwise the call's result.
 bool FDasRuntimeModule::CallScriptSite(FDasScriptCallSite& Site, UObject* Owner, const FString& Entry,
-                                       TArrayView<const FDasScriptArgument> Arguments,
-                                       const FDasScriptArgument& Result, FString& Error, bool& bTaken)
+                                       TArrayView<const FDasScriptArgument> Arguments, const FDasScriptArgument& Result,
+                                       FString& Error, bool& bTaken)
 {
     bTaken = false;
     FPersistentSession* Session = Site.Session;
@@ -358,9 +362,8 @@ bool FDasRuntimeModule::CallScriptSite(FDasScriptCallSite& Site, UObject* Owner,
     }
 }
 
-bool FDasRuntimeModule::CallScriptFunction(TSharedPtr<FDasScriptCallSite>& Site, UObject* Owner,
-                                           const FString& Script, const FString& Entry,
-                                           TArrayView<const FDasScriptArgument> Arguments,
+bool FDasRuntimeModule::CallScriptFunction(TSharedPtr<FDasScriptCallSite>& Site, UObject* Owner, const FString& Script,
+                                           const FString& Entry, TArrayView<const FDasScriptArgument> Arguments,
                                            const FDasScriptArgument& Result, FString& Error)
 {
     if (!IsValid(Owner))
@@ -414,6 +417,6 @@ bool DasCallScriptFunction(TSharedPtr<FDasScriptCallSite>& Site, UObject* Owner,
                            const FString& Entry, TArrayView<const FDasScriptArgument> Arguments,
                            const FDasScriptArgument& Result, FString& Error)
 {
-    return FModuleManager::LoadModuleChecked<FDasRuntimeModule>(TEXT("DasRuntime"))
-        .CallScriptFunction(Site, Owner, Script, Entry, Arguments, Result, Error);
+    return FModuleManager::LoadModuleChecked<FDasRuntimeModule>(
+        TEXT("DasRuntime")).CallScriptFunction(Site, Owner, Script, Entry, Arguments, Result, Error);
 }

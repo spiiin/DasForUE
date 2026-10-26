@@ -1,8 +1,9 @@
 options gen2
+require ue_probe_actor
 options gc
 require ue_enhanced_input
 
-[ue_class(module_id="vector2d",Blueprintable)]
+[ue_class(module_id="vector2d",Blueprintable,parent="/Script/DasRuntime.DasProbeActor")]
 class Vector2DActor {
     @ue_property=(EditAnywhere,BlueprintReadWrite)
     Position:UEVector2D=ue_vector2d(0.0lf,0.0lf)

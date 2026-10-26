@@ -414,39 +414,19 @@ struct FUEClassAnnotation : das::StructureAnnotation
                 if (!F.type || F.type->ref || FieldType.IsEmpty() || FieldType == TEXT("void"))
                     DSLFail(TEXT("Adapter supports int/float/bool/string/double/name properties: ")+ P.Name);
                 P.Type.Kind = FieldType;
-                if (DSLSoft(F.type))
+                if (const auto* Adapted = DSLValueAdapter(F.type);
+                    Adapted && Adapted->Script->DeclareProperty(F.type, F, TypeScope, P))
                 {
-                    P.Type.Kind = TEXT("struct");
-                    P.Type.TypePath = DSLSoftPath(F.type);
-                    if (F.init)
-                    {
-                        if (F.init->__rtti != das::string("ExprCallMacro"))
-                            DSLFail(TEXT("Soft defaults require ue_soft(type<SoftType>, literal_path)"));
-                        auto* Init = static_cast<das::ExprCallMacro*>(F.init);
-                        if (Init->name != "ue_soft" || Init->arguments.size() != 2 ||
-                            Init->arguments[1]->__rtti != das::string("ExprConstString"))
-                            DSLFail(TEXT("Soft default path must be a string literal"));
-                        if (!Init->arguments[0]->rtti_isTypeDecl())
-                            DSLFail(TEXT("Soft default requires a type argument"));
-                        auto DefaultType = DSLObjectNormalize(
-                            static_cast<das::ExprTypeDecl*>(Init->arguments[0])->typeexpr, Group, St->module);
-                        if (!DSLSoft(DefaultType) || DSLSoftPath(DefaultType) != P.Type.TypePath)
-                            DSLFail(TEXT("Soft default type must match field type"));
-                        auto* Text = static_cast<das::ExprConstString*>(Init->arguments[1]);
-                        FString Issue;
-                        if (!ValidateDasSoftPath(DSLText(Text->text), Issue))
-                            DSLFail(Issue);
-                        auto Object = MakeShared<FJsonObject>();
-                        Object->SetStringField(TEXT("Values"), DSLText(Text->text));
-                        P.Default.Kind = TEXT("string");
-                        FJsonSerializer::Serialize(Object, TJsonWriterFactory<>::Create(&P.Default.String));
-                    }
-                    C.Properties.Add(P);
+                    C.Properties.Add(MoveTemp(P));
                     continue;
                 }
-                if (FieldType == TEXT("text"))
+                if (const auto* Adapted = DSLValueAdapter(F.type);
+                    Adapted && Adapted->Adapter->GetKind() != EDasTypeKind::Enum &&
+                    Adapted->Script->ParseDefault(EDasScriptDefaultUse::Property, F.type, F.init, Group, St->module,
+                                                  P.Default))
                 {
-                    P.Default = DSLTextDefault(F.init);
+                    if (Adapted->Adapter->GetKind() == EDasTypeKind::Struct)
+                        P.Type.TypePath = DSLAdaptedPath(F.type);
                     C.Properties.Add(P);
                     continue;
                 }
@@ -454,23 +434,6 @@ struct FUEClassAnnotation : das::StructureAnnotation
                 {
                     P.Default = DSLByteDefault(F.init);
                     C.Properties.Add(P);
-                    continue;
-                }
-                if (FieldType == TEXT("class"))
-                {
-                    if (DSLTypedClass(F.type))
-                    {
-                        const FString Inferred = DSLTypedClassPath(F.type);
-                        if (!P.Type.TypePath.IsEmpty() && P.Type.TypePath != Inferred)
-                            DSLFail(TEXT("Conflicting typed class property constraint"));
-                        P.Type.TypePath = Inferred;
-                    }
-                    auto* Base = FindObject<UClass>(nullptr, *P.Type.TypePath);
-                    if (!P.Type.TypePath.StartsWith(TEXT("/Script/")) || !Base ||
-                                                    Base->HasAnyClassFlags(CLASS_Interface))
-                        DSLFail(TEXT("Class property requires ue_class_base with loaded native base"));
-                    P.Default = DSLReferencePropertyDefault(F, true);
-                    C.Properties.Add(MoveTemp(P));
                     continue;
                 }
                 if (DSLContainer(F.type))
@@ -494,27 +457,12 @@ struct FUEClassAnnotation : das::StructureAnnotation
                     C.Properties.Add(P);
                     continue;
                 }
-                if (DSLDirectEnum(F.type))
+                if (DSLTypedValue(F.type, EDasTypeKind::Enum))
                 {
                     P.Type.TypePath = DSLDirectPath(F.type, TypeFolder, TypeRegistry);
                     P.Default.Kind = TEXT("string");
-                    if (F.init && F.init->__rtti == das::string("ExprConstEnumeration"))
-                        P.Default.String = DSLText(static_cast<das::ExprConstEnumeration*>(F.init)->text);
-                    else if (F.init && F.init->rtti_isField())
-                    {
-                        auto* Init = static_cast<das::ExprField*>(F.init);
-                        if (!Init->value || !Init->value->rtti_isVar() ||
-                            static_cast<das::ExprVar*>(Init->value)->name != F.type->enumType->name)
-                            DSLFail(TEXT("Direct enum initializer must name its declared enum"));
-                        P.Default.String = DSLText(Init->name);
-                    }
-                    else
-                        DSLFail(TEXT("Direct enum property requires named enum literal initializer: ")+
-                                     (F.init ? DSLText(F.init->__rtti) : TEXT("none")));
-                    if (P.Default.String.Contains(TEXT(".")))
-                        P.Default.String = P.Default.String.RightChop(P.Default.String.Find(TEXT(".")) + 1);
-                    if (P.Default.String.Contains(TEXT("::")))
-                        P.Default.String = P.Default.String.RightChop(P.Default.String.Find(TEXT("::")) + 2);
+                    DSLValueAdapter(F.type)->Script->ParseDefault(EDasScriptDefaultUse::Property, F.type, F.init, Group,
+                                                                  St->module, P.Default);
                     FString Issue;
                     auto* E = ResolveDasEnum(P.Type.TypePath, Issue);
                     if (!E || !ValidateDasEnumNumber(P.Type.TypePath, E->GetValueByNameString(P.Default.String), Issue))
@@ -566,49 +514,8 @@ struct FUEClassAnnotation : das::StructureAnnotation
                 }
                 if (FieldType == TEXT("enum"))
                 {
-                    if (!F.init || !F.init->rtti_isCall())
-                        DSLFail(TEXT("Enum field requires ue_enum_value(path, member)"));
-                    auto* Call = static_cast<das::ExprCall*>(F.init);
-                    if (Call->name != "ue_enum_value" || Call->arguments.size() != 2 ||
-                        Call->arguments[0]->__rtti != das::string("ExprConstString") ||
-                        Call->arguments[1]->__rtti != das::string("ExprConstString"))
-                        DSLFail(TEXT("Enum initializer requires literal path/member"));
-                    P.Type.TypePath = DSLResolveType(
-                        EDSLTypeKind::Enum, DSLText(static_cast<das::ExprConstString*>(Call->arguments[0])->text),
-                        TypeScope);
-                    static_cast<das::ExprConstString*>(Call->arguments[0])->text = DSLUtf8(P.Type.TypePath);
-                    P.Default.Kind = TEXT("string");
-                    P.Default.String = DSLText(static_cast<das::ExprConstString*>(Call->arguments[1])->text);
-                    FString Issue;
-                    auto* E = ResolveDasEnum(P.Type.TypePath, Issue);
-                    if (!E || !ValidateDasEnumNumber(P.Type.TypePath, E->GetValueByNameString(P.Default.String), Issue))
-                        DSLFail(Issue);
+                    DSLRawEnumProperty(F.init, TypeScope, P.Type, P.Default);
                     C.Properties.Add(P);
-                    continue;
-                }
-                if (DSLTypedReference(F.type))
-                {
-                    P.Type.TypePath = DSLTypedReferencePath(F.type);
-                    if (DSLAuthoredView(F.type))
-                        P.Type.AuthoredId = DSLReferenceDeclaration(F.type).Id;
-                    P.Default = DSLReferencePropertyDefault(F, false);
-                    C.Properties.Add(MoveTemp(P));
-                    continue;
-                }
-                if (FieldType == TEXT("object"))
-                {
-                    if (!F.init || !F.init->rtti_isCall())
-                        DSLFail(TEXT("Object field requires literal ue_object_value(native_class_path) initializer"));
-                    auto* Call = static_cast<das::ExprCall*>(F.init);
-                    if (Call->name != "ue_object_value" || Call->arguments.size() != 1 ||
-                        Call->arguments[0]->__rtti != das::string("ExprConstString"))
-                        DSLFail(TEXT("Object field initializer requires one literal native class path"));
-                    P.Type.TypePath = DSLResolveType(
-                        EDSLTypeKind::Class, DSLText(static_cast<das::ExprConstString*>(Call->arguments[0])->text),
-                        TypeScope);
-                    static_cast<das::ExprConstString*>(Call->arguments[0])->text = DSLUtf8(P.Type.TypePath);
-                    P.Default.Kind = TEXT("null");
-                    C.Properties.Add(MoveTemp(P));
                     continue;
                 }
                 if (FieldType == TEXT("struct"))
@@ -654,15 +561,6 @@ struct FUEClassAnnotation : das::StructureAnnotation
                     {
                         P.Default.Kind = TEXT("string");
                         P.Default.String = DSLText(static_cast<das::ExprConstString*>(F.init)->text);
-                    }
-                    else if (P.Type.GetKind() == EDasTypeKind::Name && F.init->rtti_isCall())
-                    {
-                        auto* Call = static_cast<das::ExprCall*>(F.init);
-                        if (Call->name != "ue_name_value" || Call->arguments.size() != 1 ||
-                            Call->arguments[0]->__rtti != das::string("ExprConstString"))
-                            DSLFail(TEXT("Name default requires ue_name_value with literal string"));
-                        P.Default.Kind = TEXT("string");
-                        P.Default.String = DSLText(static_cast<das::ExprConstString*>(Call->arguments[0])->text);
                     }
                     else
                         DSLFail(TEXT("Only literal property defaults supported: ")+ P.Name);
@@ -805,11 +703,12 @@ struct FUEClassAnnotation : das::StructureAnnotation
                 }
                 if (ResultType == TEXT("enum"))
                 {
-                    M.ReturnType.TypePath = DSLConstraint(
-                        ObjectClasses,
-                        TEXT("return_enum"), EDSLTypeKind::Enum,
-                             DSLDirectEnum(F->result) ? DSLDirectPath(F->result, TypeFolder, TypeRegistry) : FString(),
-                             TypeScope);
+                    M.ReturnType.TypePath =
+                        DSLConstraint(ObjectClasses, TEXT("return_enum"), EDSLTypeKind::Enum,
+                                                          DSLTypedValue(F->result, EDasTypeKind::Enum)
+                                                              ? DSLDirectPath(F->result, TypeFolder, TypeRegistry)
+                                                              : FString(),
+                                                          TypeScope);
                     if (M.ReturnType.TypePath.IsEmpty())
                         DSLFail(TEXT("Enum result requires return_enum"));
                 }
@@ -867,9 +766,11 @@ struct FUEClassAnnotation : das::StructureAnnotation
                     if (K.IsEmpty() || K == TEXT("void"))
                         DSLFail(TEXT("Unsupported parameter type/ref/default: ")+ DSLText(V->name));
                     FDasDeclaredParameter P;
-                    P.Default = K == TEXT("text")
-                                          ? DSLTextDefault(V->init)
-                                          : K == TEXT("byte")? DSLByteDefault(V->init) : DSLParameterDefault(V->init);
+                    const auto* DefaultAdapter = DSLValueAdapter(V->type);
+                    if (!DefaultAdapter ||
+                        !DefaultAdapter->Script->ParseDefault(EDasScriptDefaultUse::Parameter, V->type, V->init, Group,
+                                                              St->module, P.Default))
+                        P.Default = K == TEXT("byte") ? DSLByteDefault(V->init) : DSLParameterDefault(V->init);
                     P.Direction = Direction;
                     Directions.Remove(DSLText(V->name));
                     P.Name = LegacySingle ? TEXT("Input"): DSLText(V->name);
@@ -890,10 +791,11 @@ struct FUEClassAnnotation : das::StructureAnnotation
                     if (K == TEXT("enum"))
                     {
                         const FString Key = TEXT("arg_")+ DSLText(V->name) + TEXT("_enum");
-                        P.Type.TypePath = DSLConstraint(
-                            ObjectClasses, Key, EDSLTypeKind::Enum,
-                            DSLDirectEnum(V->type) ? DSLDirectPath(V->type, TypeFolder, TypeRegistry) : FString(),
-                            TypeScope);
+                        P.Type.TypePath = DSLConstraint(ObjectClasses, Key, EDSLTypeKind::Enum,
+                                                        DSLTypedValue(V->type, EDasTypeKind::Enum)
+                                                            ? DSLDirectPath(V->type, TypeFolder, TypeRegistry)
+                                                            : FString(),
+                                                        TypeScope);
                         if (P.Type.TypePath.IsEmpty())
                             DSLFail(TEXT("Enum argument requires arg_name_enum"));
                     }
@@ -983,7 +885,7 @@ struct FUEClassAnnotation : das::StructureAnnotation
                 das::Structure::FieldDeclaration Handle;
                 Handle.flags = 0;
                 Handle.name = "handle";
-                Handle.type = DSLHandleType(Group, St->module, "UObjectHandle");
+                Handle.type = DSLPropertyType(TEXT("object"), Group, St->module, St->at);
                 Handle.at = St->at;
                 Ref->fields.push_back(Handle);
                 auto Annotations = Group.findAnnotation("ue_object_ref", St->module);
@@ -1011,7 +913,7 @@ struct FUEClassAnnotation : das::StructureAnnotation
                 das::Structure::FieldDeclaration Handle;
                 Handle.flags = 0;
                 Handle.name = "handle";
-                Handle.type = DSLHandleType(Group, St->module, "UObjectHandle");
+                Handle.type = DSLPropertyType(TEXT("object"), Group, St->module, St->at);
                 Handle.at = St->at;
                 Ref->fields.push_back(Handle);
                 auto Annotations = Group.findAnnotation("ue_object_ref", St->module);
@@ -1366,7 +1268,7 @@ struct FUEClassAnnotation : das::StructureAnnotation
                         DasTypeKind(Callback.ParameterKind) == EDasTypeKind::Struct)
                     {
                         const auto T = F->arguments[1]->type;
-                        if (!DSLDirectEnum(T) && !DSLDirectStruct(T) && !DSLContainer(T))
+                        if (!DSLTypedValue(T, EDasTypeKind::Enum) && !DSLDirectStruct(T) && !DSLContainer(T))
                             DSLFail(TEXT("Event value requires a concrete registered type/carrier"));
                         Callback.ParameterTypePath = DSLDirectPath(T, TypeFolder, TypeRegistry);
                         FString Issue;
@@ -1470,8 +1372,7 @@ struct FUEClassAnnotation : das::StructureAnnotation
                     const auto OriginalName = Arg->name;
                     const auto SourceType = DSLCopyType(Arg->type);
                     Arg->name = "__ue_event_raw_object";
-                    Arg->type =
-                        DSLHandleType(Group, St->module, Parameter == TEXT("class")? "UEClassHandle" : "UObjectHandle");
+                    Arg->type = DSLPropertyType(Parameter, Group, St->module, F->at);
                     auto* Local = new das::Variable();
                     Local->at = F->at;
                     Local->name = OriginalName;
@@ -1500,8 +1401,8 @@ struct FUEClassAnnotation : das::StructureAnnotation
                     if (Parameter != TEXT("enum"))
                         DSLEnsureStructHelpers(SourceType, Carrier, Group, St->module, HelpersGenerated, Helpers);
                     Arg->name = "__ue_event_raw_array";
-                    Arg->type =
-                        DSLHandleType(Group, St->module, Parameter == TEXT("enum")? "UEEnumValue" : "UEStructValue");
+                    Arg->type = DSLPropertyType(Parameter == TEXT("enum") ? TEXT("enum")
+                                                                          : TEXT("struct"), Group, St->module, F->at);
                     auto* Local = new das::Variable();
                     Local->at = F->at;
                     Local->name = OriginalName;

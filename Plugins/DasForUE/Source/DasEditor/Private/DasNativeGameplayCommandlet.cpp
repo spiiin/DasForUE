@@ -27,6 +27,7 @@ int32 UDasNativeGameplayCommandlet::Main(const FString& Params)
         UE_LOG(LogTemp, Display, TEXT("DAS_API_COVERAGE_EXPORT=PASS"));
         return 0;
     }
+#if DAS_WITH_EDITOR_TESTS
     if (FParse::Param(*Params, TEXT("Probe")))
     {
         auto& Runtime = FModuleManager::LoadModuleChecked<FDasRuntimeModule>(TEXT("DasRuntime"));
@@ -52,6 +53,7 @@ int32 UDasNativeGameplayCommandlet::Main(const FString& Params)
         UE_LOG(LogTemp, Display, TEXT("DAS_NATIVE_DISCOVERY_RUNTIME=PASS"));
         return 0;
     }
+#endif
     FString Output, Requests, Error;
     if (!FParse::Value(*Params, TEXT("Output="), Output) || !FParse::Value(*Params, TEXT("Requests="), Requests))
     {
