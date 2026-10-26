@@ -152,7 +152,7 @@ bool VerifyContract(const das::ProgramPtr& Program, const FString& Entry, const 
     auto* F = Program->getThisModule()->findUniqueFunction(N.Get());
     if (WidgetPaintContract && C.ReturnKind == EDasMethodSignature::Void && C.Inputs.Num() == 1 &&
         C.Inputs[0] == EDasMethodSignature::Struct && C.InputClasses.Num() == 1 &&
-        DasHasNativeRolePath(C.InputClasses[0], EDasNativeTypeRole::Paint))
+        DasSynchronousCallbackRole(C.InputClasses[0], EDasNativeTypeRole::Paint))
     {
         if (!F || !F->exports || !C.InputDirections.IsEmpty() || F->arguments.size() != 1 || !F->result ||
             F->result->ref || F->result->baseType != das::Type::tVoid)
@@ -177,7 +177,7 @@ bool VerifyContract(const das::ProgramPtr& Program, const FString& Entry, const 
             F->arguments.size() != size_t(C.Inputs.Num()))
             return false;
         const int32 Count = C.Inputs.Num();
-        const bool HasGeometry = Count && DasHasNativeRolePath(C.InputClasses[0], EDasNativeTypeRole::Geometry);
+        const bool HasGeometry = Count && DasSynchronousCallbackRole(C.InputClasses[0], EDasNativeTypeRole::Geometry);
         if ((Count != 2 && Count != 3) || (!HasGeometry && Count != 2))
             return false;
         int32 I = 0;
@@ -189,7 +189,7 @@ bool VerifyContract(const das::ProgramPtr& Program, const FString& Entry, const 
             ++I;
         }
         if (C.Inputs[I] != EDasMethodSignature::Struct ||
-            !DasHasNativeRolePath(C.InputClasses[I], EDasNativeTypeRole::PointerEvent) ||
+            !DasSynchronousCallbackRole(C.InputClasses[I], EDasNativeTypeRole::PointerEvent) ||
             !Handle(F->arguments[I]->type, NativeTransportHandle(C.InputClasses[I])))
             return false;
         ++I;
@@ -207,7 +207,7 @@ bool VerifyContract(const das::ProgramPtr& Program, const FString& Entry, const 
     }
     if (FocusNotificationContract && C.ReturnKind == EDasMethodSignature::Void && C.Inputs.Num() == 1 &&
         C.Inputs[0] == EDasMethodSignature::Struct && C.InputClasses.Num() == 1 &&
-        DasHasNativeRolePath(C.InputClasses[0], EDasNativeTypeRole::FocusEvent))
+        DasSynchronousCallbackRole(C.InputClasses[0], EDasNativeTypeRole::FocusEvent))
     {
         const auto T = F && F->arguments.size() == 1 ? F->arguments[0]->type : das::TypeDeclPtr();
         return F && F->exports && C.InputDirections.IsEmpty() && F->result && !F->result->ref &&
@@ -215,7 +215,7 @@ bool VerifyContract(const das::ProgramPtr& Program, const FString& Entry, const 
                T->annotation && T->annotation->name == NativeTransportHandle(C.InputClasses[0]);
     }
     if (WidgetReplyContract && C.ReturnKind == EDasMethodSignature::Struct &&
-        DasHasNativeRolePath(C.ReturnClass, EDasNativeTypeRole::EventReply))
+        DasSynchronousCallbackRole(C.ReturnClass, EDasNativeTypeRole::EventReply))
     {
         auto Handle = [](const das::TypeDeclPtr& T, const char* Name)
         {
@@ -224,15 +224,17 @@ bool VerifyContract(const das::ProgramPtr& Program, const FString& Entry, const 
         };
         return F && F->exports && C.InputDirections.IsEmpty() && C.Inputs.Num() == 2 &&
                C.Inputs[0] == EDasMethodSignature::Struct && C.Inputs[1] == EDasMethodSignature::Struct &&
-               C.InputClasses.Num() == 2 && DasHasNativeRolePath(C.InputClasses[0], EDasNativeTypeRole::Geometry) &&
+               C.InputClasses.Num() == 2 &&
+               DasSynchronousCallbackRole(C.InputClasses[0], EDasNativeTypeRole::Geometry) &&
                F->arguments.size() == 2 && Handle(F->result, NativeTransportHandle(C.ReturnClass)) &&
                Handle(F->arguments[0]->type, NativeTransportHandle(C.InputClasses[0])) &&
                Handle(F->arguments[1]->type, WidgetEventHandleName(C.InputClasses[1]));
     }
     if (AllowNativeInputValue && F && F->exports && C.ReturnKind == EDasMethodSignature::Void && C.Inputs.Num() == 1 &&
         C.Inputs[0] == EDasMethodSignature::Struct && C.InputClasses.Num() == 1 &&
-        DasHasNativeRolePath(C.InputClasses[0], EDasNativeTypeRole::InputActionValue) && C.InputDirections.IsEmpty() &&
-        F->arguments.size() == 1 && F->result && !F->result->ref && F->result->baseType == das::Type::tVoid)
+        DasSynchronousCallbackRole(C.InputClasses[0], EDasNativeTypeRole::InputActionValue) &&
+        C.InputDirections.IsEmpty() && F->arguments.size() == 1 && F->result && !F->result->ref &&
+        F->result->baseType == das::Type::tVoid)
     {
         const auto& T = F->arguments[0]->type;
         if (T && !T->ref && T->baseType == das::Type::tHandle && T->annotation &&
@@ -408,14 +410,13 @@ bool VerifyContract(const das::ProgramPtr& Program, const FString& Entry, const 
                 bool Safe = true;
                 for (int32 I = 0; I < C.Inputs.Num(); ++I)
                     Safe &= C.Inputs[I] == EDasMethodSignature::Struct &&
-                            DasHasNativeRole(FindObject<UScriptStruct>(nullptr, *C.InputClasses[I]),
-                                             EDasNativeTypeRole::InputEvent);
+                            DasSynchronousCallbackRole(C.InputClasses[I], EDasNativeTypeRole::InputEvent);
                 if (Safe)
                     return true;
             }
             if (GeometrySnapshotDispatch && C.ReturnKind == EDasMethodSignature::Int && C.InputDirections.IsEmpty() &&
                 C.Inputs.Num() == 1 && C.Inputs[0] == EDasMethodSignature::Struct && C.InputClasses.Num() == 1 &&
-                DasHasNativeRole(FindObject<UScriptStruct>(nullptr, *C.InputClasses[0]), EDasNativeTypeRole::Geometry))
+                DasSynchronousCallbackRole(C.InputClasses[0], EDasNativeTypeRole::Geometry))
                 return true;
             if (!C.InputDirections.IsEmpty())
                 return false;

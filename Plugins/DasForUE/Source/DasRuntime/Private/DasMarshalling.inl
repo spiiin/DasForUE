@@ -152,8 +152,9 @@ void ValidateCallField(FProperty* Property, const FString& Path, bool bInput, bo
         UScriptStruct* Type = CastFieldChecked<FStructProperty>(Property)->Struct;
         if (const auto* Policy = DasNativeTypePolicy(Type); Policy && Policy->AllowCall)
         {
-            if (!Policy->AllowCall(Property, bInput, bOutput, Depth))
-                Context->throw_error(Policy->CallError);
+            FString Error;
+            if (!ValidateDasNativeCallContract(Property, bInput, bOutput, Depth, Error))
+                Context->throw_error(TCHAR_TO_UTF8(*Error));
             Signature.Add({Path.ToLower(), EMarshallingKind::Struct, bInput, bOutput, Type->GetPathName()});
             return;
         }

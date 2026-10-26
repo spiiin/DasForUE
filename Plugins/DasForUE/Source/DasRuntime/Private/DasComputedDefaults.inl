@@ -1,7 +1,17 @@
 bool DSLDefaultScalar(das::Type T)
 {
-    return T == das::Type::tInt || T == das::Type::tFloat || T == das::Type::tDouble || T == das::Type::tBool ||
-           T == das::Type::tString;
+    FDasDeclaredType Type;
+    Type.Kind = T == das::Type::tInt ? TEXT("int")
+                                     : T == das::Type::tFloat
+        ? TEXT("float")
+        : T == das::Type::tDouble
+        ? TEXT("double")
+        : T == das::Type::tBool
+        ? TEXT("bool")
+        : T == das::Type::tString
+        ? TEXT("string")
+        : TEXT("invalid");
+    return QueryDasTypeUse(Type, EDasTypeUse::ComputedDefaultLeaf).IsSupported();
 }
 FString DSLDefaultLocation(const das::LineInfo& At)
 {

@@ -14,6 +14,10 @@
 
 namespace
 {
+bool CallbackAbiAllowed(const FDasCallbackType* Type, EDasCallbackUsage Usage)
+{
+    return Type && (Usage != EDasCallbackUsage::Timer || Type->bTimer);
+}
 bool CallbackText(const FText& Text, int64& Characters, FString& Error)
 {
     const auto Namespace = FTextInspector::GetNamespace(Text), Key = FTextInspector::GetKey(Text);
@@ -359,6 +363,58 @@ bool ValidateDasCallbackTypePath(const FString& Kind, const FString& Path, FStri
             return false;
     return true;
 }
+bool ValidateDasCallbackType(const FDasDeclaredType& T, EDasCallbackUsage Usage, FString& Error)
+{
+    Error.Reset();
+    const auto K = T.GetKind();
+    const FDasCallbackType* C = nullptr;
+    if (K == EDasTypeKind::Void)
+    {
+        if (!T.TypePath.IsEmpty() || T.Element || T.Key || T.Value || !T.DelegateWire.IsEmpty())
+        {
+            Error = TEXT("Invalid void callback descriptor");
+            return false;
+        }
+        C = FindDasCallbackType(TEXT("void"));
+    }
+    else
+    {
+        if (!ValidateDasPropertyType(T, EDasPropertyUsage::Value, Error))
+            return false;
+        if (K == EDasTypeKind::Array || K == EDasTypeKind::Set || K == EDasTypeKind::Map)
+        {
+            auto* Carrier = DasContainerCarrier(T);
+            if (!Carrier || !ValidateDasCallbackTypePath(TEXT("struct"), Carrier->GetPathName(), Error))
+                return false;
+            C = FindDasCallbackType(EDasMethodSignature::Struct, Carrier);
+        }
+        else if (K == EDasTypeKind::Struct)
+        {
+            const auto* A = FDasTypeAdapters::Get().Find(T);
+            if (A && A->GetSignature())
+                C = FindDasCallbackType(A->GetDefaultKind());
+            else
+            {
+                if (!ValidateDasCallbackTypePath(T.Kind, T.TypePath, Error))
+                    return false;
+                C = FindDasCallbackType(EDasMethodSignature::Struct, FindObject<UScriptStruct>(nullptr, *T.TypePath));
+            }
+        }
+        else
+        {
+            if ((K == EDasTypeKind::Object || K == EDasTypeKind::Class || K == EDasTypeKind::Enum) &&
+                !ValidateDasCallbackTypePath(T.Kind, T.TypePath, Error))
+                return false;
+            C = FindDasCallbackType(T.Kind);
+        }
+    }
+    if (!CallbackAbiAllowed(C, Usage))
+    {
+        Error = TEXT("Unsupported queued callback/timer type");
+        return false;
+    }
+    return true;
+}
 bool ValidateDasCallbackPayload(const FDasScalarValue& Value, EDasCallbackUsage Usage, FString& Error)
 {
     Error.Reset();
@@ -370,7 +426,7 @@ bool ValidateDasCallbackPayload(const FDasScalarValue& Value, EDasCallbackUsage 
     const auto* Type = FindDasCallbackType(
         static_cast<EDasMethodSignature>(Value.Kind),
         Value.Kind == int32(EDasMethodSignature::Struct) ? Value.StructValue.GetScriptStruct() : nullptr);
-    if (!Type || (Usage == EDasCallbackUsage::Timer && !Type->bTimer) || Value.Direction != 0)
+    if (!CallbackAbiAllowed(Type, Usage) || Value.Direction != 0)
     {
         Error = TEXT("Unsupported callback payload or direction");
         return false;

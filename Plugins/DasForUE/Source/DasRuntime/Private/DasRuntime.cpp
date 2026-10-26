@@ -5,6 +5,7 @@
 #include "UObject/FieldPath.h"
 #include "DasGameplayTags.h"
 #include "DasTypeAdapters.h"
+#include "DasTypeContracts.h"
 #include "DasOpaqueTypeAdapters.h"
 #include "DasContainerAdapters.h"
 #include "DasInterfaceContracts.h"

@@ -1,4 +1,5 @@
 #include "DasDataAssets.h"
+#include "DasTypeContracts.h"
 #include "UObject/TextProperty.h"
 #include "Internationalization/Text.h"
 #include "DasScriptHosts.h"
@@ -288,69 +289,16 @@ bool FDasClassSchema::Validate(FString& Error) const
             }
             ParameterNames.Add(P.Name);
         }
-        for (const auto& P : M.EffectiveParameters())
-            if (P.Kind == EDasMethodSignature::Object &&
-                (!FindObject<UClass>(nullptr, *P.ClassPath) ||
-                 (!P.ClassPath.StartsWith(
-                     TEXT("/Script/")) &&
-                     !FindObject<UClass>(nullptr, *P.ClassPath)->HasAnyClassFlags(CLASS_Interface))))
-            {
-                Error = TEXT("Object parameter requires loaded native class path");
-                return false;
-            }
-        if (Contract.ReturnKind == EDasMethodSignature::Object &&
-            (!FindObject<UClass>(nullptr, *M.ReturnClass) ||
-             (!M.ReturnClass.StartsWith(
-                 TEXT("/Script/")) && !FindObject<UClass>(nullptr, *M.ReturnClass)->HasAnyClassFlags(CLASS_Interface))))
-        {
-            Error = TEXT("Object result requires loaded native class path");
-            return false;
-        }
-        auto ClassBase = [](const FString& Path)
-        {
-            auto* B = FindObject<UClass>(nullptr, *Path);
-            return Path.StartsWith(TEXT("/Script/")) && IsValid(B) &&
-                                   !B->HasAnyClassFlags(CLASS_Interface | CLASS_Deprecated | CLASS_NewerVersionExists);
-        };
-        for (const auto& P : M.EffectiveParameters())
-            if (P.Kind == EDasMethodSignature::Class && !ClassBase(P.ClassPath))
-            {
-                Error = TEXT("Class parameter requires a loaded native base class");
-                return false;
-            }
-        if (Contract.ReturnKind == EDasMethodSignature::Class && !ClassBase(M.ReturnClass))
-        {
-            Error = TEXT("Class result requires a loaded native base class");
-            return false;
-        }
-        for (const auto& P : M.EffectiveParameters())
-            if (P.Kind == EDasMethodSignature::Struct && !ValidateDasValueStruct(P.ClassPath, Error))
-                return false;
-        if (Contract.ReturnKind == EDasMethodSignature::Struct && !ValidateDasValueStruct(M.ReturnClass, Error))
+        if (!ValidateDasLoweredSignatureType(Contract.ReturnKind, M.ReturnClass, EDasTypeUse::AuthoredReturn, Error))
             return false;
         for (const auto& P : M.EffectiveParameters())
-            if (P.Kind == EDasMethodSignature::Enum && !ResolveDasEnum(P.ClassPath, Error))
+            if (!ValidateDasLoweredSignatureType(P.Kind, P.ClassPath,
+                                                 P.Direction == TEXT("in") ? EDasTypeUse::AuthoredInput
+                                                                           : P.Direction ==
+                                                                                 TEXT("out") ? EDasTypeUse::AuthoredOut
+                                                                                             : EDasTypeUse::AuthoredRef,
+                                                                                      Error))
                 return false;
-        if (Contract.ReturnKind == EDasMethodSignature::Enum && !ResolveDasEnum(M.ReturnClass, Error))
-            return false;
-        if (Contract.ReturnKind == EDasMethodSignature::Delegate)
-        {
-            TStrongObjectPtr<UFunction> Sig(MakeDasSingleDelegateSignature(M.ReturnClass, Error));
-            if (!Sig)
-                return false;
-        }
-        for (const auto& P : M.EffectiveParameters())
-            if (P.Kind == EDasMethodSignature::Delegate)
-            {
-                if (P.Direction != TEXT("in"))
-                {
-                    Error = TEXT("Delegate-valued ref/out parameters are unsupported");
-                    return false;
-                }
-                TStrongObjectPtr<UFunction> Sig(MakeDasSingleDelegateSignature(P.ClassPath, Error));
-                if (!Sig)
-                    return false;
-            }
         if (!ValidMeta(M.Metadata, true))
             return false;
         Names.Add(M.Name);

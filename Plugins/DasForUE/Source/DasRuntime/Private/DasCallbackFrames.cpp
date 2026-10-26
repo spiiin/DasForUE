@@ -2,6 +2,7 @@
 #include "DasCallbackFrames.h"
 #include "DasPerceptionTypes.h"
 #include "DasCallbackTypes.h"
+#include "DasTypeContracts.h"
 #include "DasDelegateSignatures.h"
 #include "UObject/StrongObjectPtr.h"
 #include "DasContainerRegistry.h"
@@ -222,6 +223,8 @@ bool ValidateDasCallbackSignature(UFunction* Signature, const TArray<FDasDeclare
         FDasDeclaredParameter P;
         P.Name = FString::Printf(TEXT("arg_%d"), I);
         P.Type = Arguments[I];
+        if (!ValidateDasTypeUse(P.Type, EDasTypeUse::QueuedEvent, Error))
+            return false;
         M.Parameters.Add(P);
     }
     TStrongObjectPtr<UFunction> Expected(MakeDasDelegateSignature(M, false, GetTransientPackage(), NAME_None, Error));

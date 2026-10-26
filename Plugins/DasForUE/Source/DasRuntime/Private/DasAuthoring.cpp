@@ -1,5 +1,6 @@
 #include "DasDataAssets.h"
 #include "DasTypeAdapters.h"
+#include "DasTypeContracts.h"
 #include "DasCallbackTypes.h"
 #include "DasScriptHosts.h"
 #include "DasAuthoring.h"
@@ -77,124 +78,6 @@ bool SameMetadata(const TMap<FString, FString>& A, const TMap<FString, FString>&
             return false;
     }
     return true;
-}
-bool TypeValid(const FDasDeclaredType& Type, const TSet<FString>& Classes, bool bVoid, FString& Error, int32 Depth = 0)
-{
-    if (Depth > 16)
-        return Fail(Error, TEXT("Declaration type nesting limit exceeded"));
-    const FString& K = Type.Kind;
-    if (!Type.AuthoredId.IsEmpty() && (K != TEXT("object") || !StableId(Type.AuthoredId)))
-        return Fail(Error, TEXT("Invalid authored object identity"));
-    if (K == TEXT("array") || K == TEXT("set"))
-    {
-        if (!Type.Element || Type.Key || Type.Value || !Type.TypePath.IsEmpty())
-            return Fail(Error, TEXT("Invalid element type shape"));
-        return TypeValid(*Type.Element, Classes, false, Error, Depth + 1);
-    }
-    if (K == TEXT("map"))
-    {
-        if (!Type.Key || !Type.Value || Type.Element || !Type.TypePath.IsEmpty())
-            return Fail(Error, TEXT("Invalid map type shape"));
-        if (Type.Key->Kind !=
-            TEXT("byte") && Type.Key->Kind !=
-                                TEXT("int") && Type.Key->Kind !=
-                                                   TEXT("float") &&
-                                                        Type.Key->Kind !=
-                                                            TEXT("double") &&
-                                                                 Type.Key->Kind !=
-                                                                     TEXT("bool") &&
-                                                                          Type.Key->Kind !=
-                                                                              TEXT("string") &&
-                                                                                   Type.Key->Kind !=
-                                                                                       TEXT("name") &&
-                                                                                            Type.Key->Kind !=
-                                                                                                TEXT("enum") &&
-                                                                                                     Type.Key->Kind !=
-                                                                                                         TEXT("object"))
-            return Fail(Error, TEXT("Map key requires a supported scalar identity"));
-        return TypeValid(*Type.Key, Classes, false, Error, Depth + 1) &&
-               TypeValid(*Type.Value, Classes, false, Error, Depth + 1);
-    }
-    if (!Type.DelegateWire.IsEmpty() &&
-        (K != TEXT("delegate") || Type.DelegateWire.Len() > 131072 ||
-                   Type.TypePath != TEXT("/DasDelegates/")+ FMD5::HashAnsiString(*Type.DelegateWire) + TEXT(".Type")))
-        return Fail(Error, TEXT("Delegate type/signature identity mismatch"));
-    if (Type.Element || Type.Key || Type.Value)
-        return Fail(Error, TEXT("Scalar/reference type has container members"));
-    if (K == TEXT("object") || K == TEXT("enum") || K == TEXT("struct") ||
-                                                              (K == TEXT("event") || K == TEXT("delegate")) ||
-                                                               K == TEXT("class"))
-        return (NativePath(Type.TypePath) || (K == TEXT("object") && Classes.Contains(Type.TypePath))) ||
-                Fail(Error, TEXT("Missing type identity: ") + Type.TypePath);
-    if (!Type.TypePath.IsEmpty())
-        return Fail(Error, TEXT("Primitive type has a type_path"));
-    if (K == TEXT("byte") ||
-                  K == TEXT("text") ||
-                            K == TEXT("int") ||
-                                      K == TEXT("float") ||
-                                                K == TEXT("double") ||
-                                                          K == TEXT("bool") ||
-                                                                    K == TEXT("string") ||
-                                                                              K == TEXT("name") ||
-                                                                                        (bVoid && K == TEXT("void")))
-        return true;
-    return Fail(Error, TEXT("Unsupported declaration type: ") + K);
-}
-bool DefaultValid(const FDasDeclaredProperty& P, FString& Error)
-{
-    const auto& D = P.Default;
-    if (auto* Carrier = DasContainerCarrier(P.Type))
-    {
-        if (D.Kind.IsEmpty())
-            return true;
-        FInstancedStruct Value;
-        return (D.Kind == TEXT("string") && ParseDasStructDefault(Carrier->GetPathName(), D.String, Value, Error)) ||
-                Fail(Error, TEXT("Invalid container default: ")+ Error);
-    }
-    if (D.Kind.IsEmpty())
-        return true;
-    const auto& K = P.Type.Kind;
-    if (K == TEXT("text"))
-    {
-        FText Value;
-        return D.Kind == TEXT("string") && ParseDasTextDefault(D.String, Value, Error);
-    }
-    if (K == TEXT("byte"))
-        return D.Kind == TEXT("number") && FMath::IsFinite(D.Number) && D.Number >= 0 && D.Number <= 255 &&
-                              FMath::FloorToDouble(D.Number) == D.Number;
-    if (D.Kind == TEXT("number") && FMath::IsFinite(D.Number))
-    {
-        if (K == TEXT("int") && D.Number >= MIN_int32 && D.Number <= MAX_int32 &&
-                      FMath::FloorToDouble(D.Number) == D.Number)
-            return true;
-        if (K == TEXT("double"))
-            return true;
-        if (K == TEXT("float") && FMath::IsFinite(static_cast<float>(D.Number)) &&
-                      (D.Number == 0 || static_cast<float>(D.Number) != 0))
-            return true;
-    }
-    if (K == TEXT("bool") && D.Kind == TEXT("bool"))
-        return true;
-    if ((K == TEXT("string") || K == TEXT("name") || K == TEXT("enum")) &&
-                                          D.Kind == TEXT("string") &&
-                                                         (K != TEXT("name") || D.String.Len() < NAME_SIZE) &&
-                                                          (K != TEXT("enum") || Identifier(D.String)))
-        return true;
-    if (K == TEXT("struct") && D.Kind == TEXT("string"))
-    {
-        FInstancedStruct Value;
-        return ParseDasStructDefault(P.Type.TypePath, D.String, Value, Error);
-    }
-    if ((K == TEXT("object") || K == TEXT("class")) && D.Kind == TEXT("null"))
-        return true;
-    if ((K == TEXT("object") || K == TEXT("class")) && D.Kind == TEXT("string") && !D.String.IsEmpty())
-    {
-        if (!P.Type.AuthoredId.IsEmpty())
-            return Fail(Error, TEXT("Non-null authored object defaults require a separate identity contract"));
-        UObject* Value = nullptr;
-        return ResolveDasReferenceDefault(K == TEXT("class"), P.Type.TypePath, D.String, Value, Error);
-    }
-    return Fail(Error, TEXT("Invalid default for property ") + P.Name);
 }
 bool SameDefault(const FDasDeclaredLiteral& A, const FDasDeclaredLiteral& B)
 {
@@ -442,7 +325,8 @@ bool FDasAuthoringModule::Validate(FString& Error) const
             else if (!P.DelegateWire.IsEmpty())
                 return Fail(Error, TEXT("Delegate signature is only valid on event fields"));
             Names.Add(P.Name.ToLower());
-            if (!TypeValid(P.Type, ClassIds, false, Error) || !DefaultValid(P, Error) ||
+            if (!ValidateDasDeclarationType(P.Type, ClassIds, false, Error) ||
+                !ValidateDasAuthoredDefault(P.Type, P.Default, EDasTypeUse::PropertyDefault, Error) ||
                 !MetadataValid(P.Metadata, Error, false, true))
                 return false;
         }
@@ -528,7 +412,7 @@ bool FDasAuthoringModule::Validate(FString& Error) const
                            [](const auto& P) { return P.Direction == TEXT("out") || P.Direction == TEXT("inout"); }))))
                 return Fail(Error, TEXT("BlueprintPure requires callable function with a result or output parameter: ")+
                                         M.Name);
-            if (!TypeValid(M.ReturnType, ClassIds, true, Error) || !MetadataValid(M.Metadata, Error))
+            if (!ValidateDasDeclarationType(M.ReturnType, ClassIds, true, Error) || !MetadataValid(M.Metadata, Error))
                 return false;
             if (!Identifier(M.EntryPoint) || M.ScriptFile.IsEmpty() ||
                 FPaths::GetCleanFilename(M.ScriptFile) != M.ScriptFile ||
@@ -547,50 +431,16 @@ bool FDasAuthoringModule::Validate(FString& Error) const
             if (M.Parameters.Num() > 64)
                 return Fail(Error, TEXT("Parameter count limit exceeded"));
             TSet<FString> Parameters;
-            bool SawParameterDefault = false;
+            if (!ValidateDasParameterDefaults(M, true, Error))
+                return false;
             for (const auto& P : M.Parameters)
             {
                 if (!AddId(P.Id) || !Identifier(P.Name) || Parameters.Contains(P.Name.ToLower()) ||
                     (P.Direction != TEXT("in") && P.Direction != TEXT("out") && P.Direction != TEXT("inout")))
                     return Fail(Error, TEXT("Invalid parameter: ")+ P.Name);
                 Parameters.Add(P.Name.ToLower());
-                if (!TypeValid(P.Type, ClassIds, false, Error))
+                if (!ValidateDasDeclarationType(P.Type, ClassIds, false, Error))
                     return false;
-                if (!P.Default.Kind.IsEmpty())
-                {
-                    if (P.Direction !=
-                        TEXT("in") || P.Name == M.WorldContext ||
-                            (P.Type.Kind !=
-                             TEXT("byte") &&
-                                  P.Type.Kind != TEXT("text") &&
-                                                      P.Type.Kind !=
-                                                          TEXT("int") && P.Type.Kind !=
-                                                                             TEXT("float") &&
-                                                                                  P.Type.Kind !=
-                                                                                      TEXT("double") &&
-                                                                                           P.Type.Kind !=
-                                                                                               TEXT("bool") &&
-                                                                                                    P.Type.Kind !=
-                                                                                                        TEXT("string")))
-                        return Fail(Error, TEXT("Parameter default requires a scalar input: ")+ P.Name);
-                    FDasDeclaredProperty Value;
-                    Value.Name = P.Name;
-                    Value.Type = P.Type;
-                    Value.Default = P.Default;
-                    if (P.Default.Kind == TEXT("string"))
-                    {
-                        if (P.Default.String.Len() > 4096)
-                            return Fail(Error, TEXT("Parameter string default exceeds supported limits"));
-                        for (int32 I = 0; I < P.Default.String.Len(); ++I)
-                            if (P.Default.String[I] == 0)
-                                return Fail(Error, TEXT("Parameter string default contains NUL"));
-                    }
-                    if (!DefaultValid(Value, Error))
-                        return false;
-                    SawParameterDefault = true;
-                }
-                else if (SawParameterDefault)
-                    return Fail(Error, TEXT("Required parameter follows a default parameter: ")+ P.Name);
             }
         }
     }
@@ -1357,7 +1207,7 @@ bool FDasAuthoringModule::ResolveClass(const FString& ClassId, FDasDeclaredClass
             PropertyDefaults.Add(O.Id);
             auto Value = *P;
             Value.Default = O.Default;
-            if (!DefaultValid(Value, Error))
+            if (!ValidateDasAuthoredDefault(Value.Type, Value.Default, EDasTypeUse::PropertyDefault, Error))
                 return false;
             P->Default = O.Default;
         }
@@ -1570,30 +1420,15 @@ bool FDasAuthoringModule::ToActorSchema(const FString& ClassId, FDasClassSchema&
                                                            M.Parameters[0].Type.Kind == K &&
                                                            M.Parameters[0].Direction ==
                                                                TEXT("in") && M.Parameters[0].Name == TEXT("Input");
-        // Scalars by the kind table; struct and container parameters are resolved by ValueKind.
-        auto Kind = [](const FString& T)
+        auto ValueKind = [](const FDasDeclaredType& T)
         {
-            return DasSignatureKind(DasTypeKind(T)).Get(EDasMethodSignature::Frame);
+            return DasAuthoredTypeSignature(T);
         };
-        auto ValueKind = [&](const FDasDeclaredType& T)
-        {
-            const EDasTypeKind K = T.GetKind();
-            if (K == EDasTypeKind::Array || K == EDasTypeKind::Map || K == EDasTypeKind::Set)
-                return DasContainerCarrier(T) ? EDasMethodSignature::Struct : EDasMethodSignature::Frame;
-            if (K == EDasTypeKind::Struct)
-            {
-                const auto* Adapter = FDasTypeAdapters::Get().FindStructPath(T.TypePath);
-                const auto Signature = Adapter ? Adapter->GetSignature() : TOptional<EDasMethodSignature>();
-                return Signature.Get(EDasMethodSignature::Struct);
-            }
-            return Kind(T.Kind);
-        };
-        if (ValueKind(M.ReturnType) == EDasMethodSignature::Frame || M.Parameters.Num() > 16 || !M.bCallable ||
-            M.bStatic != Library)
-            return Fail(
-                Error,
-                TEXT("Actor adapter requires callable scalar/void methods with up to 16 by-value inputs, without static: ")+
-                    M.Id);
+        if (!ValidateDasSignatureContract(M, EDasSignatureUse::Method, Error))
+            return false;
+        if (!M.bCallable || M.bStatic != Library)
+            return Fail(Error,
+                        TEXT("Actor adapter requires callable methods with matching static/library role: ") + M.Id);
         FDasMethodSchema Method;
         Method.Name = *M.Name;
         Method.ScriptFile = M.ScriptFile;
@@ -1668,7 +1503,7 @@ bool FDasAuthoringModule::ToActorSchema(const FString& ClassId, FDasClassSchema&
                             Result.Parent == TEXT("ActorComponent") || !C->Interfaces.IsEmpty()
                                                   ? EDasMethodSignature::Frame
                                               : Action ? EDasMethodSignature::Void
-                                              : Scalar ? Kind(K)
+                                              : Scalar ? ValueKind(M.ReturnType)
                                                        : EDasMethodSignature::Frame;
         Result.Methods.Add(MoveTemp(Method));
     }

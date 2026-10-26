@@ -539,3 +539,64 @@ Legacy runners now use the shared `Invoke-DasPythonTests` helper so Windows Powe
 stderr handling cannot mistake normal unittest progress for failure; exit 0/stderr and exit 7
 with restored caller error policy were verified. Constraint's optional cross-package comparison
 uses only present baselines and writes diagnostic reports into staging, not delivered docs.
+
+
+## Contextual contracts (signature / callbacks / defaults follow-up)
+
+`DasTypeContracts.h` exposes named `EDasTypeUse` boundaries and `QueryDasTypeUse`.
+The query composes the existing registry, property ABI, callback and authoring rules; it is
+also used by the production validators. It does not keep a parallel table of per-type Yes flags.
+
+- Authored method lowering and the lowered `FDasClassSchema` preflight use the same
+  signature type query. Enum, class and object/interface identities, value-struct layouts,
+  container carriers and delegate-valued in/out/return restrictions are checked there.
+  `ValidateDasSignatureContract` owns count/direction rules for methods, interfaces,
+  single delegates and multicast delegates. Interface Apply checks before creating graphs;
+  native interface name, purity, const and exact signature matching stay in their resolver.
+- Queued events and timers query `ValidateDasCallbackType`; frame preflight uses that gate and delivery
+  payload admission shares its callback ABI gate (without a duplicate descriptor walk). The callback table retains wire/proxy/timer facts.
+  Exact receiver compatibility, native const-ref rules, finite values, budgets, snapshot
+  identity and object lifetime remain checked at their existing boundaries.
+- Explicit property, struct-member and parameter defaults share `ValidateDasAuthoredDefault`.
+  Struct symbol resolution, enum membership, recursive graph/leaf limits and native CDO
+  editability remain separate checks. Parameter input/world-context/ordering checks remain
+  declaration-level. The computed-default query covers evaluator scalar leaves; constructor
+  markers and container elements compose those leaves, and the evaluator still audits the
+  call graph and execution limits. This does not add arbitrary computed struct evaluation.
+- Opaque native calls use `ValidateDasNativeCallContract` with the real `FProperty`, owning
+  function, directions and depth. Without these inputs the query reports `requires_context`,
+  never a blanket permission. Scoped reply/paint and weak/component-owned capabilities
+  retain their existing transport lifetime checks and cannot enter generic queued payloads.
+
+Support JSON schema 3 exports the C++ context names and their validation boundary, then
+queries each representative descriptor in every context. The renderer has no per-type
+or per-context policy branches. `supported` means that named type gate passed; complete
+DSL syntax, expression/literal validity, graph resolution, receiver compatibility and
+delivery checks are explicitly outside that result. Native API generation and per-binding
+AOT eligibility remain separately validated. `requires_context` always includes a reason.
+
+The extra context tables are generated beside the original property ABI matrix. The
+manual authored/native summaries describe end-to-end public surfaces and can be narrower
+than a runtime type gate (for example class references in an interface source parser).
+
+Delegate signature factories can project existing methods, so source defaults do not participate
+in their ABI signature comparison. The delegate DSL declaration parser still rejects defaults;
+interface definitions reject them before Apply. This separation preserves method-reference binding.
+
+
+Validation (2026-10-26): `type-contracts-bootstrap` produced the schema 3 live export.
+`type-contracts-core` rebuilt successfully and exited 0: all 383 Python tests (22 support/schema
+tests), fresh export/drift check, Foundation with zero failures, 23 linked AOT checks,
+authored interface contracts, native defaults, defaults merge, computed defaults,
+execution roles, delegate values and event checks passed.
+
+The baseline contains 37 adapters, 40 representative descriptors and 22 contextual gates:
+880 contextual results (567 supported, 288 unsupported with reasons, 25 requiring concrete
+context), in addition to the 280 original property ABI/composition results. The scoped/native
+results do not grant general reflected storage, queued callbacks or type-wide AOT eligibility.
+
+
+`type-contracts-runtime` also exited 0: Geometry, input events, EventReply, Paint and widget-event
+transport suites passed; MethodValues Create/Reopen and all 51 editor/PIE automation tests
+passed with zero failures or skipped tests. Formatting, whitespace and the guarded-extern audit
+(494 source sites) pass. All changes and verification belong to `refactor/soft-type-adapters`.

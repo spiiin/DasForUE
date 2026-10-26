@@ -37,11 +37,19 @@ def validate_descriptor(t):
         validate_descriptor(t[key])
 
 def validate(data):
-    fields(data, 'schema_version scope evidence aot_scope not_inferred adapters', 'root')
-    if type(data.get('schema_version')) is not int or data['schema_version'] != 2:
+    fields(data, 'schema_version scope evidence aot_scope not_inferred contexts adapters', 'root')
+    if type(data.get('schema_version')) is not int or data['schema_version'] != 3:
         raise ValueError('Unsupported type support schema')
     if not data.get('scope') or not data.get('evidence') or not data.get('not_inferred') or not data.get('aot_scope'):
         raise ValueError('Missing scope/evidence boundaries')
+    contexts = data['contexts']
+    names = [c['name'] for c in contexts]
+    if not names or len(names) != len(set(names)):
+        raise ValueError('Context names must be unique and nonempty')
+    for context in contexts:
+        fields(context, 'name boundary', 'context')
+        if not context['name'] or not context['boundary']:
+            raise ValueError('Context needs name and boundary')
     adapters = data['adapters']
     ids = [a['id'] for a in adapters]
     if not ids or ids != sorted(set(ids)):
@@ -74,12 +82,20 @@ def validate(data):
         if sample_ids != sorted(set(sample_ids)):
             raise ValueError('Sample identities must be unique and sorted')
         for sample in a['samples']:
-            fields(sample, 'id type capabilities', 'sample')
+            fields(sample, 'id type capabilities uses', 'sample')
             validate_descriptor(sample['type'])
             if sample['type']['kind'] != a['kind']:
                 raise ValueError('Sample belongs to a different kind')
             if set(sample['capabilities']) != set(CAPS):
                 raise ValueError('Incomplete property capability contexts')
+            if set(sample['uses']) != set(names):
+                raise ValueError('Incomplete contextual type gates')
+            for cell in sample['uses'].values():
+                fields(cell, 'state reason', 'type use')
+                if cell['state'] not in ('supported', 'unsupported', 'requires_context'):
+                    raise ValueError('Unknown type use state')
+                if type(cell['reason']) is not str or ((cell['state'] != 'supported') != bool(cell['reason'])):
+                    raise ValueError('Type use state and validator reason disagree')
             for cell in sample['capabilities'].values():
                 fields(cell, 'state reason', 'capability')
                 if cell['state'] not in ('supported', 'unsupported'):
@@ -124,6 +140,25 @@ def render(data):
             count += 1
             lines.append('| ' + code(descriptor(s['type'])) + ' | ' + ' | '.join(
                 'Yes' if s['capabilities'][key]['state'] == 'supported' else 'No' for key in CAPS) + ' |')
+    lines += ['', '### Signature, callback and default type gates', '',
+              'These columns query `QueryDasTypeUse` at the boundaries listed below. '
+              'They are not acceptance by every authored DSL parser or a guarantee for arbitrary literals/expressions. '
+              '`Context` requires the concrete native property, owning function, direction and nesting depth; '
+              'the adapter gate is applied before a call. `No` reasons are retained in JSON.', '']
+    # Fixed-width groups retain export order and need no per-type or per-context policy in Python.
+    for offset in range(0, len(data['contexts']), 5):
+        group = data['contexts'][offset:offset + 5]
+        lines += ['| Descriptor | ' + ' | '.join(code(c['name']) for c in group) + ' |',
+                  '| --- | ' + ' | '.join(['---'] * len(group)) + ' |']
+        for a in data['adapters']:
+            for sample in a['samples']:
+                lines.append('| ' + code(descriptor(sample['type'])) + ' | ' + ' | '.join(
+                    {'supported': 'Yes', 'unsupported': 'No', 'requires_context': 'Context'}[
+                        sample['uses'][c['name']]['state']] for c in group) + ' |')
+        lines.append('')
+    lines += ['| Context | Actual validation boundary |', '| --- | --- |']
+    for context in data['contexts']:
+        lines.append('| ' + code(context['name']) + ' | ' + escape(context['boundary']) + ' |')
     lines += ['', '### Registered script facets and default policies', '',
               'These are adapter/facet declarations, not an independent support table. '
               '`—` means no dedicated hook is declared; generic lowering may still apply. '

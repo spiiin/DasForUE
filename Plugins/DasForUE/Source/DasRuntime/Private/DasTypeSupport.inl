@@ -27,17 +27,28 @@ FString BuildTypeAdapterSupportManifest()
 {
     check(IsInGameThread());
     auto Root = MakeShared<FJsonObject>();
-    Root->SetNumberField(TEXT("schema_version"), 2);
+    Root->SetNumberField(TEXT("schema_version"), 3);
     Root->SetStringField(TEXT("scope"),
-                              TEXT("registered adapter contracts and representative property ABI validation"));
-    Root->SetStringField(TEXT("evidence"), TEXT("ValidateDasPropertyType; adapter and script facet queries"));
+                              TEXT("registered adapter property ABI, signature, callback and default type gates"));
+    Root->SetStringField(TEXT("evidence"),
+                              TEXT("ValidateDasPropertyType; QueryDasTypeUse; adapter and script facet queries"));
     Root->SetStringField(TEXT("aot_scope"), TEXT("per binding; not inferred from a type adapter"));
     TArray<TSharedPtr<FJsonValue>> Unmodeled;
-    for (const TCHAR* S : {TEXT("authored field/signature and default-expression syntax"),
-                                TEXT("event and timer callback payload contracts"),
-                                     TEXT("generated native API and unregistered engine transports")})
+    for (const TCHAR* S :
+         {TEXT("complete DSL syntax, expression evaluation, literal validity and declaration graph resolution"),
+               TEXT("source receiver/signature compatibility, payload budgets and delivery liveness"),
+                    TEXT("generated native API and unregistered engine transports")})
         Unmodeled.Add(MakeShared<FJsonValueString>(S));
     Root->SetArrayField(TEXT("not_inferred"), Unmodeled);
+    TArray<TSharedPtr<FJsonValue>> Uses;
+    for (const auto& Use : DasTypeUses())
+    {
+        auto J = MakeShared<FJsonObject>();
+        J->SetStringField(TEXT("name"), Use.Name);
+        J->SetStringField(TEXT("boundary"), Use.Boundary);
+        Uses.Add(MakeShared<FJsonValueObject>(J));
+    }
+    Root->SetArrayField(TEXT("contexts"), Uses);
     TArray<TPair<FString, TSharedPtr<FJsonValue>>> Sorted;
     for (const auto& Entry : FDasTypeAdapters::Get().Entries())
     {
@@ -133,6 +144,20 @@ FString BuildTypeAdapterSupportManifest()
                 Caps->SetObjectField(Context, SupportCell(C, EDasPropertyUsage::Value));
             }
             S->SetObjectField(TEXT("capabilities"), Caps);
+            auto Contracts = MakeShared<FJsonObject>();
+            for (const auto& Use : DasTypeUses())
+            {
+                const auto Result = QueryDasTypeUse(Type, Use.Use);
+                auto Cell = MakeShared<FJsonObject>();
+                Cell->SetStringField(TEXT("state"), Result.State == EDasTypeSupport::Supported
+                                          ? TEXT("supported")
+                                          : Result.State == EDasTypeSupport::RequiresContext
+                                          ? TEXT("requires_context")
+                                          : TEXT("unsupported"));
+                Cell->SetStringField(TEXT("reason"), Result.Reason);
+                Contracts->SetObjectField(Use.Name, Cell);
+            }
+            S->SetObjectField(TEXT("uses"), Contracts);
             Samples.Add(MakeShared<FJsonValueObject>(S));
         }
         J->SetArrayField(TEXT("samples"), Samples);

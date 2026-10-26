@@ -1,3 +1,7 @@
+#include "DasTypeContracts.h"
+#include "DasCallbackTypes.h"
+#include "DasDelegateSignatures.h"
+#include "UObject/Package.h"
 #include "Blueprint/UserWidget.h"
 #include "Blueprint/WidgetBlueprintLibrary.h"
 #include "Components/Widget.h"
@@ -344,6 +348,123 @@ bool CheckDasTypeAdapterSupport(FString& Error)
                 }
         }
     }
+    // Direction, surface and literal boundaries must remain distinct even for the same scalar.
+    FDasDeclaredType Int;
+    FDasDeclaredType Void;
+    Void.Kind = TEXT("void");
+    FDasDeclaredType Name;
+    Name.Kind = TEXT("name");
+    FDasDeclaredType Text;
+    Text.Kind = TEXT("text");
+    auto Expect = [&](bool Good, const TCHAR* Why)
+    {
+        if (!Good)
+            Error = Why;
+        return Good;
+    };
+    if (!Expect(!QueryDasTypeUse(Void, EDasTypeUse::AuthoredInput).IsSupported() &&
+                    QueryDasTypeUse(Void, EDasTypeUse::AuthoredReturn).IsSupported() &&
+                    QueryDasTypeUse(Name, EDasTypeUse::PropertyDefault).IsSupported() &&
+                    !QueryDasTypeUse(Name, EDasTypeUse::ParameterDefault).IsSupported() &&
+                    QueryDasTypeUse(Text, EDasTypeUse::ParameterDefault).IsSupported() &&
+                    !QueryDasTypeUse(Text, EDasTypeUse::ComputedDefaultLeaf).IsSupported(),
+                TEXT("Type contexts collapsed distinct signature/default boundaries")))
+        return false;
+    FDasDeclaredMethod M;
+    M.ReturnType = Void;
+    FDasDeclaredParameter Param;
+    Param.Name = TEXT("Value");
+    Param.Type = Int;
+    Param.Direction = TEXT("out");
+    M.Parameters.Add(Param);
+    FString Why;
+    if (!Expect(ValidateDasSignatureContract(M, EDasSignatureUse::Method, Why) &&
+                    ValidateDasSignatureContract(M, EDasSignatureUse::Interface, Why) &&
+                    ValidateDasSignatureContract(M, EDasSignatureUse::Delegate, Why) &&
+                    !ValidateDasSignatureContract(M, EDasSignatureUse::Multicast, Why),
+                TEXT("Signature contract lost out-only multicast restriction")))
+        return false;
+    M.Parameters[0].Direction = TEXT("inout");
+    TStrongObjectPtr<UFunction> Sig(MakeDasDelegateSignature(M, true, GetTransientPackage(), NAME_None, Why));
+    if (!Expect(Sig.IsValid(), TEXT("Multicast mutable-ref signature rejected")))
+        return false;
+    M.ReturnType = Int;
+    if (!Expect(!ValidateDasSignatureContract(M, EDasSignatureUse::Multicast, Why),
+                TEXT("Multicast return value accepted")))
+        return false;
+    M.ReturnType = Void;
+    M.Parameters[0].Direction = TEXT("in");
+    M.Parameters[0].Default.Kind = TEXT("number");
+    M.Parameters[0].Default.Number = 1;
+    if (!Expect(ValidateDasParameterDefaults(M, true, Why) &&
+                    !ValidateDasSignatureContract(M, EDasSignatureUse::Interface, Why) &&
+                    ValidateDasSignatureContract(M, EDasSignatureUse::Delegate, Why),
+                TEXT("Interface defaults or delegate signature projection changed")))
+        return false;
+    M.Parameters.Add(Param);
+    M.Parameters.Last().Direction = TEXT("in");
+    if (!Expect(!ValidateDasParameterDefaults(M, true, Why), TEXT("Non-trailing parameter default accepted")))
+        return false;
+    M.Parameters.Pop();
+    M.WorldContext = M.Parameters[0].Name;
+    if (!Expect(!ValidateDasParameterDefaults(M, true, Why), TEXT("WorldContext default accepted")))
+        return false;
+    M.WorldContext.Reset();
+    M.Parameters[0].Default.Kind.Reset();
+    M.Parameters[0].Direction = TEXT("invalid");
+    if (!Expect(!ValidateDasSignatureContract(M, EDasSignatureUse::Method, Why), TEXT("Unknown direction accepted")))
+        return false;
+    FDasDeclaredLiteral V;
+    V.Kind = TEXT("number");
+    V.Number = 2147483648.0;
+    if (!Expect(!ValidateDasAuthoredDefault(Int, V, EDasTypeUse::ParameterDefault, Why),
+                TEXT("Out-of-range parameter default accepted")))
+        return false;
+    V.Number = 42;
+    if (!Expect(ValidateDasAuthoredDefault(Int, V, EDasTypeUse::ParameterDefault, Why),
+                TEXT("Valid parameter default rejected")))
+        return false;
+    FDasDeclaredType String;
+    String.Kind = TEXT("string");
+    V.Kind = TEXT("string");
+    V.String = FString::ChrN(4097, 'a');
+    if (!Expect(!ValidateDasAuthoredDefault(String, V, EDasTypeUse::ParameterDefault, Why) &&
+                    ValidateDasAuthoredDefault(String, V, EDasTypeUse::PropertyDefault, Why),
+                TEXT("Property and parameter string budgets merged")))
+        return false;
+    FDasDeclaredType Array;
+    Array.Kind = TEXT("array");
+    Array.Element = MakeShared<FDasDeclaredType>(Int);
+    V.Kind = TEXT("number");
+    V.Number = 1;
+    if (!Expect(!ValidateDasAuthoredDefault(Array, V, EDasTypeUse::StructMemberDefault, Why),
+                TEXT("Struct container accepted an explicit initializer")))
+        return false;
+    V.Kind.Reset();
+    if (!Expect(ValidateDasAuthoredDefault(Array, V, EDasTypeUse::StructMemberDefault, Why) &&
+                    QueryDasTypeUse(Array, EDasTypeUse::QueuedEvent).IsSupported() &&
+                    QueryDasTypeUse(Array, EDasTypeUse::Timer).IsSupported(),
+                TEXT("Empty struct container or owned callback carrier rejected")))
+        return false;
+    for (const auto& Entry : Registry.Entries())
+    {
+        TArray<FDasDeclaredType> Samples;
+        Entry.Adapter->GetSupportSamples(Samples);
+        for (const auto& Type : Samples)
+            for (const auto& Use : DasTypeUses())
+            {
+                auto Result = QueryDasTypeUse(Type, Use.Use);
+                if (!Expect(Result.IsSupported() == Result.Reason.IsEmpty(),
+                            TEXT("Context report lost rejection/context reason")))
+                    return false;
+                if (const auto* N = Entry.Adapter->GetNativePolicy(); N && N->StorageError)
+                    if (!Expect(!QueryDasTypeUse(Type, EDasTypeUse::PropertyDefault).IsSupported() &&
+                                    !QueryDasTypeUse(Type, EDasTypeUse::QueuedEvent).IsSupported() &&
+                                    !QueryDasTypeUse(Type, EDasTypeUse::Timer).IsSupported(),
+                                TEXT("Opaque transport opened generic defaults/queued callbacks")))
+                        return false;
+            }
+    }
     Error.Reset();
     return Positive > 0 && Negative > 0;
 }
@@ -395,6 +516,19 @@ bool CheckDasOpaqueTypeAdapters(FString& Error)
         Error = TEXT("Opaque families lost exact widget membership or ambiguous-role protection");
         return false;
     }
+    for (Role R : {Role::Paint, Role::EventReply, Role::Geometry, Role::InputActionValue})
+        if (!DasSynchronousCallbackRole(DasNativeTypePath(R), R))
+        {
+            Error = TEXT("Specialized synchronous callback lost exact role admission");
+            return false;
+        }
+    for (Role R : {Role::WidgetAnimation, Role::Constraint, Role::HitResult})
+        if (DasSynchronousCallbackRole(DasNativeTypePath(R), R))
+        {
+            Error = TEXT("Non-callback capability opened synchronous callback admission");
+            return false;
+        }
+    bool NativeAgreement = true;
     auto Gate = [&](Role R, UFunction* F, bool In, bool Out, bool Return, int32 Depth, int32 ArrayDim)
     {
         const FString Path = DasNativeTypePath(R);
@@ -406,7 +540,11 @@ bool CheckDasOpaqueTypeAdapters(FString& Error)
         Field->Struct = const_cast<UScriptStruct*>(A->GetStruct());
         Field->ArrayDim = ArrayDim;
         Field->SetPropertyFlags(CPF_Parm | (Return ? CPF_ReturnParm : CPF_None));
-        return P->AllowCall(Field.Get(), In, Out, Depth);
+        FString Why;
+        const bool Expected = P->AllowCall(Field.Get(), In, Out, Depth);
+        const bool Actual = ValidateDasNativeCallContract(Field.Get(), In, Out, Depth, Why);
+        NativeAgreement &= Expected == Actual && (Actual || !Why.IsEmpty());
+        return Actual;
     };
     auto* Geometry = UWidget::StaticClass()->FindFunctionByName(TEXT("GetCachedGeometry"));
     auto* Paint = UWidgetBlueprintLibrary::StaticClass()->FindFunctionByName(TEXT("DrawBox"));
@@ -435,7 +573,7 @@ bool CheckDasOpaqueTypeAdapters(FString& Error)
         !Gate(Role::Constraint, Consumer, false, true, true, 0, 1) &&
         Gate(Role::HitResult, Geometry, true, false, false, 2, 1) &&
         !Gate(Role::HitResult, Geometry, true, false, false, 0, 2);
-    if (!Valid)
+    if (!Valid || !NativeAgreement)
     {
         Error = TEXT("Native policy lost exact function/direction/depth/fixed-array restrictions");
         return false;

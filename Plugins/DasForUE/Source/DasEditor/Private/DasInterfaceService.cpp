@@ -1,4 +1,5 @@
 #include "DasInterfaceService.h"
+#include "DasTypeContracts.h"
 #include "DasTypePins.h"
 #include "DasRuntime.h"
 #include "DasAuthoring.h"
@@ -107,6 +108,9 @@ bool FDasInterfaceService::Apply(const FString& Script, const FString& Folder, T
     TArray<FTarget> Targets;
     for (const auto& C : Model.Classes)
     {
+        for (const auto& M : C.Methods)
+            if (!ValidateDasSignatureContract(M, EDasSignatureUse::Interface, Error))
+                return false;
         const FString Package = Folder + TEXT("/")+ C.Name;
         auto* Object = LoadObject<UObject>(nullptr, *(Package + TEXT(".")+ C.Name), nullptr, LOAD_NoWarn);
         auto* BP = Cast<UBlueprint>(Object);

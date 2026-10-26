@@ -32,6 +32,39 @@ class TypeSupportTest(unittest.TestCase):
                 self.assertIn(gen.code(a['native_policy']['lifetime']), text)
                 self.assertIn(gen.code(a['native_policy']['transport']), text)
 
+    def test_contexts_are_exported_and_rendered_without_inference(self):
+        text = gen.render(self.data)
+        names = {c['name'] for c in self.data['contexts']}
+        self.assertTrue({'authored_in', 'authored_out', 'authored_ref', 'authored_return',
+                         'interface_in', 'delegate_return', 'multicast_ref', 'queued_event', 'timer',
+                         'property_default', 'struct_member_default', 'parameter_default',
+                         'computed_default_leaf', 'native_call'} <= names)
+        for context in self.data['contexts']:
+            self.assertIn(gen.code(context['name']), text)
+            self.assertIn(gen.escape(context['boundary']), text)
+        for adapter in self.data['adapters']:
+            for sample in adapter['samples']:
+                self.assertEqual(set(sample['uses']), names)
+
+    def test_native_gate_requires_concrete_context(self):
+        for adapter in self.data['adapters']:
+            native = adapter['native_policy']
+            if native and native['call_gate'] and native['transport']:
+                for sample in adapter['samples']:
+                    self.assertEqual(sample['uses']['native_call']['state'], 'requires_context')
+        self.assertIn('Context', gen.render(self.data))
+
+    def test_context_reason_is_required(self):
+        cell = self.data['adapters'][0]['samples'][0]['uses']['native_call']
+        cell.update(state='requires_context', reason='')
+        with self.assertRaisesRegex(ValueError, 'reason'):
+            gen.validate(self.data)
+
+    def test_missing_contextual_gate_is_rejected(self):
+        del self.data['adapters'][0]['samples'][0]['uses']['timer']
+        with self.assertRaisesRegex(ValueError, 'contextual'):
+            gen.validate(self.data)
+
     def test_document_is_current(self):
         doc = gen.DOCUMENT.read_text(encoding='utf-8')
         self.assertEqual(doc, gen.replace_section(doc, gen.render(self.data)))
@@ -85,7 +118,7 @@ class TypeSupportTest(unittest.TestCase):
             gen.validate(self.data)
 
     def test_unsupported_schema_is_rejected(self):
-        self.data['schema_version'] = 3
+        self.data['schema_version'] = 4
         with self.assertRaisesRegex(ValueError, 'schema'):
             gen.validate(self.data)
 

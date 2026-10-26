@@ -2,6 +2,7 @@
 #include "UObject/UObjectGlobals.h"
 #include "DasReflectedTypes.h"
 #include "DasTypeAdapters.h"
+#include "DasTypeContracts.h"
 #include "DasSoftReferences.h"
 #include "Dom/JsonObject.h"
 #include "Misc/SecureHash.h"
@@ -98,40 +99,13 @@ bool FDasReflectedTypes::Validate(FString& Error, bool AllowUnresolved) const
             return false;
         for (const auto& P : S.Properties)
         {
+            if (!ValidateDasTypeUse(P.Type, EDasTypeUse::StructMemberDefault, Error))
+                return false;
             if (IDs.Contains(P.Id))
                 return Fail(TEXT("Duplicate type/member stable ID"));
             IDs.Add(P.Id);
             if (P.bReadOnly || !P.bEditable)
                 return Fail(TEXT("Initial user structs require editable read-write fields"));
-            if (P.Type.Kind !=
-                TEXT("byte") &&
-                    P.Type.Kind !=
-                        TEXT("text") &&
-                            P.Type.Kind !=
-                                TEXT("int") &&
-                                    P.Type.Kind !=
-                                        TEXT("float") &&
-                                            P.Type.Kind !=
-                                                TEXT("double") &&
-                                                    P.Type.Kind !=
-                                                        TEXT("bool") &&
-                                                            P.Type.Kind !=
-                                                                TEXT("string") &&
-                                                                    P.Type.Kind !=
-                                                                        TEXT("name") &&
-                                                                            P.Type.Kind !=
-                                                                                TEXT("object") &&
-                                                                                    P.Type.Kind !=
-                                                                                        TEXT("enum") &&
-                                                                                            P.Type.Kind !=
-                                                                                                TEXT("struct") &&
-                                                                                                    P.Type.Kind !=
-                                                                                                        TEXT("array") &&
-                                                                                                            P.Type.Kind !=
-                                                                                                                TEXT("map") &&
-                                                                                                                    P.Type.Kind !=
-                                                                                                                        TEXT("set"))
-                return Fail(TEXT("Initial reflected structs support scalar/name fields only"));
         }
     }
     TMap<FString, const FDasDeclaredClass*> Refs;
@@ -152,6 +126,8 @@ bool FDasReflectedTypes::Validate(FString& Error, bool AllowUnresolved) const
         Active.Add(S.Id);
         for (const auto& P : S.Properties)
         {
+            if (!ValidateDasAuthoredDefault(P.Type, P.Default, EDasTypeUse::StructMemberDefault, Error))
+                return false;
             if (P.Type.Kind == TEXT("enum"))
             {
                 const auto* E = EnumRefs.Find(P.Type.TypePath);
@@ -176,14 +152,6 @@ bool FDasReflectedTypes::Validate(FString& Error, bool AllowUnresolved) const
             }
             if (P.Type.Kind == TEXT("set"))
             {
-                if (!P.Type.Element ||
-                    (P.Type.Element->Kind !=
-                     TEXT("byte") && P.Type.Element->Kind != TEXT("int") && P.Type.Element->Kind != TEXT("string")) ||
-                                         !P.Default.Kind.IsEmpty())
-                {
-                    Error = TEXT("Authored sets require int/string elements and empty defaults");
-                    return false;
-                }
                 if (++Leaves > 1024)
                 {
                     Error = TEXT("Authored struct leaf limit exceeded");
@@ -193,46 +161,6 @@ bool FDasReflectedTypes::Validate(FString& Error, bool AllowUnresolved) const
             }
             if (P.Type.Kind == TEXT("map"))
             {
-                if (!P.Type.Key || !P.Type.Value ||
-                    (P.Type.Key->Kind !=
-                     TEXT("byte") &&
-                         P.Type.Key->Kind != TEXT("int") && P.Type.Key->Kind != TEXT("string")) ||
-                             (P.Type.Value->Kind !=
-                              TEXT("byte") &&
-                                  P.Type.Value->Kind !=
-                                      TEXT("text") &&
-                                          P.Type.Value->Kind !=
-                                              TEXT("int") &&
-                                                  P.Type.Value
-                                                          ->Kind !=
-                                                      TEXT("string") &&
-                                                          P.Type.Value
-                                                                  ->Kind !=
-                                                              TEXT("float") &&
-                                                                  P.Type.Value
-                                                                          ->Kind !=
-                                                                      TEXT("double") &&
-                                                                          P.Type.Value
-                                                                                  ->Kind !=
-                                                                              TEXT("bool") &&
-                                                                                  P.Type.Value
-                                                                                          ->Kind !=
-                                                                                      TEXT("name") &&
-                                                                                          P.Type.Value
-                                                                                                  ->Kind !=
-                                                                                              TEXT("struct") &&
-                                                                                                  P.Type.Value
-                                                                                                          ->Kind !=
-                                                                                                      TEXT("enum") &&
-                                                                                                          P.Type.Value
-                                                                                                                  ->Kind !=
-                                                                                                              TEXT("object")) ||
-                                                                                                      !P.Default.Kind
-                                                                                                           .IsEmpty())
-                {
-                    Error = TEXT("Authored maps require int/string keys, scalar/name/struct/enum/reference values and empty defaults");
-                    return false;
-                }
                 if (P.Type.Value->Kind == TEXT("enum") && !EnumRefs.Contains(P.Type.Value->TypePath) &&
                                                !AllowUnresolved)
                 {
@@ -273,11 +201,6 @@ bool FDasReflectedTypes::Validate(FString& Error, bool AllowUnresolved) const
                 const auto* Ref = &P.Type;
                 if (P.Type.Kind == TEXT("array"))
                 {
-                    if (!P.Type.Element || !P.Default.Kind.IsEmpty())
-                    {
-                        Error = TEXT("Authored arrays require an element and empty defaults");
-                        return false;
-                    }
                     const auto& K = P.Type.Element->Kind;
                     if (K == TEXT("object"))
                     {
@@ -305,18 +228,6 @@ bool FDasReflectedTypes::Validate(FString& Error, bool AllowUnresolved) const
                     }
                     if (K != TEXT("struct"))
                     {
-                        if (K != TEXT("byte") &&
-                                      K != TEXT("text") &&
-                                                K != TEXT("int") &&
-                                                          K != TEXT("float") &&
-                                                                    K != TEXT("double") &&
-                                                                              K != TEXT("bool") &&
-                                                                                        K != TEXT("string") &&
-                                                                                                  K != TEXT("name"))
-                        {
-                            Error = TEXT("Unsupported authored array element");
-                            return false;
-                        }
                         if (++Leaves > 1024)
                         {
                             Error = TEXT("Authored struct leaf limit exceeded");
@@ -338,33 +249,18 @@ bool FDasReflectedTypes::Validate(FString& Error, bool AllowUnresolved) const
                 if (const auto* Leaf =
                         P.Type.GetKind() == EDasTypeKind::Struct ? DasLeafValueAdapter(Ref->TypePath) : nullptr)
                 {
-                    if (!P.Default.Kind.IsEmpty() && Leaf->GetDefaultPolicy() == EDasAdapterDefault::ImplicitEmpty)
-                    {
-                        Error = Ref->TypePath + TEXT(" struct fields use implicit empty defaults");
-                        return false;
-                    }
                     if (++Leaves > 1024)
                         return false;
                     continue;
                 }
                 if (P.Type.Kind == TEXT("struct") && DasMathAdapter(Ref->TypePath))
                 {
-                    if (P.Default.Kind != TEXT("string"))
-                    {
-                        Error = TEXT("Math struct members require literal defaults");
-                        return false;
-                    }
                     if (++Leaves > 1024)
                     {
                         Error = TEXT("Authored struct leaf limit exceeded");
                         return false;
                     }
                     continue;
-                }
-                if (!P.Default.Kind.IsEmpty())
-                {
-                    Error = TEXT("Nested authored fields use implicit child defaults");
-                    return false;
                 }
                 const auto* Child = Refs.Find(Ref->TypePath);
                 if (!Child)
