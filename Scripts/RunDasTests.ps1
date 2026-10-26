@@ -107,8 +107,12 @@ $Steps = @{
 }
 
 $PreviousSdkSetup = $env:UE_SKIP_UBT_SDK_SETUP
+$OuterRun = $env:DAS_RUN_ACTIVE
 try {
     $env:UE_SKIP_UBT_SDK_SETUP = '1'
+    $env:DAS_RUN_ACTIVE = '1'
+    # Once per top-level run: a suite that calls this runner again (gas-merge-regression) keeps the outer run's files.
+    if (!$OuterRun) { Clear-DasRunArtifacts $Das }
     foreach ($S in $Plan) {
         $Started = Get-Date
         & $Steps[$S.kind] $S
@@ -120,4 +124,4 @@ try {
     & $Python (Join-Path $PSScriptRoot 'RenderValidation.py') --check
     if ($LASTEXITCODE) { throw 'Validation index freshness check failed' }
     Write-Output 'DAS_SUITES=PASS'
-} finally { $env:UE_SKIP_UBT_SDK_SETUP = $PreviousSdkSetup }
+} finally { $env:UE_SKIP_UBT_SDK_SETUP = $PreviousSdkSetup; $env:DAS_RUN_ACTIVE = $OuterRun }

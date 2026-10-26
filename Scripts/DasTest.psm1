@@ -207,6 +207,69 @@ function Invoke-DasValidation {
     Write-Output "$SuccessMarker checks=$Checks"
 }
 
+# Removes what earlier runs left behind: per-run asset folders (a GUID or hex id, PIE_<guid>) under
+# Content/Das*/ of the smoke project and the generated method-values / savegame scripts. Keeps the ids that
+# logs/*-probe-id.txt names (suites run with -NoDependencies reopen them) and the newest entry of each root (to
+# look at after a failure); deletes only what git ignores. -DryRun lists the candidates instead.
+function Clear-DasRunArtifacts {
+    param($Das, [switch]$DryRun)
+    $Id = '^(PIE_)?[0-9A-Fa-f]{12,32}$'
+    $Keep = @{}
+    foreach ($F in @(Get-ChildItem -LiteralPath $Das.Logs -Filter '*-probe-id.txt' -File -ErrorAction SilentlyContinue)) {
+        $Text = (Get-Content -LiteralPath $F.FullName -Raw)
+        if ($Text) { $Keep[$Text.Trim().ToLowerInvariant()] = $true }
+    }
+    # Groups of entries of one run: the newest group of a root stays.
+    $Groups = @()
+    $Content = Join-Path $Das.Repo 'Tests\DasForUESmoke\Content'
+    foreach ($Root in @(Get-ChildItem -LiteralPath $Content -Directory -Filter 'Das*')) {
+        $Runs = @(Get-ChildItem -LiteralPath $Root.FullName |
+            Where-Object { [IO.Path]::GetFileNameWithoutExtension($_.Name) -match $Id })
+        foreach ($R in $Runs) {
+            $Groups += [pscustomobject]@{ Root = $Root.FullName; Key = [IO.Path]::GetFileNameWithoutExtension($R.Name)
+                                          Items = @($R); Time = $R.LastWriteTimeUtc }
+        }
+    }
+    $Scripts = Join-Path $Das.Repo 'Plugins\DasForUE\Content\Das\Scripts'
+    $Generated = @(Get-ChildItem -LiteralPath $Scripts -File -Filter '*.das' |
+        Where-Object { $_.Name -match '^(dsl_registered_methodvalues|savegame_compatibility)_([0-9A-Fa-f]{32})' })
+    foreach ($G in ($Generated | Group-Object { $_.Name -replace '^(.+?_)([0-9A-Fa-f]{32}).*$', '$1$2' })) {
+        $Groups += [pscustomobject]@{ Root = $Scripts + ':' + ($G.Name -replace '_[0-9A-Fa-f]{32}$', '')
+                                      Key = ($G.Name -replace '^.*_', ''); Items = @($G.Group)
+                                      Time = ($G.Group | Measure-Object LastWriteTimeUtc -Maximum).Maximum }
+    }
+    $Remove = @(); $Kept = 0
+    foreach ($Root in ($Groups | Group-Object Root)) {
+        $Newest = ($Root.Group | Sort-Object Time -Descending | Select-Object -First 1).Key
+        foreach ($G in $Root.Group) {
+            if ($G.Key -eq $Newest -or $Keep.ContainsKey(($G.Key -replace '^PIE_', '').ToLowerInvariant())) { ++$Kept }
+            else { $Remove += $G.Items }
+        }
+    }
+    # Only paths git ignores: a tracked file never matches, whatever its name.
+    $Ignored = @{}
+    if ($Remove) {
+        $Previous = $ErrorActionPreference; $ErrorActionPreference = 'Continue'
+        try {
+            $Relative = @($Remove | ForEach-Object { $_.FullName.Substring($Das.Repo.Length + 1).Replace('\', '/') })
+            # Paths as arguments, in batches under the command-line limit: Windows PowerShell pipes CRLF into
+            # --stdin, and git then matches nothing.
+            for ($I = 0; $I -lt $Relative.Count; $I += 100) {
+                $Batch = $Relative[$I..([Math]::Min($I + 99, $Relative.Count - 1))]
+                foreach ($Line in @(& git -C $Das.Repo check-ignore -- @Batch 2>$null)) { $Ignored[$Line] = $true }
+            }
+        } finally { $ErrorActionPreference = $Previous }
+    }
+    $Removed = 0
+    foreach ($Item in $Remove) {
+        if (!$Ignored.ContainsKey($Item.FullName.Substring($Das.Repo.Length + 1).Replace('\', '/'))) { ++$Kept; continue }
+        if ($DryRun) { Write-Output "DAS_CLEANUP_CANDIDATE $($Item.FullName)" }
+        else { Remove-Item -LiteralPath $Item.FullName -Recurse -Force }
+        ++$Removed
+    }
+    Write-Output "DAS_CLEANUP removed=$Removed kept=$Kept"
+}
+
 Export-ModuleMember -Function Get-DasContext, Invoke-DasBuild, Assert-DasLog, Invoke-DasCommandlet, Invoke-DasAutomation,
     Invoke-DasPackaged, Invoke-DasAssetPhases, Test-DasResult, Get-DasResult, Assert-DasResult,
-    Lock-SourceHashes, Write-DasValidation, Get-DasValidationPaths, Invoke-DasValidation -Variable DasEngineErrorPattern
+    Lock-SourceHashes, Write-DasValidation, Get-DasValidationPaths, Invoke-DasValidation, Clear-DasRunArtifacts -Variable DasEngineErrorPattern
