@@ -1,5 +1,6 @@
 #include "DasExportCommandlet.h"
 #include "DasRuntime.h"
+#include "DasTypeAdapters.h"
 #include "Modules/ModuleManager.h"
 #include "Misc/Parse.h"
 #include "DasAuthoredInterfaceClass.h"
@@ -35,6 +36,19 @@ int32 UDasExportCommandlet::Main(const FString& Params)
                 return 1;
             }
         }
+    }
+    FString TypeSupport;
+    if (FParse::Value(*Params, TEXT("TypeSupport="), TypeSupport))
+    {
+        FModuleManager::LoadModuleChecked<FDasRuntimeModule>(TEXT("DasRuntime"));
+        if (!FFileHelper::SaveStringToFile(DasTypeAdapterSupportManifest(), *TypeSupport,
+                                           FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM))
+        {
+            UE_LOG(LogTemp, Error, TEXT("DAS_TYPE_SUPPORT_EXPORT=FAIL %s"), *TypeSupport);
+            return 1;
+        }
+        UE_LOG(LogTemp, Display, TEXT("DAS_TYPE_SUPPORT_EXPORT=PASS %s"), *TypeSupport);
+        return 0;
     }
 #if DAS_WITH_EDITOR_TESTS
     FString Probe;

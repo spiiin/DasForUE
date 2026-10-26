@@ -1,5 +1,6 @@
 #include "DasEnumAdapter.h"
 #include "DasDefinedEnum.h"
+#include "Engine/EngineTypes.h"
 #include "UObject/UnrealType.h"
 
 EDasEnumStorage DasAutomaticEnumStorage(const UEnum* Enum)
@@ -21,6 +22,13 @@ class FDasEnumAdapter final : public IDasTypeAdapter
 {
 public:
     EDasTypeKind GetKind() const override { return EDasTypeKind::Enum; }
+    void GetSupportSamples(TArray<FDasDeclaredType>& Out) const override
+    {
+        FDasDeclaredType Type;
+        Type.Kind = TEXT("enum");
+        Type.TypePath = StaticEnum<ECollisionChannel>()->GetPathName();
+        Out.Add(MoveTemp(Type));
+    }
     bool CanBeContainerKey(const FDasDeclaredType&) const override { return true; }
     bool UsesTypeIdentity() const override { return true; }
     bool MatchesProperty(const FProperty* Property) const override

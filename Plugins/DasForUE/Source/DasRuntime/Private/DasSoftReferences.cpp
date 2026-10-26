@@ -176,6 +176,20 @@ class FDasSoftReferenceAdapter final : public IDasTypeAdapter
 {
 public:
     EDasTypeKind GetKind() const override { return EDasTypeKind::Struct; }
+    void GetSupportSamples(TArray<FDasDeclaredType>& Out) const override
+    {
+        for (bool ClassReference : {false, true})
+        {
+            FString Error;
+            if (const auto* Carrier = DasSoftCarrier(UObject::StaticClass(), ClassReference, Error))
+            {
+                FDasDeclaredType Type;
+                Type.Kind = TEXT("struct");
+                Type.TypePath = Carrier->GetPathName();
+                Out.Add(MoveTemp(Type));
+            }
+        }
+    }
     bool IsReferenceValue() const override { return true; }
     bool IsStructFamily() const override { return true; }
     bool MatchesStructPath(const FString& Path) const override { return DasSoftProperty(Path) != nullptr; }

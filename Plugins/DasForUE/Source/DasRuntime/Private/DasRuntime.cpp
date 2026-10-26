@@ -582,6 +582,7 @@ FSourceSet* AuthoredReferenceSources = nullptr;
 #include "DasRuntimeTypeAnnotations.inl"
 #include "DasTypeAdaptersBuiltin.inl"
 #include "DasMapInterop.inl"
+#include "DasTypeSupport.inl"
 #include "DasPersistentGlobals.inl"
 #include "DasCollisionNames.inl"
 #include "DasFoundationModule.inl"
@@ -609,6 +610,10 @@ void* dasue::aot::Resolve(uint64_t Key, das::Context* Context)
 void DasRegisterBuiltinTypeAdapters(FDasTypeAdapters& Registry)
 {
     RegisterBuiltinTypeAdapters(Registry);
+}
+FString DasTypeAdapterSupportManifest()
+{
+    return BuildTypeAdapterSupportManifest();
 }
 void FDasRuntimeModule::StartupModule()
 {

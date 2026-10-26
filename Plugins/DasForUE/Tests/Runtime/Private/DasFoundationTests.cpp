@@ -78,6 +78,9 @@ bool RunDasFoundationTests(FString& Report)
     {
         FString AdapterError;
         Expect(CheckDasTypeAdapters(AdapterError), TEXT("type_adapters_reachable_by_identity"), AdapterError);
+        AdapterError.Reset();
+        Expect(CheckDasTypeAdapterSupport(AdapterError), TEXT("type_adapter_support_materializes_contracts"),
+                                                              AdapterError);
     }
 #if WITH_EDITOR
     {
@@ -99,6 +102,10 @@ bool RunDasFoundationTests(FString& Report)
         CheckManifest(DasFoundationExternManifest(), TEXT("Bindings/FoundationExterns.txt"),
                                                           TEXT("foundation-externs.txt"),
                                                                TEXT("foundation_extern_manifest_matches_baseline"));
+        Expect(FPaths::FileExists(Repo / TEXT("Bindings/TypeSupport.json")), TEXT("type_support_baseline_present"));
+        CheckManifest(DasTypeAdapterSupportManifest(), TEXT("Bindings/TypeSupport.json"),
+                                                            TEXT("type-support.json"),
+                                                                 TEXT("type_support_manifest_matches_registry"));
         CheckManifest(DasKindManifest(), TEXT("Bindings/Kinds.json"), TEXT("kinds.json"),
                                                                            TEXT("kind_manifest_matches_baseline"));
     }

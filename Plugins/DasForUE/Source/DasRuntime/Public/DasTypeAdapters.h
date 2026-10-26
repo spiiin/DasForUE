@@ -26,6 +26,9 @@ class DASRUNTIME_API IDasTypeAdapter
 public:
     virtual ~IDasTypeAdapter() = default;
     virtual EDasTypeKind GetKind() const = 0;
+    // Representative descriptors for diagnostics, not a second capability table. Nominal and dynamic
+    // families provide their own samples; actual support is queried through the normal validators.
+    virtual void GetSupportSamples(TArray<FDasDeclaredType>& Out) const;
     virtual TConstArrayView<FDasContainerSlot> GetContainerSlots() const { return {}; }
     virtual bool SupportsContainerValue() const { return true; }
     virtual bool CanBeContainerKey(const FDasDeclaredType&) const { return false; }
@@ -98,6 +101,10 @@ private:
     TArray<int32> StructFamilies;
 };
 
+// Deterministic, versioned registry/facet contracts for documentation and drift checks.
+// Property ABI acceptance does not imply authored DSL, callback, generator or per-binding AOT support.
+DASRUNTIME_API FString DasTypeAdapterSupportManifest();
+
 // Nominal call contract: enum storage forms share an identity; object/class bases are exact.
 DASRUNTIME_API bool DasPropertyMatchesContract(const FProperty* Property, EDasMethodSignature Kind,
                                                const FString& TypePath);
@@ -108,4 +115,5 @@ DASRUNTIME_API const IDasTypeAdapter* DasLeafValueAdapter(const FString& StructP
 DASRUNTIME_API const IDasTypeAdapter* DasMathAdapter(const FString& StructPath);
 #if DAS_WITH_TEST_PROBES
 DASRUNTIME_API bool CheckDasTypeAdapters(FString& Error);
+DASRUNTIME_API bool CheckDasTypeAdapterSupport(FString& Error);
 #endif

@@ -31,6 +31,8 @@
       "marker": "DAS_GAS_CUE_ASSETS_RESULT=PASS" },
     { "name": "gas-cues", "kind": "commandlet", "run": "DasGASCues", "log": "gas-cues-runtime",
       "marker": "DAS_GAS_CUES_RESULT=PASS" },
+    { "name": "type-support-export", "kind": "script", "script": "ExportTypeSupport.ps1", "requires": ["build"] },
+    { "name": "type-support", "kind": "script", "script": "TestTypeSupport.ps1", "requires": ["type-support-export"] },
     { "name": "python", "kind": "python", "log": "combined-python-tests" },
     { "name": "interface-contracts", "kind": "script", "script": "TestInterfaceContracts.ps1" },
     { "name": "foundation", "kind": "commandlet", "run": "DasSmoke", "log": "combined-editor-foundation",
@@ -102,8 +104,8 @@
     { "name": "editor-isolation", "kind": "script", "script": "TestEditorIsolation.ps1", "comment": "Build and launch a normal Editor without test extensions. Run last: it builds another Editor project." }
   ],
   "presets": {
-    "quick": ["build", "python", "foundation", "automation-quick"],
-    "editor": ["build", "python", "foundation", "automation"],
-    "full": ["build", "python", "foundation", "automation", "packaged"]
+    "quick": ["build", "type-support", "python", "foundation", "automation-quick"],
+    "editor": ["build", "type-support", "python", "foundation", "automation"],
+    "full": ["build", "type-support", "python", "foundation", "automation", "packaged"]
   }
 }

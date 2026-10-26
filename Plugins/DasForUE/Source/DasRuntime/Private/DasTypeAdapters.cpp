@@ -16,6 +16,18 @@ const FDasTypeAdapters& FDasTypeAdapters::Get()
     }();
     return *Registry;
 }
+void IDasTypeAdapter::GetSupportSamples(TArray<FDasDeclaredType>& Out) const
+{
+    FDasDeclaredType Type;
+    Type.Kind = DasTypeKindName(GetKind());
+    if (const auto* Struct = GetStruct())
+        Type.TypePath = Struct->GetPathName();
+    else if (UsesTypeIdentity() || IsStructFamily())
+        return; // Unreported unless the owner supplies a concrete identity.
+    for (const auto& Slot : GetContainerSlots())
+        Type.*Slot.Descriptor = MakeShared<FDasDeclaredType>(); // int child
+    Out.Add(MoveTemp(Type));
+}
 void FDasTypeAdapters::Register(TSharedRef<const IDasTypeAdapter> Adapter, const IDasScriptTypeFacet* Script)
 {
     const int32 Index = EntryList.Add({Adapter, Script});

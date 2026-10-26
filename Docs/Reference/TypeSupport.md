@@ -2,6 +2,84 @@
 
 This page summarizes which value kinds can appear in which positions of authored DSL code (classes, structs, interfaces, delegates, events and timers) and in generated native API. It is a map; the linked pages have the exact rules. A loaded, registered concrete enum/struct/class identity is required wherever a type is named, and "Yes" never means unrestricted signatures.
 
+<!-- BEGIN GENERATED TYPE SUPPORT -->
+## Registry-derived contracts
+
+Generated from the live registry export in [Bindings/TypeSupport.json](../../Bindings/TypeSupport.json). Update with `GenerateTypeSupport.py --manifest logs/type-support-live.json`; verify with `--check`.
+
+**Scope:** representative property descriptors checked by `ValidateDasPropertyType`. `Value`, `Snapshot member`, and `Delegate parameter` mean the three **property ABI usages**, not acceptance by every authored DSL parser, signature validator or callback. Container columns validate the complete composed descriptor with this sample as the child (the other map slot is `int`). Native class, interface and weak-reference samples remain separate.
+
+`Yes` applies to the shown descriptor only. `No` has the exact validator reason in the JSON. `Unreported` means an adapter has no representative sample; it is never rendered as supported.
+
+| Representative descriptor | Value | Snapshot member | Delegate parameter | Array element | Map value | Map key | Set element |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| <code>array&lt;int&gt;</code> | Yes | Yes | Yes | No | No | No | No |
+| <code>bool</code> | Yes | Yes | Yes | Yes | Yes | No | No |
+| <code>byte</code> | Yes | Yes | Yes | Yes | Yes | Yes | Yes |
+| <code>class:/Script/CoreUObject.Object</code> | Yes | Yes | Yes | No | No | No | No |
+| <code>double</code> | Yes | Yes | Yes | Yes | Yes | No | No |
+| <code>enum:/Script/Engine.ECollisionChannel</code> | Yes | Yes | Yes | Yes | Yes | Yes | Yes |
+| <code>float</code> | Yes | Yes | Yes | Yes | Yes | No | No |
+| <code>int</code> | Yes | Yes | Yes | Yes | Yes | Yes | Yes |
+| <code>map&lt;int, int&gt;</code> | Yes | Yes | Yes | No | No | No | No |
+| <code>name</code> | Yes | Yes | Yes | Yes | Yes | Yes | Yes |
+| <code>object:/Script/CoreUObject.Object</code> | Yes | Yes | Yes | Yes | Yes | Yes | Yes |
+| <code>weak&lt;object:/Script/CoreUObject.Object&gt;</code> | Yes | Yes | Yes | No | No | No | No |
+| <code>object:/Script/CoreUObject.Interface</code> | Yes | Yes | Yes | Yes | Yes | No | No |
+| <code>set&lt;int&gt;</code> | Yes | Yes | Yes | No | No | No | No |
+| <code>string</code> | Yes | Yes | Yes | Yes | Yes | Yes | Yes |
+| <code>struct:/Script/CoreUObject.Rotator</code> | Yes | Yes | Yes | Yes | Yes | No | No |
+| <code>struct:/Script/CoreUObject.Transform</code> | Yes | Yes | Yes | Yes | Yes | No | No |
+| <code>struct:/Script/CoreUObject.Vector</code> | Yes | Yes | Yes | Yes | Yes | No | No |
+| <code>struct:/Script/CoreUObject.Vector2D</code> | Yes | Yes | Yes | Yes | Yes | No | No |
+| <code>struct:/Script/EnhancedInput.InputActionValue</code> | Yes | Yes | Yes | Yes | Yes | No | No |
+| <code>struct:/Script/GameplayTags.GameplayTag</code> | Yes | Yes | Yes | Yes | Yes | No | No |
+| <code>struct:/Script/GameplayTags.GameplayTagContainer</code> | Yes | Yes | Yes | Yes | Yes | No | No |
+| <code>struct:/Script/DasRuntime.DasSoftClass_f6005a7380ac4daaf37e8e855ef43965</code> | Yes | Yes | Yes | Yes | Yes | No | No |
+| <code>struct:/Script/DasRuntime.DasSoftObject_f6005a7380ac4daaf37e8e855ef43965</code> | Yes | Yes | Yes | Yes | Yes | No | No |
+| <code>text</code> | Yes | Yes | Yes | Yes | Yes | No | No |
+
+### Registered script facets and default policies
+
+These are adapter/facet declarations, not an independent support table. `—` means no dedicated hook is declared; generic lowering may still apply. View flags describe specialized view uses, not complete field/signature support. `explicit`/`implicit_empty` is the adapter default policy, not a claim that a particular property, parameter or computed-default expression is accepted.
+
+| Adapter | View module | Specialized view uses | Frame / method bridges | Default policy | Default kind |
+| --- | --- | --- | --- | --- | --- |
+| <code>array</code> | — | — | — / — | <code>explicit</code> | — |
+| <code>bool</code> | — | — | — / — | <code>explicit</code> | — |
+| <code>byte</code> | — | — | — / — | <code>explicit</code> | — |
+| <code>class</code> | <code>ue_native_gameplay</code> | native_property, self_property, authored_reference | — / — | <code>explicit</code> | — |
+| <code>double</code> | — | — | — / — | <code>explicit</code> | — |
+| <code>enum</code> | <code>ue_native_gameplay</code> | native_property | — / — | <code>explicit</code> | — |
+| <code>float</code> | — | — | — / — | <code>explicit</code> | — |
+| <code>int</code> | — | — | — / — | <code>explicit</code> | — |
+| <code>map</code> | — | — | — / — | <code>explicit</code> | — |
+| <code>name</code> | <code>ue_foundation</code> | native_property, self_property, authored_reference | — / — | <code>explicit</code> | — |
+| <code>object</code> | <code>ue_native_gameplay</code> | native_property, self_property, authored_reference | — / — | <code>explicit</code> | — |
+| <code>set</code> | — | — | — / — | <code>explicit</code> | — |
+| <code>string</code> | — | — | — / — | <code>explicit</code> | — |
+| <code>struct:/Script/CoreUObject.Rotator</code> | <code>ue_foundation</code> | native_property, self_property, authored_reference | <code>rotator</code> / <code>rotator</code> | <code>explicit</code> | <code>rotator</code> |
+| <code>struct:/Script/CoreUObject.Transform</code> | <code>ue_foundation</code> | native_property, self_property, authored_reference | <code>transform</code> / <code>transform</code> | <code>explicit</code> | <code>transform</code> |
+| <code>struct:/Script/CoreUObject.Vector</code> | <code>ue_foundation</code> | native_property, self_property, authored_reference | <code>vector</code> / <code>vector</code> | <code>explicit</code> | <code>vector</code> |
+| <code>struct:/Script/CoreUObject.Vector2D</code> | <code>ue_foundation</code> | native_property, self_property | — / — | <code>explicit</code> | <code>vector2d</code> |
+| <code>struct:/Script/EnhancedInput.InputActionValue</code> | <code>ue_foundation</code> | — | — / <code>input_value</code> | <code>explicit</code> | — |
+| <code>struct:/Script/GameplayTags.GameplayTag</code> | <code>ue_gameplay_tags</code> | native_property | — / — | <code>implicit_empty</code> | — |
+| <code>struct:/Script/GameplayTags.GameplayTagContainer</code> | <code>ue_gameplay_tags</code> | native_property | — / — | <code>implicit_empty</code> | — |
+| <code>struct:family</code> | <code>ue_native_gameplay</code> | native_property | — / — | <code>implicit_empty</code> | — |
+| <code>text</code> | <code>ue_foundation</code> | native_property, self_property, authored_reference | — / — | <code>explicit</code> | — |
+
+Coverage: **22 registered adapters, 25 representative descriptors**.
+
+**AOT:** per binding; not inferred from a type adapter. A scalar-compatible binding can be AOT eligible while an opaque overload of the same operation is closed. A type-level `Yes` would be misleading.
+
+**Not inferred by this registry export:** authored field/signature and default-expression syntax; event and timer callback payload contracts; generated native API and unregistered engine transports.
+
+<!-- END GENERATED TYPE SUPPORT -->
+
+The authored and generated-API summaries below are contextual guidance maintained separately:
+those subsystems have additional policies that the adapter registry does not yet expose.
+The generated tables above deliberately do not turn property-ABI acceptance into a general DSL/API promise.
+
 ## Authored DSL
 
 | Value kind | Field | Param in | Param out / ref | Return | Array element | Map key / set element | Map value | Event payload (`ue_event`, delegates) | Timer argument | Default value |

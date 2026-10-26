@@ -1,0 +1,1868 @@
+{
+	"schema_version": 1,
+	"scope": "registered adapter contracts and representative property ABI validation",
+	"evidence": "ValidateDasPropertyType; adapter and script facet queries",
+	"aot_scope": "per binding; not inferred from a type adapter",
+	"not_inferred": [
+		"authored field/signature and default-expression syntax",
+		"event and timer callback payload contracts",
+		"generated native API and unregistered engine transports"
+	],
+	"adapters": [
+		{
+			"id": "array",
+			"kind": "array",
+			"struct_path": "",
+			"family": false,
+			"leaf": false,
+			"reference_value": false,
+			"container_value_policy": false,
+			"default_policy": "explicit",
+			"default_kind": "",
+			"container_slots": [
+				{
+					"name": "element",
+					"hash_key": false
+				}
+			],
+			"script":
+			{
+				"registered": false,
+				"module": "",
+				"handle": "",
+				"native_property": false,
+				"self_property": false,
+				"authored_reference": false,
+				"frame_bridge": "",
+				"method_bridge": ""
+			},
+			"samples": [
+				{
+					"id": "array[0]:0:<int[0]:0:>",
+					"type":
+					{
+						"kind": "array",
+						"type_path": "",
+						"weak": false,
+						"enum_storage": 0,
+						"authored_id": "",
+						"delegate_wire": "",
+						"element":
+						{
+							"kind": "int",
+							"type_path": "",
+							"weak": false,
+							"enum_storage": 0,
+							"authored_id": "",
+							"delegate_wire": ""
+						}
+					},
+					"capabilities":
+					{
+						"value_property":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"snapshot_member":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_parameter":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"array_element":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container child type: array "
+						},
+						"map_value":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container child type: map "
+						},
+						"map_key":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container child type: map "
+						},
+						"set_element":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container child type: set "
+						}
+					}
+				}
+			]
+		},
+		{
+			"id": "bool",
+			"kind": "bool",
+			"struct_path": "",
+			"family": false,
+			"leaf": false,
+			"reference_value": false,
+			"container_value_policy": true,
+			"default_policy": "explicit",
+			"default_kind": "",
+			"container_slots": [],
+			"script":
+			{
+				"registered": false,
+				"module": "",
+				"handle": "",
+				"native_property": false,
+				"self_property": false,
+				"authored_reference": false,
+				"frame_bridge": "",
+				"method_bridge": ""
+			},
+			"samples": [
+				{
+					"id": "bool[0]:0:",
+					"type":
+					{
+						"kind": "bool",
+						"type_path": "",
+						"weak": false,
+						"enum_storage": 0,
+						"authored_id": "",
+						"delegate_wire": ""
+					},
+					"capabilities":
+					{
+						"value_property":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"snapshot_member":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_parameter":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"array_element":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_value":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_key":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container hash key: map "
+						},
+						"set_element":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container hash key: set "
+						}
+					}
+				}
+			]
+		},
+		{
+			"id": "byte",
+			"kind": "byte",
+			"struct_path": "",
+			"family": false,
+			"leaf": false,
+			"reference_value": false,
+			"container_value_policy": true,
+			"default_policy": "explicit",
+			"default_kind": "",
+			"container_slots": [],
+			"script":
+			{
+				"registered": false,
+				"module": "",
+				"handle": "",
+				"native_property": false,
+				"self_property": false,
+				"authored_reference": false,
+				"frame_bridge": "",
+				"method_bridge": ""
+			},
+			"samples": [
+				{
+					"id": "byte[0]:0:",
+					"type":
+					{
+						"kind": "byte",
+						"type_path": "",
+						"weak": false,
+						"enum_storage": 0,
+						"authored_id": "",
+						"delegate_wire": ""
+					},
+					"capabilities":
+					{
+						"value_property":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"snapshot_member":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_parameter":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"array_element":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_value":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_key":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"set_element":
+						{
+							"state": "supported",
+							"reason": ""
+						}
+					}
+				}
+			]
+		},
+		{
+			"id": "class",
+			"kind": "class",
+			"struct_path": "",
+			"family": false,
+			"leaf": false,
+			"reference_value": false,
+			"container_value_policy": false,
+			"default_policy": "explicit",
+			"default_kind": "",
+			"container_slots": [],
+			"script":
+			{
+				"registered": true,
+				"module": "ue_native_gameplay",
+				"handle": "",
+				"native_property": true,
+				"self_property": true,
+				"authored_reference": true,
+				"frame_bridge": "",
+				"method_bridge": ""
+			},
+			"samples": [
+				{
+					"id": "class[0]:26:/Script/CoreUObject.Object",
+					"type":
+					{
+						"kind": "class",
+						"type_path": "/Script/CoreUObject.Object",
+						"weak": false,
+						"enum_storage": 0,
+						"authored_id": "",
+						"delegate_wire": ""
+					},
+					"capabilities":
+					{
+						"value_property":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"snapshot_member":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_parameter":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"array_element":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container child type: array "
+						},
+						"map_value":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container child type: map "
+						},
+						"map_key":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container child type: map "
+						},
+						"set_element":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container child type: set "
+						}
+					}
+				}
+			]
+		},
+		{
+			"id": "double",
+			"kind": "double",
+			"struct_path": "",
+			"family": false,
+			"leaf": false,
+			"reference_value": false,
+			"container_value_policy": true,
+			"default_policy": "explicit",
+			"default_kind": "",
+			"container_slots": [],
+			"script":
+			{
+				"registered": false,
+				"module": "",
+				"handle": "",
+				"native_property": false,
+				"self_property": false,
+				"authored_reference": false,
+				"frame_bridge": "",
+				"method_bridge": ""
+			},
+			"samples": [
+				{
+					"id": "double[0]:0:",
+					"type":
+					{
+						"kind": "double",
+						"type_path": "",
+						"weak": false,
+						"enum_storage": 0,
+						"authored_id": "",
+						"delegate_wire": ""
+					},
+					"capabilities":
+					{
+						"value_property":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"snapshot_member":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_parameter":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"array_element":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_value":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_key":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container hash key: map "
+						},
+						"set_element":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container hash key: set "
+						}
+					}
+				}
+			]
+		},
+		{
+			"id": "enum",
+			"kind": "enum",
+			"struct_path": "",
+			"family": false,
+			"leaf": false,
+			"reference_value": false,
+			"container_value_policy": true,
+			"default_policy": "explicit",
+			"default_kind": "",
+			"container_slots": [],
+			"script":
+			{
+				"registered": true,
+				"module": "ue_native_gameplay",
+				"handle": "",
+				"native_property": true,
+				"self_property": false,
+				"authored_reference": false,
+				"frame_bridge": "",
+				"method_bridge": ""
+			},
+			"samples": [
+				{
+					"id": "enum[0]:32:/Script/Engine.ECollisionChannel",
+					"type":
+					{
+						"kind": "enum",
+						"type_path": "/Script/Engine.ECollisionChannel",
+						"weak": false,
+						"enum_storage": 0,
+						"authored_id": "",
+						"delegate_wire": ""
+					},
+					"capabilities":
+					{
+						"value_property":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"snapshot_member":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_parameter":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"array_element":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_value":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_key":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"set_element":
+						{
+							"state": "supported",
+							"reason": ""
+						}
+					}
+				}
+			]
+		},
+		{
+			"id": "float",
+			"kind": "float",
+			"struct_path": "",
+			"family": false,
+			"leaf": false,
+			"reference_value": false,
+			"container_value_policy": true,
+			"default_policy": "explicit",
+			"default_kind": "",
+			"container_slots": [],
+			"script":
+			{
+				"registered": false,
+				"module": "",
+				"handle": "",
+				"native_property": false,
+				"self_property": false,
+				"authored_reference": false,
+				"frame_bridge": "",
+				"method_bridge": ""
+			},
+			"samples": [
+				{
+					"id": "float[0]:0:",
+					"type":
+					{
+						"kind": "float",
+						"type_path": "",
+						"weak": false,
+						"enum_storage": 0,
+						"authored_id": "",
+						"delegate_wire": ""
+					},
+					"capabilities":
+					{
+						"value_property":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"snapshot_member":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_parameter":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"array_element":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_value":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_key":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container hash key: map "
+						},
+						"set_element":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container hash key: set "
+						}
+					}
+				}
+			]
+		},
+		{
+			"id": "int",
+			"kind": "int",
+			"struct_path": "",
+			"family": false,
+			"leaf": false,
+			"reference_value": false,
+			"container_value_policy": true,
+			"default_policy": "explicit",
+			"default_kind": "",
+			"container_slots": [],
+			"script":
+			{
+				"registered": false,
+				"module": "",
+				"handle": "",
+				"native_property": false,
+				"self_property": false,
+				"authored_reference": false,
+				"frame_bridge": "",
+				"method_bridge": ""
+			},
+			"samples": [
+				{
+					"id": "int[0]:0:",
+					"type":
+					{
+						"kind": "int",
+						"type_path": "",
+						"weak": false,
+						"enum_storage": 0,
+						"authored_id": "",
+						"delegate_wire": ""
+					},
+					"capabilities":
+					{
+						"value_property":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"snapshot_member":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_parameter":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"array_element":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_value":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_key":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"set_element":
+						{
+							"state": "supported",
+							"reason": ""
+						}
+					}
+				}
+			]
+		},
+		{
+			"id": "map",
+			"kind": "map",
+			"struct_path": "",
+			"family": false,
+			"leaf": false,
+			"reference_value": false,
+			"container_value_policy": false,
+			"default_policy": "explicit",
+			"default_kind": "",
+			"container_slots": [
+				{
+					"name": "key",
+					"hash_key": true
+				},
+				{
+					"name": "value",
+					"hash_key": false
+				}
+			],
+			"script":
+			{
+				"registered": false,
+				"module": "",
+				"handle": "",
+				"native_property": false,
+				"self_property": false,
+				"authored_reference": false,
+				"frame_bridge": "",
+				"method_bridge": ""
+			},
+			"samples": [
+				{
+					"id": "map[0]:0:{int[0]:0:;int[0]:0:}",
+					"type":
+					{
+						"kind": "map",
+						"type_path": "",
+						"weak": false,
+						"enum_storage": 0,
+						"authored_id": "",
+						"delegate_wire": "",
+						"key":
+						{
+							"kind": "int",
+							"type_path": "",
+							"weak": false,
+							"enum_storage": 0,
+							"authored_id": "",
+							"delegate_wire": ""
+						},
+						"value":
+						{
+							"kind": "int",
+							"type_path": "",
+							"weak": false,
+							"enum_storage": 0,
+							"authored_id": "",
+							"delegate_wire": ""
+						}
+					},
+					"capabilities":
+					{
+						"value_property":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"snapshot_member":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_parameter":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"array_element":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container child type: array "
+						},
+						"map_value":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container child type: map "
+						},
+						"map_key":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container child type: map "
+						},
+						"set_element":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container child type: set "
+						}
+					}
+				}
+			]
+		},
+		{
+			"id": "name",
+			"kind": "name",
+			"struct_path": "",
+			"family": false,
+			"leaf": false,
+			"reference_value": false,
+			"container_value_policy": true,
+			"default_policy": "explicit",
+			"default_kind": "",
+			"container_slots": [],
+			"script":
+			{
+				"registered": true,
+				"module": "ue_foundation",
+				"handle": "",
+				"native_property": true,
+				"self_property": true,
+				"authored_reference": true,
+				"frame_bridge": "",
+				"method_bridge": ""
+			},
+			"samples": [
+				{
+					"id": "name[0]:0:",
+					"type":
+					{
+						"kind": "name",
+						"type_path": "",
+						"weak": false,
+						"enum_storage": 0,
+						"authored_id": "",
+						"delegate_wire": ""
+					},
+					"capabilities":
+					{
+						"value_property":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"snapshot_member":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_parameter":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"array_element":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_value":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_key":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"set_element":
+						{
+							"state": "supported",
+							"reason": ""
+						}
+					}
+				}
+			]
+		},
+		{
+			"id": "object",
+			"kind": "object",
+			"struct_path": "",
+			"family": false,
+			"leaf": false,
+			"reference_value": false,
+			"container_value_policy": true,
+			"default_policy": "explicit",
+			"default_kind": "",
+			"container_slots": [],
+			"script":
+			{
+				"registered": true,
+				"module": "ue_native_gameplay",
+				"handle": "",
+				"native_property": true,
+				"self_property": true,
+				"authored_reference": true,
+				"frame_bridge": "",
+				"method_bridge": ""
+			},
+			"samples": [
+				{
+					"id": "object[0]:26:/Script/CoreUObject.Object",
+					"type":
+					{
+						"kind": "object",
+						"type_path": "/Script/CoreUObject.Object",
+						"weak": false,
+						"enum_storage": 0,
+						"authored_id": "",
+						"delegate_wire": ""
+					},
+					"capabilities":
+					{
+						"value_property":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"snapshot_member":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_parameter":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"array_element":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_value":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_key":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"set_element":
+						{
+							"state": "supported",
+							"reason": ""
+						}
+					}
+				},
+				{
+					"id": "object[0]:26:/Script/CoreUObject.Object#weak",
+					"type":
+					{
+						"kind": "object",
+						"type_path": "/Script/CoreUObject.Object",
+						"weak": true,
+						"enum_storage": 0,
+						"authored_id": "",
+						"delegate_wire": ""
+					},
+					"capabilities":
+					{
+						"value_property":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"snapshot_member":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_parameter":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"array_element":
+						{
+							"state": "unsupported",
+							"reason": "Direct weak-reference containers need a storage-preserving carrier: array "
+						},
+						"map_value":
+						{
+							"state": "unsupported",
+							"reason": "Direct weak-reference containers need a storage-preserving carrier: map "
+						},
+						"map_key":
+						{
+							"state": "unsupported",
+							"reason": "Direct weak-reference containers need a storage-preserving carrier: map "
+						},
+						"set_element":
+						{
+							"state": "unsupported",
+							"reason": "Direct weak-reference containers need a storage-preserving carrier: set "
+						}
+					}
+				},
+				{
+					"id": "object[0]:29:/Script/CoreUObject.Interface",
+					"type":
+					{
+						"kind": "object",
+						"type_path": "/Script/CoreUObject.Interface",
+						"weak": false,
+						"enum_storage": 0,
+						"authored_id": "",
+						"delegate_wire": ""
+					},
+					"capabilities":
+					{
+						"value_property":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"snapshot_member":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_parameter":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"array_element":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_value":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_key":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container hash key: map "
+						},
+						"set_element":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container hash key: set "
+						}
+					}
+				}
+			]
+		},
+		{
+			"id": "set",
+			"kind": "set",
+			"struct_path": "",
+			"family": false,
+			"leaf": false,
+			"reference_value": false,
+			"container_value_policy": false,
+			"default_policy": "explicit",
+			"default_kind": "",
+			"container_slots": [
+				{
+					"name": "element",
+					"hash_key": true
+				}
+			],
+			"script":
+			{
+				"registered": false,
+				"module": "",
+				"handle": "",
+				"native_property": false,
+				"self_property": false,
+				"authored_reference": false,
+				"frame_bridge": "",
+				"method_bridge": ""
+			},
+			"samples": [
+				{
+					"id": "set[0]:0:<int[0]:0:>",
+					"type":
+					{
+						"kind": "set",
+						"type_path": "",
+						"weak": false,
+						"enum_storage": 0,
+						"authored_id": "",
+						"delegate_wire": "",
+						"element":
+						{
+							"kind": "int",
+							"type_path": "",
+							"weak": false,
+							"enum_storage": 0,
+							"authored_id": "",
+							"delegate_wire": ""
+						}
+					},
+					"capabilities":
+					{
+						"value_property":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"snapshot_member":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_parameter":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"array_element":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container child type: array "
+						},
+						"map_value":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container child type: map "
+						},
+						"map_key":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container child type: map "
+						},
+						"set_element":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container child type: set "
+						}
+					}
+				}
+			]
+		},
+		{
+			"id": "string",
+			"kind": "string",
+			"struct_path": "",
+			"family": false,
+			"leaf": false,
+			"reference_value": false,
+			"container_value_policy": true,
+			"default_policy": "explicit",
+			"default_kind": "",
+			"container_slots": [],
+			"script":
+			{
+				"registered": false,
+				"module": "",
+				"handle": "",
+				"native_property": false,
+				"self_property": false,
+				"authored_reference": false,
+				"frame_bridge": "",
+				"method_bridge": ""
+			},
+			"samples": [
+				{
+					"id": "string[0]:0:",
+					"type":
+					{
+						"kind": "string",
+						"type_path": "",
+						"weak": false,
+						"enum_storage": 0,
+						"authored_id": "",
+						"delegate_wire": ""
+					},
+					"capabilities":
+					{
+						"value_property":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"snapshot_member":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_parameter":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"array_element":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_value":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_key":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"set_element":
+						{
+							"state": "supported",
+							"reason": ""
+						}
+					}
+				}
+			]
+		},
+		{
+			"id": "struct:/Script/CoreUObject.Rotator",
+			"kind": "struct",
+			"struct_path": "/Script/CoreUObject.Rotator",
+			"family": false,
+			"leaf": true,
+			"reference_value": false,
+			"container_value_policy": true,
+			"default_policy": "explicit",
+			"default_kind": "rotator",
+			"container_slots": [],
+			"script":
+			{
+				"registered": true,
+				"module": "ue_foundation",
+				"handle": "UERotator",
+				"native_property": true,
+				"self_property": true,
+				"authored_reference": true,
+				"frame_bridge": "rotator",
+				"method_bridge": "rotator"
+			},
+			"samples": [
+				{
+					"id": "struct[0]:27:/Script/CoreUObject.Rotator",
+					"type":
+					{
+						"kind": "struct",
+						"type_path": "/Script/CoreUObject.Rotator",
+						"weak": false,
+						"enum_storage": 0,
+						"authored_id": "",
+						"delegate_wire": ""
+					},
+					"capabilities":
+					{
+						"value_property":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"snapshot_member":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_parameter":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"array_element":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_value":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_key":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container hash key: map "
+						},
+						"set_element":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container hash key: set "
+						}
+					}
+				}
+			]
+		},
+		{
+			"id": "struct:/Script/CoreUObject.Transform",
+			"kind": "struct",
+			"struct_path": "/Script/CoreUObject.Transform",
+			"family": false,
+			"leaf": true,
+			"reference_value": false,
+			"container_value_policy": true,
+			"default_policy": "explicit",
+			"default_kind": "transform",
+			"container_slots": [],
+			"script":
+			{
+				"registered": true,
+				"module": "ue_foundation",
+				"handle": "UETransform",
+				"native_property": true,
+				"self_property": true,
+				"authored_reference": true,
+				"frame_bridge": "transform",
+				"method_bridge": "transform"
+			},
+			"samples": [
+				{
+					"id": "struct[0]:29:/Script/CoreUObject.Transform",
+					"type":
+					{
+						"kind": "struct",
+						"type_path": "/Script/CoreUObject.Transform",
+						"weak": false,
+						"enum_storage": 0,
+						"authored_id": "",
+						"delegate_wire": ""
+					},
+					"capabilities":
+					{
+						"value_property":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"snapshot_member":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_parameter":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"array_element":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_value":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_key":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container hash key: map "
+						},
+						"set_element":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container hash key: set "
+						}
+					}
+				}
+			]
+		},
+		{
+			"id": "struct:/Script/CoreUObject.Vector",
+			"kind": "struct",
+			"struct_path": "/Script/CoreUObject.Vector",
+			"family": false,
+			"leaf": true,
+			"reference_value": false,
+			"container_value_policy": true,
+			"default_policy": "explicit",
+			"default_kind": "vector",
+			"container_slots": [],
+			"script":
+			{
+				"registered": true,
+				"module": "ue_foundation",
+				"handle": "UEVector",
+				"native_property": true,
+				"self_property": true,
+				"authored_reference": true,
+				"frame_bridge": "vector",
+				"method_bridge": "vector"
+			},
+			"samples": [
+				{
+					"id": "struct[0]:26:/Script/CoreUObject.Vector",
+					"type":
+					{
+						"kind": "struct",
+						"type_path": "/Script/CoreUObject.Vector",
+						"weak": false,
+						"enum_storage": 0,
+						"authored_id": "",
+						"delegate_wire": ""
+					},
+					"capabilities":
+					{
+						"value_property":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"snapshot_member":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_parameter":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"array_element":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_value":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_key":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container hash key: map "
+						},
+						"set_element":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container hash key: set "
+						}
+					}
+				}
+			]
+		},
+		{
+			"id": "struct:/Script/CoreUObject.Vector2D",
+			"kind": "struct",
+			"struct_path": "/Script/CoreUObject.Vector2D",
+			"family": false,
+			"leaf": true,
+			"reference_value": false,
+			"container_value_policy": true,
+			"default_policy": "explicit",
+			"default_kind": "vector2d",
+			"container_slots": [],
+			"script":
+			{
+				"registered": true,
+				"module": "ue_foundation",
+				"handle": "UEVector2D",
+				"native_property": true,
+				"self_property": true,
+				"authored_reference": false,
+				"frame_bridge": "",
+				"method_bridge": ""
+			},
+			"samples": [
+				{
+					"id": "struct[0]:28:/Script/CoreUObject.Vector2D",
+					"type":
+					{
+						"kind": "struct",
+						"type_path": "/Script/CoreUObject.Vector2D",
+						"weak": false,
+						"enum_storage": 0,
+						"authored_id": "",
+						"delegate_wire": ""
+					},
+					"capabilities":
+					{
+						"value_property":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"snapshot_member":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_parameter":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"array_element":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_value":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_key":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container hash key: map "
+						},
+						"set_element":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container hash key: set "
+						}
+					}
+				}
+			]
+		},
+		{
+			"id": "struct:/Script/EnhancedInput.InputActionValue",
+			"kind": "struct",
+			"struct_path": "/Script/EnhancedInput.InputActionValue",
+			"family": false,
+			"leaf": false,
+			"reference_value": false,
+			"container_value_policy": true,
+			"default_policy": "explicit",
+			"default_kind": "",
+			"container_slots": [],
+			"script":
+			{
+				"registered": true,
+				"module": "ue_foundation",
+				"handle": "InputActionValue",
+				"native_property": false,
+				"self_property": false,
+				"authored_reference": false,
+				"frame_bridge": "",
+				"method_bridge": "input_value"
+			},
+			"samples": [
+				{
+					"id": "struct[0]:38:/Script/EnhancedInput.InputActionValue",
+					"type":
+					{
+						"kind": "struct",
+						"type_path": "/Script/EnhancedInput.InputActionValue",
+						"weak": false,
+						"enum_storage": 0,
+						"authored_id": "",
+						"delegate_wire": ""
+					},
+					"capabilities":
+					{
+						"value_property":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"snapshot_member":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_parameter":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"array_element":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_value":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_key":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container hash key: map "
+						},
+						"set_element":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container hash key: set "
+						}
+					}
+				}
+			]
+		},
+		{
+			"id": "struct:/Script/GameplayTags.GameplayTag",
+			"kind": "struct",
+			"struct_path": "/Script/GameplayTags.GameplayTag",
+			"family": false,
+			"leaf": true,
+			"reference_value": false,
+			"container_value_policy": true,
+			"default_policy": "implicit_empty",
+			"default_kind": "",
+			"container_slots": [],
+			"script":
+			{
+				"registered": true,
+				"module": "ue_gameplay_tags",
+				"handle": "",
+				"native_property": true,
+				"self_property": false,
+				"authored_reference": false,
+				"frame_bridge": "",
+				"method_bridge": ""
+			},
+			"samples": [
+				{
+					"id": "struct[0]:32:/Script/GameplayTags.GameplayTag",
+					"type":
+					{
+						"kind": "struct",
+						"type_path": "/Script/GameplayTags.GameplayTag",
+						"weak": false,
+						"enum_storage": 0,
+						"authored_id": "",
+						"delegate_wire": ""
+					},
+					"capabilities":
+					{
+						"value_property":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"snapshot_member":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_parameter":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"array_element":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_value":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_key":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container hash key: map "
+						},
+						"set_element":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container hash key: set "
+						}
+					}
+				}
+			]
+		},
+		{
+			"id": "struct:/Script/GameplayTags.GameplayTagContainer",
+			"kind": "struct",
+			"struct_path": "/Script/GameplayTags.GameplayTagContainer",
+			"family": false,
+			"leaf": true,
+			"reference_value": false,
+			"container_value_policy": true,
+			"default_policy": "implicit_empty",
+			"default_kind": "",
+			"container_slots": [],
+			"script":
+			{
+				"registered": true,
+				"module": "ue_gameplay_tags",
+				"handle": "",
+				"native_property": true,
+				"self_property": false,
+				"authored_reference": false,
+				"frame_bridge": "",
+				"method_bridge": ""
+			},
+			"samples": [
+				{
+					"id": "struct[0]:41:/Script/GameplayTags.GameplayTagContainer",
+					"type":
+					{
+						"kind": "struct",
+						"type_path": "/Script/GameplayTags.GameplayTagContainer",
+						"weak": false,
+						"enum_storage": 0,
+						"authored_id": "",
+						"delegate_wire": ""
+					},
+					"capabilities":
+					{
+						"value_property":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"snapshot_member":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_parameter":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"array_element":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_value":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_key":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container hash key: map "
+						},
+						"set_element":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container hash key: set "
+						}
+					}
+				}
+			]
+		},
+		{
+			"id": "struct:family",
+			"kind": "struct",
+			"struct_path": "",
+			"family": true,
+			"leaf": true,
+			"reference_value": true,
+			"container_value_policy": true,
+			"default_policy": "implicit_empty",
+			"default_kind": "",
+			"container_slots": [],
+			"script":
+			{
+				"registered": true,
+				"module": "ue_native_gameplay",
+				"handle": "",
+				"native_property": true,
+				"self_property": false,
+				"authored_reference": false,
+				"frame_bridge": "",
+				"method_bridge": ""
+			},
+			"samples": [
+				{
+					"id": "struct[0]:64:/Script/DasRuntime.DasSoftClass_f6005a7380ac4daaf37e8e855ef43965",
+					"type":
+					{
+						"kind": "struct",
+						"type_path": "/Script/DasRuntime.DasSoftClass_f6005a7380ac4daaf37e8e855ef43965",
+						"weak": false,
+						"enum_storage": 0,
+						"authored_id": "",
+						"delegate_wire": ""
+					},
+					"capabilities":
+					{
+						"value_property":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"snapshot_member":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_parameter":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"array_element":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_value":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_key":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container hash key: map "
+						},
+						"set_element":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container hash key: set "
+						}
+					}
+				},
+				{
+					"id": "struct[0]:65:/Script/DasRuntime.DasSoftObject_f6005a7380ac4daaf37e8e855ef43965",
+					"type":
+					{
+						"kind": "struct",
+						"type_path": "/Script/DasRuntime.DasSoftObject_f6005a7380ac4daaf37e8e855ef43965",
+						"weak": false,
+						"enum_storage": 0,
+						"authored_id": "",
+						"delegate_wire": ""
+					},
+					"capabilities":
+					{
+						"value_property":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"snapshot_member":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_parameter":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"array_element":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_value":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_key":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container hash key: map "
+						},
+						"set_element":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container hash key: set "
+						}
+					}
+				}
+			]
+		},
+		{
+			"id": "text",
+			"kind": "text",
+			"struct_path": "",
+			"family": false,
+			"leaf": false,
+			"reference_value": false,
+			"container_value_policy": true,
+			"default_policy": "explicit",
+			"default_kind": "",
+			"container_slots": [],
+			"script":
+			{
+				"registered": true,
+				"module": "ue_foundation",
+				"handle": "",
+				"native_property": true,
+				"self_property": true,
+				"authored_reference": true,
+				"frame_bridge": "",
+				"method_bridge": ""
+			},
+			"samples": [
+				{
+					"id": "text[0]:0:",
+					"type":
+					{
+						"kind": "text",
+						"type_path": "",
+						"weak": false,
+						"enum_storage": 0,
+						"authored_id": "",
+						"delegate_wire": ""
+					},
+					"capabilities":
+					{
+						"value_property":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"snapshot_member":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_parameter":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"array_element":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_value":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_key":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container hash key: map "
+						},
+						"set_element":
+						{
+							"state": "unsupported",
+							"reason": "Unsupported container hash key: set "
+						}
+					}
+				}
+			]
+		}
+	]
+}

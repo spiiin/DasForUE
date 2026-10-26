@@ -1,5 +1,6 @@
 #include "DasObjectClassAdapters.h"
 #include "DasSchema.h"
+#include "UObject/Interface.h"
 #include "UObject/UnrealType.h"
 
 class FDasObjectClassAdapter final : public IDasTypeAdapter
@@ -9,6 +10,21 @@ class FDasObjectClassAdapter final : public IDasTypeAdapter
 public:
     explicit FDasObjectClassAdapter(bool IsClass) : Class(IsClass) {}
     EDasTypeKind GetKind() const override { return Class ? EDasTypeKind::Class : EDasTypeKind::Object; }
+    void GetSupportSamples(TArray<FDasDeclaredType>& Out) const override
+    {
+        FDasDeclaredType Type;
+        Type.Kind = Class ? TEXT("class") : TEXT("object");
+        Type.TypePath = UObject::StaticClass()->GetPathName();
+        Out.Add(Type);
+        if (!Class)
+        {
+            Type.WeakReference = true;
+            Out.Add(Type);
+            Type.WeakReference = false;
+            Type.TypePath = UInterface::StaticClass()->GetPathName();
+            Out.Add(Type);
+        }
+    }
     bool UsesTypeIdentity() const override { return true; }
     bool SupportsContainerValue() const override { return !Class; }
     bool CanBeContainerKey(const FDasDeclaredType& Type) const override

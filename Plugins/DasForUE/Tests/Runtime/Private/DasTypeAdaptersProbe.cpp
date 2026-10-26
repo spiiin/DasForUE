@@ -284,3 +284,61 @@ bool CheckDasTypeAdapters(FString& Error)
     Error.Reset();
     return true;
 }
+
+
+// Validate the report's representative positives through the real property factory too. A negative
+// validator decision must not create a property. No independent table of expected per-kind answers.
+bool CheckDasTypeAdapterSupport(FString& Error)
+{
+    const auto& Registry = FDasTypeAdapters::Get();
+    int32 Positive = 0, Negative = 0;
+    for (const auto& Entry : Registry.Entries())
+    {
+        TArray<FDasDeclaredType> Samples;
+        Entry.Adapter->GetSupportSamples(Samples);
+        if (Samples.IsEmpty())
+        {
+            Error = TEXT("Built-in adapter has no support samples");
+            return false;
+        }
+        for (const auto& Sample : Samples)
+        {
+            if (Registry.Find(Sample) != &Entry.Adapter.Get())
+            {
+                Error = TEXT("Support sample resolves to a different adapter: ") + Sample.StorageIdentity();
+                return false;
+            }
+            TArray<FDasDeclaredType> Types{Sample};
+            for (auto Kind : {EDasTypeKind::Array, EDasTypeKind::Set, EDasTypeKind::Map})
+                for (bool Key : {false, true})
+                {
+                    if (Kind != EDasTypeKind::Map && Key)
+                        continue;
+                    FDasDeclaredType Type;
+                    Type.Kind = DasTypeKindName(Kind);
+                    for (const auto& Slot : Registry.FindKind(Kind)->GetContainerSlots())
+                        Type.*Slot.Descriptor = MakeShared<FDasDeclaredType>(
+                            Kind != EDasTypeKind::Map || Slot.bHashKey == Key ? Sample : FDasDeclaredType());
+                    Types.Add(MoveTemp(Type));
+                }
+            for (const auto& Type : Types)
+                for (auto Usage :
+                     {EDasPropertyUsage::Value, EDasPropertyUsage::Container, EDasPropertyUsage::DelegateParameter})
+                {
+                    FString Why;
+                    const bool Valid = ValidateDasPropertyType(Type, Usage, Why);
+                    auto* P = CreateDasProperty(FFieldVariant(), TEXT("SupportProbe"), Type, Usage, Error);
+                    const bool Good = Valid == (P != nullptr) && (Valid || !Why.IsEmpty());
+                    delete P;
+                    if (!Good)
+                    {
+                        Error = TEXT("Support report disagrees with property factory: ") + Type.StorageIdentity();
+                        return false;
+                    }
+                    Valid ? ++Positive : ++Negative;
+                }
+        }
+    }
+    Error.Reset();
+    return Positive > 0 && Negative > 0;
+}

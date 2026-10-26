@@ -1,6 +1,6 @@
-# Адаптеры типов (фаза 2, шаг 2.1): эскиз
+# Адаптеры типов
 
-Статус: шаг 2.1 и перенос GameplayTag реализованы (2026-10-20). План: [ImprovementPlan](../Plans/ImprovementPlan.md), фаза 2.
+Статус (2026-10-26): реестр, переносы основных семейств, контейнерные комбинаторы, map interop и генерация контрактов поддержки реализованы. Перенос оставшихся специальных типов продолжается. План: [ImprovementPlan](../Plans/ImprovementPlan.md), фаза 2.
 
 Отличия реализации от эскиза ниже:
 - скриптовый фасет передаётся при регистрации (`Register(Adapter, &Facet)`), а не через метод адаптера:
@@ -457,3 +457,40 @@ typed 329.37 ns/op, interop 359.95 ns/op (ratio 1.093). Разброс двух 
 от -3% до +9% не позволяет заявлять ускорение или отсутствие небольшой стоимости
 динамического разбора ключа. Измерение включает VM и вычитает отдельно измеренный setup;
 это ограничение замера, а не performance guarantee. Формат staged C++ и diff check — PASS.
+
+
+## Registry-derived support export (step 2.4)
+
+`IDasTypeAdapter::GetSupportSamples` supplies representative descriptors beside each identity owner.
+Scalars, structs and container slots get generic samples; enum, object/class (including weak/interface)
+and dynamic soft-reference carriers provide concrete identities in their own adapter files.
+This is sample selection, not a second per-kind capability table.
+
+`DasTypeAdapterSupportManifest()` walks the live registry and script facets. For each sample it calls
+`ValidateDasPropertyType` for Value/Container/DelegateParameter usages and for fully composed
+array/map/set descriptors. The versioned JSON retains negative validator reasons, identity,
+child slots, specialized view flags, call bridges and default policy. The export is a game-thread
+diagnostic; soft samples use the normal transient carrier cache and never load assets or save files.
+The public `DasExport -TypeSupport=<path>` mode does not depend on test-probe opt-in.
+
+`Scripts/ExportTypeSupport.ps1` exports to `logs/type-support-live.json` through the shared test helper.
+`GenerateTypeSupport.py --manifest logs/type-support-live.json` deliberately refreshes
+`Bindings/TypeSupport.json` and the marked section of `Docs/Reference/TypeSupport.md`.
+`--check` is read-only and rejects both live/baseline drift and stale generated documentation.
+Suite `type-support` requires `type-support-export`; Python tests check schema and renderer contracts;
+Foundation checks the live baseline and materializes positive/negative samples through the real factory.
+
+Scope is explicit: property ABI validation does not prove authored DSL parsing, concrete signatures,
+default-expression syntax, native generators or event/timer payload acceptance. Existing contextual
+tables and notes remain human guidance until those policies expose queries. AOT eligibility belongs
+to each checked binding/signature; the generator never promotes it to a type-wide Yes. Missing samples
+render Unreported, not supported. Schema additions require a generator update; new registered types
+using existing contracts require no Python per-type branch.
+
+
+Validation (2026-10-26): agent jobs `type-support-bootstrap` and `type-support-check` exited 0.
+The production export contains 22 registered adapters and 25 concrete sample descriptors: 175
+property-context results (127 supported, 48 rejected with reasons). Export from a second process
+matches the baseline; generated documentation is current. All 377 Python tests passed (16 new
+support/schema/renderer tests); Foundation passed with zero failures, including live manifest
+comparison and positive/negative property materialization. Staged C++ formatting and guard audit pass.
