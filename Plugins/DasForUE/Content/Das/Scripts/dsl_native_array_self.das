@@ -29,7 +29,7 @@ class NativeArraySelf : ProbeActor {
         var rejected=false
         try { self.DasNativeArrayEnumKeys := invalid } recover { rejected=true }
         var wrong=false
-        try { __ue_struct_map_with_enum_int(ue_get_self_struct("DasNativeArrayEnumKeys"),"Values",ue_enum_from_number("/Script/Engine.EComponentMobility",2),5) } recover { wrong=true }
+        try { ue_struct_map_with_int(ue_get_self_struct("DasNativeArrayEnumKeys"),"Values",ue_enum_from_number("/Script/Engine.EComponentMobility",2),5) } recover { wrong=true }
         return rejected && wrong && length(self.DasNativeArrayEnumKeys)==2 && self.DasNativeArrayEnumKeys[SpawnCollision.AlwaysSpawn]==322 && self.DasNativeArrayByteKeys[NativeMobility.Movable].x==5.0lf && self.DasNativeArrayEnumKeyEnums[SpawnCollision.AlwaysSpawn]==SpawnCollision.DontSpawnIfColliding && ue_object_valid(self.DasNativeArrayEnumKeyObjects[SpawnCollision.AlwaysSpawn].handle)
     }
 

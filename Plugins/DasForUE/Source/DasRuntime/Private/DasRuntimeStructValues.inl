@@ -82,54 +82,6 @@ template <class Property> constexpr ESnapshotKind SnapshotValueKind()
         return ESnapshotKind::Struct;
     }
 }
-template <class KeyType, class Read>
-auto ReadSnapshotMap(const FDasStructValue& H, const char* Path, const KeyType& Key, ESnapshotKind KeyKind,
-                     ESnapshotKind ValueKind, das::Context* C, Read Reader)
-{
-    const auto& V = ResolveStructValue(H, C);
-    auto View = SnapshotMap(StructLeaf(V, Path, C), KeyKind, ValueKind, C);
-    FConstStructLeaf Value{};
-    FString Error;
-    if (!View.Find(&Key, Value, Error))
-        C->throw_error(TCHAR_TO_UTF8(*Error));
-    return Reader(Value.Property, Value.Memory);
-}
-template <class KeyType, class Write>
-FDasStructValue WriteSnapshotMap(const FDasStructValue& H, const char* Path, const KeyType& Key, ESnapshotKind KeyKind,
-                                 ESnapshotKind ValueKind, das::Context* C, das::LineInfoArg* At, Write Writer)
-{
-    FStructMutation Mutation(H, C);
-    auto& V = Mutation.Value;
-    auto View = SnapshotMap(StructLeaf(V, Path, C), KeyKind, ValueKind, C);
-    FString Error;
-    if (!View.Upsert(
-            &Key,
-            [&](FProperty* P, void* Memory, FString&)
-            {
-                Writer(P, Memory);
-                return true;
-            },
-            Error))
-        C->throw_error(TCHAR_TO_UTF8(*Error));
-    return Mutation.Finish(C, At);
-}
-template <class ValueProperty, class KeyType>
-auto StructScalarMapGet(const FDasStructValue& H, const char* Path, const KeyType& Key, ESnapshotKind KeyKind,
-                        das::Context* C)
-{
-    return ReadSnapshotMap(H, Path, Key, KeyKind, SnapshotValueKind<ValueProperty>(), C,
-                           [&](FProperty* P, const void* Memory)
-                           { return ReadPropertyScalarValue(CastFieldChecked<ValueProperty>(P), Memory, C); });
-}
-template <class ValueProperty, class KeyType, class ValueType>
-FDasStructValue StructScalarMapWith(const FDasStructValue& H, const char* Path, const KeyType& Key,
-                                    const ValueType& Value, ESnapshotKind KeyKind, das::Context* C,
-                                    das::LineInfoArg* At)
-{
-    return WriteSnapshotMap(H, Path, Key, KeyKind, SnapshotValueKind<ValueProperty>(), C, At,
-                            [&](FProperty* P, void* Memory)
-                            { WriteNativePropertyValue(P, Memory, PropertyScalarValue<ValueProperty>(Value), C); });
-}
 template <class View>
 FConstStructLeaf SnapshotKeyAt(const FDasStructValue& H, const char* Path, const View& Values, int32 Index,
                                das::Context* C)
@@ -248,42 +200,6 @@ FDasStructValue StructArrayResize(const FDasStructValue& H, const char* Path, in
     return Mutation.Finish(C, At);
 }
 
-
-template <typename KeyType>
-FDasStructValue StructMapGetStruct(const FDasStructValue& H, const char* Path, const KeyType& Key,
-                                   ESnapshotKind KeyKind, das::Context* C, das::LineInfoArg* At)
-{
-    return ReadSnapshotMap(H, Path, Key, KeyKind, ESnapshotKind::Struct, C,
-                           [&](FProperty* P, const void* Memory) { return ReadPropertySnapshot(P, Memory, C, At); });
-}
-template <typename KeyType>
-FDasStructValue StructMapWithStruct(const FDasStructValue& H, const char* Path, const KeyType& Key,
-                                    const FDasStructValue& Value, ESnapshotKind KeyKind, das::Context* C,
-                                    das::LineInfoArg* At)
-{
-    return WriteSnapshotMap(H, Path, Key, KeyKind, ESnapshotKind::Struct, C, At,
-                            [&](FProperty* P, void* Memory) { WritePropertySnapshot(P, Memory, Value, C); });
-}
-FDasStructValue StructMapGetIntStruct(const FDasStructValue& H, const char* Path, int32 Key, das::Context* C,
-                                      das::LineInfoArg* At)
-{
-    return StructMapGetStruct(H, Path, Key, ESnapshotKind::Int, C, At);
-}
-FDasStructValue StructMapWithIntStruct(const FDasStructValue& H, const char* Path, int32 Key, const FDasStructValue& V,
-                                       das::Context* C, das::LineInfoArg* At)
-{
-    return StructMapWithStruct(H, Path, Key, V, ESnapshotKind::Int, C, At);
-}
-FDasStructValue StructMapGetStringStruct(const FDasStructValue& H, const char* Path, const char* Key, das::Context* C,
-                                         das::LineInfoArg* At)
-{
-    return StructMapGetStruct(H, Path, FString(Key ? UTF8_TO_TCHAR(Key) : TEXT("")), ESnapshotKind::String, C, At);
-}
-FDasStructValue StructMapWithStringStruct(const FDasStructValue& H, const char* Path, const char* Key,
-                                          const FDasStructValue& V, das::Context* C, das::LineInfoArg* At)
-{
-    return StructMapWithStruct(H, Path, FString(Key ? UTF8_TO_TCHAR(Key) : TEXT("")), V, ESnapshotKind::String, C, At);
-}
 
 template <class Snapshot> auto StructNestedLeaf(Snapshot& V, const char* Path, int32 Index, das::Context* C)
 {
@@ -448,78 +364,6 @@ FDasStructValue StructEnumWithValue(const FDasStructValue& H, const char* Path, 
     return Mutation.Finish(C, At);
 }
 
-
-template <typename KeyType>
-FDasEnumValue StructMapGetEnum(const FDasStructValue& H, const char* Path, const KeyType& Key, ESnapshotKind KeyKind,
-                               das::Context* C)
-{
-    return ReadSnapshotMap(H, Path, Key, KeyKind, ESnapshotKind::Enum, C,
-                           [&](FProperty* P, const void* Memory)
-                           {
-                               auto* E = DasEnumPropertyType(P);
-                               return MakeEnumValue(E->GetPathName(), ReadNativeEnumNumber(P, Memory, C), C);
-                           });
-}
-template <typename KeyType>
-FDasStructValue StructMapWithEnum(const FDasStructValue& H, const char* Path, const KeyType& Key, FDasEnumValue Value,
-                                  ESnapshotKind KeyKind, das::Context* C, das::LineInfoArg* At)
-{
-    const auto& E = ResolveEnumValue(Value, C);
-    return WriteSnapshotMap(H, Path, Key, KeyKind, ESnapshotKind::Enum, C, At, [&](FProperty* P, void* Memory)
-                            { WriteNativeEnumNumber(P, Memory, E.Type.Get(), E.Value, C); });
-}
-template <typename KeyType>
-FDasObjectHandle StructMapGetObject(const FDasStructValue& H, const char* Path, const KeyType& Key,
-                                    ESnapshotKind KeyKind, das::Context* C)
-{
-    return ReadSnapshotMap(H, Path, Key, KeyKind, ESnapshotKind::Object, C,
-                           [&](FProperty* P, const void* Memory) { return ReadNullablePropertyObject(P, Memory, C); });
-}
-template <typename KeyType>
-FDasStructValue StructMapWithObject(const FDasStructValue& H, const char* Path, const KeyType& Key,
-                                    const FDasObjectHandle& Value, ESnapshotKind KeyKind, das::Context* C,
-                                    das::LineInfoArg* At)
-{
-    UObject* Object = Value.Token ? ResolveObject(Value, C) : nullptr;
-    return WriteSnapshotMap(H, Path, Key, KeyKind, ESnapshotKind::Object, C, At, [&](FProperty* P, void* Memory)
-                            { WriteNativePropertyValue(P, Memory, SnapshotObjectValue(P, Object, C), C); });
-}
-FDasEnumValue StructMapGetIntEnum(const FDasStructValue& H, const char* Path, int32 Key, das::Context* C)
-{
-    return StructMapGetEnum(H, Path, Key, ESnapshotKind::Int, C);
-}
-FDasStructValue StructMapWithIntEnum(const FDasStructValue& H, const char* Path, int32 Key, FDasEnumValue V,
-                                     das::Context* C, das::LineInfoArg* At)
-{
-    return StructMapWithEnum(H, Path, Key, V, ESnapshotKind::Int, C, At);
-}
-FDasObjectHandle StructMapGetIntObject(const FDasStructValue& H, const char* Path, int32 Key, das::Context* C)
-{
-    return StructMapGetObject(H, Path, Key, ESnapshotKind::Int, C);
-}
-FDasStructValue StructMapWithIntObject(const FDasStructValue& H, const char* Path, int32 Key, const FDasObjectHandle& V,
-                                       das::Context* C, das::LineInfoArg* At)
-{
-    return StructMapWithObject(H, Path, Key, V, ESnapshotKind::Int, C, At);
-}
-FDasEnumValue StructMapGetStringEnum(const FDasStructValue& H, const char* Path, const char* Key, das::Context* C)
-{
-    return StructMapGetEnum(H, Path, FString(Key ? UTF8_TO_TCHAR(Key) : TEXT("")), ESnapshotKind::String, C);
-}
-FDasStructValue StructMapWithStringEnum(const FDasStructValue& H, const char* Path, const char* Key, FDasEnumValue V,
-                                        das::Context* C, das::LineInfoArg* At)
-{
-    return StructMapWithEnum(H, Path, FString(Key ? UTF8_TO_TCHAR(Key) : TEXT("")), V, ESnapshotKind::String, C, At);
-}
-FDasObjectHandle StructMapGetStringObject(const FDasStructValue& H, const char* Path, const char* Key, das::Context* C)
-{
-    return StructMapGetObject(H, Path, FString(Key ? UTF8_TO_TCHAR(Key) : TEXT("")), ESnapshotKind::String, C);
-}
-FDasStructValue StructMapWithStringObject(const FDasStructValue& H, const char* Path, const char* Key,
-                                          const FDasObjectHandle& V, das::Context* C, das::LineInfoArg* At)
-{
-    return StructMapWithObject(H, Path, FString(Key ? UTF8_TO_TCHAR(Key) : TEXT("")), V, ESnapshotKind::String, C, At);
-}
 
 int32 EnumNumber(FDasEnumValue V, das::Context* C)
 {
@@ -688,32 +532,4 @@ FDasNameValue StructMapNameKey(const FDasStructValue& H, const char* Path, int32
         SnapshotMap(StructLeaf(ResolveStructValue(H, C), Path, C), ESnapshotKind::Name, ESnapshotKind::Invalid, C),
         Index, C);
     return MakeDSLName(ReadPropertyScalarValue(CastFieldChecked<FNameProperty>(F.Property), F.Memory, C), C);
-}
-FDasStructValue StructMapGetNameStruct(const FDasStructValue& H, const char* Path, FDasNameValue Key, das::Context* C,
-                                       das::LineInfoArg* At)
-{
-    return StructMapGetStruct(H, Path, ResolveDSLName(Key, C), ESnapshotKind::Name, C, At);
-}
-FDasStructValue StructMapWithNameStruct(const FDasStructValue& H, const char* Path, FDasNameValue Key,
-                                        const FDasStructValue& Value, das::Context* C, das::LineInfoArg* At)
-{
-    return StructMapWithStruct(H, Path, ResolveDSLName(Key, C), Value, ESnapshotKind::Name, C, At);
-}
-FDasEnumValue StructMapGetNameEnum(const FDasStructValue& H, const char* Path, FDasNameValue Key, das::Context* C)
-{
-    return StructMapGetEnum(H, Path, ResolveDSLName(Key, C), ESnapshotKind::Name, C);
-}
-FDasStructValue StructMapWithNameEnum(const FDasStructValue& H, const char* Path, FDasNameValue Key,
-                                      FDasEnumValue Value, das::Context* C, das::LineInfoArg* At)
-{
-    return StructMapWithEnum(H, Path, ResolveDSLName(Key, C), Value, ESnapshotKind::Name, C, At);
-}
-FDasObjectHandle StructMapGetNameObject(const FDasStructValue& H, const char* Path, FDasNameValue Key, das::Context* C)
-{
-    return StructMapGetObject(H, Path, ResolveDSLName(Key, C), ESnapshotKind::Name, C);
-}
-FDasStructValue StructMapWithNameObject(const FDasStructValue& H, const char* Path, FDasNameValue Key,
-                                        const FDasObjectHandle& Value, das::Context* C, das::LineInfoArg* At)
-{
-    return StructMapWithObject(H, Path, ResolveDSLName(Key, C), Value, ESnapshotKind::Name, C, At);
 }

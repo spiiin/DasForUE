@@ -542,6 +542,15 @@ public:
     UPROPERTY(BlueprintReadWrite, Category = "Probe")
     TMap<FName, double> SelfScores;
     UPROPERTY(BlueprintReadWrite, Category = "Probe")
+    TMap<int32, int32> InteropCounts;
+    UPROPERTY(BlueprintReadWrite, Category = "Probe")
+    TMap<FString, double> InteropStrings;
+    UPROPERTY(BlueprintReadWrite, Category = "Probe")
+    TMap<uint8, int32> InteropBytes;
+    UPROPERTY(BlueprintReadOnly, Category = "Probe")
+    TMap<int32, int32> InteropLocked;
+
+    UPROPERTY(BlueprintReadWrite, Category = "Probe")
     TSet<int32> SelfIds;
     UPROPERTY(BlueprintReadOnly, Category = "Probe")
     TArray<int32> SelfLockedInts;

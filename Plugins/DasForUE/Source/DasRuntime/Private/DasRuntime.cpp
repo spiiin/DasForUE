@@ -581,6 +581,7 @@ FSourceSet* AuthoredReferenceSources = nullptr;
 #include "DasRuntimeSubscriptionApi.inl"
 #include "DasRuntimeTypeAnnotations.inl"
 #include "DasTypeAdaptersBuiltin.inl"
+#include "DasMapInterop.inl"
 #include "DasPersistentGlobals.inl"
 #include "DasCollisionNames.inl"
 #include "DasFoundationModule.inl"

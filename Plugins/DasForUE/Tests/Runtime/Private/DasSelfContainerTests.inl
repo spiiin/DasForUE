@@ -19,10 +19,10 @@ try { __ue_self_array_pop("SelfStrings") } recover { rejected += 1 }
 try { __ue_self_array_push_float("SelfInts", 1.0) } recover { rejected += 1 }
 try { __ue_self_array_push_int("SelfLockedInts", 1) } recover { rejected += 1 }
 try { __ue_self_array_erase("SelfInts", 1l, 5l) } recover { rejected += 1 }
-__ue_self_map_set_name_double("SelfScores", ue_name_value("Unit"), 1.5lf)
-__ue_self_map_set_name_double("SelfScores", ue_name_value("UNIT"),
-    __ue_self_map_get_name_double("SelfScores", ue_name_value("UNIT")) + 1.0lf)
-verify(__ue_self_map_get_name_double("SelfScores", ue_name_value("Missing")) == 0.0lf)
+__ue_self_map_set_double("SelfScores", ue_name_value("Unit"), 1.5lf)
+__ue_self_map_set_double("SelfScores", ue_name_value("UNIT"),
+    __ue_self_map_get_double("SelfScores", ue_name_value("UNIT")) + 1.0lf)
+verify(__ue_self_map_get_double("SelfScores", ue_name_value("Missing")) == 0.0lf)
 verify(!__ue_self_map_erase_name("SelfScores", ue_name_value("Missing")))
 __ue_self_set_insert_int("SelfIds", 4)
 __ue_self_set_insert_int("SelfIds", 4)
@@ -83,4 +83,53 @@ return rejected ? 1 : 0)"));
                 FString::Printf(TEXT("in_place=%.0f snapshot_round_trip=%.0f (ns per operation, 1024 ints)"), InPlaceNs,
                                      SnapshotNs));
     First->SelfInts.Reset();
+}
+
+{
+    First->InteropCounts.Reset();
+    First->InteropStrings.Reset();
+    First->InteropBytes.Reset();
+    const auto Interop = ObjectRun(TEXT(R"(
+var key=3
+__ue_self_map_set_int("InteropCounts",key,10)
+verify(__ue_self_map_get_int("InteropCounts",key)==10)
+var text="Unicode 世界"
+__ue_self_map_set_double("InteropStrings",text,1.25lf)
+var byte_key=uint8(8)
+__ue_self_map_set_int("InteropBytes",byte_key,12)
+var rejected=0
+try { __ue_self_map_set_int("InteropCounts",text,30) } recover { rejected+=1 }
+try { __ue_self_map_set_int("InteropLocked",key,30) } recover { rejected+=1 }
+verify(__ue_self_map_get_int("InteropCounts",key)==10)
+verify(__ue_self_map_get_double("InteropStrings",text)==1.25lf)
+verify(__ue_self_map_get_int("InteropBytes",byte_key)==12)
+return rejected)"));
+    Expect(Interop.bSucceeded && Interop.Value == 2 && First->InteropCounts.Num() == 1 &&
+               First->InteropLocked.IsEmpty(),
+           TEXT("map_interop_ref_keys_and_atomic_failures"), Interop.Error);
+    auto TimeMap = [&](bool Erased, int32 N)
+    {
+        const FString Prefix = Erased ? TEXT("__ue_self_map_"): TEXT("__ue_probe_typed_map_");
+        const FString Body = FString::Printf(
+            TEXT("for(i in range(%d)) { %sset_int(\"InteropCounts\",3,%sget_int(\"InteropCounts\",3)+1) }\nreturn 1"),
+                 N, *Prefix, *Prefix);
+        const double Start = FPlatformTime::Seconds();
+        const auto Result = ObjectRun(Body);
+        Expect(Result.bSucceeded, TEXT("map_interop_benchmark_runs"), Result.Error);
+        return FPlatformTime::Seconds() - Start;
+    };
+    constexpr int32 N = 200000;
+    const double MapTypedNs = FMath::Max(0.0, TimeMap(false, N + 1) - TimeMap(false, 1)) * 1e9 / (2 * N);
+    const double MapInteropNs = FMath::Max(0.0, TimeMap(true, N + 1) - TimeMap(true, 1)) * 1e9 / (2 * N);
+    UE_LOG(LogTemp, Display,
+           TEXT("DAS_MAP_INTEROP_BENCH typed_ns=%.2f interop_ns=%.2f ratio=%.3f"), MapTypedNs, MapInteropNs,
+                MapTypedNs > 0 ? MapInteropNs / MapTypedNs : 0);
+}
+
+{
+    const auto Inventory = ObjectRun(TEXT("return __ue_probe_map_binding_count()"));
+    const int32 MapBindings = Inventory.Value;
+    const bool Legacy = !Inventory.bSucceeded;
+    Expect(MapBindings == 56 && !Legacy, TEXT("map_interop_linear_binding_inventory"));
+    UE_LOG(LogTemp, Display, TEXT("DAS_MAP_INTEROP_BINDINGS legacy=196 current=%d"), MapBindings);
 }

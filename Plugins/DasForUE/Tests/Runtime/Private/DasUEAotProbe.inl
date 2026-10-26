@@ -108,6 +108,16 @@ bool RunDasUEAotProbe(FString& Report)
     Check(!R.bSucceeded && Owner->speed == 3.5f, TEXT("wrong_property_type_refused"), R.Error);
     R = Runtime.RunFile(Path, 0, true);
     Check(!R.bSucceeded && Owner->health == 102, TEXT("missing_owner_refused"), R.Error);
+    R = Run(5);
+    Check(R.bSucceeded && R.bUsedAot && R.Value == 1 && Owner->InteropCounts.FindRef(3) == 41 &&
+          Owner->InteropStrings.FindRef(TEXT("世界 Key")) == 2.5 && Owner->InteropBytes.FindRef(7) == 11,
+                                        TEXT("interop_native_int_string_byte_keys_and_references"), R.Error);
+    R = Run(6);
+    Check(!R.bSucceeded && R.Error.Contains(TEXT("map key/property type mismatch")) && Owner->InteropStrings.Num() == 1,
+                                            TEXT("interop_key_mismatch_atomic"), R.Error);
+    R = Run(7);
+    Check(!R.bSucceeded && Owner->InteropLocked.IsEmpty(), TEXT("interop_readonly_atomic"), R.Error);
+    const int32 BeforeForbidden = Owner->InteropCounts.FindRef(0);
     // Prepare the linked function once, then enter its native body under each forbidden
     // execution state. RunFile itself would refuse before reaching the extern guard.
     das::TextWriter Log;
@@ -178,8 +188,60 @@ bool RunDasUEAotProbe(FString& Report)
         const auto E = Eval(false);
         Check(E.Contains(TEXT("active game-thread")), TEXT("foreign_context_refused"), E);
     }
+    das::InteropFunction* CheckedMap = nullptr;
+    das::Module::require("ue_foundation")
+        ->functions.foreach (
+            [&](const das::FunctionPtr& Fn)
+            {
+                if (Fn->name == "__ue_self_map_get_int" && Fn->arguments[1]->type->baseType == das::Type::anyArgument)
+                    CheckedMap = reinterpret_cast<das::InteropFunction*>(
+                        static_cast<das::BuiltInFunction*>(Fn)->getBuiltinAddress());
+            });
+    auto Direct = [&]()
+    {
+        C.restart();
+        C.runWithCatch(
+            [&]
+            {
+                if (CheckedMap)
+                    CheckedMap(C, nullptr, nullptr);
+            });
+        const auto* E = C.getException();
+        return E ? FString(UTF8_TO_TCHAR(E)) : FString();
+    };
+    const auto DirectMissing = Direct();
+    Check(DirectMissing.Contains(TEXT("active game-thread")), TEXT("interop_direct_missing_context_before_metadata"),
+                                                                   DirectMissing);
+    {
+        FUnrealDasContext Other(16384);
+        FActiveContextScope Scope(Other);
+        const auto E = Direct();
+        Check(E.Contains(TEXT("active game-thread")), TEXT("interop_direct_foreign_context_before_metadata"), E);
+    }
+    {
+        FActiveContextScope Scope(C);
+        const auto E = Direct();
+        Check(E.Contains(TEXT("invalid map interop call metadata")),
+                         TEXT("interop_valid_context_null_metadata_rejected"), E);
+    }
     const auto Recovered = Eval(true);
     Check(Recovered.IsEmpty() && Owner->health == 104, TEXT("recovered_without_forbidden_writes"), Recovered);
+    Check(Owner->InteropCounts.FindRef(0) == BeforeForbidden + 1,
+          TEXT("interop_forbidden_roles_do_not_write_and_recover"));
+    bool InteropOpen = false, NameKeyClosed = false;
+    das::Module::require("ue_foundation")
+        ->functions.foreach (
+            [&](const das::FunctionPtr& Fn)
+            {
+                if (Fn->name == "__ue_self_map_get_int")
+                {
+                    if (Fn->arguments[1]->type->baseType == das::Type::anyArgument)
+                        InteropOpen = !Fn->noAot;
+                    else
+                        NameKeyClosed = Fn->noAot;
+                }
+            });
+    Check(InteropOpen && NameKeyClosed, TEXT("interop_AOT_scalar_open_opaque_name_closed"));
     bool Closed = false, Open = false;
     das::Module::require("ue_foundation")
         ->functions.foreach (

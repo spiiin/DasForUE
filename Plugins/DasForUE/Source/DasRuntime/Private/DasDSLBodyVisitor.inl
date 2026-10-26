@@ -887,9 +887,8 @@ struct FDSLBodyVisitor : das::Visitor
                 };
                 auto Accessor = [&](const char* Verb)
                 {
-                    return InPlace.bArray
-                               ? "__ue_self_array_" + das::string(Verb) + "_" + InPlace.Element
-                               : "__ue_self_map_" + das::string(Verb) + "_" + InPlace.Key + "_" + InPlace.Element;
+                    return InPlace.bArray ? "__ue_self_array_" + das::string(Verb) + "_" + InPlace.Element
+                                          : "__ue_self_map_" + das::string(Verb) + "_" + InPlace.Element;
                 };
                 das::ExpressionPtr Value = new das::ExprVar(At, "value");
                 if (!Assignment->rtti_isCopy() && !Assignment->rtti_isClone())
@@ -1868,8 +1867,7 @@ struct FDSLBodyVisitor : das::Visitor
                         Op = DSLCall(At, (Insert ? "__ue_self_set_insert_" : "__ue_self_set_erase_") + InPlace.Key,
                                      {Property, Arg(1)});
                     else
-                        Op = Insert ? DSLCall(At, "__ue_self_map_set_" + InPlace.Key + "_" + InPlace.Element,
-                                              {Property, Arg(1), Arg(2)})
+                        Op = Insert ? DSLCall(At, "__ue_self_map_set_" + InPlace.Element, {Property, Arg(1), Arg(2)})
                                     : DSLCall(At, "__ue_self_map_erase_" + InPlace.Key, {Property, Arg(1)});
                     Body->list.push_back(Result ? static_cast<das::ExpressionPtr>(new das::ExprReturn(At, Op)) : Op);
                 }

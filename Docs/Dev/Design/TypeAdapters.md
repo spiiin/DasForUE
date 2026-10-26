@@ -381,13 +381,79 @@ hash flags, missing/extra slots, direct calls с ошибочным descriptor, 
 цикл descriptor, а также depth/node limits на reflection trees. Архитектурный gate запрещает
 создание container properties вне файла комбинаторов.
 
-Это структурная часть 2.3. Матрица typed map externs пока остаётся ABI-фасетом; её сокращение
-требует отдельного выбора общего транспорта ключа с проверкой lifetime/GC и измерением
+На структурном шаге 2.3 матрица typed map externs оставалась ABI-фасетом; её сокращение
+требовало отдельного выбора общего транспорта ключа с проверкой lifetime/GC и измерением
 in-place access. Замена на boxed values ради числа символов не считается выполнением
 этого пункта. Валидация ещё не зарегистрированных авторских типов и backend schemas также
 сохраняет собственные правила разрешения ссылок, поверх общего property contract.
 
-Кандидат для следующего ABI-шага: daScript addInterop передаёт vec4f arguments вместе с
-call->types (так реализован builtin hash). Это позволяет стереть тип ключа без boxed-value
+Выбранный транспорт следующего ABI-шага (реализация ниже): daScript addInterop передаёт vec4f arguments вместе с
+call->types для anyArgument (так реализован builtin hash). Это позволяет стереть тип ключа без boxed-value
 и без хранения raw string pointer между вызовами. Перед применением к UE map access нужны
 GuardUEExtern, отдельная совместимость с текущим checked AOT bridge и замеры hot path.
+
+
+## Map addInterop ABI (2026-10-26)
+
+Map get/upsert больше не регистрируются как key × value. Новый DasMapInterop.inl читает
+borrowed vec4f и call->types для anyArgument, проверяет тип ключа и передаёт native key memory прежним
+snapshot views / FScriptMapHelper. Поддерживаются int, byte, string, FName, а для snapshots
+также nominal enum и object-key tokens. String преобразуется в локальный FString ровно
+на время вызова; TypeInfo, VM pointers и native key memory не сохраняются. Enum identity,
+object class/liveness и context-owned handles проверяются до обращения к map.
+
+Get/with snapshot имеют суффикс только типа значения (int/float/double/bool/string/name/
+byte/text/enum/object/struct); self get/set — только scalar value suffix. Измерение ключа
+общее. Scalar value codecs берутся из прежних traits, а enum/object/struct используют
+существующие read/write/snapshot services. Readonly, growth limits, default-on-missing
+для self и error-on-missing для snapshot сохранены. Snapshot upsert сохраняет
+FStructMutation, draft lifetime, rollback и caller-frame requirements.
+
+CMRES handles возвращаются через краткий uint64 token и немедленную call-macro конверсию
+в UEStructValue/UObjectHandle. Конверсия повторно проверяет context ownership; нового
+snapshot или boxed key не создаёт. Legacy key-specific names удалены, DSL helpers
+генерируют новые имена. Синтаксис вызова ue_struct_map_with_int(...) сохранён, но это
+теперь call macro; taking address старого low-level helper не является совместимым ABI.
+
+AddUEInterop — единственная фабрика interop-регистрации. Native address и AOT registry
+хранят CheckedUEInterop thunk: общий role/frozen-physics guard и явная проверка активного
+game-thread context выполняются до чтения Node/Args. Null Node/Args, отсутствующая metadata erased key slot и неподдерживаемые
+типы/размерности отклоняются. Аннотация функции закрывает неподдерживаемые source key types.
+
+Checked AOT bridge поддерживает Interop<Id> с ABI-versioned identity, включающей тип результата, имя и
+mangled signature (daScript overload name сам по себе не включает результат). Сгенерированный SimNode_AotInterop содержит metadata текущего call site,
+Resolve проверяет контекст/роль/ABI, затем вызывается тот же checked thunk. Scalar signatures
+и anyArgument доступны AOT; snapshot/opaque handle signatures сохраняют прежний closed
+boundary. Exact FName-key overloads используют общий SelfMap с известным ABI ключа, но закрыты AOT,
+чтобы generic anyArgument не открыл private FDasNameValue C++ ABI.
+
+Набор map get/upsert/self get/set сокращён с 196 регистраций до 56 (32 self overloads,
+22 snapshot interops и 2 общие handle conversions). 16 self overloads — FName AOT boundary,
+а не отдельная native реализация. Erase/set-element/key enumeration уже линейны по ключу
+и сохраняют прежний ABI. Удалены 78 старых C++ map wrappers, а также template products.
+Точная новая inventory проверяется foundation; typed reference для замера горячего пути
+находится только в test probes. Аудитор проверяет обе guarded factories.
+
+VM TypeInfo sparse: metadata нужна только erased key slot, фиксированные параметры читаются
+по ABI объявления (скаляры by-value, snapshot/ObjectRef через reference). Exact Name overload
+не требует TypeInfo; runtime всё равно проверяет native key property и context-owned Name.
+Генерируемый DSL AST строит token/conversion calls явно; parser call macros обслуживают
+эквивалентные вызовы из исходного .das. Оба пути используют одни и те же native handlers.
+
+
+Проверка реализации: общий build-agent job `map-interop-6` завершился с кодом 0.
+Сборка editor, генерация/линковка AOT, 23 linked-AOT guard checks, 361 Python tests,
+Foundation (failures=0), components-prepare, MethodValues Create/Reopen, все 51 editor/PIE
+automation tests и performance suite — PASS. Source guard audit — 494 guarded source sites.
+Runtime inventory — 56 map registrations вместо 196. Informational VM benchmark:
+200000 get/set pairs, typed reference 337.46 ns/op, interop 328.53 ns/op (ratio 0.974).
+Это один локальный прогон с вычитанием compile/setup baseline, а не обещание ускорения;
+наблюдаемой регрессии горячего пути в нём нет.
+
+После включения return type в ABI identity и переноса тестового литерала без изменения
+его содержимого job `map-interop-final` повторил editor build, AOT generation/link,
+23 linked-AOT checks и Foundation — PASS, код 0. Повторный informational benchmark:
+typed 329.37 ns/op, interop 359.95 ns/op (ratio 1.093). Разброс двух локальных прогонов
+от -3% до +9% не позволяет заявлять ускорение или отсутствие небольшой стоимости
+динамического разбора ключа. Измерение включает VM и вычитает отдельно измеренный setup;
+это ограничение замера, а не performance guarantee. Формат staged C++ и diff check — PASS.

@@ -51,7 +51,15 @@ namespace das {
 namespace _anon_13855297892086146258 {
 
 // unused enumeration CollisionProfile
+extern TypeInfo __type_info__af87fe4c863f5252;
+extern TypeInfo __type_info__af8afe4c86446b52;
+extern TypeInfo __type_info__af90fe4c864e9d52;
+extern TypeInfo __type_info__b661860848e8711e;
 
+TypeInfo __type_info__af87fe4c863f5252 = { Type::tDouble, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, 0, 0, nullptr, 60, 8, UINT64_C(0xaf87fe4c863f5252) };
+TypeInfo __type_info__af8afe4c86446b52 = { Type::tInt, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, 0, 0, nullptr, 60, 4, UINT64_C(0xaf8afe4c86446b52) };
+TypeInfo __type_info__af90fe4c864e9d52 = { Type::tString, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, 0, 0, nullptr, 16420, 8, UINT64_C(0xaf90fe4c864e9d52) };
+TypeInfo __type_info__b661860848e8711e = { Type::tUInt8, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, 0, 0, nullptr, 60, 1, UINT64_C(0xb661860848e8711e) };
 
 static void resolveTypeInfoAnnotations()
 {
@@ -61,51 +69,82 @@ static void resolveTypeInfoAnnotations()
     }
 }
 
+TypeInfo * __tinfo_0[3] = { &__type_info__af90fe4c864e9d52, &__type_info__af8afe4c86446b52, &__type_info__af8afe4c86446b52 };
+TypeInfo * __tinfo_1[2] = { &__type_info__af90fe4c864e9d52, &__type_info__af8afe4c86446b52 };
+TypeInfo * __tinfo_3[3] = { &__type_info__af90fe4c864e9d52, &__type_info__af90fe4c864e9d52, &__type_info__af87fe4c863f5252 };
+TypeInfo * __tinfo_4[3] = { &__type_info__af90fe4c864e9d52, &__type_info__b661860848e8711e, &__type_info__af8afe4c86446b52 };
+TypeInfo * __tinfo_6[2] = { &__type_info__af90fe4c864e9d52, &__type_info__af90fe4c864e9d52 };
+TypeInfo * __tinfo_7[2] = { &__type_info__af90fe4c864e9d52, &__type_info__b661860848e8711e };
+TypeInfo * __tinfo_8[3] = { &__type_info__af90fe4c864e9d52, &__type_info__af8afe4c86446b52, &__type_info__af87fe4c863f5252 };
 
-inline int32_t main_ed20d9f5f5e769b9 ( Context * __context__, int32_t __input_rename_at_5_0 );
+inline int32_t main_f782fedfad24abc9 ( Context * __context__, int32_t __input_rename_at_5_0 );
 
 void __init_script ( Context * __context__, bool __init_shared )
 {
 }
 
-inline int32_t main_ed20d9f5f5e769b9 ( Context * __context__, int32_t __input_rename_at_5_0 )
+inline int32_t main_f782fedfad24abc9 ( Context * __context__, int32_t __input_rename_at_5_0 )
 {
-    if ( __input_rename_at_5_0 == 0 )
+    das_call_interop<void>::call(&dasue::aot::Interop<385390202817552623ULL>,__context__,SimNode_AotInterop<3>(__tinfo_0,cast<char * const >::from((das_string_cast(((char *) "InteropCounts")))),cast<int32_t>::from(0),cast<int32_t>::from(das_ordered2([&](auto && __lr_left, auto && __lr_right) { return (__lr_left + __lr_right); }, [&]() { return das_call_interop<int32_t>::call(&dasue::aot::Interop<18356957500689652871ULL>,__context__,SimNode_AotInterop<2>(__tinfo_1,cast<char * const >::from((das_string_cast(((char *) "InteropCounts")))),cast<int32_t>::from(0))); }, [&]() { return 1; }))));
+    if ( __input_rename_at_5_0 == 5 )
     {
-        dasue::aot::Call<9957724071252641970ULL,void,const char *,int32_t,das::Context *>((das_string_cast(((char *) "health"))),das_ordered2([&](auto && __lr_left, auto && __lr_right) { return (__lr_left + __lr_right); }, [&]() { return dasue::aot::Call<12594730263501179578ULL,int32_t,const char *,das::Context *>((das_string_cast(((char *) "health"))),__context__); }, [&]() { return 2; }),__context__);
-        return das_auto_cast<int32_t>::cast(dasue::aot::Call<12594730263501179578ULL,int32_t,const char *,das::Context *>((das_string_cast(((char *) "health"))),__context__));
+        das_call_interop<void>::call(&dasue::aot::Interop<385390202817552623ULL>,__context__,SimNode_AotInterop<3>(__tinfo_0,cast<char * const >::from((das_string_cast(((char *) "InteropCounts")))),cast<int32_t>::from(3),cast<int32_t>::from(41)));
+        das_call_interop<void>::call(&dasue::aot::Interop<7622508557698625182ULL>,__context__,SimNode_AotInterop<3>(__tinfo_3,cast<char * const >::from((das_string_cast(((char *) "InteropStrings")))),cast<char * const >::from(((char *) "世界 Key")),cast<double>::from(2.50000000000000000e+00)));
+        das_call_interop<void>::call(&dasue::aot::Interop<385390202817552623ULL>,__context__,SimNode_AotInterop<3>(__tinfo_4,cast<char * const >::from((das_string_cast(((char *) "InteropBytes")))),cast<uint8_t>::from(0x7),cast<int32_t>::from(11)));
+        das_verify(das_ordered2([&](auto && __lr_left, auto && __lr_right) { return (__lr_left == __lr_right); }, [&]() { return das_call_interop<int32_t>::call(&dasue::aot::Interop<18356957500689652871ULL>,__context__,SimNode_AotInterop<2>(__tinfo_1,cast<char * const >::from((das_string_cast(((char *) "InteropCounts")))),cast<int32_t>::from(3))); }, [&]() { return 41; }),__context__);
+        das_verify(das_ordered2([&](auto && __lr_left, auto && __lr_right) { return (__lr_left == __lr_right); }, [&]() { return das_call_interop<double>::call(&dasue::aot::Interop<10706168135169311370ULL>,__context__,SimNode_AotInterop<2>(__tinfo_6,cast<char * const >::from((das_string_cast(((char *) "InteropStrings")))),cast<char * const >::from(((char *) "世界 Key")))); }, [&]() { return 2.50000000000000000e+00; }),__context__);
+        das_verify(das_ordered2([&](auto && __lr_left, auto && __lr_right) { return (__lr_left == __lr_right); }, [&]() { return das_call_interop<int32_t>::call(&dasue::aot::Interop<18356957500689652871ULL>,__context__,SimNode_AotInterop<2>(__tinfo_7,cast<char * const >::from((das_string_cast(((char *) "InteropBytes")))),cast<uint8_t>::from(0x7))); }, [&]() { return 11; }),__context__);
+        return das_auto_cast<int32_t>::cast(1);
     } else {
-        if ( __input_rename_at_5_0 == 1 )
+        if ( __input_rename_at_5_0 == 6 )
         {
-            return das_auto_cast<int32_t>::cast(dasue::aot::Call<12594730263501179578ULL,int32_t,const char *,das::Context *>((das_string_cast(((char *) "missingAotField"))),__context__));
+            das_call_interop<void>::call(&dasue::aot::Interop<7622508557698625182ULL>,__context__,SimNode_AotInterop<3>(__tinfo_8,cast<char * const >::from((das_string_cast(((char *) "InteropStrings")))),cast<int32_t>::from(3),cast<double>::from(7.00000000000000000e+00)));
+            return das_auto_cast<int32_t>::cast(0);
         } else {
-            if ( __input_rename_at_5_0 == 2 )
+            if ( __input_rename_at_5_0 == 7 )
             {
-                dasue::aot::Call<9957724071252641970ULL,void,const char *,int32_t,das::Context *>((das_string_cast(((char *) "readOnly"))),9,__context__);
+                das_call_interop<void>::call(&dasue::aot::Interop<385390202817552623ULL>,__context__,SimNode_AotInterop<3>(__tinfo_0,cast<char * const >::from((das_string_cast(((char *) "InteropLocked")))),cast<int32_t>::from(0),cast<int32_t>::from(9)));
                 return das_auto_cast<int32_t>::cast(0);
             } else {
-                if ( __input_rename_at_5_0 == 3 )
+                if ( __input_rename_at_5_0 == 0 )
                 {
-                    return das_auto_cast<int32_t>::cast(dasue::aot::Call<12594730263501179578ULL,int32_t,const char *,das::Context *>((das_string_cast(((char *) "speed"))),__context__));
+                    dasue::aot::Call<9957724071252641970ULL,void,const char *,int32_t,das::Context *>((das_string_cast(((char *) "health"))),das_ordered2([&](auto && __lr_left, auto && __lr_right) { return (__lr_left + __lr_right); }, [&]() { return dasue::aot::Call<12594730263501179578ULL,int32_t,const char *,das::Context *>((das_string_cast(((char *) "health"))),__context__); }, [&]() { return 2; }),__context__);
+                    return das_auto_cast<int32_t>::cast(dasue::aot::Call<12594730263501179578ULL,int32_t,const char *,das::Context *>((das_string_cast(((char *) "health"))),__context__));
                 } else {
-                    if ( __input_rename_at_5_0 == 4 )
+                    if ( __input_rename_at_5_0 == 1 )
                     {
-                        dasue::aot::Call<7989568879990671124ULL,void,const char *,const char *,das::Context *>((das_string_cast(((char *) "DSLText"))),(das_string_cast(((char *) "native AOT"))),__context__);
-                        dasue::aot::Call<15133154494884495644ULL,void,const char *,bool,das::Context *>((das_string_cast(((char *) "bScalar"))),true,__context__);
-                        dasue::aot::Call<5731227720843325122ULL,void,const char *,double,das::Context *>((das_string_cast(((char *) "DSLPrecise"))),2.50000000000000000e+00,__context__);
-                        dasue::aot::Call<17131355842408262904ULL,void,const char *,float,das::Context *>((das_string_cast(((char *) "speed"))),3.50000000e+00f,__context__);
-                        return das_auto_cast<int32_t>::cast(((das_ordered2([&](auto && __lr_left, auto && __lr_right) { return SimPolicy<char *>::NotEqu(cast<char *>::from(__lr_left),cast<char *>::from(__lr_right),*__context__,nullptr); }, [&]() { return ((char * const )(dasue::aot::Call<15567913253150998317ULL,char *,const char *,das::Context *>((das_string_cast(((char *) "DSLText"))),__context__))); }, [&]() { return ((char *) "native AOT"); })) || !(dasue::aot::Call<14647169766418035266ULL,bool,const char *,das::Context *>((das_string_cast(((char *) "bScalar"))),__context__))) ? das_auto_cast<int32_t>::cast(-1) : das_auto_cast<int32_t>::cast(int32_t(das_ordered2([&](auto && __lr_left, auto && __lr_right) { return (__lr_left + __lr_right); }, [&]() { return dasue::aot::Call<13624617047239837424ULL,double,const char *,das::Context *>((das_string_cast(((char *) "DSLPrecise"))),__context__); }, [&]() { return double(dasue::aot::Call<960915458129702448ULL,float,const char *,das::Context *>((das_string_cast(((char *) "speed"))),__context__)); }))));
+                        return das_auto_cast<int32_t>::cast(dasue::aot::Call<12594730263501179578ULL,int32_t,const char *,das::Context *>((das_string_cast(((char *) "missingAotField"))),__context__));
                     } else {
-                        return das_auto_cast<int32_t>::cast(dasue::aot::Call<12594730263501179578ULL,int32_t,const char *,das::Context *>((das_string_cast(((char *) "health"))),__context__));
+                        if ( __input_rename_at_5_0 == 2 )
+                        {
+                            dasue::aot::Call<9957724071252641970ULL,void,const char *,int32_t,das::Context *>((das_string_cast(((char *) "readOnly"))),9,__context__);
+                            return das_auto_cast<int32_t>::cast(0);
+                        } else {
+                            if ( __input_rename_at_5_0 == 3 )
+                            {
+                                return das_auto_cast<int32_t>::cast(dasue::aot::Call<12594730263501179578ULL,int32_t,const char *,das::Context *>((das_string_cast(((char *) "speed"))),__context__));
+                            } else {
+                                if ( __input_rename_at_5_0 == 4 )
+                                {
+                                    dasue::aot::Call<7989568879990671124ULL,void,const char *,const char *,das::Context *>((das_string_cast(((char *) "DSLText"))),(das_string_cast(((char *) "native AOT"))),__context__);
+                                    dasue::aot::Call<15133154494884495644ULL,void,const char *,bool,das::Context *>((das_string_cast(((char *) "bScalar"))),true,__context__);
+                                    dasue::aot::Call<5731227720843325122ULL,void,const char *,double,das::Context *>((das_string_cast(((char *) "DSLPrecise"))),2.50000000000000000e+00,__context__);
+                                    dasue::aot::Call<17131355842408262904ULL,void,const char *,float,das::Context *>((das_string_cast(((char *) "speed"))),3.50000000e+00f,__context__);
+                                    return das_auto_cast<int32_t>::cast(((das_ordered2([&](auto && __lr_left, auto && __lr_right) { return SimPolicy<char *>::NotEqu(cast<char *>::from(__lr_left),cast<char *>::from(__lr_right),*__context__,nullptr); }, [&]() { return ((char * const )(dasue::aot::Call<15567913253150998317ULL,char *,const char *,das::Context *>((das_string_cast(((char *) "DSLText"))),__context__))); }, [&]() { return ((char *) "native AOT"); })) || !(dasue::aot::Call<14647169766418035266ULL,bool,const char *,das::Context *>((das_string_cast(((char *) "bScalar"))),__context__))) ? das_auto_cast<int32_t>::cast(-1) : das_auto_cast<int32_t>::cast(int32_t(das_ordered2([&](auto && __lr_left, auto && __lr_right) { return (__lr_left + __lr_right); }, [&]() { return dasue::aot::Call<13624617047239837424ULL,double,const char *,das::Context *>((das_string_cast(((char *) "DSLPrecise"))),__context__); }, [&]() { return double(dasue::aot::Call<960915458129702448ULL,float,const char *,das::Context *>((das_string_cast(((char *) "speed"))),__context__)); }))));
+                                } else {
+                                    return das_auto_cast<int32_t>::cast(dasue::aot::Call<12594730263501179578ULL,int32_t,const char *,das::Context *>((das_string_cast(((char *) "health"))),__context__));
+                                };
+                            };
+                        };
                     };
                 };
             };
         };
     };
 }
-static vec4f __wrap_main_ed20d9f5f5e769b9 ( Context * __context__ ) {
+static vec4f __wrap_main_f782fedfad24abc9 ( Context * __context__ ) {
     int32_t arg_input = cast_aot_arg<int32_t>::to(*__context__,__context__->abiArguments()[0]);
-    return cast<int32_t>::from(main_ed20d9f5f5e769b9(__context__, arg_input));
+    return cast<int32_t>::from(main_f782fedfad24abc9(__context__, arg_input));
 }
 
 #ifdef _MSC_VER
@@ -113,8 +152,8 @@ static vec4f __wrap_main_ed20d9f5f5e769b9 ( Context * __context__ ) {
 #endif
 struct AotFunction { uint64_t hash; bool is_cmres; void * fn; vec4f (*wrappedFn)(Context*); };
 static AotFunction functions[] = {
-    // main Ci hash=0xed20d9f5f5e769b9
-    { 0xf9c3b88c0813c78f, false, (void*)&main_ed20d9f5f5e769b9, &__wrap_main_ed20d9f5f5e769b9 },
+    // main Ci hash=0xf782fedfad24abc9
+    { 0xf1ead45435660792, false, (void*)&main_f782fedfad24abc9, &__wrap_main_f782fedfad24abc9 },
 };
 #ifdef _MSC_VER
 #pragma optimize("", on)

@@ -6,12 +6,12 @@ let made=ue_begin_call(ue_self_object(),"NewFixture")
 ue_invoke_call(made)
 let object=ue_result_object(made,"ReturnValue")
 let changed=ue_struct_edit(original) $(var draft:UEStructValue) {
-    draft=__ue_struct_map_with_name_object(draft,"Nested.Lookup",ue_name_value("live"),object)
+    draft=ue_struct_map_with_object(draft,"Nested.Lookup",ue_name_value("live"),object)
     ue_release_call(made)
     let gc=ue_begin_call(ue_self_object(),"ForceTestGC"); ue_invoke_call(gc); ue_release_call(gc)
     verify(ue_object_valid(object))
 }
-verify(ue_object_valid(__ue_struct_map_get_name_object(changed,"Nested.Lookup",ue_name_value("live"))))
+verify(ue_object_valid(ue_struct_map_get_object(changed,"Nested.Lookup",ue_name_value("live"))))
 verify(ue_struct_map_size(original,"Nested.Lookup")==0)
 let other=ue_begin_call(ue_self_object(),"NewFixture")
 ue_invoke_call(other)
@@ -19,7 +19,7 @@ let discarded=ue_result_object(other,"ReturnValue")
 var rejected=false
 try {
     let unused=ue_struct_edit(original) $(var draft:UEStructValue) {
-        draft=__ue_struct_map_with_name_object(draft,"Nested.Lookup",ue_name_value("discarded"),discarded)
+        draft=ue_struct_map_with_object(draft,"Nested.Lookup",ue_name_value("discarded"),discarded)
         ue_release_call(other)
         panic("discard draft reference")
     }
@@ -128,7 +128,7 @@ def batch_failures(input:int):int {
     try {
         let unused=ue_struct_edit(original) $(var draft:UEStructValue) {
             escaped=draft
-            try { draft=__ue_struct_map_with_string_struct(draft,"Catalog","bad",wrong) } recover { rejected+=1 }
+            try { draft=ue_struct_map_with_struct(draft,"Catalog","bad",wrong) } recover { rejected+=1 }
         }
     } recover { rejected+=1 }
     // An inner independent edit is allowed, but re-editing the active draft is not.
@@ -162,11 +162,11 @@ def queries(input:int):int {
         verify(ue_text_key(ue_struct_get_text(value,"Nested.Caption"))=="Caption")
         verify(ue_name_text(ue_struct_set_element_name(value,"Nested.Tags",0))=="SnapshotReadTag_3")
         verify(ue_name_text(ue_struct_map_key_name(value,"Nested.Lookup",0))=="SnapshotReadAsset")
-        verify(ue_object_valid(__ue_struct_map_get_name_object(value,"Nested.Lookup",ue_name_value("SnapshotReadAsset"))))
+        verify(ue_object_valid(ue_struct_map_get_object(value,"Nested.Lookup",ue_name_value("SnapshotReadAsset"))))
         verify(ue_struct_map_key_string(value,"Catalog",0)=="saved")
     }
     let nested=ue_struct_nested_get(value,"Rows",0)
-    let saved=__ue_struct_map_get_string_struct(value,"Catalog","saved")
+    let saved=ue_struct_map_get_struct(value,"Catalog","saved")
     let changed=ue_struct_with_byte(nested,"Priority",uint8(99))
     verify(ue_struct_get_byte(changed,"Priority")==uint8(99) && ue_struct_get_byte(saved,"Priority")==uint8(11))
     verify(ue_struct_get_byte(value,"Rows.0.Priority")==uint8(11))
@@ -248,14 +248,14 @@ let original=ue_struct_value("/Script/DasRuntime.DasDefaultBundleProbe")
 var changed=original
 let wrong=ue_struct_value("/Script/CoreUObject.IntPoint")
 var rejected=false
-try { changed=__ue_struct_map_with_string_struct(changed,"Catalog","new",wrong) } recover { rejected=true }
+try { changed=ue_struct_map_with_struct(changed,"Catalog","new",wrong) } recover { rejected=true }
 verify(rejected && ue_struct_map_size(original,"Catalog")==0 && ue_struct_map_size(changed,"Catalog")==0)
 var child=ue_struct_value("/Script/DasRuntime.DasDefaultNestedProbe")
 child=ue_struct_with_byte(child,"Priority",uint8(255))
 child=ue_struct_with_text(child,"Caption",ue_text("SnapshotCodec","Caption","Saved"))
-changed=__ue_struct_map_with_string_struct(changed,"Catalog","new",child)
+changed=ue_struct_map_with_struct(changed,"Catalog","new",child)
 child=ue_struct_with_byte(child,"Priority",uint8(3))
-let saved=__ue_struct_map_get_string_struct(changed,"Catalog","new")
+let saved=ue_struct_map_get_struct(changed,"Catalog","new")
 verify(ue_struct_get_byte(saved,"Priority")==uint8(255) && ue_text_key(ue_struct_get_text(saved,"Caption"))=="Caption")
 verify(ue_struct_map_size(original,"Catalog")==0)
 changed=ue_struct_array_resize(changed,"Rows",1)

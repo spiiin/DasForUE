@@ -643,18 +643,8 @@ void DSLEnsureStructHelpers(const das::TypeDeclPtr& InputType, const FString& Pa
                     DSLFail(TEXT("Expected enum-key map carrier"));
                 KeyPath = Enum->GetPathName();
             }
-            const das::string With = (K == "object" || K == "enum") ? "__ue_struct_map_with_" + K + "_" + V
-                                     : EnumValue                    ? "__ue_struct_map_with_" + K + "_enum"
-                                     : ObjectValue                  ? "__ue_struct_map_with_" + K + "_object"
-                                     : StructValue                  ? "__ue_struct_map_with_" + K + "_struct"
-                                     : K == "int" && V == "int"     ? "ue_struct_map_with_int"
-                                                                    : "ue_struct_map_with_" + K + "_" + V;
-            const das::string Get = (K == "object" || K == "enum") ? "__ue_struct_map_get_" + K + "_" + V
-                                    : EnumValue                    ? "__ue_struct_map_get_" + K + "_enum"
-                                    : ObjectValue                  ? "__ue_struct_map_get_" + K + "_object"
-                                    : StructValue                  ? "__ue_struct_map_get_" + K + "_struct"
-                                    : K == "int" && V == "int"     ? "ue_struct_map_get_int"
-                                                                   : "ue_struct_map_get_" + K + "_" + V;
+            const das::string With = "__ue_map_with_token_" + V;
+            const das::string Get = (ObjectValue || StructValue ? "__ue_map_get_token_" : "ue_struct_map_get_") + V;
             auto* PLoop = new das::ExprBlock();
             PLoop->at = At;
             das::ExpressionPtr Mapped = new das::ExprVar(At, "mapped");
@@ -665,9 +655,10 @@ void DSLEnsureStructHelpers(const das::TypeDeclPtr& InputType, const FString& Pa
                 PackedKey = DSLKeyPack(At, Field.type->firstType, PackedKey);
             if (TypedValue)
                 Mapped = DSLDirectPack(At, Field.type->secondType, Mapped, ValuePath);
-            PLoop->list.push_back(
-                new das::ExprCopy(At, new das::ExprVar(At, "packed"),
-                                  DSLCall(At, With, {new das::ExprVar(At, "packed"), Name(), PackedKey, Mapped})));
+            PLoop->list.push_back(new das::ExprCopy(
+                At, new das::ExprVar(At, "packed"),
+                DSLCall(At, "__ue_map_struct_token",
+                        {DSLCall(At, With, {new das::ExprVar(At, "packed"), Name(), PackedKey, Mapped})})));
             auto* KeysLoop = Loop(new das::ExprConstInt(At, 0), PLoop);
             KeysLoop->sources[0] = DSLCall(At, "keys", {Access()});
             KeysLoop->iterators.push_back("mapped");
@@ -688,6 +679,8 @@ void DSLEnsureStructHelpers(const das::TypeDeclPtr& InputType, const FString& Pa
                                                              : "ue_struct_map_key",
                                              {new das::ExprVar(At, "value"), Name(), new das::ExprVar(At, "index")});
             das::ExpressionPtr Result = DSLCall(At, Get, {new das::ExprVar(At, "value"), Name(), Key->clone()});
+            if (ObjectValue || StructValue)
+                Result = DSLCall(At, ObjectValue ? "__ue_map_object_token" : "__ue_map_struct_token", {Result});
             if (TypedValue)
                 Result = DSLDirectUnpack(At, Field.type->secondType, Result, ValuePath);
             if (K == "enum")

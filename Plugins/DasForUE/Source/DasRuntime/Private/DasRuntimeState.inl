@@ -323,6 +323,11 @@ void GuardUEExtern()
         throw std::runtime_error("UE extern is forbidden in PhysicsPreSim execution role");
     }
 }
+void GuardUEInteropContext(das::Context* C)
+{
+    if (!IsInGameThread() || !ActiveContext || C != ActiveContext)
+        C->throw_error("UE interop requires the active game-thread context");
+}
 thread_local const FString* LibraryInvocationContract = nullptr;
 thread_local FString LibraryInvocationScript;
 struct FOutputFrame : FGCObject
