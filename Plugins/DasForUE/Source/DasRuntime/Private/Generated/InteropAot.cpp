@@ -282,6 +282,7 @@ namespace ue_native_gameplay { struct PhysicalMaterialStrength; };
 namespace ue_native_gameplay { struct Anchors; };
 namespace ue_native_gameplay { struct Margin; };
 namespace ue_native_gameplay { struct SlateColor; };
+namespace ue_native_gameplay { struct ShapedTextOptions; };
 namespace ue_native_gameplay { struct WidgetTransform; };
 namespace ue_native_gameplay { struct __ue_class_54171b28df3af163ef1a57a7ed50afe9; };
 namespace ue_native_gameplay { struct __ue_soft_class_54171b28df3af163ef1a57a7ed50afe9; };
@@ -396,6 +397,9 @@ static_assert(offsetof(C_Actor_adf65d5b,handle)==0,"structure field offset misma
 // unused enumeration EAspectRatioAxisConstraint
 // unused enumeration EAttachLocation
 // unused enumeration EAttachmentRule
+// unused enumeration EButtonClickMethod
+// unused enumeration EButtonPressMethod
+// unused enumeration EButtonTouchMethod
 // unused enumeration ECameraProjectionMode
 // unused enumeration ECanBeCharacterBase
 // unused enumeration EClothingTeleportMode
@@ -453,6 +457,12 @@ static_assert(offsetof(C_Actor_adf65d5b,handle)==0,"structure field offset misma
 // unused enumeration ESpawnActorCollisionHandlingMethod
 // unused enumeration EStaticMeshPaintSupport
 // unused enumeration ETeleportType
+// unused enumeration ETextFlowDirection
+// unused enumeration ETextJustify
+// unused enumeration ETextOverflowPolicy
+// unused enumeration ETextShapingMethod
+// unused enumeration ETextTransformPolicy
+// unused enumeration ETextWrappingPolicy
 // unused enumeration ETickingGroup
 // unused enumeration ETouchIndex
 // unused enumeration EUINavigation
@@ -577,6 +587,7 @@ static_assert(offsetof(C_Actor_adf65d5b,handle)==0,"structure field offset misma
 // unused structure Anchors
 // unused structure Margin
 // unused structure SlateColor
+// unused structure ShapedTextOptions
 // unused structure WidgetTransform
 // unused structure __ue_class_54171b28df3af163ef1a57a7ed50afe9
 // unused structure __ue_soft_class_54171b28df3af163ef1a57a7ed50afe9

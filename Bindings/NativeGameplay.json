@@ -165,6 +165,16 @@
 				"name": "PhysicalMaterialRef"
 			},
 			{
+				"path": "/Script/UMG.Button",
+				"module": "ue_gameplay_services",
+				"name": "ButtonRef"
+			},
+			{
+				"path": "/Script/UMG.TextBlock",
+				"module": "ue_gameplay_services",
+				"name": "TextBlockRef"
+			},
+			{
 				"path": "/Script/UMG.UserWidget",
 				"module": "ue_gameplay_services",
 				"name": "UserWidgetRef"
@@ -2136,6 +2146,120 @@
 			]
 		},
 		{
+			"path": "/Script/Slate.ETextFlowDirection",
+			"entries": [
+				{
+					"name": "Auto",
+					"value": 0
+				},
+				{
+					"name": "LeftToRight",
+					"value": 1
+				},
+				{
+					"name": "RightToLeft",
+					"value": 2
+				},
+				{
+					"name": "Culture",
+					"value": 3
+				}
+			]
+		},
+		{
+			"path": "/Script/Slate.ETextJustify",
+			"entries": [
+				{
+					"name": "Left",
+					"value": 0
+				},
+				{
+					"name": "Center",
+					"value": 1
+				},
+				{
+					"name": "Right",
+					"value": 2
+				},
+				{
+					"name": "InvariantLeft",
+					"value": 3
+				},
+				{
+					"name": "InvariantRight",
+					"value": 4
+				}
+			]
+		},
+		{
+			"path": "/Script/Slate.ETextWrappingPolicy",
+			"entries": [
+				{
+					"name": "DefaultWrapping",
+					"value": 0
+				},
+				{
+					"name": "AllowPerCharacterWrapping",
+					"value": 1
+				}
+			]
+		},
+		{
+			"path": "/Script/SlateCore.EButtonClickMethod",
+			"entries": [
+				{
+					"name": "DownAndUp",
+					"value": 0
+				},
+				{
+					"name": "MouseDown",
+					"value": 1
+				},
+				{
+					"name": "MouseUp",
+					"value": 2
+				},
+				{
+					"name": "PreciseClick",
+					"value": 3
+				}
+			]
+		},
+		{
+			"path": "/Script/SlateCore.EButtonPressMethod",
+			"entries": [
+				{
+					"name": "DownAndUp",
+					"value": 0
+				},
+				{
+					"name": "ButtonPress",
+					"value": 1
+				},
+				{
+					"name": "ButtonRelease",
+					"value": 2
+				}
+			]
+		},
+		{
+			"path": "/Script/SlateCore.EButtonTouchMethod",
+			"entries": [
+				{
+					"name": "DownAndUp",
+					"value": 0
+				},
+				{
+					"name": "Down",
+					"value": 1
+				},
+				{
+					"name": "PreciseTap",
+					"value": 2
+				}
+			]
+		},
+		{
 			"path": "/Script/SlateCore.EFlowDirectionPreference",
 			"entries": [
 				{
@@ -2178,6 +2302,61 @@
 				{
 					"name": "UseColor_UseStyle",
 					"value": 4
+				}
+			]
+		},
+		{
+			"path": "/Script/SlateCore.ETextOverflowPolicy",
+			"entries": [
+				{
+					"name": "Clip",
+					"value": 0
+				},
+				{
+					"name": "Ellipsis",
+					"value": 1
+				},
+				{
+					"name": "MultilineEllipsis",
+					"value": 2
+				},
+				{
+					"name": "MiddleEllipsis",
+					"value": 3
+				}
+			]
+		},
+		{
+			"path": "/Script/SlateCore.ETextShapingMethod",
+			"entries": [
+				{
+					"name": "Auto",
+					"value": 0
+				},
+				{
+					"name": "KerningOnly",
+					"value": 1
+				},
+				{
+					"name": "FullShaping",
+					"value": 2
+				}
+			]
+		},
+		{
+			"path": "/Script/SlateCore.ETextTransformPolicy",
+			"entries": [
+				{
+					"name": "None",
+					"value": 0
+				},
+				{
+					"name": "ToLower",
+					"value": 1
+				},
+				{
+					"name": "ToUpper",
+					"value": 2
 				}
 			]
 		},
@@ -2430,32 +2609,6 @@
 			]
 		},
 		{
-			"path": "/Script/CoreUObject.LinearColor",
-			"signature": "R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;",
-			"fields": [
-				{
-					"kind": "float",
-					"type_path": "",
-					"name": "R"
-				},
-				{
-					"kind": "float",
-					"type_path": "",
-					"name": "G"
-				},
-				{
-					"kind": "float",
-					"type_path": "",
-					"name": "B"
-				},
-				{
-					"kind": "float",
-					"type_path": "",
-					"name": "A"
-				}
-			]
-		},
-		{
 			"path": "/Script/CoreUObject.PlatformUserId",
 			"signature": "InternalId:IntProperty:0;",
 			"fields": [
@@ -2463,32 +2616,6 @@
 					"kind": "int",
 					"type_path": "",
 					"name": "InternalId"
-				}
-			]
-		},
-		{
-			"path": "/Script/CoreUObject.Quat",
-			"signature": "X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;",
-			"fields": [
-				{
-					"kind": "double",
-					"type_path": "",
-					"name": "X"
-				},
-				{
-					"kind": "double",
-					"type_path": "",
-					"name": "Y"
-				},
-				{
-					"kind": "double",
-					"type_path": "",
-					"name": "Z"
-				},
-				{
-					"kind": "double",
-					"type_path": "",
-					"name": "W"
 				}
 			]
 		},
@@ -4283,6 +4410,32 @@
 					"kind": "enum",
 					"type_path": "/Script/SlateCore.ESlateColorStylingMode",
 					"name": "ColorUseRule"
+				}
+			]
+		},
+		{
+			"path": "/Script/UMG.ShapedTextOptions",
+			"signature": "bOverride_TextShapingMethod:BoolProperty:0;bOverride_TextFlowDirection:BoolProperty:0;TextShapingMethod:EnumProperty:0:/Script/SlateCore.ETextShapingMethod;TextFlowDirection:EnumProperty:0:/Script/Slate.ETextFlowDirection;",
+			"fields": [
+				{
+					"kind": "bool",
+					"type_path": "",
+					"name": "bOverride_TextShapingMethod"
+				},
+				{
+					"kind": "bool",
+					"type_path": "",
+					"name": "bOverride_TextFlowDirection"
+				},
+				{
+					"kind": "enum",
+					"type_path": "/Script/SlateCore.ETextShapingMethod",
+					"name": "TextShapingMethod"
+				},
+				{
+					"kind": "enum",
+					"type_path": "/Script/Slate.ETextFlowDirection",
+					"name": "TextFlowDirection"
 				}
 			]
 		},
@@ -12394,6 +12547,121 @@
 					"signature": "readOnly:IntProperty:0;"
 				},
 				{
+					"kind": "set",
+					"type_path": "",
+					"element":
+					{
+						"kind": "int",
+						"type_path": ""
+					},
+					"name": "SelfIds",
+					"declaring_class": "/Script/DasRuntime.DasObjectFixture",
+					"readonly": false,
+					"access":
+					{
+						"native_getter": false,
+						"native_setter": false,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": ""
+					},
+					"signature": "SelfIds:SetProperty:0[SelfIds:IntProperty:0;];"
+				},
+				{
+					"kind": "array",
+					"type_path": "",
+					"element":
+					{
+						"kind": "int",
+						"type_path": ""
+					},
+					"name": "SelfInts",
+					"declaring_class": "/Script/DasRuntime.DasObjectFixture",
+					"readonly": false,
+					"access":
+					{
+						"native_getter": false,
+						"native_setter": false,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": ""
+					},
+					"signature": "SelfInts:ArrayProperty:0[SelfInts:IntProperty:0;];"
+				},
+				{
+					"kind": "array",
+					"type_path": "",
+					"element":
+					{
+						"kind": "int",
+						"type_path": ""
+					},
+					"name": "SelfLockedInts",
+					"declaring_class": "/Script/DasRuntime.DasObjectFixture",
+					"readonly": true,
+					"access":
+					{
+						"native_getter": false,
+						"native_setter": false,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": ""
+					},
+					"signature": "SelfLockedInts:ArrayProperty:0[SelfLockedInts:IntProperty:0;];"
+				},
+				{
+					"kind": "map",
+					"type_path": "",
+					"key":
+					{
+						"kind": "name",
+						"type_path": ""
+					},
+					"value":
+					{
+						"kind": "double",
+						"type_path": ""
+					},
+					"name": "SelfScores",
+					"declaring_class": "/Script/DasRuntime.DasObjectFixture",
+					"readonly": false,
+					"access":
+					{
+						"native_getter": false,
+						"native_setter": false,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": ""
+					},
+					"signature": "SelfScores:MapProperty:0[SelfScores_Key:NameProperty:0;SelfScores:DoubleProperty:0;];"
+				},
+				{
+					"kind": "array",
+					"type_path": "",
+					"element":
+					{
+						"kind": "string",
+						"type_path": ""
+					},
+					"name": "SelfStrings",
+					"declaring_class": "/Script/DasRuntime.DasObjectFixture",
+					"readonly": false,
+					"access":
+					{
+						"native_getter": false,
+						"native_setter": false,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": ""
+					},
+					"signature": "SelfStrings:ArrayProperty:0[SelfStrings:StrProperty:0;];"
+				},
+				{
 					"kind": "float",
 					"type_path": "",
 					"name": "speed",
@@ -19224,7 +19492,7 @@
 				{
 					"domain": "field",
 					"name": "PostProcessSettings",
-					"reason": "unsupported_property_type"
+					"reason": "editor_only_struct_data"
 				},
 				{
 					"domain": "field",
@@ -20881,6 +21149,23 @@
 						"setter": ""
 					},
 					"signature": "ShadowCacheInvalidationBehavior:EnumProperty:0:/Script/Engine.EShadowCacheInvalidationBehavior;"
+				},
+				{
+					"kind": "struct",
+					"type_path": "/Script/CoreUObject.Color",
+					"name": "ShapeColor",
+					"declaring_class": "/Script/Engine.ShapeComponent",
+					"readonly": false,
+					"access":
+					{
+						"native_getter": false,
+						"native_setter": false,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": ""
+					},
+					"signature": "ShapeColor:StructProperty:0:/Script/CoreUObject.Color{B:ByteProperty:0;G:ByteProperty:0;R:ByteProperty:0;A:ByteProperty:0;};"
 				},
 				{
 					"kind": "float",
@@ -25445,7 +25730,7 @@
 				{
 					"domain": "field",
 					"name": "BodyInstance",
-					"reason": "unsupported_property_type"
+					"reason": "editor_only_struct_data"
 				},
 				{
 					"domain": "field",
@@ -25706,11 +25991,6 @@
 					"domain": "field",
 					"name": "ShapeBodySetup",
 					"reason": "hidden_editor_or_deprecated"
-				},
-				{
-					"domain": "field",
-					"name": "ShapeColor",
-					"reason": "unsupported_property_type"
 				},
 				{
 					"domain": "field",
@@ -38788,6 +39068,23 @@
 					"signature": "SpawnCollisionHandlingMethod:EnumProperty:0:/Script/Engine.ESpawnActorCollisionHandlingMethod;"
 				},
 				{
+					"kind": "struct",
+					"type_path": "/Script/CoreUObject.Color",
+					"name": "StreamingSourceDebugColor",
+					"declaring_class": "/Script/Engine.PlayerController",
+					"readonly": false,
+					"access":
+					{
+						"native_getter": false,
+						"native_setter": false,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": ""
+					},
+					"signature": "StreamingSourceDebugColor:StructProperty:0:/Script/CoreUObject.Color{B:ByteProperty:0;G:ByteProperty:0;R:ByteProperty:0;A:ByteProperty:0;};"
+				},
+				{
 					"kind": "array",
 					"type_path": "",
 					"element":
@@ -41509,6 +41806,21 @@
 					]
 				},
 				{
+					"name": "SetControllerLightColor",
+					"declaring_class": "/Script/Engine.PlayerController",
+					"signature": "v1;SetControllerLightColor;Color:StructProperty:128:/Script/CoreUObject.Color{B:ByteProperty:0;G:ByteProperty:0;R:ByteProperty:0;A:ByteProperty:0;};",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "struct",
+							"type_path": "/Script/CoreUObject.Color",
+							"name": "Color",
+							"direction": "in"
+						}
+					]
+				},
+				{
 					"name": "SetControllerTriggerReleaseThresholds",
 					"declaring_class": "/Script/Engine.PlayerController",
 					"signature": "v1;SetControllerTriggerReleaseThresholds;LeftThreshold:FloatProperty:130;RightThreshold:FloatProperty:130;",
@@ -42752,11 +43064,6 @@
 				},
 				{
 					"domain": "field",
-					"name": "StreamingSourceDebugColor",
-					"reason": "unsupported_property_type"
-				},
-				{
-					"domain": "field",
 					"name": "StreamingSourcePriority",
 					"reason": "unsupported_property_type"
 				},
@@ -42938,7 +43245,7 @@
 				{
 					"domain": "method",
 					"name": "ClientSetCameraFade",
-					"reason": "unsupported_parameter_type"
+					"reason": "not_public_local_native_instance_callable"
 				},
 				{
 					"domain": "method",
@@ -43589,11 +43896,6 @@
 					"domain": "method",
 					"name": "SetActorLabel",
 					"reason": "not_public_local_native_instance_callable"
-				},
-				{
-					"domain": "method",
-					"name": "SetControllerLightColor",
-					"reason": "unsupported_parameter_type"
 				},
 				{
 					"domain": "method",
@@ -49317,7 +49619,7 @@
 				{
 					"domain": "field",
 					"name": "BodyInstance",
-					"reason": "unsupported_property_type"
+					"reason": "editor_only_struct_data"
 				},
 				{
 					"domain": "field",
@@ -62293,7 +62595,7 @@
 				{
 					"domain": "field",
 					"name": "BodyInstance",
-					"reason": "unsupported_property_type"
+					"reason": "editor_only_struct_data"
 				},
 				{
 					"domain": "field",
@@ -63316,12 +63618,12 @@
 				{
 					"domain": "field",
 					"name": "BusSends",
-					"reason": "unsupported_property_type"
+					"reason": "editor_only_struct_data"
 				},
 				{
 					"domain": "field",
 					"name": "ConcurrencyOverrides",
-					"reason": "unsupported_property_type"
+					"reason": "editor_only_struct_data"
 				},
 				{
 					"domain": "field",
@@ -63346,12 +63648,12 @@
 				{
 					"domain": "field",
 					"name": "PostAttenuationBusSends",
-					"reason": "unsupported_property_type"
+					"reason": "editor_only_struct_data"
 				},
 				{
 					"domain": "field",
 					"name": "PreEffectBusSends",
-					"reason": "unsupported_property_type"
+					"reason": "editor_only_struct_data"
 				},
 				{
 					"domain": "field",
@@ -63361,7 +63663,7 @@
 				{
 					"domain": "field",
 					"name": "SoundSubmixSends",
-					"reason": "unsupported_property_type"
+					"reason": "editor_only_struct_data"
 				},
 				{
 					"domain": "field",
@@ -64804,6 +65106,23 @@
 						"setter": ""
 					},
 					"signature": "ShadowCacheInvalidationBehavior:EnumProperty:0:/Script/Engine.EShadowCacheInvalidationBehavior;"
+				},
+				{
+					"kind": "struct",
+					"type_path": "/Script/CoreUObject.Color",
+					"name": "ShapeColor",
+					"declaring_class": "/Script/Engine.ShapeComponent",
+					"readonly": false,
+					"access":
+					{
+						"native_getter": false,
+						"native_setter": false,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": ""
+					},
+					"signature": "ShapeColor:StructProperty:0:/Script/CoreUObject.Color{B:ByteProperty:0;G:ByteProperty:0;R:ByteProperty:0;A:ByteProperty:0;};"
 				},
 				{
 					"kind": "float",
@@ -69191,7 +69510,7 @@
 				{
 					"domain": "field",
 					"name": "BodyInstance",
-					"reason": "unsupported_property_type"
+					"reason": "editor_only_struct_data"
 				},
 				{
 					"domain": "field",
@@ -69447,11 +69766,6 @@
 					"domain": "field",
 					"name": "ShapeBodySetup",
 					"reason": "hidden_editor_or_deprecated"
-				},
-				{
-					"domain": "field",
-					"name": "ShapeColor",
-					"reason": "unsupported_property_type"
 				},
 				{
 					"domain": "field",
@@ -72760,6 +73074,23 @@
 						"setter": ""
 					},
 					"signature": "VirtualTextureRenderPassType:EnumProperty:0:/Script/Engine.ERuntimeVirtualTextureMainPassType;"
+				},
+				{
+					"kind": "struct",
+					"type_path": "/Script/CoreUObject.Color",
+					"name": "WireframeColorOverride",
+					"declaring_class": "/Script/Engine.StaticMeshComponent",
+					"readonly": true,
+					"access":
+					{
+						"native_getter": false,
+						"native_setter": false,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": ""
+					},
+					"signature": "WireframeColorOverride:StructProperty:0:/Script/CoreUObject.Color{B:ByteProperty:0;G:ByteProperty:0;R:ByteProperty:0;A:ByteProperty:0;};"
 				},
 				{
 					"kind": "int",
@@ -77419,7 +77750,7 @@
 				{
 					"domain": "field",
 					"name": "BodyInstance",
-					"reason": "unsupported_property_type"
+					"reason": "editor_only_struct_data"
 				},
 				{
 					"domain": "field",
@@ -77800,11 +78131,6 @@
 					"domain": "field",
 					"name": "VisibilityId",
 					"reason": "hidden_editor_or_deprecated"
-				},
-				{
-					"domain": "field",
-					"name": "WireframeColorOverride",
-					"reason": "unsupported_property_type"
 				},
 				{
 					"domain": "method",
@@ -79532,6 +79858,23 @@
 						"setter": ""
 					},
 					"signature": "TextMaterial:ObjectProperty:0:/Script/Engine.MaterialInterface;"
+				},
+				{
+					"kind": "struct",
+					"type_path": "/Script/CoreUObject.Color",
+					"name": "TextRenderColor",
+					"declaring_class": "/Script/Engine.TextRenderComponent",
+					"readonly": true,
+					"access":
+					{
+						"native_getter": false,
+						"native_setter": false,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": ""
+					},
+					"signature": "TextRenderColor:StructProperty:0:/Script/CoreUObject.Color{B:ByteProperty:0;G:ByteProperty:0;R:ByteProperty:0;A:ByteProperty:0;};"
 				},
 				{
 					"kind": "float",
@@ -83497,6 +83840,21 @@
 					]
 				},
 				{
+					"name": "SetTextRenderColor",
+					"declaring_class": "/Script/Engine.TextRenderComponent",
+					"signature": "v1;SetTextRenderColor;Value:StructProperty:128:/Script/CoreUObject.Color{B:ByteProperty:0;G:ByteProperty:0;R:ByteProperty:0;A:ByteProperty:0;};",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "struct",
+							"type_path": "/Script/CoreUObject.Color",
+							"name": "Value",
+							"direction": "in"
+						}
+					]
+				},
+				{
 					"name": "SetTickableWhenPaused",
 					"declaring_class": "/Script/Engine.ActorComponent",
 					"signature": "v1;SetTickableWhenPaused;bTickableWhenPaused:BoolProperty:128;",
@@ -84065,7 +84423,7 @@
 				{
 					"domain": "field",
 					"name": "BodyInstance",
-					"reason": "unsupported_property_type"
+					"reason": "editor_only_struct_data"
 				},
 				{
 					"domain": "field",
@@ -84311,11 +84669,6 @@
 					"domain": "field",
 					"name": "PrimaryComponentTick",
 					"reason": "hidden_editor_or_deprecated"
-				},
-				{
-					"domain": "field",
-					"name": "TextRenderColor",
-					"reason": "unsupported_property_type"
 				},
 				{
 					"domain": "field",
@@ -84566,11 +84919,6 @@
 					"domain": "method",
 					"name": "SetText",
 					"reason": "not_public_local_native_instance_callable"
-				},
-				{
-					"domain": "method",
-					"name": "SetTextRenderColor",
-					"reason": "unsupported_parameter_type"
 				}
 			]
 		},
@@ -85819,6 +86167,3527 @@
 					"domain": "method",
 					"name": "ExecuteUbergraph",
 					"reason": "requires_adapter_or_nonpublic_policy"
+				}
+			]
+		},
+		{
+			"path": "/Script/UMG.Button",
+			"fixture": false,
+			"fields": [
+				{
+					"kind": "struct",
+					"type_path": "/Script/CoreUObject.LinearColor",
+					"name": "BackgroundColor",
+					"declaring_class": "/Script/UMG.Button",
+					"readonly": false,
+					"access":
+					{
+						"native_getter": true,
+						"native_setter": true,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": "SetBackgroundColor"
+					},
+					"signature": "BackgroundColor:StructProperty:0:/Script/CoreUObject.LinearColor{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;};"
+				},
+				{
+					"kind": "bool",
+					"type_path": "",
+					"name": "bAllowDragDrop",
+					"declaring_class": "/Script/UMG.Button",
+					"readonly": true,
+					"access":
+					{
+						"native_getter": false,
+						"native_setter": false,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": ""
+					},
+					"signature": "bAllowDragDrop:BoolProperty:0;"
+				},
+				{
+					"kind": "bool",
+					"type_path": "",
+					"name": "bIsEnabled",
+					"declaring_class": "/Script/UMG.Widget",
+					"readonly": false,
+					"access":
+					{
+						"native_getter": true,
+						"native_setter": true,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "GetIsEnabled",
+						"setter": "SetIsEnabled"
+					},
+					"signature": "bIsEnabled:BoolProperty:0;"
+				},
+				{
+					"kind": "bool",
+					"type_path": "",
+					"name": "bIsVolatile",
+					"declaring_class": "/Script/UMG.Widget",
+					"readonly": true,
+					"access":
+					{
+						"native_getter": false,
+						"native_setter": false,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": ""
+					},
+					"signature": "bIsVolatile:BoolProperty:0;"
+				},
+				{
+					"kind": "enum",
+					"type_path": "/Script/SlateCore.EButtonClickMethod",
+					"name": "ClickMethod",
+					"declaring_class": "/Script/UMG.Button",
+					"readonly": false,
+					"access":
+					{
+						"native_getter": true,
+						"native_setter": true,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": "SetClickMethod"
+					},
+					"signature": "ClickMethod:ByteProperty:0:/Script/SlateCore.EButtonClickMethod;"
+				},
+				{
+					"kind": "enum",
+					"type_path": "/Script/SlateCore.EWidgetClipping",
+					"name": "Clipping",
+					"declaring_class": "/Script/UMG.Widget",
+					"readonly": false,
+					"access":
+					{
+						"native_getter": true,
+						"native_setter": true,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": ""
+					},
+					"signature": "Clipping:EnumProperty:0:/Script/SlateCore.EWidgetClipping;"
+				},
+				{
+					"kind": "struct",
+					"type_path": "/Script/CoreUObject.LinearColor",
+					"name": "ColorAndOpacity",
+					"declaring_class": "/Script/UMG.Button",
+					"readonly": false,
+					"access":
+					{
+						"native_getter": true,
+						"native_setter": true,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": "SetColorAndOpacity"
+					},
+					"signature": "ColorAndOpacity:StructProperty:0:/Script/CoreUObject.LinearColor{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;};"
+				},
+				{
+					"kind": "enum",
+					"type_path": "/Script/CoreUObject.EMouseCursor",
+					"name": "Cursor",
+					"declaring_class": "/Script/UMG.Widget",
+					"readonly": false,
+					"access":
+					{
+						"native_getter": true,
+						"native_setter": true,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": "SetCursor"
+					},
+					"signature": "Cursor:ByteProperty:0:/Script/CoreUObject.EMouseCursor;"
+				},
+				{
+					"kind": "enum",
+					"type_path": "/Script/SlateCore.EFlowDirectionPreference",
+					"name": "FlowDirectionPreference",
+					"declaring_class": "/Script/UMG.Widget",
+					"readonly": false,
+					"access":
+					{
+						"native_getter": true,
+						"native_setter": true,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": ""
+					},
+					"signature": "FlowDirectionPreference:EnumProperty:0:/Script/SlateCore.EFlowDirectionPreference;"
+				},
+				{
+					"kind": "bool",
+					"type_path": "",
+					"name": "IsFocusable",
+					"declaring_class": "/Script/UMG.Button",
+					"readonly": true,
+					"access":
+					{
+						"native_getter": true,
+						"native_setter": false,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": ""
+					},
+					"signature": "IsFocusable:BoolProperty:0;"
+				},
+				{
+					"kind": "object",
+					"type_path": "/Script/UMG.WidgetNavigation",
+					"name": "Navigation",
+					"declaring_class": "/Script/UMG.Widget",
+					"readonly": true,
+					"access":
+					{
+						"native_getter": false,
+						"native_setter": false,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": ""
+					},
+					"signature": "Navigation:ObjectProperty:0:/Script/UMG.WidgetNavigation;"
+				},
+				{
+					"kind": "enum",
+					"type_path": "/Script/SlateCore.EWidgetPixelSnapping",
+					"name": "PixelSnapping",
+					"declaring_class": "/Script/UMG.Widget",
+					"readonly": false,
+					"access":
+					{
+						"native_getter": true,
+						"native_setter": true,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": ""
+					},
+					"signature": "PixelSnapping:EnumProperty:0:/Script/SlateCore.EWidgetPixelSnapping;"
+				},
+				{
+					"kind": "enum",
+					"type_path": "/Script/SlateCore.EButtonPressMethod",
+					"name": "PressMethod",
+					"declaring_class": "/Script/UMG.Button",
+					"readonly": false,
+					"access":
+					{
+						"native_getter": true,
+						"native_setter": true,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": "SetPressMethod"
+					},
+					"signature": "PressMethod:ByteProperty:0:/Script/SlateCore.EButtonPressMethod;"
+				},
+				{
+					"kind": "float",
+					"type_path": "",
+					"name": "RenderOpacity",
+					"declaring_class": "/Script/UMG.Widget",
+					"readonly": false,
+					"access":
+					{
+						"native_getter": true,
+						"native_setter": true,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "GetRenderOpacity",
+						"setter": "SetRenderOpacity"
+					},
+					"signature": "RenderOpacity:FloatProperty:0;"
+				},
+				{
+					"kind": "struct",
+					"type_path": "/Script/UMG.WidgetTransform",
+					"name": "RenderTransform",
+					"declaring_class": "/Script/UMG.Widget",
+					"readonly": false,
+					"access":
+					{
+						"native_getter": true,
+						"native_setter": true,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": "SetRenderTransform"
+					},
+					"signature": "RenderTransform:StructProperty:0:/Script/UMG.WidgetTransform{Translation:StructProperty:0:/Script/CoreUObject.Vector2D{X:DoubleProperty:0;Y:DoubleProperty:0;};Scale:StructProperty:0:/Script/CoreUObject.Vector2D{X:DoubleProperty:0;Y:DoubleProperty:0;};Shear:StructProperty:0:/Script/CoreUObject.Vector2D{X:DoubleProperty:0;Y:DoubleProperty:0;};Angle:FloatProperty:0;};"
+				},
+				{
+					"kind": "struct",
+					"type_path": "/Script/CoreUObject.Vector2D",
+					"name": "RenderTransformPivot",
+					"declaring_class": "/Script/UMG.Widget",
+					"readonly": false,
+					"access":
+					{
+						"native_getter": true,
+						"native_setter": true,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": "SetRenderTransformPivot"
+					},
+					"signature": "RenderTransformPivot:StructProperty:0:/Script/CoreUObject.Vector2D{X:DoubleProperty:0;Y:DoubleProperty:0;};"
+				},
+				{
+					"kind": "object",
+					"type_path": "/Script/UMG.PanelSlot",
+					"name": "Slot",
+					"declaring_class": "/Script/UMG.Widget",
+					"readonly": true,
+					"access":
+					{
+						"native_getter": false,
+						"native_setter": false,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": ""
+					},
+					"signature": "Slot:ObjectProperty:0:/Script/UMG.PanelSlot;"
+				},
+				{
+					"kind": "text",
+					"type_path": "",
+					"name": "ToolTipText",
+					"declaring_class": "/Script/UMG.Widget",
+					"readonly": false,
+					"access":
+					{
+						"native_getter": true,
+						"native_setter": true,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": "SetToolTipText"
+					},
+					"signature": "ToolTipText:TextProperty:0;"
+				},
+				{
+					"kind": "object",
+					"type_path": "/Script/UMG.Widget",
+					"name": "ToolTipWidget",
+					"declaring_class": "/Script/UMG.Widget",
+					"readonly": false,
+					"access":
+					{
+						"native_getter": true,
+						"native_setter": true,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": "SetToolTip"
+					},
+					"signature": "ToolTipWidget:ObjectProperty:0:/Script/UMG.Widget;"
+				},
+				{
+					"kind": "enum",
+					"type_path": "/Script/SlateCore.EButtonTouchMethod",
+					"name": "TouchMethod",
+					"declaring_class": "/Script/UMG.Button",
+					"readonly": false,
+					"access":
+					{
+						"native_getter": true,
+						"native_setter": true,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": "SetTouchMethod"
+					},
+					"signature": "TouchMethod:ByteProperty:0:/Script/SlateCore.EButtonTouchMethod;"
+				},
+				{
+					"kind": "enum",
+					"type_path": "/Script/UMG.ESlateVisibility",
+					"name": "Visibility",
+					"declaring_class": "/Script/UMG.Widget",
+					"readonly": false,
+					"access":
+					{
+						"native_getter": true,
+						"native_setter": true,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "GetVisibility",
+						"setter": "SetVisibility"
+					},
+					"signature": "Visibility:EnumProperty:0:/Script/UMG.ESlateVisibility;"
+				}
+			],
+			"methods": [
+				{
+					"name": "AddChild",
+					"declaring_class": "/Script/UMG.PanelWidget",
+					"signature": "v1;AddChild;Content:ObjectProperty:128:/Script/UMG.Widget;ReturnValue:ObjectProperty:1408:/Script/UMG.PanelSlot;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "object",
+							"type_path": "/Script/UMG.Widget",
+							"name": "Content",
+							"direction": "in"
+						},
+						{
+							"kind": "object",
+							"type_path": "/Script/UMG.PanelSlot",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "ClearChildren",
+					"declaring_class": "/Script/UMG.PanelWidget",
+					"signature": "v1;ClearChildren;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": []
+				},
+				{
+					"name": "ForceLayoutPrepass",
+					"declaring_class": "/Script/UMG.Widget",
+					"signature": "v1;ForceLayoutPrepass;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": []
+				},
+				{
+					"name": "ForceVolatile",
+					"declaring_class": "/Script/UMG.Widget",
+					"signature": "v1;ForceVolatile;bForce:BoolProperty:128;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "bForce",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "GetAccessibleSummaryText",
+					"declaring_class": "/Script/UMG.Widget",
+					"signature": "v1;GetAccessibleSummaryText;ReturnValue:TextProperty:1408;",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "text",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "GetAccessibleText",
+					"declaring_class": "/Script/UMG.Widget",
+					"signature": "v1;GetAccessibleText;ReturnValue:TextProperty:1408;",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "text",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "GetAllChildren",
+					"declaring_class": "/Script/UMG.PanelWidget",
+					"signature": "v1;GetAllChildren;ReturnValue:ArrayProperty:1408[ReturnValue:ObjectProperty:0:/Script/UMG.Widget;];",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "array",
+							"type_path": "",
+							"element":
+							{
+								"kind": "object",
+								"type_path": "/Script/UMG.Widget"
+							},
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "GetChildAt",
+					"declaring_class": "/Script/UMG.PanelWidget",
+					"signature": "v1;GetChildAt;Index:IntProperty:128;ReturnValue:ObjectProperty:1408:/Script/UMG.Widget;",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "int",
+							"type_path": "",
+							"name": "Index",
+							"direction": "in"
+						},
+						{
+							"kind": "object",
+							"type_path": "/Script/UMG.Widget",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "GetChildIndex",
+					"declaring_class": "/Script/UMG.PanelWidget",
+					"signature": "v1;GetChildIndex;Content:ObjectProperty:130:/Script/UMG.Widget;ReturnValue:IntProperty:1408;",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "object",
+							"type_path": "/Script/UMG.Widget",
+							"name": "Content",
+							"direction": "in"
+						},
+						{
+							"kind": "int",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "GetChildrenCount",
+					"declaring_class": "/Script/UMG.PanelWidget",
+					"signature": "v1;GetChildrenCount;ReturnValue:IntProperty:1408;",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "int",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "GetClipping",
+					"declaring_class": "/Script/UMG.Widget",
+					"signature": "v1;GetClipping;ReturnValue:EnumProperty:1408:/Script/SlateCore.EWidgetClipping;",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "enum",
+							"type_path": "/Script/SlateCore.EWidgetClipping",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "GetContent",
+					"declaring_class": "/Script/UMG.ContentWidget",
+					"signature": "v1;GetContent;ReturnValue:ObjectProperty:1408:/Script/UMG.Widget;",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "object",
+							"type_path": "/Script/UMG.Widget",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "GetContentSlot",
+					"declaring_class": "/Script/UMG.ContentWidget",
+					"signature": "v1;GetContentSlot;ReturnValue:ObjectProperty:1408:/Script/UMG.PanelSlot;",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "object",
+							"type_path": "/Script/UMG.PanelSlot",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "GetDesiredSize",
+					"declaring_class": "/Script/UMG.Widget",
+					"signature": "v1;GetDesiredSize;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector2D{X:DoubleProperty:0;Y:DoubleProperty:0;};",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "struct",
+							"type_path": "/Script/CoreUObject.Vector2D",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "GetGameInstance",
+					"declaring_class": "/Script/UMG.Widget",
+					"signature": "v1;GetGameInstance;ReturnValue:ObjectProperty:1408:/Script/Engine.GameInstance;",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "object",
+							"type_path": "/Script/Engine.GameInstance",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "GetIsEnabled",
+					"declaring_class": "/Script/UMG.Widget",
+					"signature": "v1;GetIsEnabled;ReturnValue:BoolProperty:1408;",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "GetOwningLocalPlayer",
+					"declaring_class": "/Script/UMG.Widget",
+					"signature": "v1;GetOwningLocalPlayer;ReturnValue:ObjectProperty:1408:/Script/Engine.LocalPlayer;",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "object",
+							"type_path": "/Script/Engine.LocalPlayer",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "GetOwningPlayer",
+					"declaring_class": "/Script/UMG.Widget",
+					"signature": "v1;GetOwningPlayer;ReturnValue:ObjectProperty:1408:/Script/Engine.PlayerController;",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "object",
+							"type_path": "/Script/Engine.PlayerController",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "GetParent",
+					"declaring_class": "/Script/UMG.Widget",
+					"signature": "v1;GetParent;ReturnValue:ObjectProperty:1408:/Script/UMG.PanelWidget;",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "object",
+							"type_path": "/Script/UMG.PanelWidget",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "GetRenderOpacity",
+					"declaring_class": "/Script/UMG.Widget",
+					"signature": "v1;GetRenderOpacity;ReturnValue:FloatProperty:1408;",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "float",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "GetRenderTransformAngle",
+					"declaring_class": "/Script/UMG.Widget",
+					"signature": "v1;GetRenderTransformAngle;ReturnValue:FloatProperty:1408;",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "float",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "GetVisibility",
+					"declaring_class": "/Script/UMG.Widget",
+					"signature": "v1;GetVisibility;ReturnValue:EnumProperty:1408:/Script/UMG.ESlateVisibility;",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "enum",
+							"type_path": "/Script/UMG.ESlateVisibility",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "HasAnyChildren",
+					"declaring_class": "/Script/UMG.PanelWidget",
+					"signature": "v1;HasAnyChildren;ReturnValue:BoolProperty:1408;",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "HasAnyUserFocus",
+					"declaring_class": "/Script/UMG.Widget",
+					"signature": "v1;HasAnyUserFocus;ReturnValue:BoolProperty:1408;",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "HasChild",
+					"declaring_class": "/Script/UMG.PanelWidget",
+					"signature": "v1;HasChild;Content:ObjectProperty:128:/Script/UMG.Widget;ReturnValue:BoolProperty:1408;",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "object",
+							"type_path": "/Script/UMG.Widget",
+							"name": "Content",
+							"direction": "in"
+						},
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "HasFocusedDescendants",
+					"declaring_class": "/Script/UMG.Widget",
+					"signature": "v1;HasFocusedDescendants;ReturnValue:BoolProperty:1408;",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "HasKeyboardFocus",
+					"declaring_class": "/Script/UMG.Widget",
+					"signature": "v1;HasKeyboardFocus;ReturnValue:BoolProperty:1408;",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "HasMouseCapture",
+					"declaring_class": "/Script/UMG.Widget",
+					"signature": "v1;HasMouseCapture;ReturnValue:BoolProperty:1408;",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "HasMouseCaptureByUser",
+					"declaring_class": "/Script/UMG.Widget",
+					"signature": "v1;HasMouseCaptureByUser;UserIndex:IntProperty:128;PointerIndex:IntProperty:128;ReturnValue:BoolProperty:1408;",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "int",
+							"type_path": "",
+							"name": "UserIndex",
+							"direction": "in"
+						},
+						{
+							"kind": "int",
+							"type_path": "",
+							"name": "PointerIndex",
+							"direction": "in",
+							"default_text": "-1"
+						},
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "HasUserFocus",
+					"declaring_class": "/Script/UMG.Widget",
+					"signature": "v1;HasUserFocus;PlayerController:ObjectProperty:128:/Script/Engine.PlayerController;ReturnValue:BoolProperty:1408;",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "object",
+							"type_path": "/Script/Engine.PlayerController",
+							"name": "PlayerController",
+							"direction": "in"
+						},
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "HasUserFocusedDescendants",
+					"declaring_class": "/Script/UMG.Widget",
+					"signature": "v1;HasUserFocusedDescendants;PlayerController:ObjectProperty:128:/Script/Engine.PlayerController;ReturnValue:BoolProperty:1408;",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "object",
+							"type_path": "/Script/Engine.PlayerController",
+							"name": "PlayerController",
+							"direction": "in"
+						},
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "InvalidateLayoutAndVolatility",
+					"declaring_class": "/Script/UMG.Widget",
+					"signature": "v1;InvalidateLayoutAndVolatility;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": []
+				},
+				{
+					"name": "IsHovered",
+					"declaring_class": "/Script/UMG.Widget",
+					"signature": "v1;IsHovered;ReturnValue:BoolProperty:1408;",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "IsInViewport",
+					"declaring_class": "/Script/UMG.Widget",
+					"signature": "v1;IsInViewport;ReturnValue:BoolProperty:1408;",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "IsPressed",
+					"declaring_class": "/Script/UMG.Button",
+					"signature": "v1;IsPressed;ReturnValue:BoolProperty:1408;",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "IsRendered",
+					"declaring_class": "/Script/UMG.Widget",
+					"signature": "v1;IsRendered;ReturnValue:BoolProperty:1408;",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "IsVisible",
+					"declaring_class": "/Script/UMG.Widget",
+					"signature": "v1;IsVisible;ReturnValue:BoolProperty:1408;",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "RemoveChild",
+					"declaring_class": "/Script/UMG.PanelWidget",
+					"signature": "v1;RemoveChild;Content:ObjectProperty:128:/Script/UMG.Widget;ReturnValue:BoolProperty:1408;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "object",
+							"type_path": "/Script/UMG.Widget",
+							"name": "Content",
+							"direction": "in"
+						},
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "RemoveChildAt",
+					"declaring_class": "/Script/UMG.PanelWidget",
+					"signature": "v1;RemoveChildAt;Index:IntProperty:128;ReturnValue:BoolProperty:1408;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "int",
+							"type_path": "",
+							"name": "Index",
+							"direction": "in"
+						},
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "RemoveFromParent",
+					"declaring_class": "/Script/UMG.Widget",
+					"signature": "v1;RemoveFromParent;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": []
+				},
+				{
+					"name": "ResetCursor",
+					"declaring_class": "/Script/UMG.Widget",
+					"signature": "v1;ResetCursor;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": []
+				},
+				{
+					"name": "SetAllNavigationRules",
+					"declaring_class": "/Script/UMG.Widget",
+					"signature": "v1;SetAllNavigationRules;Rule:EnumProperty:128:/Script/SlateCore.EUINavigationRule;WidgetToFocus:NameProperty:128;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "enum",
+							"type_path": "/Script/SlateCore.EUINavigationRule",
+							"name": "Rule",
+							"direction": "in"
+						},
+						{
+							"kind": "name",
+							"type_path": "",
+							"name": "WidgetToFocus",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "SetAllowDragDrop",
+					"declaring_class": "/Script/UMG.Button",
+					"signature": "v1;SetAllowDragDrop;bInAllowDragDrop:BoolProperty:128;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "bInAllowDragDrop",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "SetBackgroundColor",
+					"declaring_class": "/Script/UMG.Button",
+					"signature": "v1;SetBackgroundColor;InBackgroundColor:StructProperty:128:/Script/CoreUObject.LinearColor{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;};",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "struct",
+							"type_path": "/Script/CoreUObject.LinearColor",
+							"name": "InBackgroundColor",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "SetClickMethod",
+					"declaring_class": "/Script/UMG.Button",
+					"signature": "v1;SetClickMethod;InClickMethod:ByteProperty:128:/Script/SlateCore.EButtonClickMethod;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "enum",
+							"type_path": "/Script/SlateCore.EButtonClickMethod",
+							"name": "InClickMethod",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "SetClipping",
+					"declaring_class": "/Script/UMG.Widget",
+					"signature": "v1;SetClipping;InClipping:EnumProperty:128:/Script/SlateCore.EWidgetClipping;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "enum",
+							"type_path": "/Script/SlateCore.EWidgetClipping",
+							"name": "InClipping",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "SetColorAndOpacity",
+					"declaring_class": "/Script/UMG.Button",
+					"signature": "v1;SetColorAndOpacity;InColorAndOpacity:StructProperty:128:/Script/CoreUObject.LinearColor{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;};",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "struct",
+							"type_path": "/Script/CoreUObject.LinearColor",
+							"name": "InColorAndOpacity",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "SetContent",
+					"declaring_class": "/Script/UMG.ContentWidget",
+					"signature": "v1;SetContent;Content:ObjectProperty:128:/Script/UMG.Widget;ReturnValue:ObjectProperty:1408:/Script/UMG.PanelSlot;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "object",
+							"type_path": "/Script/UMG.Widget",
+							"name": "Content",
+							"direction": "in"
+						},
+						{
+							"kind": "object",
+							"type_path": "/Script/UMG.PanelSlot",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "SetCursor",
+					"declaring_class": "/Script/UMG.Widget",
+					"signature": "v1;SetCursor;InCursor:ByteProperty:128:/Script/CoreUObject.EMouseCursor;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "enum",
+							"type_path": "/Script/CoreUObject.EMouseCursor",
+							"name": "InCursor",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "SetFocus",
+					"declaring_class": "/Script/UMG.Widget",
+					"signature": "v1;SetFocus;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": []
+				},
+				{
+					"name": "SetIsEnabled",
+					"declaring_class": "/Script/UMG.Widget",
+					"signature": "v1;SetIsEnabled;bInIsEnabled:BoolProperty:128;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "bInIsEnabled",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "SetKeyboardFocus",
+					"declaring_class": "/Script/UMG.Widget",
+					"signature": "v1;SetKeyboardFocus;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": []
+				},
+				{
+					"name": "SetNavigationRuleBase",
+					"declaring_class": "/Script/UMG.Widget",
+					"signature": "v1;SetNavigationRuleBase;Direction:EnumProperty:128:/Script/SlateCore.EUINavigation;Rule:EnumProperty:128:/Script/SlateCore.EUINavigationRule;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "enum",
+							"type_path": "/Script/SlateCore.EUINavigation",
+							"name": "Direction",
+							"direction": "in"
+						},
+						{
+							"kind": "enum",
+							"type_path": "/Script/SlateCore.EUINavigationRule",
+							"name": "Rule",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "SetNavigationRuleExplicit",
+					"declaring_class": "/Script/UMG.Widget",
+					"signature": "v1;SetNavigationRuleExplicit;Direction:EnumProperty:128:/Script/SlateCore.EUINavigation;InWidget:ObjectProperty:128:/Script/UMG.Widget;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "enum",
+							"type_path": "/Script/SlateCore.EUINavigation",
+							"name": "Direction",
+							"direction": "in"
+						},
+						{
+							"kind": "object",
+							"type_path": "/Script/UMG.Widget",
+							"name": "InWidget",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "SetPressMethod",
+					"declaring_class": "/Script/UMG.Button",
+					"signature": "v1;SetPressMethod;InPressMethod:ByteProperty:128:/Script/SlateCore.EButtonPressMethod;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "enum",
+							"type_path": "/Script/SlateCore.EButtonPressMethod",
+							"name": "InPressMethod",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "SetRenderOpacity",
+					"declaring_class": "/Script/UMG.Widget",
+					"signature": "v1;SetRenderOpacity;InOpacity:FloatProperty:128;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "float",
+							"type_path": "",
+							"name": "InOpacity",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "SetRenderScale",
+					"declaring_class": "/Script/UMG.Widget",
+					"signature": "v1;SetRenderScale;Scale:StructProperty:128:/Script/CoreUObject.Vector2D{X:DoubleProperty:0;Y:DoubleProperty:0;};",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "struct",
+							"type_path": "/Script/CoreUObject.Vector2D",
+							"name": "Scale",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "SetRenderShear",
+					"declaring_class": "/Script/UMG.Widget",
+					"signature": "v1;SetRenderShear;Shear:StructProperty:128:/Script/CoreUObject.Vector2D{X:DoubleProperty:0;Y:DoubleProperty:0;};",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "struct",
+							"type_path": "/Script/CoreUObject.Vector2D",
+							"name": "Shear",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "SetRenderTransform",
+					"declaring_class": "/Script/UMG.Widget",
+					"signature": "v1;SetRenderTransform;InTransform:StructProperty:128:/Script/UMG.WidgetTransform{Translation:StructProperty:0:/Script/CoreUObject.Vector2D{X:DoubleProperty:0;Y:DoubleProperty:0;};Scale:StructProperty:0:/Script/CoreUObject.Vector2D{X:DoubleProperty:0;Y:DoubleProperty:0;};Shear:StructProperty:0:/Script/CoreUObject.Vector2D{X:DoubleProperty:0;Y:DoubleProperty:0;};Angle:FloatProperty:0;};",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "struct",
+							"type_path": "/Script/UMG.WidgetTransform",
+							"name": "InTransform",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "SetRenderTransformAngle",
+					"declaring_class": "/Script/UMG.Widget",
+					"signature": "v1;SetRenderTransformAngle;Angle:FloatProperty:128;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "float",
+							"type_path": "",
+							"name": "Angle",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "SetRenderTransformPivot",
+					"declaring_class": "/Script/UMG.Widget",
+					"signature": "v1;SetRenderTransformPivot;Pivot:StructProperty:128:/Script/CoreUObject.Vector2D{X:DoubleProperty:0;Y:DoubleProperty:0;};",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "struct",
+							"type_path": "/Script/CoreUObject.Vector2D",
+							"name": "Pivot",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "SetRenderTranslation",
+					"declaring_class": "/Script/UMG.Widget",
+					"signature": "v1;SetRenderTranslation;Translation:StructProperty:128:/Script/CoreUObject.Vector2D{X:DoubleProperty:0;Y:DoubleProperty:0;};",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "struct",
+							"type_path": "/Script/CoreUObject.Vector2D",
+							"name": "Translation",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "SetToolTip",
+					"declaring_class": "/Script/UMG.Widget",
+					"signature": "v1;SetToolTip;Widget:ObjectProperty:128:/Script/UMG.Widget;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "object",
+							"type_path": "/Script/UMG.Widget",
+							"name": "Widget",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "SetToolTipText",
+					"declaring_class": "/Script/UMG.Widget",
+					"signature": "v1;SetToolTipText;InToolTipText:TextProperty:134218114;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "text",
+							"type_path": "",
+							"name": "InToolTipText",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "SetTouchMethod",
+					"declaring_class": "/Script/UMG.Button",
+					"signature": "v1;SetTouchMethod;InTouchMethod:ByteProperty:128:/Script/SlateCore.EButtonTouchMethod;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "enum",
+							"type_path": "/Script/SlateCore.EButtonTouchMethod",
+							"name": "InTouchMethod",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "SetUserFocus",
+					"declaring_class": "/Script/UMG.Widget",
+					"signature": "v1;SetUserFocus;PlayerController:ObjectProperty:128:/Script/Engine.PlayerController;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "object",
+							"type_path": "/Script/Engine.PlayerController",
+							"name": "PlayerController",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "SetVisibility",
+					"declaring_class": "/Script/UMG.Widget",
+					"signature": "v1;SetVisibility;InVisibility:EnumProperty:128:/Script/UMG.ESlateVisibility;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "enum",
+							"type_path": "/Script/UMG.ESlateVisibility",
+							"name": "InVisibility",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "SupportsKeyboardFocus",
+					"declaring_class": "/Script/UMG.Widget",
+					"signature": "v1;SupportsKeyboardFocus;ReturnValue:BoolProperty:1408;",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				}
+			],
+			"skipped": [
+				{
+					"domain": "field",
+					"name": "AccessibleBehavior",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "AccessibleSummaryBehavior",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "AccessibleSummaryText",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "AccessibleSummaryTextDelegate",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "AccessibleText",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "AccessibleTextDelegate",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "AccessibleWidgetData",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bCanChildrenBeAccessible",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bCreatedByConstructionScript",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bExpandedInDesigner",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bHiddenInDesigner",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bIsEnabledDelegate",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bIsVariable",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bLockedInDesigner",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bOverride_Cursor",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bOverrideAccessibleDefaults",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bWrappedByComponent",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "CategoryName",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "DesignerFlags",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "DisplayLabel",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "NativeBindings",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "OnClicked",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "OnHovered",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "OnPressed",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "OnReleased",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "OnUnhovered",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "Slots",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "ToolTipTextDelegate",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "ToolTipWidgetDelegate",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "VisibilityDelegate",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "WidgetStyle",
+					"reason": "editor_only_struct_data"
+				},
+				{
+					"domain": "method",
+					"name": "ExecuteUbergraph",
+					"reason": "requires_adapter_or_nonpublic_policy"
+				},
+				{
+					"domain": "method",
+					"name": "GenerateWidgetForObject__DelegateSignature",
+					"reason": "not_public_local_native_instance_callable"
+				},
+				{
+					"domain": "method",
+					"name": "GenerateWidgetForString__DelegateSignature",
+					"reason": "not_public_local_native_instance_callable"
+				},
+				{
+					"domain": "method",
+					"name": "GetBool__DelegateSignature",
+					"reason": "not_public_local_native_instance_callable"
+				},
+				{
+					"domain": "method",
+					"name": "GetCachedGeometry",
+					"reason": "unsupported_parameter_type"
+				},
+				{
+					"domain": "method",
+					"name": "GetCheckBoxState__DelegateSignature",
+					"reason": "not_public_local_native_instance_callable"
+				},
+				{
+					"domain": "method",
+					"name": "GetFloat__DelegateSignature",
+					"reason": "not_public_local_native_instance_callable"
+				},
+				{
+					"domain": "method",
+					"name": "GetInt32__DelegateSignature",
+					"reason": "not_public_local_native_instance_callable"
+				},
+				{
+					"domain": "method",
+					"name": "GetLinearColor__DelegateSignature",
+					"reason": "not_public_local_native_instance_callable"
+				},
+				{
+					"domain": "method",
+					"name": "GetMouseCursor__DelegateSignature",
+					"reason": "not_public_local_native_instance_callable"
+				},
+				{
+					"domain": "method",
+					"name": "GetPaintSpaceGeometry",
+					"reason": "unsupported_parameter_type"
+				},
+				{
+					"domain": "method",
+					"name": "GetSlateBrush__DelegateSignature",
+					"reason": "not_public_local_native_instance_callable"
+				},
+				{
+					"domain": "method",
+					"name": "GetSlateColor__DelegateSignature",
+					"reason": "not_public_local_native_instance_callable"
+				},
+				{
+					"domain": "method",
+					"name": "GetSlateVisibility__DelegateSignature",
+					"reason": "not_public_local_native_instance_callable"
+				},
+				{
+					"domain": "method",
+					"name": "GetText__DelegateSignature",
+					"reason": "not_public_local_native_instance_callable"
+				},
+				{
+					"domain": "method",
+					"name": "GetTickSpaceGeometry",
+					"reason": "unsupported_parameter_type"
+				},
+				{
+					"domain": "method",
+					"name": "GetWidget__DelegateSignature",
+					"reason": "not_public_local_native_instance_callable"
+				},
+				{
+					"domain": "method",
+					"name": "K2_AddFieldValueChangedDelegate",
+					"reason": "unsupported_parameter_type"
+				},
+				{
+					"domain": "method",
+					"name": "K2_BroadcastFieldValueChanged",
+					"reason": "not_public_local_native_instance_callable"
+				},
+				{
+					"domain": "method",
+					"name": "K2_RemoveFieldValueChangedDelegate",
+					"reason": "unsupported_parameter_type"
+				},
+				{
+					"domain": "method",
+					"name": "OnPointerEvent__DelegateSignature",
+					"reason": "unsupported_parameter_type"
+				},
+				{
+					"domain": "method",
+					"name": "OnReply__DelegateSignature",
+					"reason": "unsupported_parameter_type"
+				},
+				{
+					"domain": "method",
+					"name": "SetNavigationRule",
+					"reason": "requires_adapter_or_nonpublic_policy"
+				},
+				{
+					"domain": "method",
+					"name": "SetNavigationRuleCustom",
+					"reason": "unsupported_parameter_type"
+				},
+				{
+					"domain": "method",
+					"name": "SetNavigationRuleCustomBoundary",
+					"reason": "unsupported_parameter_type"
+				},
+				{
+					"domain": "method",
+					"name": "SetStyle",
+					"reason": "editor_only_struct_data"
+				}
+			]
+		},
+		{
+			"path": "/Script/UMG.TextBlock",
+			"fixture": false,
+			"fields": [
+				{
+					"kind": "bool",
+					"type_path": "",
+					"name": "ApplyLineHeightToBottomLine",
+					"declaring_class": "/Script/UMG.TextLayoutWidget",
+					"readonly": false,
+					"access":
+					{
+						"native_getter": false,
+						"native_setter": true,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": ""
+					},
+					"signature": "ApplyLineHeightToBottomLine:BoolProperty:0;"
+				},
+				{
+					"kind": "bool",
+					"type_path": "",
+					"name": "AutoWrapText",
+					"declaring_class": "/Script/UMG.TextLayoutWidget",
+					"readonly": false,
+					"access":
+					{
+						"native_getter": false,
+						"native_setter": true,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": ""
+					},
+					"signature": "AutoWrapText:BoolProperty:0;"
+				},
+				{
+					"kind": "bool",
+					"type_path": "",
+					"name": "bIsEnabled",
+					"declaring_class": "/Script/UMG.Widget",
+					"readonly": false,
+					"access":
+					{
+						"native_getter": true,
+						"native_setter": true,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "GetIsEnabled",
+						"setter": "SetIsEnabled"
+					},
+					"signature": "bIsEnabled:BoolProperty:0;"
+				},
+				{
+					"kind": "bool",
+					"type_path": "",
+					"name": "bIsVolatile",
+					"declaring_class": "/Script/UMG.Widget",
+					"readonly": true,
+					"access":
+					{
+						"native_getter": false,
+						"native_setter": false,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": ""
+					},
+					"signature": "bIsVolatile:BoolProperty:0;"
+				},
+				{
+					"kind": "bool",
+					"type_path": "",
+					"name": "bSimpleTextMode",
+					"declaring_class": "/Script/UMG.TextBlock",
+					"readonly": true,
+					"access":
+					{
+						"native_getter": false,
+						"native_setter": false,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": ""
+					},
+					"signature": "bSimpleTextMode:BoolProperty:0;"
+				},
+				{
+					"kind": "bool",
+					"type_path": "",
+					"name": "bWrapWithInvalidationPanel",
+					"declaring_class": "/Script/UMG.TextBlock",
+					"readonly": true,
+					"access":
+					{
+						"native_getter": false,
+						"native_setter": false,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": ""
+					},
+					"signature": "bWrapWithInvalidationPanel:BoolProperty:0;"
+				},
+				{
+					"kind": "enum",
+					"type_path": "/Script/SlateCore.EWidgetClipping",
+					"name": "Clipping",
+					"declaring_class": "/Script/UMG.Widget",
+					"readonly": false,
+					"access":
+					{
+						"native_getter": true,
+						"native_setter": true,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": ""
+					},
+					"signature": "Clipping:EnumProperty:0:/Script/SlateCore.EWidgetClipping;"
+				},
+				{
+					"kind": "struct",
+					"type_path": "/Script/SlateCore.SlateColor",
+					"name": "ColorAndOpacity",
+					"declaring_class": "/Script/UMG.TextBlock",
+					"readonly": false,
+					"access":
+					{
+						"native_getter": true,
+						"native_setter": true,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": "SetColorAndOpacity"
+					},
+					"signature": "ColorAndOpacity:StructProperty:0:/Script/SlateCore.SlateColor{SpecifiedColor:StructProperty:0:/Script/CoreUObject.LinearColor{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;};ColorUseRule:EnumProperty:0:/Script/SlateCore.ESlateColorStylingMode;};"
+				},
+				{
+					"kind": "enum",
+					"type_path": "/Script/CoreUObject.EMouseCursor",
+					"name": "Cursor",
+					"declaring_class": "/Script/UMG.Widget",
+					"readonly": false,
+					"access":
+					{
+						"native_getter": true,
+						"native_setter": true,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": "SetCursor"
+					},
+					"signature": "Cursor:ByteProperty:0:/Script/CoreUObject.EMouseCursor;"
+				},
+				{
+					"kind": "enum",
+					"type_path": "/Script/SlateCore.EFlowDirectionPreference",
+					"name": "FlowDirectionPreference",
+					"declaring_class": "/Script/UMG.Widget",
+					"readonly": false,
+					"access":
+					{
+						"native_getter": true,
+						"native_setter": true,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": ""
+					},
+					"signature": "FlowDirectionPreference:EnumProperty:0:/Script/SlateCore.EFlowDirectionPreference;"
+				},
+				{
+					"kind": "enum",
+					"type_path": "/Script/Slate.ETextJustify",
+					"name": "Justification",
+					"declaring_class": "/Script/UMG.TextLayoutWidget",
+					"readonly": false,
+					"access":
+					{
+						"native_getter": false,
+						"native_setter": true,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": "SetJustification"
+					},
+					"signature": "Justification:ByteProperty:0:/Script/Slate.ETextJustify;"
+				},
+				{
+					"kind": "float",
+					"type_path": "",
+					"name": "LineHeightPercentage",
+					"declaring_class": "/Script/UMG.TextLayoutWidget",
+					"readonly": false,
+					"access":
+					{
+						"native_getter": false,
+						"native_setter": true,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": ""
+					},
+					"signature": "LineHeightPercentage:FloatProperty:0;"
+				},
+				{
+					"kind": "struct",
+					"type_path": "/Script/SlateCore.Margin",
+					"name": "Margin",
+					"declaring_class": "/Script/UMG.TextLayoutWidget",
+					"readonly": false,
+					"access":
+					{
+						"native_getter": false,
+						"native_setter": true,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": ""
+					},
+					"signature": "Margin:StructProperty:0:/Script/SlateCore.Margin{Left:FloatProperty:0;Top:FloatProperty:0;Right:FloatProperty:0;Bottom:FloatProperty:0;};"
+				},
+				{
+					"kind": "float",
+					"type_path": "",
+					"name": "MinDesiredWidth",
+					"declaring_class": "/Script/UMG.TextBlock",
+					"readonly": false,
+					"access":
+					{
+						"native_getter": true,
+						"native_setter": true,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": "SetMinDesiredWidth"
+					},
+					"signature": "MinDesiredWidth:FloatProperty:0;"
+				},
+				{
+					"kind": "object",
+					"type_path": "/Script/UMG.WidgetNavigation",
+					"name": "Navigation",
+					"declaring_class": "/Script/UMG.Widget",
+					"readonly": true,
+					"access":
+					{
+						"native_getter": false,
+						"native_setter": false,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": ""
+					},
+					"signature": "Navigation:ObjectProperty:0:/Script/UMG.WidgetNavigation;"
+				},
+				{
+					"kind": "enum",
+					"type_path": "/Script/SlateCore.EWidgetPixelSnapping",
+					"name": "PixelSnapping",
+					"declaring_class": "/Script/UMG.Widget",
+					"readonly": false,
+					"access":
+					{
+						"native_getter": true,
+						"native_setter": true,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": ""
+					},
+					"signature": "PixelSnapping:EnumProperty:0:/Script/SlateCore.EWidgetPixelSnapping;"
+				},
+				{
+					"kind": "float",
+					"type_path": "",
+					"name": "RenderOpacity",
+					"declaring_class": "/Script/UMG.Widget",
+					"readonly": false,
+					"access":
+					{
+						"native_getter": true,
+						"native_setter": true,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "GetRenderOpacity",
+						"setter": "SetRenderOpacity"
+					},
+					"signature": "RenderOpacity:FloatProperty:0;"
+				},
+				{
+					"kind": "struct",
+					"type_path": "/Script/UMG.WidgetTransform",
+					"name": "RenderTransform",
+					"declaring_class": "/Script/UMG.Widget",
+					"readonly": false,
+					"access":
+					{
+						"native_getter": true,
+						"native_setter": true,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": "SetRenderTransform"
+					},
+					"signature": "RenderTransform:StructProperty:0:/Script/UMG.WidgetTransform{Translation:StructProperty:0:/Script/CoreUObject.Vector2D{X:DoubleProperty:0;Y:DoubleProperty:0;};Scale:StructProperty:0:/Script/CoreUObject.Vector2D{X:DoubleProperty:0;Y:DoubleProperty:0;};Shear:StructProperty:0:/Script/CoreUObject.Vector2D{X:DoubleProperty:0;Y:DoubleProperty:0;};Angle:FloatProperty:0;};"
+				},
+				{
+					"kind": "struct",
+					"type_path": "/Script/CoreUObject.Vector2D",
+					"name": "RenderTransformPivot",
+					"declaring_class": "/Script/UMG.Widget",
+					"readonly": false,
+					"access":
+					{
+						"native_getter": true,
+						"native_setter": true,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": "SetRenderTransformPivot"
+					},
+					"signature": "RenderTransformPivot:StructProperty:0:/Script/CoreUObject.Vector2D{X:DoubleProperty:0;Y:DoubleProperty:0;};"
+				},
+				{
+					"kind": "struct",
+					"type_path": "/Script/CoreUObject.LinearColor",
+					"name": "ShadowColorAndOpacity",
+					"declaring_class": "/Script/UMG.TextBlock",
+					"readonly": false,
+					"access":
+					{
+						"native_getter": true,
+						"native_setter": true,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": "SetShadowColorAndOpacity"
+					},
+					"signature": "ShadowColorAndOpacity:StructProperty:0:/Script/CoreUObject.LinearColor{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;};"
+				},
+				{
+					"kind": "struct",
+					"type_path": "/Script/CoreUObject.Vector2D",
+					"name": "ShadowOffset",
+					"declaring_class": "/Script/UMG.TextBlock",
+					"readonly": false,
+					"access":
+					{
+						"native_getter": true,
+						"native_setter": true,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": "SetShadowOffset"
+					},
+					"signature": "ShadowOffset:StructProperty:0:/Script/CoreUObject.Vector2D{X:DoubleProperty:0;Y:DoubleProperty:0;};"
+				},
+				{
+					"kind": "struct",
+					"type_path": "/Script/UMG.ShapedTextOptions",
+					"name": "ShapedTextOptions",
+					"declaring_class": "/Script/UMG.TextLayoutWidget",
+					"readonly": false,
+					"access":
+					{
+						"native_getter": false,
+						"native_setter": true,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": ""
+					},
+					"signature": "ShapedTextOptions:StructProperty:0:/Script/UMG.ShapedTextOptions{bOverride_TextShapingMethod:BoolProperty:0;bOverride_TextFlowDirection:BoolProperty:0;TextShapingMethod:EnumProperty:0:/Script/SlateCore.ETextShapingMethod;TextFlowDirection:EnumProperty:0:/Script/Slate.ETextFlowDirection;};"
+				},
+				{
+					"kind": "object",
+					"type_path": "/Script/UMG.PanelSlot",
+					"name": "Slot",
+					"declaring_class": "/Script/UMG.Widget",
+					"readonly": true,
+					"access":
+					{
+						"native_getter": false,
+						"native_setter": false,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": ""
+					},
+					"signature": "Slot:ObjectProperty:0:/Script/UMG.PanelSlot;"
+				},
+				{
+					"kind": "text",
+					"type_path": "",
+					"name": "Text",
+					"declaring_class": "/Script/UMG.TextBlock",
+					"readonly": false,
+					"access":
+					{
+						"native_getter": true,
+						"native_setter": true,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "GetText",
+						"setter": "SetText"
+					},
+					"signature": "Text:TextProperty:0;"
+				},
+				{
+					"kind": "enum",
+					"type_path": "/Script/SlateCore.ETextOverflowPolicy",
+					"name": "TextOverflowPolicy",
+					"declaring_class": "/Script/UMG.TextBlock",
+					"readonly": false,
+					"access":
+					{
+						"native_getter": true,
+						"native_setter": true,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": "SetTextOverflowPolicy"
+					},
+					"signature": "TextOverflowPolicy:EnumProperty:0:/Script/SlateCore.ETextOverflowPolicy;"
+				},
+				{
+					"kind": "enum",
+					"type_path": "/Script/SlateCore.ETextTransformPolicy",
+					"name": "TextTransformPolicy",
+					"declaring_class": "/Script/UMG.TextBlock",
+					"readonly": false,
+					"access":
+					{
+						"native_getter": true,
+						"native_setter": true,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": "SetTextTransformPolicy"
+					},
+					"signature": "TextTransformPolicy:EnumProperty:0:/Script/SlateCore.ETextTransformPolicy;"
+				},
+				{
+					"kind": "text",
+					"type_path": "",
+					"name": "ToolTipText",
+					"declaring_class": "/Script/UMG.Widget",
+					"readonly": false,
+					"access":
+					{
+						"native_getter": true,
+						"native_setter": true,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": "SetToolTipText"
+					},
+					"signature": "ToolTipText:TextProperty:0;"
+				},
+				{
+					"kind": "object",
+					"type_path": "/Script/UMG.Widget",
+					"name": "ToolTipWidget",
+					"declaring_class": "/Script/UMG.Widget",
+					"readonly": false,
+					"access":
+					{
+						"native_getter": true,
+						"native_setter": true,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": "SetToolTip"
+					},
+					"signature": "ToolTipWidget:ObjectProperty:0:/Script/UMG.Widget;"
+				},
+				{
+					"kind": "enum",
+					"type_path": "/Script/UMG.ESlateVisibility",
+					"name": "Visibility",
+					"declaring_class": "/Script/UMG.Widget",
+					"readonly": false,
+					"access":
+					{
+						"native_getter": true,
+						"native_setter": true,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "GetVisibility",
+						"setter": "SetVisibility"
+					},
+					"signature": "Visibility:EnumProperty:0:/Script/UMG.ESlateVisibility;"
+				},
+				{
+					"kind": "enum",
+					"type_path": "/Script/Slate.ETextWrappingPolicy",
+					"name": "WrappingPolicy",
+					"declaring_class": "/Script/UMG.TextLayoutWidget",
+					"readonly": false,
+					"access":
+					{
+						"native_getter": false,
+						"native_setter": true,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": ""
+					},
+					"signature": "WrappingPolicy:EnumProperty:0:/Script/Slate.ETextWrappingPolicy;"
+				},
+				{
+					"kind": "float",
+					"type_path": "",
+					"name": "WrapTextAt",
+					"declaring_class": "/Script/UMG.TextLayoutWidget",
+					"readonly": false,
+					"access":
+					{
+						"native_getter": false,
+						"native_setter": true,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": ""
+					},
+					"signature": "WrapTextAt:FloatProperty:0;"
+				}
+			],
+			"methods": [
+				{
+					"name": "ForceLayoutPrepass",
+					"declaring_class": "/Script/UMG.Widget",
+					"signature": "v1;ForceLayoutPrepass;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": []
+				},
+				{
+					"name": "ForceVolatile",
+					"declaring_class": "/Script/UMG.Widget",
+					"signature": "v1;ForceVolatile;bForce:BoolProperty:128;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "bForce",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "GetAccessibleSummaryText",
+					"declaring_class": "/Script/UMG.Widget",
+					"signature": "v1;GetAccessibleSummaryText;ReturnValue:TextProperty:1408;",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "text",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "GetAccessibleText",
+					"declaring_class": "/Script/UMG.Widget",
+					"signature": "v1;GetAccessibleText;ReturnValue:TextProperty:1408;",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "text",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "GetClipping",
+					"declaring_class": "/Script/UMG.Widget",
+					"signature": "v1;GetClipping;ReturnValue:EnumProperty:1408:/Script/SlateCore.EWidgetClipping;",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "enum",
+							"type_path": "/Script/SlateCore.EWidgetClipping",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "GetDesiredSize",
+					"declaring_class": "/Script/UMG.Widget",
+					"signature": "v1;GetDesiredSize;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector2D{X:DoubleProperty:0;Y:DoubleProperty:0;};",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "struct",
+							"type_path": "/Script/CoreUObject.Vector2D",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "GetDynamicFontMaterial",
+					"declaring_class": "/Script/UMG.TextBlock",
+					"signature": "v1;GetDynamicFontMaterial;ReturnValue:ObjectProperty:1408:/Script/Engine.MaterialInstanceDynamic;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "object",
+							"type_path": "/Script/Engine.MaterialInstanceDynamic",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "GetDynamicOutlineMaterial",
+					"declaring_class": "/Script/UMG.TextBlock",
+					"signature": "v1;GetDynamicOutlineMaterial;ReturnValue:ObjectProperty:1408:/Script/Engine.MaterialInstanceDynamic;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "object",
+							"type_path": "/Script/Engine.MaterialInstanceDynamic",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "GetFontSize",
+					"declaring_class": "/Script/UMG.TextBlock",
+					"signature": "v1;GetFontSize;ReturnValue:FloatProperty:1408;",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "float",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "GetGameInstance",
+					"declaring_class": "/Script/UMG.Widget",
+					"signature": "v1;GetGameInstance;ReturnValue:ObjectProperty:1408:/Script/Engine.GameInstance;",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "object",
+							"type_path": "/Script/Engine.GameInstance",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "GetIsEnabled",
+					"declaring_class": "/Script/UMG.Widget",
+					"signature": "v1;GetIsEnabled;ReturnValue:BoolProperty:1408;",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "GetOwningLocalPlayer",
+					"declaring_class": "/Script/UMG.Widget",
+					"signature": "v1;GetOwningLocalPlayer;ReturnValue:ObjectProperty:1408:/Script/Engine.LocalPlayer;",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "object",
+							"type_path": "/Script/Engine.LocalPlayer",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "GetOwningPlayer",
+					"declaring_class": "/Script/UMG.Widget",
+					"signature": "v1;GetOwningPlayer;ReturnValue:ObjectProperty:1408:/Script/Engine.PlayerController;",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "object",
+							"type_path": "/Script/Engine.PlayerController",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "GetParent",
+					"declaring_class": "/Script/UMG.Widget",
+					"signature": "v1;GetParent;ReturnValue:ObjectProperty:1408:/Script/UMG.PanelWidget;",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "object",
+							"type_path": "/Script/UMG.PanelWidget",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "GetRenderOpacity",
+					"declaring_class": "/Script/UMG.Widget",
+					"signature": "v1;GetRenderOpacity;ReturnValue:FloatProperty:1408;",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "float",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "GetRenderTransformAngle",
+					"declaring_class": "/Script/UMG.Widget",
+					"signature": "v1;GetRenderTransformAngle;ReturnValue:FloatProperty:1408;",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "float",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "GetText",
+					"declaring_class": "/Script/UMG.TextBlock",
+					"signature": "v1;GetText;ReturnValue:TextProperty:1408;",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "text",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "GetVisibility",
+					"declaring_class": "/Script/UMG.Widget",
+					"signature": "v1;GetVisibility;ReturnValue:EnumProperty:1408:/Script/UMG.ESlateVisibility;",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "enum",
+							"type_path": "/Script/UMG.ESlateVisibility",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "HasAnyUserFocus",
+					"declaring_class": "/Script/UMG.Widget",
+					"signature": "v1;HasAnyUserFocus;ReturnValue:BoolProperty:1408;",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "HasFocusedDescendants",
+					"declaring_class": "/Script/UMG.Widget",
+					"signature": "v1;HasFocusedDescendants;ReturnValue:BoolProperty:1408;",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "HasKeyboardFocus",
+					"declaring_class": "/Script/UMG.Widget",
+					"signature": "v1;HasKeyboardFocus;ReturnValue:BoolProperty:1408;",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "HasMouseCapture",
+					"declaring_class": "/Script/UMG.Widget",
+					"signature": "v1;HasMouseCapture;ReturnValue:BoolProperty:1408;",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "HasMouseCaptureByUser",
+					"declaring_class": "/Script/UMG.Widget",
+					"signature": "v1;HasMouseCaptureByUser;UserIndex:IntProperty:128;PointerIndex:IntProperty:128;ReturnValue:BoolProperty:1408;",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "int",
+							"type_path": "",
+							"name": "UserIndex",
+							"direction": "in"
+						},
+						{
+							"kind": "int",
+							"type_path": "",
+							"name": "PointerIndex",
+							"direction": "in",
+							"default_text": "-1"
+						},
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "HasUserFocus",
+					"declaring_class": "/Script/UMG.Widget",
+					"signature": "v1;HasUserFocus;PlayerController:ObjectProperty:128:/Script/Engine.PlayerController;ReturnValue:BoolProperty:1408;",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "object",
+							"type_path": "/Script/Engine.PlayerController",
+							"name": "PlayerController",
+							"direction": "in"
+						},
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "HasUserFocusedDescendants",
+					"declaring_class": "/Script/UMG.Widget",
+					"signature": "v1;HasUserFocusedDescendants;PlayerController:ObjectProperty:128:/Script/Engine.PlayerController;ReturnValue:BoolProperty:1408;",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "object",
+							"type_path": "/Script/Engine.PlayerController",
+							"name": "PlayerController",
+							"direction": "in"
+						},
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "InvalidateLayoutAndVolatility",
+					"declaring_class": "/Script/UMG.Widget",
+					"signature": "v1;InvalidateLayoutAndVolatility;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": []
+				},
+				{
+					"name": "IsHovered",
+					"declaring_class": "/Script/UMG.Widget",
+					"signature": "v1;IsHovered;ReturnValue:BoolProperty:1408;",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "IsInViewport",
+					"declaring_class": "/Script/UMG.Widget",
+					"signature": "v1;IsInViewport;ReturnValue:BoolProperty:1408;",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "IsRendered",
+					"declaring_class": "/Script/UMG.Widget",
+					"signature": "v1;IsRendered;ReturnValue:BoolProperty:1408;",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "IsVisible",
+					"declaring_class": "/Script/UMG.Widget",
+					"signature": "v1;IsVisible;ReturnValue:BoolProperty:1408;",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "RemoveFromParent",
+					"declaring_class": "/Script/UMG.Widget",
+					"signature": "v1;RemoveFromParent;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": []
+				},
+				{
+					"name": "ResetCursor",
+					"declaring_class": "/Script/UMG.Widget",
+					"signature": "v1;ResetCursor;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": []
+				},
+				{
+					"name": "SetAllNavigationRules",
+					"declaring_class": "/Script/UMG.Widget",
+					"signature": "v1;SetAllNavigationRules;Rule:EnumProperty:128:/Script/SlateCore.EUINavigationRule;WidgetToFocus:NameProperty:128;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "enum",
+							"type_path": "/Script/SlateCore.EUINavigationRule",
+							"name": "Rule",
+							"direction": "in"
+						},
+						{
+							"kind": "name",
+							"type_path": "",
+							"name": "WidgetToFocus",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "SetAutoWrapText",
+					"declaring_class": "/Script/UMG.TextBlock",
+					"signature": "v1;SetAutoWrapText;InAutoTextWrap:BoolProperty:128;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "InAutoTextWrap",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "SetClipping",
+					"declaring_class": "/Script/UMG.Widget",
+					"signature": "v1;SetClipping;InClipping:EnumProperty:128:/Script/SlateCore.EWidgetClipping;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "enum",
+							"type_path": "/Script/SlateCore.EWidgetClipping",
+							"name": "InClipping",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "SetColorAndOpacity",
+					"declaring_class": "/Script/UMG.TextBlock",
+					"signature": "v1;SetColorAndOpacity;InColorAndOpacity:StructProperty:128:/Script/SlateCore.SlateColor{SpecifiedColor:StructProperty:0:/Script/CoreUObject.LinearColor{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;};ColorUseRule:EnumProperty:0:/Script/SlateCore.ESlateColorStylingMode;};",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "struct",
+							"type_path": "/Script/SlateCore.SlateColor",
+							"name": "InColorAndOpacity",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "SetCursor",
+					"declaring_class": "/Script/UMG.Widget",
+					"signature": "v1;SetCursor;InCursor:ByteProperty:128:/Script/CoreUObject.EMouseCursor;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "enum",
+							"type_path": "/Script/CoreUObject.EMouseCursor",
+							"name": "InCursor",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "SetFocus",
+					"declaring_class": "/Script/UMG.Widget",
+					"signature": "v1;SetFocus;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": []
+				},
+				{
+					"name": "SetFontMaterial",
+					"declaring_class": "/Script/UMG.TextBlock",
+					"signature": "v1;SetFontMaterial;InMaterial:ObjectProperty:128:/Script/Engine.MaterialInterface;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "object",
+							"type_path": "/Script/Engine.MaterialInterface",
+							"name": "InMaterial",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "SetFontOutlineMaterial",
+					"declaring_class": "/Script/UMG.TextBlock",
+					"signature": "v1;SetFontOutlineMaterial;InMaterial:ObjectProperty:128:/Script/Engine.MaterialInterface;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "object",
+							"type_path": "/Script/Engine.MaterialInterface",
+							"name": "InMaterial",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "SetFontSize",
+					"declaring_class": "/Script/UMG.TextBlock",
+					"signature": "v1;SetFontSize;DisplayFontSize:FloatProperty:128;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "float",
+							"type_path": "",
+							"name": "DisplayFontSize",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "SetIsEnabled",
+					"declaring_class": "/Script/UMG.Widget",
+					"signature": "v1;SetIsEnabled;bInIsEnabled:BoolProperty:128;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "bInIsEnabled",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "SetJustification",
+					"declaring_class": "/Script/UMG.TextLayoutWidget",
+					"signature": "v1;SetJustification;InJustification:ByteProperty:128:/Script/Slate.ETextJustify;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "enum",
+							"type_path": "/Script/Slate.ETextJustify",
+							"name": "InJustification",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "SetKeyboardFocus",
+					"declaring_class": "/Script/UMG.Widget",
+					"signature": "v1;SetKeyboardFocus;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": []
+				},
+				{
+					"name": "SetMinDesiredWidth",
+					"declaring_class": "/Script/UMG.TextBlock",
+					"signature": "v1;SetMinDesiredWidth;InMinDesiredWidth:FloatProperty:128;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "float",
+							"type_path": "",
+							"name": "InMinDesiredWidth",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "SetNavigationRuleBase",
+					"declaring_class": "/Script/UMG.Widget",
+					"signature": "v1;SetNavigationRuleBase;Direction:EnumProperty:128:/Script/SlateCore.EUINavigation;Rule:EnumProperty:128:/Script/SlateCore.EUINavigationRule;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "enum",
+							"type_path": "/Script/SlateCore.EUINavigation",
+							"name": "Direction",
+							"direction": "in"
+						},
+						{
+							"kind": "enum",
+							"type_path": "/Script/SlateCore.EUINavigationRule",
+							"name": "Rule",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "SetNavigationRuleExplicit",
+					"declaring_class": "/Script/UMG.Widget",
+					"signature": "v1;SetNavigationRuleExplicit;Direction:EnumProperty:128:/Script/SlateCore.EUINavigation;InWidget:ObjectProperty:128:/Script/UMG.Widget;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "enum",
+							"type_path": "/Script/SlateCore.EUINavigation",
+							"name": "Direction",
+							"direction": "in"
+						},
+						{
+							"kind": "object",
+							"type_path": "/Script/UMG.Widget",
+							"name": "InWidget",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "SetOpacity",
+					"declaring_class": "/Script/UMG.TextBlock",
+					"signature": "v1;SetOpacity;InOpacity:FloatProperty:128;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "float",
+							"type_path": "",
+							"name": "InOpacity",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "SetRenderOpacity",
+					"declaring_class": "/Script/UMG.Widget",
+					"signature": "v1;SetRenderOpacity;InOpacity:FloatProperty:128;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "float",
+							"type_path": "",
+							"name": "InOpacity",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "SetRenderScale",
+					"declaring_class": "/Script/UMG.Widget",
+					"signature": "v1;SetRenderScale;Scale:StructProperty:128:/Script/CoreUObject.Vector2D{X:DoubleProperty:0;Y:DoubleProperty:0;};",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "struct",
+							"type_path": "/Script/CoreUObject.Vector2D",
+							"name": "Scale",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "SetRenderShear",
+					"declaring_class": "/Script/UMG.Widget",
+					"signature": "v1;SetRenderShear;Shear:StructProperty:128:/Script/CoreUObject.Vector2D{X:DoubleProperty:0;Y:DoubleProperty:0;};",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "struct",
+							"type_path": "/Script/CoreUObject.Vector2D",
+							"name": "Shear",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "SetRenderTransform",
+					"declaring_class": "/Script/UMG.Widget",
+					"signature": "v1;SetRenderTransform;InTransform:StructProperty:128:/Script/UMG.WidgetTransform{Translation:StructProperty:0:/Script/CoreUObject.Vector2D{X:DoubleProperty:0;Y:DoubleProperty:0;};Scale:StructProperty:0:/Script/CoreUObject.Vector2D{X:DoubleProperty:0;Y:DoubleProperty:0;};Shear:StructProperty:0:/Script/CoreUObject.Vector2D{X:DoubleProperty:0;Y:DoubleProperty:0;};Angle:FloatProperty:0;};",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "struct",
+							"type_path": "/Script/UMG.WidgetTransform",
+							"name": "InTransform",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "SetRenderTransformAngle",
+					"declaring_class": "/Script/UMG.Widget",
+					"signature": "v1;SetRenderTransformAngle;Angle:FloatProperty:128;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "float",
+							"type_path": "",
+							"name": "Angle",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "SetRenderTransformPivot",
+					"declaring_class": "/Script/UMG.Widget",
+					"signature": "v1;SetRenderTransformPivot;Pivot:StructProperty:128:/Script/CoreUObject.Vector2D{X:DoubleProperty:0;Y:DoubleProperty:0;};",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "struct",
+							"type_path": "/Script/CoreUObject.Vector2D",
+							"name": "Pivot",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "SetRenderTranslation",
+					"declaring_class": "/Script/UMG.Widget",
+					"signature": "v1;SetRenderTranslation;Translation:StructProperty:128:/Script/CoreUObject.Vector2D{X:DoubleProperty:0;Y:DoubleProperty:0;};",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "struct",
+							"type_path": "/Script/CoreUObject.Vector2D",
+							"name": "Translation",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "SetShadowColorAndOpacity",
+					"declaring_class": "/Script/UMG.TextBlock",
+					"signature": "v1;SetShadowColorAndOpacity;InShadowColorAndOpacity:StructProperty:128:/Script/CoreUObject.LinearColor{R:FloatProperty:0;G:FloatProperty:0;B:FloatProperty:0;A:FloatProperty:0;};",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "struct",
+							"type_path": "/Script/CoreUObject.LinearColor",
+							"name": "InShadowColorAndOpacity",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "SetShadowOffset",
+					"declaring_class": "/Script/UMG.TextBlock",
+					"signature": "v1;SetShadowOffset;InShadowOffset:StructProperty:128:/Script/CoreUObject.Vector2D{X:DoubleProperty:0;Y:DoubleProperty:0;};",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "struct",
+							"type_path": "/Script/CoreUObject.Vector2D",
+							"name": "InShadowOffset",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "SetText",
+					"declaring_class": "/Script/UMG.TextBlock",
+					"signature": "v1;SetText;InText:TextProperty:128;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "text",
+							"type_path": "",
+							"name": "InText",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "SetTextOverflowPolicy",
+					"declaring_class": "/Script/UMG.TextBlock",
+					"signature": "v1;SetTextOverflowPolicy;InOverflowPolicy:EnumProperty:128:/Script/SlateCore.ETextOverflowPolicy;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "enum",
+							"type_path": "/Script/SlateCore.ETextOverflowPolicy",
+							"name": "InOverflowPolicy",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "SetTextTransformPolicy",
+					"declaring_class": "/Script/UMG.TextBlock",
+					"signature": "v1;SetTextTransformPolicy;InTransformPolicy:EnumProperty:128:/Script/SlateCore.ETextTransformPolicy;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "enum",
+							"type_path": "/Script/SlateCore.ETextTransformPolicy",
+							"name": "InTransformPolicy",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "SetToolTip",
+					"declaring_class": "/Script/UMG.Widget",
+					"signature": "v1;SetToolTip;Widget:ObjectProperty:128:/Script/UMG.Widget;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "object",
+							"type_path": "/Script/UMG.Widget",
+							"name": "Widget",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "SetToolTipText",
+					"declaring_class": "/Script/UMG.Widget",
+					"signature": "v1;SetToolTipText;InToolTipText:TextProperty:134218114;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "text",
+							"type_path": "",
+							"name": "InToolTipText",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "SetUserFocus",
+					"declaring_class": "/Script/UMG.Widget",
+					"signature": "v1;SetUserFocus;PlayerController:ObjectProperty:128:/Script/Engine.PlayerController;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "object",
+							"type_path": "/Script/Engine.PlayerController",
+							"name": "PlayerController",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "SetVisibility",
+					"declaring_class": "/Script/UMG.Widget",
+					"signature": "v1;SetVisibility;InVisibility:EnumProperty:128:/Script/UMG.ESlateVisibility;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "enum",
+							"type_path": "/Script/UMG.ESlateVisibility",
+							"name": "InVisibility",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "SupportsKeyboardFocus",
+					"declaring_class": "/Script/UMG.Widget",
+					"signature": "v1;SupportsKeyboardFocus;ReturnValue:BoolProperty:1408;",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				}
+			],
+			"skipped": [
+				{
+					"domain": "field",
+					"name": "AccessibleBehavior",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "AccessibleSummaryBehavior",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "AccessibleSummaryText",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "AccessibleSummaryTextDelegate",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "AccessibleText",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "AccessibleTextDelegate",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "AccessibleWidgetData",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bCanChildrenBeAccessible",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bCreatedByConstructionScript",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bExpandedInDesigner",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bHiddenInDesigner",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bIsEnabledDelegate",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bIsVariable",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bLockedInDesigner",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bOverride_Cursor",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bOverrideAccessibleDefaults",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bWrappedByComponent",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "CategoryName",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "ColorAndOpacityDelegate",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "DesignerFlags",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "DisplayLabel",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "Font",
+					"reason": "editor_only_struct_data"
+				},
+				{
+					"domain": "field",
+					"name": "FontFacesLoadingPaintPolicy",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "NativeBindings",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "OnAllFontFacesFinishLoading",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "ShadowColorAndOpacityDelegate",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "StrikeBrush",
+					"reason": "editor_only_struct_data"
+				},
+				{
+					"domain": "field",
+					"name": "TextDelegate",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "ToolTipTextDelegate",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "ToolTipWidgetDelegate",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "VisibilityDelegate",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "method",
+					"name": "ExecuteUbergraph",
+					"reason": "requires_adapter_or_nonpublic_policy"
+				},
+				{
+					"domain": "method",
+					"name": "GenerateWidgetForObject__DelegateSignature",
+					"reason": "not_public_local_native_instance_callable"
+				},
+				{
+					"domain": "method",
+					"name": "GenerateWidgetForString__DelegateSignature",
+					"reason": "not_public_local_native_instance_callable"
+				},
+				{
+					"domain": "method",
+					"name": "GetBool__DelegateSignature",
+					"reason": "not_public_local_native_instance_callable"
+				},
+				{
+					"domain": "method",
+					"name": "GetCachedGeometry",
+					"reason": "unsupported_parameter_type"
+				},
+				{
+					"domain": "method",
+					"name": "GetCheckBoxState__DelegateSignature",
+					"reason": "not_public_local_native_instance_callable"
+				},
+				{
+					"domain": "method",
+					"name": "GetFloat__DelegateSignature",
+					"reason": "not_public_local_native_instance_callable"
+				},
+				{
+					"domain": "method",
+					"name": "GetInt32__DelegateSignature",
+					"reason": "not_public_local_native_instance_callable"
+				},
+				{
+					"domain": "method",
+					"name": "GetLinearColor__DelegateSignature",
+					"reason": "not_public_local_native_instance_callable"
+				},
+				{
+					"domain": "method",
+					"name": "GetMouseCursor__DelegateSignature",
+					"reason": "not_public_local_native_instance_callable"
+				},
+				{
+					"domain": "method",
+					"name": "GetPaintSpaceGeometry",
+					"reason": "unsupported_parameter_type"
+				},
+				{
+					"domain": "method",
+					"name": "GetSlateBrush__DelegateSignature",
+					"reason": "not_public_local_native_instance_callable"
+				},
+				{
+					"domain": "method",
+					"name": "GetSlateColor__DelegateSignature",
+					"reason": "not_public_local_native_instance_callable"
+				},
+				{
+					"domain": "method",
+					"name": "GetSlateVisibility__DelegateSignature",
+					"reason": "not_public_local_native_instance_callable"
+				},
+				{
+					"domain": "method",
+					"name": "GetText__DelegateSignature",
+					"reason": "not_public_local_native_instance_callable"
+				},
+				{
+					"domain": "method",
+					"name": "GetTickSpaceGeometry",
+					"reason": "unsupported_parameter_type"
+				},
+				{
+					"domain": "method",
+					"name": "GetWidget__DelegateSignature",
+					"reason": "not_public_local_native_instance_callable"
+				},
+				{
+					"domain": "method",
+					"name": "K2_AddFieldValueChangedDelegate",
+					"reason": "unsupported_parameter_type"
+				},
+				{
+					"domain": "method",
+					"name": "K2_BroadcastFieldValueChanged",
+					"reason": "not_public_local_native_instance_callable"
+				},
+				{
+					"domain": "method",
+					"name": "K2_RemoveFieldValueChangedDelegate",
+					"reason": "unsupported_parameter_type"
+				},
+				{
+					"domain": "method",
+					"name": "OnAllFontFacesFinishLoading_TextLayoutWidget__DelegateSignature",
+					"reason": "not_public_local_native_instance_callable"
+				},
+				{
+					"domain": "method",
+					"name": "OnPointerEvent__DelegateSignature",
+					"reason": "unsupported_parameter_type"
+				},
+				{
+					"domain": "method",
+					"name": "OnReply__DelegateSignature",
+					"reason": "unsupported_parameter_type"
+				},
+				{
+					"domain": "method",
+					"name": "SetFont",
+					"reason": "editor_only_struct_data"
+				},
+				{
+					"domain": "method",
+					"name": "SetNavigationRule",
+					"reason": "requires_adapter_or_nonpublic_policy"
+				},
+				{
+					"domain": "method",
+					"name": "SetNavigationRuleCustom",
+					"reason": "unsupported_parameter_type"
+				},
+				{
+					"domain": "method",
+					"name": "SetNavigationRuleCustomBoundary",
+					"reason": "unsupported_parameter_type"
+				},
+				{
+					"domain": "method",
+					"name": "SetStrikeBrush",
+					"reason": "editor_only_struct_data"
 				}
 			]
 		},

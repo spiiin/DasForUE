@@ -82,7 +82,10 @@ $Steps = @{
         Invoke-DasAutomation $Das -Test $S.test -Name $S.log -Count $S.minimum -AtLeast -Extra $Extra -Rendering:([bool]$S.rendering)
     }
     script     = { param($S)
-        & (Join-Path $PSScriptRoot $S.script) -Engine $Engine -SkipBuild
+        # Optional "switches" (e.g. Check): switch parameters of the script.
+        $Switches = @{}
+        foreach ($N in @($S.switches)) { if ($N) { $Switches[$N] = $true } }
+        & (Join-Path $PSScriptRoot $S.script) -Engine $Engine -SkipBuild @Switches
         if ($S.probe) { $Probes[$S.name] = (Get-Content -LiteralPath (Join-Path $Das.Logs $S.probe) -Raw).Trim() }
     }
     packaged   = { param($S)

@@ -902,6 +902,51 @@ enum ERadialImpulseFalloff {
     RIF_Linear=1
 }
 
+[ue_native_enum(path="/Script/Slate.ETextFlowDirection")]
+enum ETextFlowDirection {
+    Auto=0
+    LeftToRight=1
+    RightToLeft=2
+    Culture=3
+}
+
+[ue_native_enum(path="/Script/Slate.ETextJustify")]
+enum ETextJustify {
+    Left=0
+    Center=1
+    Right=2
+    InvariantLeft=3
+    InvariantRight=4
+}
+
+[ue_native_enum(path="/Script/Slate.ETextWrappingPolicy")]
+enum ETextWrappingPolicy {
+    DefaultWrapping=0
+    AllowPerCharacterWrapping=1
+}
+
+[ue_native_enum(path="/Script/SlateCore.EButtonClickMethod")]
+enum EButtonClickMethod {
+    DownAndUp=0
+    MouseDown=1
+    MouseUp=2
+    PreciseClick=3
+}
+
+[ue_native_enum(path="/Script/SlateCore.EButtonPressMethod")]
+enum EButtonPressMethod {
+    DownAndUp=0
+    ButtonPress=1
+    ButtonRelease=2
+}
+
+[ue_native_enum(path="/Script/SlateCore.EButtonTouchMethod")]
+enum EButtonTouchMethod {
+    DownAndUp=0
+    Down=1
+    PreciseTap=2
+}
+
 [ue_native_enum(path="/Script/SlateCore.EFlowDirectionPreference")]
 enum EFlowDirectionPreference {
     Inherit=0
@@ -917,6 +962,28 @@ enum ESlateColorStylingMode {
     UseColor_Foreground=2
     UseColor_Foreground_Subdued=3
     UseColor_UseStyle=4
+}
+
+[ue_native_enum(path="/Script/SlateCore.ETextOverflowPolicy")]
+enum ETextOverflowPolicy {
+    Clip=0
+    Ellipsis=1
+    MultilineEllipsis=2
+    MiddleEllipsis=3
+}
+
+[ue_native_enum(path="/Script/SlateCore.ETextShapingMethod")]
+enum ETextShapingMethod {
+    Auto=0
+    KerningOnly=1
+    FullShaping=2
+}
+
+[ue_native_enum(path="/Script/SlateCore.ETextTransformPolicy")]
+enum ETextTransformPolicy {
+    None=0
+    ToLower=1
+    ToUpper=2
 }
 
 [ue_native_enum(path="/Script/SlateCore.EUINavigation")]
@@ -1468,6 +1535,14 @@ struct Margin {
 struct SlateColor {
     SpecifiedColor:UELinearColor
     ColorUseRule:ESlateColorStylingMode
+}
+
+[ue_native_struct(path="/Script/UMG.ShapedTextOptions")]
+struct ShapedTextOptions {
+    bOverride_TextShapingMethod:bool
+    bOverride_TextFlowDirection:bool
+    TextShapingMethod:ETextShapingMethod
+    TextFlowDirection:ETextFlowDirection
 }
 
 [ue_native_struct(path="/Script/UMG.WidgetTransform")]

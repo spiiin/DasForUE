@@ -1094,6 +1094,10 @@ FString DasFoundationExternManifest()
         Module->functions.foreach (
             [&](const das::FunctionPtr& Fn)
             {
+                // Routes of reflected UFUNCTIONs (AddRoute) appear when a native module is built and are numbered
+                // per build: internal, not part of the script-visible surface.
+                if (Fn->name.rfind("__ue_native_route_", 0) == 0)
+                    return;
                 const das::string Result = Fn->result ? Fn->result->describe() : das::string();
                 Lines.Add(FString::Printf(TEXT("%s\t%s\t%s\t%u"), UTF8_TO_TCHAR(Fn->name.c_str()),
                                                UTF8_TO_TCHAR(Fn->getMangledName().c_str()),

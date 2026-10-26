@@ -12,7 +12,9 @@ def generate(ir,script_dirs=None):
  'struct FDasNativeGameplayMethod { const TCHAR *Class,*Name,*Signature; bool ConstructionUnsafe; };',
  'struct FDasNativeGameplayDefault { const TCHAR *Class,*Method,*Name,*Text; };',
  'inline const FDasNativeGameplayField DasNativeGameplayFields[] = {']
- def q(s):return 'TEXT('+json.dumps(s,ensure_ascii=True)+')'
+ # MSVC limits one literal to 16380 bytes (8K wide chars); nested struct signatures (UMG ButtonStyle) exceed it,
+ # so long strings become adjacent literals, which the compiler concatenates.
+ def q(s):return ' '.join('TEXT('+json.dumps(s[i:i+2000],ensure_ascii=True)+')' for i in range(0,max(len(s),1),2000))
  methods=[];defaults=[];used=[];soft_types={}
  def visit(value,depth=0):
   if depth>16:raise ValueError('Recursive native type')

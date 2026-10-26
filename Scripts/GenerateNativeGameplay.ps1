@@ -57,6 +57,13 @@ if($ProjectMode){
 }else{
 $Pairs=@(@($IR,"$Repo\Bindings\NativeGameplay.json"),@($Header,"$Repo\Plugins\DasForUE\Source\DasRuntime\Private\Generated\DasNativeGameplay.generated.h"),@($Module,"$Repo\Plugins\DasForUE\Content\Das\Scripts\ue_native_gameplay.das"))
 }
-foreach($Pair in $Pairs){if($Check){if(!(Test-Path -LiteralPath $Pair[1]) -or [IO.File]::ReadAllText($Pair[0]).Replace("`r`n","`n") -cne [IO.File]::ReadAllText($Pair[1]).Replace("`r`n","`n")){throw "Stale native gameplay artifact: $($Pair[1])"}}elseif(!(Test-Path -LiteralPath $Pair[1]) -or [IO.File]::ReadAllText($Pair[0]) -cne [IO.File]::ReadAllText($Pair[1])){Copy-Item -LiteralPath $Pair[0] -Destination $Pair[1] -Force}}
+# Artifacts are written with LF, as the repository stores them (.gitattributes eol=lf): Python and the
+# engine's JSON writer produce CRLF on Windows.
+foreach($Pair in $Pairs){
+    $Text=[IO.File]::ReadAllText($Pair[0]).Replace("`r`n","`n")
+    $Current=if(Test-Path -LiteralPath $Pair[1]){[IO.File]::ReadAllText($Pair[1])}else{$null}
+    if($Check){if($null -eq $Current -or $Text -cne $Current.Replace("`r`n","`n")){throw "Stale native gameplay artifact: $($Pair[1])"}}
+    elseif($Text -cne $Current){[IO.File]::WriteAllText($Pair[1],$Text,[Text.UTF8Encoding]::new($false))}
+}
 if(!$SkipBuild -and !$Check){Build-NativeRegistry 'registry'}
 Write-Output 'DAS_NATIVE_GAMEPLAY_ARTIFACTS=PASS'

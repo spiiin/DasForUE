@@ -55,6 +55,26 @@ void DasAuditTypeIssues(FProperty* P, const FString& Path, TArray<TSharedPtr<FJs
         Out.Add(MakeShared<FJsonValueObject>(D));
     }
 }
+// A struct with WITH_EDITORONLY_DATA members (FSlateBrush::Tint_DEPRECATED) has another layout in a cooked game
+// than the Editor exports, so a native schema of it would be stale there.
+bool DasHasEditorOnlyData(FProperty* P, int32 Depth = 0)
+{
+    if (!P || Depth > 16)
+        return false;
+    if (P->HasAnyPropertyFlags(CPF_EditorOnly))
+        return true;
+    if (auto* A = CastField<FArrayProperty>(P))
+        return DasHasEditorOnlyData(A->Inner, Depth + 1);
+    if (auto* M = CastField<FMapProperty>(P))
+        return DasHasEditorOnlyData(M->KeyProp, Depth + 1) || DasHasEditorOnlyData(M->ValueProp, Depth + 1);
+    if (auto* S = CastField<FSetProperty>(P))
+        return DasHasEditorOnlyData(S->ElementProp, Depth + 1);
+    if (auto* S = CastField<FStructProperty>(P))
+        for (TFieldIterator<FProperty> I(S->Struct); I; ++I)
+            if (DasHasEditorOnlyData(*I, Depth + 1))
+                return true;
+    return false;
+}
 FDasNativeAssessment DasAssessNativeField(FProperty* P, bool Details = false)
 {
     FDasNativeAssessment R;
@@ -66,6 +86,9 @@ FDasNativeAssessment DasAssessNativeField(FProperty* P, bool Details = false)
         R.Add(TEXT("deprecated"));
     if (P->HasAnyPropertyFlags(CPF_EditorOnly))
         R.Add(TEXT("editor_only"));
+    const bool EditorOnlyData = !P->HasAnyPropertyFlags(CPF_EditorOnly) && DasHasEditorOnlyData(P);
+    if (EditorOnlyData)
+        R.Add(TEXT("editor_only_struct_data"));
     FDasPropertyAccess Access;
     FString AccessError;
     const bool Accessor = !DescribeDasPropertyAccess(P, Access, AccessError);
@@ -80,6 +103,8 @@ FDasNativeAssessment DasAssessNativeField(FProperty* P, bool Details = false)
     // Deterministic primary reason; accessor semantics use the shared value contract.
     if (!P->HasAnyPropertyFlags(CPF_BlueprintVisible) || P->HasAnyPropertyFlags(CPF_Deprecated | CPF_EditorOnly))
         R.Primary = TEXT("hidden_editor_or_deprecated");
+    else if (EditorOnlyData)
+        R.Primary = TEXT("editor_only_struct_data");
     else if (Accessor)
         R.Primary = TEXT("invalid_accessor_contract");
     else if (!Supported)
@@ -125,6 +150,12 @@ FDasNativeAssessment DasAssessNativeMethod(UFunction* F, bool Details = false)
                 R.Add(TEXT("unsupported_parameter_type"));
                 if (Details)
                     DasAuditTypeIssues(*I, I->GetName(), R.TypeIssues);
+            }
+            else if (DasHasEditorOnlyData(*I))
+            {
+                R.Add(TEXT("editor_only_struct_data"));
+                if (R.Primary.IsEmpty())
+                    R.Primary = TEXT("editor_only_struct_data");
             }
         }
     if (R.Primary.IsEmpty())
