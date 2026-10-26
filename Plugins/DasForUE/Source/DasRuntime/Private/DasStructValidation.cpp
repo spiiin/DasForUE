@@ -60,34 +60,9 @@ bool ValidateDasValueStruct(const FString& Path, FString& Error)
     TFunction<bool(UScriptStruct*, int32)> Visit;
     Visit = [&](UScriptStruct* S, int32 Depth)
     {
-        if (DasIsPaintContextType(S))
+        if (const auto* Policy = DasNativeTypePolicy(S); Policy && Policy->StorageError)
         {
-            Error = TEXT("PaintContext requires synchronous OnPaint, not reflected storage/defaults");
-            return false;
-        }
-        if (DasIsWidgetAnimationType(S))
-        {
-            Error = TEXT("WidgetAnimation requires a weak context capability, not reflected storage/defaults");
-            return false;
-        }
-        if (DasIsEventReplyType(S))
-        {
-            Error = TEXT("EventReply requires a synchronous callback, not reflected storage/defaults");
-            return false;
-        }
-        if (DasIsGeometryType(S))
-        {
-            Error = TEXT("Geometry requires owned snapshot transport, not reflected storage/defaults");
-            return false;
-        }
-        if (DasIsInputEventType(S))
-        {
-            Error = TEXT("Input events require detached snapshot transport, not reflected storage/defaults");
-            return false;
-        }
-        if (S->GetPathName() == TEXT("/Script/Engine.ActorInstanceHandle"))
-        {
-            Error = TEXT("Actor instance handles require the collision result adapter");
+            Error = Policy->StorageError;
             return false;
         }
         if (DasHasBuildDependentLayout(S))

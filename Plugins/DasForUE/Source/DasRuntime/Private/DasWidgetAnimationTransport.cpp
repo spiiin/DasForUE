@@ -1,10 +1,11 @@
+#include "DasTypeAdapters.h"
 #include "DasWidgetAnimationTransport.h"
 #include "Animation/WidgetAnimationState.h"
 #include "Blueprint/UserWidget.h"
 #include "Engine/World.h"
 bool DasIsWidgetAnimationType(const UScriptStruct* T)
 {
-    return T == FWidgetAnimationHandle::StaticStruct();
+    return DasHasNativeRole(T, EDasNativeTypeRole::WidgetAnimation);
 }
 bool DasWidgetAnimationFunctionAllowed(const UFunction* F)
 {

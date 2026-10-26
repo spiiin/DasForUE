@@ -27,7 +27,7 @@ FString BuildTypeAdapterSupportManifest()
 {
     check(IsInGameThread());
     auto Root = MakeShared<FJsonObject>();
-    Root->SetNumberField(TEXT("schema_version"), 1);
+    Root->SetNumberField(TEXT("schema_version"), 2);
     Root->SetStringField(TEXT("scope"),
                               TEXT("registered adapter contracts and representative property ABI validation"));
     Root->SetStringField(TEXT("evidence"), TEXT("ValidateDasPropertyType; adapter and script facet queries"));
@@ -52,6 +52,23 @@ FString BuildTypeAdapterSupportManifest()
         J->SetBoolField(TEXT("family"), A.IsStructFamily());
         J->SetBoolField(TEXT("leaf"), A.IsLeafValue());
         J->SetBoolField(TEXT("reference_value"), A.IsReferenceValue());
+        if (const auto* P = A.GetNativePolicy())
+        {
+            auto N = MakeShared<FJsonObject>();
+            N->SetNumberField(TEXT("roles"), int32(P->Roles));
+            N->SetStringField(TEXT("transport"), P->Transport ? P->Transport : TEXT(""));
+            N->SetStringField(TEXT("handle"), P->Handle ? UTF8_TO_TCHAR(P->Handle) : TEXT(""));
+            N->SetStringField(TEXT("lifetime"), P->Lifetime ? P->Lifetime : TEXT(""));
+            N->SetStringField(TEXT("storage_error"), P->StorageError ? P->StorageError : TEXT(""));
+            N->SetStringField(TEXT("call_constraint"), P->CallError ? UTF8_TO_TCHAR(P->CallError) : TEXT(""));
+            N->SetBoolField(TEXT("call_gate"), P->AllowCall != nullptr);
+            N->SetBoolField(TEXT("capture_snapshot"), P->Capture != nullptr);
+            N->SetBoolField(TEXT("validate_snapshot"), P->ValidateSnapshot != nullptr);
+            J->SetObjectField(TEXT("native_policy"), N);
+        }
+        else
+            J->SetField(TEXT("native_policy"), MakeShared<FJsonValueNull>());
+
         J->SetBoolField(TEXT("container_value_policy"), A.SupportsContainerValue());
         J->SetStringField(TEXT("default_policy"),
                                A.GetDefaultPolicy() == EDasAdapterDefault::ImplicitEmpty ? TEXT("implicit_empty")

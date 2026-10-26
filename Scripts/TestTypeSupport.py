@@ -13,6 +13,25 @@ class TypeSupportTest(unittest.TestCase):
     def setUp(self):
         self.data = gen.load(gen.BASELINE)
 
+    def test_scoped_handles_never_claim_owned_snapshot_capture(self):
+        policies = [a['native_policy'] for a in self.data['adapters'] if a['native_policy']]
+        self.assertTrue(policies)
+        for n in policies:
+            if n['lifetime'] in ('synchronous_callback_scope', 'synchronous_paint_scope', 'weak_widget_context_capability', 'component_owned_capability', 'rejected_internal_handle'):
+                self.assertFalse(n['capture_snapshot'])
+                self.assertTrue(n['call_gate'])
+                self.assertTrue(n['call_constraint'])
+            if n['lifetime'] in ('owned_snapshot', 'detached_snapshot'):
+                self.assertTrue(n['capture_snapshot'])
+                self.assertTrue(n['validate_snapshot'])
+
+    def test_native_transport_metadata_is_rendered(self):
+        text = gen.render(self.data)
+        for a in self.data['adapters']:
+            if a['native_policy']:
+                self.assertIn(gen.code(a['native_policy']['lifetime']), text)
+                self.assertIn(gen.code(a['native_policy']['transport']), text)
+
     def test_document_is_current(self):
         doc = gen.DOCUMENT.read_text(encoding='utf-8')
         self.assertEqual(doc, gen.replace_section(doc, gen.render(self.data)))
@@ -66,7 +85,7 @@ class TypeSupportTest(unittest.TestCase):
             gen.validate(self.data)
 
     def test_unsupported_schema_is_rejected(self):
-        self.data['schema_version'] = 2
+        self.data['schema_version'] = 3
         with self.assertRaisesRegex(ValueError, 'schema'):
             gen.validate(self.data)
 

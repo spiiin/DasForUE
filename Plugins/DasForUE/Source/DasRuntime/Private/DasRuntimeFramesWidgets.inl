@@ -129,17 +129,15 @@ thread_local FWidgetDragScope* ActiveWidgetDrag = nullptr;
 thread_local bool WidgetDragContract = false;
 const char* WidgetEventHandleName(const FString& Path)
 {
-    if (Path == TEXT("/Script/SlateCore.FocusEvent"))
-        return "UEFocusEvent";
-    if (Path == TEXT("/Script/SlateCore.KeyEvent"))
-        return "UEKeyEvent";
-    if (Path == TEXT("/Script/SlateCore.AnalogInputEvent"))
-        return "UEAnalogInputEvent";
-    if (Path == TEXT("/Script/SlateCore.CharacterEvent"))
-        return "UECharacterEvent";
-    if (Path == TEXT("/Script/SlateCore.PointerEvent"))
-        return "UEPointerEvent";
-    return nullptr;
+    const auto* A = FDasTypeAdapters::Get().FindStructPath(Path);
+    const auto* P = A ? A->GetNativePolicy() : nullptr;
+    return P && EnumHasAllFlags(P->Roles, EDasNativeTypeRole::WidgetEvent) ? P->Handle : nullptr;
+}
+const char* NativeTransportHandle(const FString& Path)
+{
+    const auto* A = FDasTypeAdapters::Get().FindStructPath(Path);
+    const auto* P = A ? A->GetNativePolicy() : nullptr;
+    return P ? P->Handle : nullptr;
 }
 bool VerifyContract(const das::ProgramPtr& Program, const FString& Entry, const FDasCallContract& C,
                     bool AllowNativeInputValue = false)
@@ -154,19 +152,18 @@ bool VerifyContract(const das::ProgramPtr& Program, const FString& Entry, const 
     auto* F = Program->getThisModule()->findUniqueFunction(N.Get());
     if (WidgetPaintContract && C.ReturnKind == EDasMethodSignature::Void && C.Inputs.Num() == 1 &&
         C.Inputs[0] == EDasMethodSignature::Struct && C.InputClasses.Num() == 1 &&
-        C.InputClasses[0] == TEXT("/Script/UMG.PaintContext"))
+        DasHasNativeRolePath(C.InputClasses[0], EDasNativeTypeRole::Paint))
     {
         if (!F || !F->exports || !C.InputDirections.IsEmpty() || F->arguments.size() != 1 || !F->result ||
             F->result->ref || F->result->baseType != das::Type::tVoid)
             return false;
         const auto& T = F->arguments[0]->type;
         return T && !T->ref && T->baseType == das::Type::tHandle && T->annotation &&
-               T->annotation->name == "UEPaintContext";
+               T->annotation->name == NativeTransportHandle(C.InputClasses[0]);
     }
-    if (WidgetDragContract && C.InputClasses.Contains(TEXT("/Script/SlateCore.PointerEvent")) &&
-                                                      (C.ReturnKind == EDasMethodSignature::Object ||
-                                                       C.ReturnKind == EDasMethodSignature::Bool ||
-                                                       C.ReturnKind == EDasMethodSignature::Void))
+    if (WidgetDragContract && C.InputClasses.Contains(DasNativeTypePath(EDasNativeTypeRole::PointerEvent)) &&
+        (C.ReturnKind == EDasMethodSignature::Object || C.ReturnKind == EDasMethodSignature::Bool ||
+         C.ReturnKind == EDasMethodSignature::Void))
     {
         auto Handle = [](const das::TypeDeclPtr& T, const char* Name)
         {
@@ -180,19 +177,20 @@ bool VerifyContract(const das::ProgramPtr& Program, const FString& Entry, const 
             F->arguments.size() != size_t(C.Inputs.Num()))
             return false;
         const int32 Count = C.Inputs.Num();
-        const bool HasGeometry = Count && C.InputClasses[0] == TEXT("/Script/SlateCore.Geometry");
+        const bool HasGeometry = Count && DasHasNativeRolePath(C.InputClasses[0], EDasNativeTypeRole::Geometry);
         if ((Count != 2 && Count != 3) || (!HasGeometry && Count != 2))
             return false;
         int32 I = 0;
         if (HasGeometry)
         {
-            if (C.Inputs[0] != EDasMethodSignature::Struct || !Handle(F->arguments[0]->type, "UEGeometry"))
+            if (C.Inputs[0] != EDasMethodSignature::Struct ||
+                !Handle(F->arguments[0]->type, NativeTransportHandle(C.InputClasses[0])))
                 return false;
             ++I;
         }
         if (C.Inputs[I] != EDasMethodSignature::Struct ||
-            C.InputClasses[I] != TEXT("/Script/SlateCore.PointerEvent") ||
-                                      !Handle(F->arguments[I]->type, "UEPointerEvent"))
+            !DasHasNativeRolePath(C.InputClasses[I], EDasNativeTypeRole::PointerEvent) ||
+            !Handle(F->arguments[I]->type, NativeTransportHandle(C.InputClasses[I])))
             return false;
         ++I;
         if (I < Count)
@@ -209,15 +207,15 @@ bool VerifyContract(const das::ProgramPtr& Program, const FString& Entry, const 
     }
     if (FocusNotificationContract && C.ReturnKind == EDasMethodSignature::Void && C.Inputs.Num() == 1 &&
         C.Inputs[0] == EDasMethodSignature::Struct && C.InputClasses.Num() == 1 &&
-        C.InputClasses[0] == TEXT("/Script/SlateCore.FocusEvent"))
+        DasHasNativeRolePath(C.InputClasses[0], EDasNativeTypeRole::FocusEvent))
     {
         const auto T = F && F->arguments.size() == 1 ? F->arguments[0]->type : das::TypeDeclPtr();
         return F && F->exports && C.InputDirections.IsEmpty() && F->result && !F->result->ref &&
                F->result->baseType == das::Type::tVoid && T && !T->ref && T->baseType == das::Type::tHandle &&
-               T->annotation && T->annotation->name == "UEFocusEvent";
+               T->annotation && T->annotation->name == NativeTransportHandle(C.InputClasses[0]);
     }
     if (WidgetReplyContract && C.ReturnKind == EDasMethodSignature::Struct &&
-        C.ReturnClass == TEXT("/Script/UMG.EventReply"))
+        DasHasNativeRolePath(C.ReturnClass, EDasNativeTypeRole::EventReply))
     {
         auto Handle = [](const das::TypeDeclPtr& T, const char* Name)
         {
@@ -226,21 +224,19 @@ bool VerifyContract(const das::ProgramPtr& Program, const FString& Entry, const 
         };
         return F && F->exports && C.InputDirections.IsEmpty() && C.Inputs.Num() == 2 &&
                C.Inputs[0] == EDasMethodSignature::Struct && C.Inputs[1] == EDasMethodSignature::Struct &&
-               C.InputClasses.Num() == 2 &&
-               C.InputClasses[0] == TEXT("/Script/SlateCore.Geometry") && F->arguments.size() == 2 &&
-                                         Handle(F->result, "UEEventReply") &&
-                                         Handle(F->arguments[0]->type, "UEGeometry") &&
-                                         Handle(F->arguments[1]->type, WidgetEventHandleName(C.InputClasses[1]));
+               C.InputClasses.Num() == 2 && DasHasNativeRolePath(C.InputClasses[0], EDasNativeTypeRole::Geometry) &&
+               F->arguments.size() == 2 && Handle(F->result, NativeTransportHandle(C.ReturnClass)) &&
+               Handle(F->arguments[0]->type, NativeTransportHandle(C.InputClasses[0])) &&
+               Handle(F->arguments[1]->type, WidgetEventHandleName(C.InputClasses[1]));
     }
     if (AllowNativeInputValue && F && F->exports && C.ReturnKind == EDasMethodSignature::Void && C.Inputs.Num() == 1 &&
         C.Inputs[0] == EDasMethodSignature::Struct && C.InputClasses.Num() == 1 &&
-        C.InputClasses[0] == TEXT("/Script/EnhancedInput.InputActionValue") && C.InputDirections.IsEmpty() &&
-                                  F->arguments.size() == 1 && F->result && !F->result->ref &&
-                                  F->result->baseType == das::Type::tVoid)
+        DasHasNativeRolePath(C.InputClasses[0], EDasNativeTypeRole::InputActionValue) && C.InputDirections.IsEmpty() &&
+        F->arguments.size() == 1 && F->result && !F->result->ref && F->result->baseType == das::Type::tVoid)
     {
         const auto& T = F->arguments[0]->type;
         if (T && !T->ref && T->baseType == das::Type::tHandle && T->annotation &&
-            T->annotation->name == "InputActionValue")
+            T->annotation->name == NativeTransportHandle(C.InputClasses[0]))
             return true;
     }
     auto Matches = [](const das::TypeDeclPtr& T, EDasMethodSignature K)
@@ -412,13 +408,14 @@ bool VerifyContract(const das::ProgramPtr& Program, const FString& Entry, const 
                 bool Safe = true;
                 for (int32 I = 0; I < C.Inputs.Num(); ++I)
                     Safe &= C.Inputs[I] == EDasMethodSignature::Struct &&
-                            DasIsInputEventType(FindObject<UScriptStruct>(nullptr, *C.InputClasses[I]));
+                            DasHasNativeRole(FindObject<UScriptStruct>(nullptr, *C.InputClasses[I]),
+                                             EDasNativeTypeRole::InputEvent);
                 if (Safe)
                     return true;
             }
             if (GeometrySnapshotDispatch && C.ReturnKind == EDasMethodSignature::Int && C.InputDirections.IsEmpty() &&
                 C.Inputs.Num() == 1 && C.Inputs[0] == EDasMethodSignature::Struct && C.InputClasses.Num() == 1 &&
-                DasIsGeometryType(FindObject<UScriptStruct>(nullptr, *C.InputClasses[0])))
+                DasHasNativeRole(FindObject<UScriptStruct>(nullptr, *C.InputClasses[0]), EDasNativeTypeRole::Geometry))
                 return true;
             if (!C.InputDirections.IsEmpty())
                 return false;

@@ -70,4 +70,5 @@ void RegisterBuiltinTypeAdapters(FDasTypeAdapters& Registry)
     Registry.Register(MakeDasRotatorAdapter(), &RotatorScript);
     Registry.Register(MakeDasTransformAdapter(), &TransformScript);
     Registry.Register(MakeDasInputActionValueAdapter(), &InputValueScript);
+    RegisterDasOpaqueTypeAdapters(Registry);
 }

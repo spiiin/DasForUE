@@ -431,7 +431,7 @@ bool ValidateDasCallbackPayload(const FDasScalarValue& Value, EDasCallbackUsage 
     if (!ValidateDasCallbackTypePath(TEXT("struct"), Value.ObjectClass, Error) ||
                                      !ValidateDasStructSnapshot(Value.StructValue, Error))
         return false;
-    if (Snapshot == FInputActionValue::StaticStruct())
+    if (DasHasNativeRole(Snapshot, EDasNativeTypeRole::InputActionValue))
     {
         const auto& V = Value.StructValue.Get<FInputActionValue>();
         const int32 Kind = int32(V.GetValueType());

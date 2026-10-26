@@ -1,8 +1,9 @@
+#include "DasTypeAdapters.h"
 #include "DasPaintTransport.h"
 #include "Blueprint/UserWidget.h"
 bool DasIsPaintContextType(const UScriptStruct* Type)
 {
-    return Type == FPaintContext::StaticStruct();
+    return DasHasNativeRole(Type, EDasNativeTypeRole::Paint);
 }
 bool DasPaintFunctionAllowed(const UFunction* F)
 {

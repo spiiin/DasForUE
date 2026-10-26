@@ -1,4 +1,6 @@
 #include "DasTypeAdapters.h"
+#include "DasSchema.h"
+#include "StructUtils/InstancedStruct.h"
 #include "UObject/Class.h"
 #include "UObject/UnrealType.h"
 
@@ -107,4 +109,41 @@ const IDasTypeAdapter* DasLeafValueAdapter(const FString& StructPath)
 {
     const auto* Adapter = FDasTypeAdapters::Get().FindStructPath(StructPath);
     return Adapter && Adapter->IsLeafValue() ? Adapter : nullptr;
+}
+
+const FDasNativeTypePolicy* DasNativeTypePolicy(const UScriptStruct* Type)
+{
+    const auto* A = FDasTypeAdapters::Get().FindStruct(Type);
+    return A ? A->GetNativePolicy() : nullptr;
+}
+bool DasHasNativeRole(const UScriptStruct* Type, EDasNativeTypeRole Role)
+{
+    const auto* P = DasNativeTypePolicy(Type);
+    return P && Role != EDasNativeTypeRole::None && EnumHasAllFlags(P->Roles, Role);
+}
+bool DasHasNativeRolePath(const FString& Path, EDasNativeTypeRole Role)
+{
+    const auto* A = FDasTypeAdapters::Get().FindStructPath(Path);
+    const auto* P = A ? A->GetNativePolicy() : nullptr;
+    return P && Role != EDasNativeTypeRole::None && EnumHasAllFlags(P->Roles, Role);
+}
+FString DasNativeTypePath(EDasNativeTypeRole Role)
+{
+    const UScriptStruct* Found = nullptr;
+    for (const auto& Entry : FDasTypeAdapters::Get().Entries())
+    {
+        const auto* P = Entry.Adapter->GetNativePolicy();
+        if (P && Role != EDasNativeTypeRole::None && EnumHasAllFlags(P->Roles, Role))
+        {
+            if (Found || !Entry.Adapter->GetStruct())
+                return {};
+            Found = Entry.Adapter->GetStruct();
+        }
+    }
+    return Found ? Found->GetPathName() : FString();
+}
+bool ValidateDasRegisteredSnapshot(const FInstancedStruct& Value, FString& Error)
+{
+    const auto* P = DasNativeTypePolicy(Value.GetScriptStruct());
+    return P && P->ValidateSnapshot ? P->ValidateSnapshot(Value, Error) : ValidateDasStructSnapshot(Value, Error);
 }

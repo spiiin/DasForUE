@@ -150,85 +150,13 @@ void ValidateCallField(FProperty* Property, const FString& Path, bool bInput, bo
     else if (FieldKind(Property, Context) == EMarshallingKind::Struct)
     {
         UScriptStruct* Type = CastFieldChecked<FStructProperty>(Property)->Struct;
-        if (DasIsWidgetAnimationType(Type))
+        if (const auto* Policy = DasNativeTypePolicy(Type); Policy && Policy->AllowCall)
         {
-            auto* Function = Cast<UFunction>(Property->GetOwnerStruct());
-            if (Depth != 0 || Property->ArrayDim != 1 || !Property->HasAnyPropertyFlags(CPF_ReturnParm) || bInput ||
-                !bOutput || !DasWidgetAnimationFunctionAllowed(Function))
-                Context->throw_error("WidgetAnimation requires exact scalar producer result");
+            if (!Policy->AllowCall(Property, bInput, bOutput, Depth))
+                Context->throw_error(Policy->CallError);
             Signature.Add({Path.ToLower(), EMarshallingKind::Struct, bInput, bOutput, Type->GetPathName()});
             return;
         }
-        if (DasIsPaintContextType(Type))
-        {
-            auto* Function = Cast<UFunction>(Property->GetOwnerStruct());
-            if (Depth != 0 || Property->ArrayDim != 1 || !Property->HasAnyPropertyFlags(CPF_Parm) ||
-                Property->HasAnyPropertyFlags(CPF_ReturnParm) || !DasPaintFunctionAllowed(Function))
-                Context->throw_error("PaintContext requires exact scalar synchronous OnPaint adapter");
-            Signature.Add({Path.ToLower(), EMarshallingKind::Struct, bInput, bOutput, Type->GetPathName()});
-            return;
-        }
-        if (DasIsEventReplyType(Type))
-        {
-            auto* Function = Cast<UFunction>(Property->GetOwnerStruct());
-            if (Depth != 0 || Property->ArrayDim != 1 || !Property->HasAnyPropertyFlags(CPF_Parm) ||
-                !DasEventReplyFunctionAllowed(Function))
-                Context->throw_error("EventReply requires exact scalar synchronous callback adapter");
-            Signature.Add({Path.ToLower(), EMarshallingKind::Struct, bInput, bOutput, Type->GetPathName()});
-            return;
-        }
-        if (DasIsGeometryType(Type))
-        {
-            auto* Function = Cast<UFunction>(Property->GetOwnerStruct());
-            if (Depth != 0 || Property->ArrayDim != 1 || !Property->HasAnyPropertyFlags(CPF_Parm) ||
-                !DasGeometryFunctionAllowed(Function))
-                Context->throw_error("Geometry requires exact scalar snapshot function allowlist");
-            Signature.Add({Path.ToLower(), EMarshallingKind::Struct, bInput, bOutput, Type->GetPathName()});
-            return;
-        }
-        if (DasIsInputEventType(Type))
-        {
-            auto* Function = Cast<UFunction>(Property->GetOwnerStruct());
-            if (Depth != 0 || Property->ArrayDim != 1 || !Property->HasAnyPropertyFlags(CPF_Parm) ||
-                !DasInputEventFunctionAllowed(Function))
-                Context->throw_error(
-                    "input events require exact scalar snapshot function allowlist; navigation/reply need live adapters");
-            Signature.Add({Path.ToLower(), EMarshallingKind::Struct, bInput, bOutput, Type->GetPathName()});
-            return;
-        }
-        if (Type == FInputActionValue::StaticStruct())
-        {
-            if (Property->ArrayDim != 1)
-                Context->throw_error("fixed InputActionValue arrays need an adapter");
-            Signature.Add({Path.ToLower(), EMarshallingKind::Struct, bInput, bOutput, Type->GetPathName()});
-            return;
-        }
-        // Native collision state is an opaque leaf; never flatten ActorInstanceHandle.
-        if (Type == FHitResult::StaticStruct())
-        {
-            if (Property->ArrayDim != 1)
-                Context->throw_error("fixed hit result arrays need an adapter");
-            Signature.Add({Path.ToLower(), EMarshallingKind::Struct, bInput, bOutput, Type->GetPathName()});
-            return;
-        }
-        if (Type == FConstraintInstanceAccessor::StaticStruct())
-        {
-            auto* Function = Cast<UFunction>(Property->GetOwnerStruct());
-            const bool Getter =
-                Function && Function->GetOuterUClass() == UPhysicsConstraintComponent::StaticClass() &&
-                Function->GetFName() == TEXT("GetConstraint") && Property->HasAnyPropertyFlags(CPF_ReturnParm);
-            const bool Consumer = Function &&
-                                  Function->GetOuterUClass() == UConstraintInstanceBlueprintLibrary::StaticClass() &&
-                                  !Property->HasAnyPropertyFlags(CPF_ReturnParm) && bInput;
-            if (Property->ArrayDim != 1 || !Property->HasAnyPropertyFlags(CPF_Parm) || (!Getter && !Consumer))
-                Context->throw_error("constraint accessors require scalar component-owned getter/library contract");
-            Signature.Add({Path.ToLower(), EMarshallingKind::Struct, bInput, bOutput, Type->GetPathName()});
-            return;
-        }
-        if (Type->GetPathName() == TEXT("/Script/Engine.BodyInstanceAsyncPhysicsTickHandle"))
-            Context->throw_error("async physics handles require a scoped frozen-game-thread physics callback adapter");
-        if (Type->GetPathName() == TEXT("/Script/Engine.ActorInstanceHandle"))
-            Context->throw_error("Actor instance handles require the collision result adapter");
         // Native opaque state cannot be described by reflection alone.
         if (Type->GetCppStructOps() && Type->GetCppStructOps()->HasAddStructReferencedObjects())
             Context->throw_error("structs with native object references are unsupported");

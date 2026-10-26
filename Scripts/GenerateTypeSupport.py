@@ -38,7 +38,7 @@ def validate_descriptor(t):
 
 def validate(data):
     fields(data, 'schema_version scope evidence aot_scope not_inferred adapters', 'root')
-    if type(data.get('schema_version')) is not int or data['schema_version'] != 1:
+    if type(data.get('schema_version')) is not int or data['schema_version'] != 2:
         raise ValueError('Unsupported type support schema')
     if not data.get('scope') or not data.get('evidence') or not data.get('not_inferred') or not data.get('aot_scope'):
         raise ValueError('Missing scope/evidence boundaries')
@@ -47,7 +47,7 @@ def validate(data):
     if not ids or ids != sorted(set(ids)):
         raise ValueError('Adapter identities must be unique and sorted')
     for a in adapters:
-        fields(a, 'id kind struct_path family leaf reference_value container_value_policy default_policy default_kind container_slots script samples', 'adapter')
+        fields(a, 'id kind struct_path family leaf reference_value container_value_policy default_policy default_kind container_slots script samples native_policy', 'adapter')
         for flag in ('family', 'leaf', 'reference_value', 'container_value_policy'):
             if type(a[flag]) is not bool:
                 raise ValueError('Invalid adapter policy: ' + flag)
@@ -62,6 +62,14 @@ def validate(data):
         for flag in ('registered', 'native_property', 'self_property', 'authored_reference'):
             if type(script[flag]) is not bool:
                 raise ValueError('Invalid script query: ' + flag)
+        native = a['native_policy']
+        if native is not None:
+            fields(native, 'roles transport handle lifetime storage_error call_constraint call_gate capture_snapshot validate_snapshot', 'native policy')
+            for flag in ('call_gate', 'capture_snapshot', 'validate_snapshot'):
+                if type(native[flag]) is not bool:
+                    raise ValueError('Invalid native policy flag')
+            if not native['lifetime'] or (native['capture_snapshot'] and not native['validate_snapshot']):
+                raise ValueError('Incomplete native lifetime/snapshot contract')
         sample_ids = [s['id'] for s in a['samples']]
         if sample_ids != sorted(set(sample_ids)):
             raise ValueError('Sample identities must be unique and sorted')
@@ -130,6 +138,18 @@ def render(data):
         bridges = ' / '.join(code(s[key]) for key in ('frame_bridge', 'method_bridge'))
         lines.append('| ' + ' | '.join((code(a['id']), code(s['module']), escape(uses) or '—', bridges,
                                        code(a['default_policy']), code(a['default_kind']))) + ' |')
+    lines += ['', '### Native transports and lifetime policies', '',
+              'Transport identifiers and native-call constraints come from the owning adapter. '
+              'A property ABI `Yes` above does not bypass this call gate or grant a scoped handle reflected storage. '
+              'Opaque handles keep their dedicated entry points; registration does not add generic DSL views.', '',
+              '| Adapter | Transport / handle | Lifetime | Native call constraint | Reflected storage constraint |',
+              '| --- | --- | --- | --- | --- |']
+    for a in data['adapters']:
+        n = a['native_policy']
+        if n is not None:
+            lines.append('| ' + ' | '.join((code(a['id']), code(n['transport']) + ' / ' + code(n['handle']),
+                                           code(n['lifetime']), escape(n['call_constraint']) or 'Generic',
+                                           escape(n['storage_error']) or 'Generic validation')) + ' |')
     lines += ['', f'Coverage: **{len(data["adapters"])} registered adapters, {count} representative descriptors**.', '',
               '**AOT:** ' + escape(data['aot_scope']) + '. '
               'A scalar-compatible binding can be AOT eligible while an opaque overload of the same operation '

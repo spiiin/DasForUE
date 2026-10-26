@@ -11,6 +11,41 @@ enum class EDasAdapterDefault : uint8
     ImplicitEmpty // authored fields take no initializer and export an empty default
 };
 
+class UScriptStruct;
+struct FInstancedStruct;
+
+// Roles identify existing transport contracts, not permission to use an opaque handle as a DSL value.
+enum class EDasNativeTypeRole : uint16
+{
+    None = 0,
+    Geometry = 1,
+    InputEvent = 2,
+    WidgetEvent = 4,
+    FocusEvent = 8,
+    PointerEvent = 16,
+    Paint = 32,
+    EventReply = 64,
+    WidgetAnimation = 128,
+    HitResult = 256,
+    Constraint = 512,
+    InputActionValue = 1024,
+    Rejected = 2048
+};
+ENUM_CLASS_FLAGS(EDasNativeTypeRole)
+
+struct FDasNativeTypePolicy
+{
+    EDasNativeTypeRole Roles = EDasNativeTypeRole::None;
+    const TCHAR* Transport = nullptr;
+    const char* Handle = nullptr;
+    const TCHAR* Lifetime = nullptr;
+    const TCHAR* StorageError = nullptr;
+    const char* CallError = nullptr;
+    bool (*AllowCall)(const FProperty*, bool Input, bool Output, int32 Depth) = nullptr;
+    bool (*Capture)(const UScriptStruct*, const void*, FInstancedStruct&, FString&) = nullptr;
+    bool (*ValidateSnapshot)(const FInstancedStruct&, FString&) = nullptr;
+};
+
 // A container composes child types through these slots. Descriptor traversal keeps one depth/node
 // budget; reflected readers never create carriers or load classes.
 struct FDasContainerSlot
@@ -26,6 +61,7 @@ class DASRUNTIME_API IDasTypeAdapter
 public:
     virtual ~IDasTypeAdapter() = default;
     virtual EDasTypeKind GetKind() const = 0;
+    virtual const FDasNativeTypePolicy* GetNativePolicy() const { return nullptr; }
     // Representative descriptors for diagnostics, not a second capability table. Nominal and dynamic
     // families provide their own samples; actual support is queried through the normal validators.
     virtual void GetSupportSamples(TArray<FDasDeclaredType>& Out) const;
@@ -101,6 +137,13 @@ private:
     TArray<int32> StructFamilies;
 };
 
+DASRUNTIME_API const FDasNativeTypePolicy* DasNativeTypePolicy(const UScriptStruct* Type);
+DASRUNTIME_API bool DasHasNativeRole(const UScriptStruct* Type, EDasNativeTypeRole Role);
+DASRUNTIME_API bool DasHasNativeRolePath(const FString& Path, EDasNativeTypeRole Role);
+// Unique role only; empty for an absent or ambiguous role.
+DASRUNTIME_API FString DasNativeTypePath(EDasNativeTypeRole Role);
+DASRUNTIME_API bool ValidateDasRegisteredSnapshot(const FInstancedStruct& Value, FString& Error);
+
 // Deterministic, versioned registry/facet contracts for documentation and drift checks.
 // Property ABI acceptance does not imply authored DSL, callback, generator or per-binding AOT support.
 DASRUNTIME_API FString DasTypeAdapterSupportManifest();
@@ -116,4 +159,5 @@ DASRUNTIME_API const IDasTypeAdapter* DasMathAdapter(const FString& StructPath);
 #if DAS_WITH_TEST_PROBES
 DASRUNTIME_API bool CheckDasTypeAdapters(FString& Error);
 DASRUNTIME_API bool CheckDasTypeAdapterSupport(FString& Error);
+DASRUNTIME_API bool CheckDasOpaqueTypeAdapters(FString& Error);
 #endif

@@ -253,7 +253,7 @@ FDasExecutionResult FDasRuntimeModule::RunCallback(const FString& Path, EDasCall
     }
     const bool WidgetPaintEntry = WidgetPaintContract && ActiveWidgetPaint && Signature == EDasMethodSignature::Void &&
                                   Frame && Frame->Num() == 1 && (*Frame)[0].Kind == 12 &&
-                                  (*Frame)[0].ObjectClass == TEXT("/Script/UMG.PaintContext");
+                                  DasHasNativeRolePath((*Frame)[0].ObjectClass, EDasNativeTypeRole::Paint);
     if (Frame)
         for (const auto& V : *Frame)
             if (V.Kind == 12)
@@ -262,10 +262,7 @@ FDasExecutionResult FDasRuntimeModule::RunCallback(const FString& Path, EDasCall
                     continue;
                 FString E;
                 if (!V.StructValue.IsValid() || V.StructValue.GetScriptStruct()->GetPathName() != V.ObjectClass ||
-                    !(DasIsGeometryType(V.StructValue.GetScriptStruct()) ? ValidateDasGeometrySnapshot(V.StructValue, E)
-                      : DasIsInputEventType(V.StructValue.GetScriptStruct())
-                          ? ValidateDasInputEventSnapshot(V.StructValue, E)
-                          : ValidateDasStructSnapshot(V.StructValue, E)))
+                    !ValidateDasRegisteredSnapshot(V.StructValue, E))
                 {
                     Result.Error = TEXT("Invalid reflected struct input: ")+ E;
                     return Result;
@@ -305,7 +302,7 @@ FDasExecutionResult FDasRuntimeModule::RunCallback(const FString& Path, EDasCall
             }
     const bool WidgetReplyEntry = WidgetReplyContract && ActiveWidgetReply &&
                                   Signature == EDasMethodSignature::Struct &&
-                                  ReturnClass == TEXT("/Script/UMG.EventReply");
+                                  DasHasNativeRolePath(ReturnClass, EDasNativeTypeRole::EventReply);
     if (Signature == EDasMethodSignature::Struct)
     {
         Expected.ReturnClass = ReturnClass;
@@ -799,7 +796,7 @@ FDasExecutionResult FDasRuntimeModule::RunCallback(const FString& Path, EDasCall
             if (WidgetReplyEntry)
                 Session->WidgetReplyEntries.Add(EntryPoint);
             if (FocusNotificationContract && Signature == EDasMethodSignature::Void && Frame && Frame->Num() == 1 &&
-                (*Frame)[0].ObjectClass == TEXT("/Script/SlateCore.FocusEvent"))
+                DasHasNativeRolePath((*Frame)[0].ObjectClass, EDasNativeTypeRole::FocusEvent))
                 Session->FocusNotificationEntries.Add(EntryPoint);
         }
         else if (Event == EDasCallback::Tick)
@@ -897,9 +894,10 @@ FDasExecutionResult FDasRuntimeModule::RunCallback(const FString& Path, EDasCall
                     else if (V.Kind == 12)
                     {
                         StructArgs.Add(StoreStructValue(V.StructValue, &Context));
-                        if (WidgetReplyEntry && DasIsInputEventType(V.StructValue.GetScriptStruct()))
+                        if (WidgetReplyEntry &&
+                            DasHasNativeRole(V.StructValue.GetScriptStruct(), EDasNativeTypeRole::InputEvent))
                             ActiveWidgetReply->NavigationInputToken = StructArgs.Last().Token;
-                        if (WidgetReplyEntry && V.ObjectClass == TEXT("/Script/SlateCore.PointerEvent"))
+                        if (WidgetReplyEntry && DasHasNativeRolePath(V.ObjectClass, EDasNativeTypeRole::PointerEvent))
                             ActiveWidgetReply->PointerToken = StructArgs.Last().Token;
                         Packed.push_back(das::cast<void*>::from(&StructArgs.Last()));
                     }

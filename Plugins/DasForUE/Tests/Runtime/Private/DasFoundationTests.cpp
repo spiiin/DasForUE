@@ -81,6 +81,9 @@ bool RunDasFoundationTests(FString& Report)
         AdapterError.Reset();
         Expect(CheckDasTypeAdapterSupport(AdapterError), TEXT("type_adapter_support_materializes_contracts"),
                                                               AdapterError);
+        AdapterError.Reset();
+        Expect(CheckDasOpaqueTypeAdapters(AdapterError), TEXT("opaque_adapter_call_and_lifetime_contracts"),
+                                                              AdapterError);
     }
 #if WITH_EDITOR
     {

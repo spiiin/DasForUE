@@ -5,6 +5,7 @@
 #include "UObject/FieldPath.h"
 #include "DasGameplayTags.h"
 #include "DasTypeAdapters.h"
+#include "DasOpaqueTypeAdapters.h"
 #include "DasContainerAdapters.h"
 #include "DasInterfaceContracts.h"
 #include "DasEnumAdapter.h"
@@ -626,6 +627,8 @@ void FDasRuntimeModule::StartupModule()
     UEAotEntries.Reset();
     das::Module::Initialize();
     new FUnrealFoundationModule();
+    // Materialize native transport identities on the module startup thread before background readers.
+    FDasTypeAdapters::Get();
     InputRestoreTickHandle = FWorldDelegates::OnWorldTickStart.AddLambda([](UWorld* World, ELevelTick, float)
                                                                          { ReconcileScriptInput(World); });
     WorldCleanupHandle = FWorldDelegates::OnWorldCleanup.AddLambda(

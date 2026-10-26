@@ -1,3 +1,8 @@
+#include "Blueprint/UserWidget.h"
+#include "Blueprint/WidgetBlueprintLibrary.h"
+#include "Components/Widget.h"
+#include "PhysicsEngine/PhysicsConstraintComponent.h"
+#include "PhysicsEngine/ConstraintInstanceBlueprintLibrary.h"
 #include "DasTypeAdapters.h"
 #include "DasValueKinds.h"
 #include "DasInterfaceContracts.h"
@@ -341,4 +346,100 @@ bool CheckDasTypeAdapterSupport(FString& Error)
     }
     Error.Reset();
     return Positive > 0 && Negative > 0;
+}
+
+
+bool CheckDasOpaqueTypeAdapters(FString& Error)
+{
+    using Role = EDasNativeTypeRole;
+    int32 InputEvents = 0, WidgetEvents = 0, Rejected = 0;
+    for (const auto& Entry : FDasTypeAdapters::Get().Entries())
+    {
+        const auto* P = Entry.Adapter->GetNativePolicy();
+        if (!P)
+            continue;
+        if (!P->Lifetime || !P->AllowCall || !P->CallError || Entry.Adapter->IsLeafValue())
+        {
+            Error = TEXT("Opaque policy lost a gate or became a generic authored leaf");
+            return false;
+        }
+        if (EnumHasAnyFlags(P->Roles, Role::InputEvent))
+        {
+            ++InputEvents;
+            WidgetEvents += EnumHasAnyFlags(P->Roles, Role::WidgetEvent);
+            if (!P->Capture || !P->ValidateSnapshot || !P->StorageError)
+            {
+                Error = TEXT("Detached input lost snapshot validation/storage restrictions");
+                return false;
+            }
+        }
+        if (EnumHasAnyFlags(P->Roles, Role::Paint | Role::EventReply | Role::WidgetAnimation | Role::Constraint |
+                                          Role::HitResult) &&
+            P->Capture)
+        {
+            Error = TEXT("Scoped/weak/dedicated capability opened generic snapshot capture");
+            return false;
+        }
+        if (EnumHasAnyFlags(P->Roles, Role::Rejected))
+        {
+            ++Rejected;
+            if (P->Transport || P->Handle || P->AllowCall(nullptr, true, true, 0))
+            {
+                Error = TEXT("Internal handle acquired a native binding contract");
+                return false;
+            }
+        }
+    }
+    if (InputEvents != 7 || WidgetEvents != 5 || Rejected != 2 || !DasNativeTypePath(Role::InputEvent).IsEmpty())
+    {
+        Error = TEXT("Opaque families lost exact widget membership or ambiguous-role protection");
+        return false;
+    }
+    auto Gate = [&](Role R, UFunction* F, bool In, bool Out, bool Return, int32 Depth, int32 ArrayDim)
+    {
+        const FString Path = DasNativeTypePath(R);
+        const auto* A = FDasTypeAdapters::Get().FindStructPath(Path);
+        const auto* P = A ? A->GetNativePolicy() : nullptr;
+        if (!F || !A || !P || !P->AllowCall)
+            return false;
+        auto Field = MakeUnique<FStructProperty>(FFieldVariant(F), TEXT("PolicyProbe"));
+        Field->Struct = const_cast<UScriptStruct*>(A->GetStruct());
+        Field->ArrayDim = ArrayDim;
+        Field->SetPropertyFlags(CPF_Parm | (Return ? CPF_ReturnParm : CPF_None));
+        return P->AllowCall(Field.Get(), In, Out, Depth);
+    };
+    auto* Geometry = UWidget::StaticClass()->FindFunctionByName(TEXT("GetCachedGeometry"));
+    auto* Paint = UWidgetBlueprintLibrary::StaticClass()->FindFunctionByName(TEXT("DrawBox"));
+    auto* Reply = UWidgetBlueprintLibrary::StaticClass()->FindFunctionByName(TEXT("Handled"));
+    auto* Animation = UUserWidget::StaticClass()->FindFunctionByName(TEXT("PlayAnimation"));
+    auto* Constraint = UPhysicsConstraintComponent::StaticClass()->FindFunctionByName(TEXT("GetConstraint"));
+    UFunction* Consumer = nullptr;
+    for (TFieldIterator<UFunction> It(UConstraintInstanceBlueprintLibrary::StaticClass()); It; ++It)
+        if (It->GetOuterUClass() == UConstraintInstanceBlueprintLibrary::StaticClass())
+        {
+            Consumer = *It;
+            break;
+        }
+    const bool Valid =
+        Gate(Role::Geometry, Geometry, false, true, true, 0, 1) &&
+        !Gate(Role::Geometry, Geometry, false, true, true, 1, 1) &&
+        !Gate(Role::Geometry, Geometry, false, true, true, 0, 2) &&
+        !Gate(Role::Geometry, Reply, false, true, true, 0, 1) && Gate(Role::Paint, Paint, true, false, false, 0, 1) &&
+        !Gate(Role::Paint, Paint, false, true, true, 0, 1) && Gate(Role::EventReply, Reply, false, true, true, 0, 1) &&
+        !Gate(Role::EventReply, Reply, false, true, true, 1, 1) &&
+        Gate(Role::WidgetAnimation, Animation, false, true, true, 0, 1) &&
+        !Gate(Role::WidgetAnimation, Animation, true, true, true, 0, 1) &&
+        !Gate(Role::WidgetAnimation, Animation, false, true, false, 0, 1) &&
+        Gate(Role::Constraint, Constraint, false, true, true, 0, 1) &&
+        Gate(Role::Constraint, Consumer, true, false, false, 0, 1) &&
+        !Gate(Role::Constraint, Consumer, false, true, true, 0, 1) &&
+        Gate(Role::HitResult, Geometry, true, false, false, 2, 1) &&
+        !Gate(Role::HitResult, Geometry, true, false, false, 0, 2);
+    if (!Valid)
+    {
+        Error = TEXT("Native policy lost exact function/direction/depth/fixed-array restrictions");
+        return false;
+    }
+    Error.Reset();
+    return true;
 }

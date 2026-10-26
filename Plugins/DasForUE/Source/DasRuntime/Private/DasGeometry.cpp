@@ -1,3 +1,4 @@
+#include "DasTypeAdapters.h"
 #include "DasGeometry.h"
 #include "DasExecutionRole.h"
 #include "Layout/Geometry.h"
@@ -56,7 +57,7 @@ bool TransformSafe(const FGeometry& G, FVector2D V, bool Inverse, bool Vector, b
 }
 bool DasIsGeometryType(const UScriptStruct* T)
 {
-    return T == FGeometry::StaticStruct();
+    return DasHasNativeRole(T, EDasNativeTypeRole::Geometry);
 }
 bool ValidateDasGeometryData(const UScriptStruct* T, const void* Data, FString& E, bool Inverse)
 {

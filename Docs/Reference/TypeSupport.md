@@ -32,9 +32,24 @@ Generated from the live registry export in [Bindings/TypeSupport.json](../../Bin
 | <code>struct:/Script/CoreUObject.Transform</code> | Yes | Yes | Yes | Yes | Yes | No | No |
 | <code>struct:/Script/CoreUObject.Vector</code> | Yes | Yes | Yes | Yes | Yes | No | No |
 | <code>struct:/Script/CoreUObject.Vector2D</code> | Yes | Yes | Yes | Yes | Yes | No | No |
+| <code>struct:/Script/Engine.ActorInstanceHandle</code> | Yes | No | Yes | Yes | Yes | No | No |
+| <code>struct:/Script/Engine.BodyInstanceAsyncPhysicsTickHandle</code> | Yes | Yes | Yes | Yes | Yes | No | No |
+| <code>struct:/Script/Engine.ConstraintInstanceAccessor</code> | Yes | No | Yes | Yes | Yes | No | No |
+| <code>struct:/Script/Engine.HitResult</code> | Yes | No | Yes | Yes | Yes | No | No |
 | <code>struct:/Script/EnhancedInput.InputActionValue</code> | Yes | Yes | Yes | Yes | Yes | No | No |
 | <code>struct:/Script/GameplayTags.GameplayTag</code> | Yes | Yes | Yes | Yes | Yes | No | No |
 | <code>struct:/Script/GameplayTags.GameplayTagContainer</code> | Yes | Yes | Yes | Yes | Yes | No | No |
+| <code>struct:/Script/SlateCore.AnalogInputEvent</code> | Yes | No | Yes | Yes | Yes | No | No |
+| <code>struct:/Script/SlateCore.CharacterEvent</code> | Yes | No | Yes | Yes | Yes | No | No |
+| <code>struct:/Script/SlateCore.FocusEvent</code> | Yes | No | Yes | Yes | Yes | No | No |
+| <code>struct:/Script/SlateCore.Geometry</code> | Yes | No | Yes | Yes | Yes | No | No |
+| <code>struct:/Script/SlateCore.InputEvent</code> | Yes | No | Yes | Yes | Yes | No | No |
+| <code>struct:/Script/SlateCore.KeyEvent</code> | Yes | No | Yes | Yes | Yes | No | No |
+| <code>struct:/Script/SlateCore.NavigationEvent</code> | Yes | No | Yes | Yes | Yes | No | No |
+| <code>struct:/Script/SlateCore.PointerEvent</code> | Yes | No | Yes | Yes | Yes | No | No |
+| <code>struct:/Script/UMG.EventReply</code> | Yes | No | Yes | Yes | Yes | No | No |
+| <code>struct:/Script/UMG.PaintContext</code> | Yes | No | Yes | Yes | Yes | No | No |
+| <code>struct:/Script/UMG.WidgetAnimationHandle</code> | Yes | No | Yes | Yes | Yes | No | No |
 | <code>struct:/Script/DasRuntime.DasSoftClass_f6005a7380ac4daaf37e8e855ef43965</code> | Yes | Yes | Yes | Yes | Yes | No | No |
 | <code>struct:/Script/DasRuntime.DasSoftObject_f6005a7380ac4daaf37e8e855ef43965</code> | Yes | Yes | Yes | Yes | Yes | No | No |
 | <code>text</code> | Yes | Yes | Yes | Yes | Yes | No | No |
@@ -62,13 +77,51 @@ These are adapter/facet declarations, not an independent support table. `—` me
 | <code>struct:/Script/CoreUObject.Transform</code> | <code>ue_foundation</code> | native_property, self_property, authored_reference | <code>transform</code> / <code>transform</code> | <code>explicit</code> | <code>transform</code> |
 | <code>struct:/Script/CoreUObject.Vector</code> | <code>ue_foundation</code> | native_property, self_property, authored_reference | <code>vector</code> / <code>vector</code> | <code>explicit</code> | <code>vector</code> |
 | <code>struct:/Script/CoreUObject.Vector2D</code> | <code>ue_foundation</code> | native_property, self_property | — / — | <code>explicit</code> | <code>vector2d</code> |
+| <code>struct:/Script/Engine.ActorInstanceHandle</code> | — | — | — / — | <code>explicit</code> | — |
+| <code>struct:/Script/Engine.BodyInstanceAsyncPhysicsTickHandle</code> | — | — | — / — | <code>explicit</code> | — |
+| <code>struct:/Script/Engine.ConstraintInstanceAccessor</code> | — | — | — / — | <code>explicit</code> | — |
+| <code>struct:/Script/Engine.HitResult</code> | — | — | — / — | <code>explicit</code> | — |
 | <code>struct:/Script/EnhancedInput.InputActionValue</code> | <code>ue_foundation</code> | — | — / <code>input_value</code> | <code>explicit</code> | — |
 | <code>struct:/Script/GameplayTags.GameplayTag</code> | <code>ue_gameplay_tags</code> | native_property | — / — | <code>implicit_empty</code> | — |
 | <code>struct:/Script/GameplayTags.GameplayTagContainer</code> | <code>ue_gameplay_tags</code> | native_property | — / — | <code>implicit_empty</code> | — |
+| <code>struct:/Script/SlateCore.AnalogInputEvent</code> | — | — | — / — | <code>explicit</code> | — |
+| <code>struct:/Script/SlateCore.CharacterEvent</code> | — | — | — / — | <code>explicit</code> | — |
+| <code>struct:/Script/SlateCore.FocusEvent</code> | — | — | — / — | <code>explicit</code> | — |
+| <code>struct:/Script/SlateCore.Geometry</code> | — | — | — / — | <code>explicit</code> | — |
+| <code>struct:/Script/SlateCore.InputEvent</code> | — | — | — / — | <code>explicit</code> | — |
+| <code>struct:/Script/SlateCore.KeyEvent</code> | — | — | — / — | <code>explicit</code> | — |
+| <code>struct:/Script/SlateCore.NavigationEvent</code> | — | — | — / — | <code>explicit</code> | — |
+| <code>struct:/Script/SlateCore.PointerEvent</code> | — | — | — / — | <code>explicit</code> | — |
+| <code>struct:/Script/UMG.EventReply</code> | — | — | — / — | <code>explicit</code> | — |
+| <code>struct:/Script/UMG.PaintContext</code> | — | — | — / — | <code>explicit</code> | — |
+| <code>struct:/Script/UMG.WidgetAnimationHandle</code> | — | — | — / — | <code>explicit</code> | — |
 | <code>struct:family</code> | <code>ue_native_gameplay</code> | native_property | — / — | <code>implicit_empty</code> | — |
 | <code>text</code> | <code>ue_foundation</code> | native_property, self_property, authored_reference | — / — | <code>explicit</code> | — |
 
-Coverage: **22 registered adapters, 25 representative descriptors**.
+### Native transports and lifetime policies
+
+Transport identifiers and native-call constraints come from the owning adapter. A property ABI `Yes` above does not bypass this call gate or grant a scoped handle reflected storage. Opaque handles keep their dedicated entry points; registration does not add generic DSL views.
+
+| Adapter | Transport / handle | Lifetime | Native call constraint | Reflected storage constraint |
+| --- | --- | --- | --- | --- |
+| <code>struct:/Script/Engine.ActorInstanceHandle</code> | — / — | <code>rejected_internal_handle</code> | Actor instance handles require the collision result adapter | Actor instance handles require the collision result adapter |
+| <code>struct:/Script/Engine.BodyInstanceAsyncPhysicsTickHandle</code> | — / — | <code>rejected_internal_handle</code> | async physics handles require a scoped frozen-game-thread physics callback adapter | Generic validation |
+| <code>struct:/Script/Engine.ConstraintInstanceAccessor</code> | <code>constraint_component_v1</code> / <code>UEConstraintHandle</code> | <code>component_owned_capability</code> | constraint accessors require scalar component-owned getter/library contract | Generic validation |
+| <code>struct:/Script/Engine.HitResult</code> | <code>hit_result_v1</code> / <code>UEHitResult</code> | <code>owned_collision_snapshot</code> | fixed hit result arrays need an adapter | Generic validation |
+| <code>struct:/Script/EnhancedInput.InputActionValue</code> | <code>input_action_value_v1</code> / <code>InputActionValue</code> | <code>owned_input_value</code> | fixed InputActionValue arrays need an adapter | Generic validation |
+| <code>struct:/Script/SlateCore.AnalogInputEvent</code> | <code>slate_input_event_snapshot_v1</code> / <code>UEAnalogInputEvent</code> | <code>detached_snapshot</code> | input events require exact scalar snapshot function allowlist; navigation/reply need live adapters | Input events require detached snapshot transport, not reflected storage/defaults |
+| <code>struct:/Script/SlateCore.CharacterEvent</code> | <code>slate_input_event_snapshot_v1</code> / <code>UECharacterEvent</code> | <code>detached_snapshot</code> | input events require exact scalar snapshot function allowlist; navigation/reply need live adapters | Input events require detached snapshot transport, not reflected storage/defaults |
+| <code>struct:/Script/SlateCore.FocusEvent</code> | <code>slate_input_event_snapshot_v1</code> / <code>UEFocusEvent</code> | <code>detached_snapshot</code> | input events require exact scalar snapshot function allowlist; navigation/reply need live adapters | Input events require detached snapshot transport, not reflected storage/defaults |
+| <code>struct:/Script/SlateCore.Geometry</code> | <code>slate_geometry_snapshot_v1</code> / <code>UEGeometry</code> | <code>owned_snapshot</code> | Geometry requires exact scalar snapshot function allowlist | Geometry requires owned snapshot transport, not reflected storage/defaults |
+| <code>struct:/Script/SlateCore.InputEvent</code> | <code>slate_input_event_snapshot_v1</code> / <code>UEInputEvent</code> | <code>detached_snapshot</code> | input events require exact scalar snapshot function allowlist; navigation/reply need live adapters | Input events require detached snapshot transport, not reflected storage/defaults |
+| <code>struct:/Script/SlateCore.KeyEvent</code> | <code>slate_input_event_snapshot_v1</code> / <code>UEKeyEvent</code> | <code>detached_snapshot</code> | input events require exact scalar snapshot function allowlist; navigation/reply need live adapters | Input events require detached snapshot transport, not reflected storage/defaults |
+| <code>struct:/Script/SlateCore.NavigationEvent</code> | <code>slate_input_event_snapshot_v1</code> / <code>UENavigationEvent</code> | <code>detached_snapshot</code> | input events require exact scalar snapshot function allowlist; navigation/reply need live adapters | Input events require detached snapshot transport, not reflected storage/defaults |
+| <code>struct:/Script/SlateCore.PointerEvent</code> | <code>slate_input_event_snapshot_v1</code> / <code>UEPointerEvent</code> | <code>detached_snapshot</code> | input events require exact scalar snapshot function allowlist; navigation/reply need live adapters | Input events require detached snapshot transport, not reflected storage/defaults |
+| <code>struct:/Script/UMG.EventReply</code> | <code>scoped_event_reply_v1</code> / <code>UEEventReply</code> | <code>synchronous_callback_scope</code> | EventReply requires exact scalar synchronous callback adapter | EventReply requires a synchronous callback, not reflected storage/defaults |
+| <code>struct:/Script/UMG.PaintContext</code> | <code>scoped_paint_context_v1</code> / <code>UEPaintContext</code> | <code>synchronous_paint_scope</code> | PaintContext requires exact scalar synchronous OnPaint adapter | PaintContext requires synchronous OnPaint, not reflected storage/defaults |
+| <code>struct:/Script/UMG.WidgetAnimationHandle</code> | <code>weak_widget_animation_v1</code> / <code>UEWidgetAnimationHandle</code> | <code>weak_widget_context_capability</code> | WidgetAnimation requires exact scalar producer result | WidgetAnimation requires a weak context capability, not reflected storage/defaults |
+
+Coverage: **37 registered adapters, 40 representative descriptors**.
 
 **AOT:** per binding; not inferred from a type adapter. A scalar-compatible binding can be AOT eligible while an opaque overload of the same operation is closed. A type-level `Yes` would be misleading.
 

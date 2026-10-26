@@ -210,6 +210,22 @@ function Invoke-DasValidation {
     Write-Output "$SuccessMarker checks=$Checks"
 }
 
+# Windows PowerShell turns native stderr into ErrorRecord objects under Stop. unittest writes its
+# normal progress/report there; only its exit code decides success. Restore the caller's policy.
+function Invoke-DasPythonTests {
+    param([Parameter(Mandatory)][string[]]$Path, [string]$Python='C:/Python312/python.exe', [string]$Log)
+    foreach ($TestPath in $Path) {
+        $Previous = $ErrorActionPreference
+        $ErrorActionPreference = 'Continue'
+        try {
+            if ($Log) { & $Python $TestPath *> $Log }
+            else { & $Python $TestPath 2>&1 | ForEach-Object { "$_" } }
+            $Code = $LASTEXITCODE
+        } finally { $ErrorActionPreference = $Previous }
+        if ($Code) { throw "Python tests failed ($Code): $TestPath" }
+    }
+}
+
 Export-ModuleMember -Function Get-DasContext, Invoke-DasBuild, Assert-DasLog, Invoke-DasCommandlet, Invoke-DasAutomation,
     Invoke-DasPackaged, Invoke-DasAssetPhases, Test-DasResult, Get-DasResult, Assert-DasResult,
-    Lock-SourceHashes, Write-DasValidation, Get-DasValidationPaths, Invoke-DasValidation -Variable DasEngineErrorPattern
+    Lock-SourceHashes, Write-DasValidation, Get-DasValidationPaths, Invoke-DasValidation, Invoke-DasPythonTests -Variable DasEngineErrorPattern

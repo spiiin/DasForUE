@@ -131,7 +131,7 @@ bool DispatchEventReplyCall(FMarshalledCall& Call, das::Context* C)
     else
         C->throw_error("unsupported EventReply adapter");
     for (const auto& Field : Call.Signature)
-        if (Field.bOutput && Field.TypePath == TEXT("/Script/UMG.EventReply"))
+        if (Field.bOutput && DasHasNativeRolePath(Field.TypePath, EDasNativeTypeRole::EventReply))
             Call.WidgetReplyFields.Add(Field.Path, Out.Token);
     return true;
 }

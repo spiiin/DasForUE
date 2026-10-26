@@ -11,6 +11,18 @@ ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'Plugins',
 
 # Ported type -> (patterns, files allowed to contain them).
 PORTED = {
+    'OpaqueNativePolicies': (
+        [r'\bDasIs(?:Geometry|InputEvent|PaintContext|WidgetAnimation|EventReply)Type\b'],
+        {'DasGeometry.h', 'DasGeometry.cpp', 'DasGeometryRuntime.inl',
+         'DasInputEvents.h', 'DasInputEvents.cpp', 'DasInputEventsRuntime.inl',
+         'DasEventReplyTransport.h', 'DasEventReplyTransport.cpp', 'DasEventReplyCalls.inl',
+         'DasPaintTransport.h', 'DasPaintTransport.cpp', 'DasPaintRuntime.inl',
+         'DasWidgetAnimationTransport.h', 'DasWidgetAnimationTransport.cpp', 'DasWidgetAnimationRuntime.inl'},
+    ),
+    'OpaqueNativeIdentity': (
+        [r'"/Script/(?:SlateCore\.(?:Geometry|InputEvent|KeyEvent|AnalogInputEvent|CharacterEvent|PointerEvent|NavigationEvent|FocusEvent)|UMG\.(?:EventReply|PaintContext|WidgetAnimationHandle)|Engine\.(?:ActorInstanceHandle|BodyInstanceAsyncPhysicsTickHandle))"'],
+        {'DasOpaqueTypeAdapters.cpp'},
+    ),
     'ContainerPropertyFactory': (
         [r'\bnew F(?:Array|Set|Map)Property\b'],
         {'DasContainerAdapters.cpp'},

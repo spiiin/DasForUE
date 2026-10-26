@@ -2,7 +2,7 @@ param([string]$Engine='C:/src/unreal/UnrealEngine',[switch]$SkipBuild,[switch]$P
 Import-Module (Join-Path $PSScriptRoot 'DasTest.psm1') -Force
 
 $ErrorActionPreference='Stop';$Repo=Split-Path -Parent $PSScriptRoot;$Python='C:/Python312/python.exe';$Project="$Repo/Tests/DasForUESmoke/DasForUESmoke.uproject"
-& $Python "$PSScriptRoot/TestEventReplyGenerator.py";if($LASTEXITCODE){throw 'EventReply generator tests failed'}
+Invoke-DasPythonTests -Python $Python -Path "$PSScriptRoot/TestEventReplyGenerator.py";if($LASTEXITCODE){throw 'EventReply generator tests failed'}
 if(!$SkipBuild){Invoke-DasBuild (Get-DasContext -Engine $Engine) -BuildArguments @(
     'DasForUESmokeEditor', 'Win64', 'Development', "-Project=$Project", '-WaitMutex', '-NoXGE',
     '-MaxParallelActions=8', "-Log=$Repo/logs/event-reply-build.log") *> "$Repo/logs/event-reply-build-stdout.log";if($LASTEXITCODE){throw 'EventReply build failed'}}

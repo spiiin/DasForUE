@@ -1,6 +1,6 @@
 # Адаптеры типов
 
-Статус (2026-10-26): реестр, переносы основных семейств, контейнерные комбинаторы, map interop и генерация контрактов поддержки реализованы. Перенос оставшихся специальных типов продолжается. План: [ImprovementPlan](../Plans/ImprovementPlan.md), фаза 2.
+Статус (2026-10-26): реестр, переносы основных семейств, контейнерные комбинаторы, map interop и генерация контрактов поддержки реализованы. Перенос текущих специальных UI/collision/constraint-типов завершён; lifetime и native-call ограничения сохранены. План: [ImprovementPlan](../Plans/ImprovementPlan.md), фаза 2.
 
 Отличия реализации от эскиза ниже:
 - скриптовый фасет передаётся при регистрации (`Register(Adapter, &Facet)`), а не через метод адаптера:
@@ -494,3 +494,48 @@ property-context results (127 supported, 48 rejected with reasons). Export from 
 matches the baseline; generated documentation is current. All 377 Python tests passed (16 new
 support/schema/renderer tests); Foundation passed with zero failures, including live manifest
 comparison and positive/negative property materialization. Staged C++ formatting and guard audit pass.
+
+
+## Opaque native types (remaining step 2.2 ports)
+
+`DasOpaqueTypeAdapters.cpp` owns Geometry, the seven Slate input event identities, EventReply,
+PaintContext, WidgetAnimationHandle, HitResult and ConstraintInstanceAccessor policies. Internal
+ActorInstanceHandle and BodyInstanceAsyncPhysicsTickHandle register explicit rejected call contracts.
+InputActionValue's existing adapter now owns its native call/export policy as well.
+
+`FDasNativeTypePolicy` contains native transport ID, script handle metadata, lifetime, storage
+rejection, exact native-call gate and optional capture/validation hooks. Shared marshalling,
+binding export, storage validation and snapshot publication query it. Geometry/input remain owned,
+detached snapshots; reply/paint epochs, weak animation leases, hit GC roots and component-owned
+constraint services stay in their existing codecs. No generic script facet or authoring leaf is
+added for scoped handles, so registration cannot expose unrestricted fields/defaults or callbacks.
+Widget contracts use adapter role membership and handle names; the five input types admitted by
+widget callbacks remain distinct from base InputEvent and NavigationEvent.
+
+Support JSON schema 2 includes native transport/lifetime/gate metadata. Property ABI evidence stays
+separate from native-call and authored-storage constraints. Architecture gates forbid opaque type
+path literals and legacy selectors in generic layers; codec-local compatibility helpers delegate
+identity to the registry. Existing transports/allowlists retain their IDs and semantics.
+
+
+Validation of the opaque ports (2026-10-26): `opaque-adapters-bootstrap2` built/exported
+successfully; `opaque-adapters-core` passed fresh support export/drift, Foundation, 379 Python
+tests and 23 linked-AOT checks. The new native contract probe verifies function ownership,
+direction, depth/fixed-array limits, seven detached input identities, five widget-input identities,
+rejected internal types and absence of generic capture on scoped/weak/dedicated capabilities.
+Registry export: 37 adapters, 40 samples, 16 native policies.
+
+All nine transport suites passed across `opaque-adapters-transports2`,
+`opaque-adapters-remaining` and `opaque-adapters-ui`: Geometry, input events, reply, paint,
+widget animation, constraints, collision, widget events and navigation (24 runtime checks).
+MethodValues Create/Reopen and all 51 editor/PIE automation tests passed in `opaque-adapters-ui`.
+The final local Python rerun also passed all 379 tests. No new arbitrary reflected storage,
+generic authoring views or type-wide AOT permission is granted by opaque registration.
+
+The old published UMG baseline and fresh export have identical statuses for all 517 functions:
+409 ready, 108 blocked, zero generation blockers. Navigation's obsolete 407/110 literal was
+replaced by exact package/engine/count comparison with the tracked published summary.
+Legacy runners now use the shared `Invoke-DasPythonTests` helper so Windows PowerShell's
+stderr handling cannot mistake normal unittest progress for failure; exit 0/stderr and exit 7
+with restored caller error policy were verified. Constraint's optional cross-package comparison
+uses only present baselines and writes diagnostic reports into staging, not delivered docs.
