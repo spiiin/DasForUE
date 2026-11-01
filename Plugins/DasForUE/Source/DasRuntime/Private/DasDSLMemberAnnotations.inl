@@ -305,20 +305,9 @@ struct FUENativeBaseAnnotation : das::StructureAnnotation
             if (Args.size() != 1 || Args[0].name != "path")
                 DSLFail(TEXT("Expected ue_native_base(path=NativeClassPath)"));
             const FString Path = DSLString(Args, "path");
-            if (!DasActorNativeParent(Path) &&
-                Path != TEXT("/Script/Engine.WorldSubsystem") &&
-                             Path != TEXT("/Script/Engine.GameInstanceSubsystem") &&
-                                          Path != TEXT("/Script/Engine.ActorComponent") &&
-                                                       Path !=
-                                                           TEXT("/Script/Engine.SaveGame") &&
-                                                                Path !=
-                                                                    TEXT("/Script/Engine.DataAsset") &&
-                                                                         Path !=
-                                                                             TEXT("/Script/Engine.PrimaryDataAsset"))
-                DSLFail(TEXT("Unsupported native DSL base; expected Actor, Pawn, Character, ActorComponent, SaveGame, DataAsset or PrimaryDataAsset"));
-            auto* Native = FindObject<UClass>(nullptr, *Path);
-            if (!Native || !Native->HasAnyClassFlags(CLASS_Native) || Native->HasAnyClassFlags(CLASS_Interface))
-                DSLFail(TEXT("Native DSL base class is not loaded"));
+            auto* Native = LoadObject<UClass>(nullptr, *Path, nullptr, LOAD_NoWarn);
+            if (!Native || Native->HasAnyClassFlags(CLASS_Interface | CLASS_Deprecated | CLASS_NewerVersionExists))
+                DSLFail(TEXT("DSL base requires an existing, non-interface, non-obsolete UE class"));
             if (!St->isClass || St->parent)
                 DSLFail(TEXT("Native DSL base requires an empty root class"));
             for (const auto& F : St->fields)

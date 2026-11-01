@@ -111,8 +111,8 @@ struct FUEClassAnnotation : das::StructureAnnotation
                 if (const auto* ParentAnnotation = DSLAnnotation(NativeRoot->annotations, "ue_class"))
                     NativeHint = DSLString(ParentAnnotation->arguments, "parent", TEXT("/Script/Engine.Actor"));
             if (!NativeHint.StartsWith(TEXT("/")))
-                NativeHint = DSLResolveType(
-                    EDSLTypeKind::Class, NativeHint,
+                NativeHint = DSLResolveParent(
+                    NativeHint,
                     FDSLTypeScope{DSLString(Args, "module_id", FPaths::GetBaseFilename(DSLText(St->at.fileInfo->name))),
                                   DSLString(Args, "type_folder"), DSLString(Args, "type_registry"), &Group,
                                   St->module});
@@ -235,7 +235,7 @@ struct FUEClassAnnotation : das::StructureAnnotation
             }
             else
                 C.NativeParent = NativeBase.IsEmpty()
-                    ? DSLResolveType(EDSLTypeKind::Class, DSLString(Args, "parent", TEXT("/Script/Engine.Actor")),
+                    ? DSLResolveParent(DSLString(Args, "parent", TEXT("/Script/Engine.Actor")),
                                                                     TypeScope)
                                      : NativeBase;
             if (const auto* A = DSLAnnotation(St->annotations, "ue_async_physics"))

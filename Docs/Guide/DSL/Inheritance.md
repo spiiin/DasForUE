@@ -33,6 +33,12 @@ Examples: `ue_inheritance_base.das`, `dsl_inheritance_child.das`,
 
 ## Roots and parents
 
+Additional native/Blueprint parents use the [generic parent path](Classes.md#other-blueprint-parents).
+Their exact UE parent is retained without a new C++ host. The native-host reload
+policies below do not extend to this path: structural/default reimport is refused
+for now, while body-only updates are supported.
+
+
 - The root of a hierarchy is a native host marker: `Actor`, `Pawn`, `Character` or
   `ActorComponent` (see [Classes](Classes.md#choosing-the-parent)). Authored
   Actor/Pawn/Character and authored ActorComponent hierarchies are supported.

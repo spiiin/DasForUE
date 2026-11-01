@@ -4,6 +4,9 @@
 #include "DasPropertyTypes.h"
 #include "DasDefaultRoots.h"
 #include "DasScriptHosts.h"
+#include "DasGenericParents.h"
+#include "DasScriptClassData.h"
+#include "DasGenericBlueprints.h"
 #include "DasSaveGame.h"
 #include "DasSubsystems.h"
 #include "DasDataAssets.h"
@@ -120,6 +123,8 @@ bool AdapterCall(const UK2Node_CallFunction* Call)
     const auto* T = Call->GetTargetFunction();
     if (!T)
         return false;
+    if (T->GetOwnerClass() == UDasObjectScriptLibrary::StaticClass())
+        return true;
     for (const auto Name :
          {GET_FUNCTION_NAME_CHECKED(ADasActor, ExecuteDasConstFrame),
           GET_FUNCTION_NAME_CHECKED(ADasActor, ExecuteDasConstFrameOutputs),
@@ -504,7 +509,11 @@ bool SetInterfaceEvent(UBlueprint* BP, const FDasMethodSchema& M)
     Event->PostPlacedNewNode();
     Event->AllocateDefaultPins();
     auto* Call = NewObject<UK2Node_CallFunction>(Graph);
-    Call->SetFromFunction(BP->ParentClass->FindFunctionByName(GET_FUNCTION_NAME_CHECKED(ADasActor, ExecuteDasFrame)));
+    const bool Generic = DasGenericClassData(BP) != nullptr;
+    Call->SetFromFunction(
+        Generic ? UDasObjectScriptLibrary::StaticClass()->FindFunctionByName(
+                      GET_FUNCTION_NAME_CHECKED(UDasObjectScriptLibrary, ExecuteObjectFrame))
+                : BP->ParentClass->FindFunctionByName(GET_FUNCTION_NAME_CHECKED(ADasActor, ExecuteDasFrame)));
     Graph->AddNode(Call, false, false);
     Call->CreateNewGuid();
     Call->PostPlacedNewNode();
@@ -515,11 +524,12 @@ bool SetInterfaceEvent(UBlueprint* BP, const FDasMethodSchema& M)
     Schema->TrySetDefaultValue(*Call->FindPinChecked(TEXT("ResultKind")),
                                                      FString::FromInt(static_cast<int32>(EDasMethodSignature::Void)));
     Schema->TrySetDefaultValue(*Call->FindPinChecked(TEXT("ResultClass")), TEXT(""));
-    const bool Linked =
-        Schema->TryCreateConnection(Event->FindPinChecked(UEdGraphSchema_K2::PN_Then), Call->GetExecPin()) &&
-        BuildFrameInputs(Graph, Event, M, Call);
+    bool Linked = Schema->TryCreateConnection(Event->FindPinChecked(UEdGraphSchema_K2::PN_Then), Call->GetExecPin()) &&
+                  BuildFrameInputs(Graph, Event, M, Call);
     Metadata.SetValue(Event, TEXT("DasMemberId"), *M.StableId);
     FBlueprintEditorUtils::MarkBlueprintAsStructurallyModified(BP);
+    if (Generic)
+        Linked &= DasWireGenericOwner(Call, BP);
     return Linked;
 }
 void DasCanonicalOverridePins(UK2Node_EditablePinBase* Node, UFunction* Parent, bool Entry)
@@ -561,13 +571,18 @@ bool SetFrameMethod(UBlueprint* BP, const FDasMethodSchema& M)
     bool Directed = false;
     for (const auto& P : M.Parameters)
         Directed |= P.Direction != TEXT("in");
-    const FName Target = M.bStatic
-                             ? (Directed ? GET_FUNCTION_NAME_CHECKED(UDasBlueprintLibrary, ExecuteLibraryFrameOutputs)
-                                         : GET_FUNCTION_NAME_CHECKED(UDasBlueprintLibrary, ExecuteLibraryFrame))
-                         : M.bConst ? (Directed ? GET_FUNCTION_NAME_CHECKED(ADasActor, ExecuteDasConstFrameOutputs)
-                                                : GET_FUNCTION_NAME_CHECKED(ADasActor, ExecuteDasConstFrame))
-                                    : (Directed ? GET_FUNCTION_NAME_CHECKED(ADasActor, ExecuteDasFrameOutputs)
-                                                : GET_FUNCTION_NAME_CHECKED(ADasActor, ExecuteDasFrame));
+    const bool Generic = !M.bStatic && DasGenericClassData(BP);
+    const FName Target =
+        Generic     ? (Directed ? GET_FUNCTION_NAME_CHECKED(UDasObjectScriptLibrary, ExecuteObjectFrameOutputs)
+                                : GET_FUNCTION_NAME_CHECKED(UDasObjectScriptLibrary, ExecuteObjectFrame))
+        : M.bStatic ? (Directed ? GET_FUNCTION_NAME_CHECKED(UDasBlueprintLibrary, ExecuteLibraryFrameOutputs)
+                                : GET_FUNCTION_NAME_CHECKED(UDasBlueprintLibrary, ExecuteLibraryFrame))
+        : M.bConst  ? (Directed ? GET_FUNCTION_NAME_CHECKED(ADasActor, ExecuteDasConstFrameOutputs)
+                                : GET_FUNCTION_NAME_CHECKED(ADasActor, ExecuteDasConstFrame))
+                    : (Directed ? GET_FUNCTION_NAME_CHECKED(ADasActor, ExecuteDasFrameOutputs)
+                                : GET_FUNCTION_NAME_CHECKED(ADasActor, ExecuteDasFrame));
+    UFunction* Bridge = Generic ? UDasObjectScriptLibrary::StaticClass()->FindFunctionByName(Target)
+                                : BP->ParentClass->FindFunctionByName(Target);
     UEdGraph* G = nullptr;
     for (UEdGraph* Existing : DasOwnedMethodGraphs(BP))
         if (Existing->GetFName() == M.Name)
@@ -576,7 +591,7 @@ bool SetFrameMethod(UBlueprint* BP, const FDasMethodSchema& M)
     {
         for (UEdGraphNode* Item : G->Nodes)
             if (auto* Call = Cast<UK2Node_CallFunction>(Item))
-                if (Call->GetTargetFunction() == BP->ParentClass->FindFunctionByName(Target))
+                if (Call->GetTargetFunction() == Bridge)
                 {
                     if (!Call->FindPin(TEXT("ResultClass")))
                         Call->ReconstructNode();
@@ -637,7 +652,7 @@ bool SetFrameMethod(UBlueprint* BP, const FDasMethodSchema& M)
                                      ScalarPin(static_cast<EDasScalarKind>(M.ReturnKind), M.ReturnClass, BP),
                                      EGPD_Input);
     auto* Call = NewObject<UK2Node_CallFunction>(G);
-    Call->SetFromFunction(BP->ParentClass->FindFunctionByName(Target));
+    Call->SetFromFunction(Bridge);
     G->AddNode(Call, false, false);
     Call->CreateNewGuid();
     Call->PostPlacedNewNode();
@@ -652,6 +667,8 @@ bool SetFrameMethod(UBlueprint* BP, const FDasMethodSchema& M)
                                                      FString::FromInt(static_cast<int32>(M.ReturnKind)));
     bool Linked = Schema->TryCreateConnection(Entry->FindPinChecked(UEdGraphSchema_K2::PN_Then), Call->GetExecPin());
     UEdGraphPin* Tail = Call->GetThenPin();
+    if (Generic)
+        Linked &= DasWireGenericOwner(Call, BP);
     Linked &= BuildFrameInputs(G, Entry, M, Call);
     if (M.ReturnKind != EDasMethodSignature::Void)
     {
@@ -958,7 +975,8 @@ bool FDasBlueprintService::Apply(UBlueprint* BP, const FDasClassSchema& Schema, 
          !BP->ParentClass->IsChildOf(UDasWorldSubsystem::StaticClass()) &&
          !BP->ParentClass->IsChildOf(UDasGameInstanceSubsystem::StaticClass()) &&
          !BP->ParentClass->IsChildOf(UDasDataAsset::StaticClass()) &&
-         !BP->ParentClass->IsChildOf(UDasPrimaryDataAsset::StaticClass())))
+         !BP->ParentClass->IsChildOf(UDasPrimaryDataAsset::StaticClass()) &&
+         !DasGenericScriptParent(Schema.Parent.ToString())))
     {
         Error = TEXT("Expected an Actor or Component adapter Blueprint on the game thread");
         return false;

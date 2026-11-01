@@ -29,7 +29,7 @@ This page collects the limitations that still apply to DasForUE2, grouped by are
 
 ## DSL authoring
 
-- Only the documented native parents can be authored (see [Classes](../Guide/DSL/Classes.md): Actor, ActorComponent, Pawn, Character, data assets, SaveGame and similar hosts); arbitrary native parents need a dedicated adapter. Native receiver types exposed by the bindings (PlayerController, CameraComponent …) are not authorable parents.
+- Additional native/Blueprint parents are accepted when Unreal permits Blueprint inheritance; they use the generic frame bridge. Their structural/default reimport, native-only lifecycle hooks and async physics are refused. Existing native hosts retain their capabilities. See [Classes](../Guide/DSL/Classes.md#other-blueprint-parents).
 - No arbitrary C++ virtual overrides or custom constructors. Script-only helpers must be instance methods with value/void results; static helpers and reference returns are refused, and there is no cross-context virtual dispatch for script-only methods.
 - Re-entering an active daScript VM is not supported (for example dispatching from an active VM into a daScript-owned actor through an interface, or a `UFunction` that calls back into the VM from a low-level call frame).
 - No authored net/RPC methods or latent actions. Pure methods and static function libraries are supported.

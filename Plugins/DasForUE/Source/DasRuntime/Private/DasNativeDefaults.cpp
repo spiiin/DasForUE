@@ -29,7 +29,7 @@ UClass* DasNativeDefaultBase(const FString& Parent)
                                                             ? ACharacter::StaticClass()
                                                             : Parent == TEXT("/Script/Engine.ActorComponent")
                                                                              ? UActorComponent::StaticClass()
-                                                                             : nullptr;
+                                                                             : DasNativeScriptHost(Parent);
 }
 UObject* DasNativeDefaultTarget(const FString& Parent, UObject* Host, const FString& Component, FString& Error)
 {

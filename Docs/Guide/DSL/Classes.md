@@ -94,11 +94,83 @@ Das.DSL.Apply dsl_playable_character.das /Game/MyGame/BP_PlayableCharacter dsl_p
 The last argument is the stable class ID. Try it: `Scripts/CreatePlayableCharacter.ps1`
 builds the full example with input assets, HUD and a map.
 
+## Other Blueprint parents
+
+`ue_class(parent=...)` accepts an existing UE class that Unreal permits as a
+Blueprint parent, including a project's native class or an existing Blueprint
+GeneratedClass path. The generated Blueprint derives directly from that class;
+no new native DAS host is needed. The editor asks Unreal's compiler registry for
+the correct Blueprint and generated-class types rather than assuming every asset
+is an ordinary Blueprint.
+
+```das
+options gen2
+require ue_dsl
+
+[ue_class(parent="GameModeBase")]
+class MatchRules {
+    properties=ue_properties(EditAnywhere,BlueprintReadWrite) {
+        var Score:int=0
+    }
+    [ue_function(BlueprintCallable)]
+    def AddScore(amount:int):int {
+        self.Score+=amount
+        return self.Score
+    }
+    def BeginPlay():void { self.Score=10 }
+}
+```
+
+Ordinary DAS inheritance uses the same existing marker syntax. A shared bindings
+module can declare a marker for an additional parent without changing the C++
+host registry:
+
+```das
+[ue_native_base(path="/Script/Engine.SceneComponent")]
+class SceneComponent {}
+
+[ue_class]
+class ScoreComponent:SceneComponent {
+    @ue_property=(EditAnywhere,BlueprintReadWrite)
+    Score:int=0
+    [ue_function(BlueprintCallable)]
+    def Add(amount:int):int { self.Score+=amount; return self.Score }
+}
+```
+
+An explicit Blueprint parent uses its generated class path, for example
+`parent="/Game/Framework/BP_Base.BP_Base_C"`. Normal type-name ambiguity rules
+still apply. An interface, missing/obsolete class or non-Blueprintable parent is
+rejected before `CreateBlueprint`.
+
+Existing Actor/Pawn/Character/PlayerController, ActorComponent, SaveGame,
+DataAsset and subsystem roots retain their native hosts and existing hooks.
+Additional parents use a common checked frame bridge and a separate cooked
+class-contract export referenced by generated graphs. Values remain ordinary UE
+properties on each object. There is no companion tick component or global tick
+scan.
+
+For additional Actor/ActorComponent parents, BeginPlay, Tick and EndPlay use
+reflected UE events with a parent call; EndPlay releases the managed context.
+Other roots have no automatic world lifecycle. Initialize, ConstructionScript
+and async-physics hooks that require a native host are explicitly refused on
+this path. This does not expose arbitrary non-reflected C++ virtual overrides
+or native constructors. Inherited native root components are retained; replacing
+them with a declared root is refused. Structural/default reimport of these additional-parent classes
+is deferred and refused; unchanged declarations/body-only updates remain
+supported. Specialized Blueprint compiler behavior, cooked loading and performance
+need their own acceptance checks beyond the focused generic-parent test.
+
+Parent selection does not bypass native API generation or its safety policies.
+Access to native fields/methods still follows the project's generated bindings;
+choosing an additional parent alone does not export its entire native API.
+
+
 ## Annotation overview
 
 | Annotation | Applies to | Purpose | Details |
 | --- | --- | --- | --- |
-| `[ue_class(...)]` | `class` | Authored Actor, Pawn, Character or ActorComponent Blueprint | this page, [Inheritance](Inheritance.md) |
+| `[ue_class(...)]` | `class` | Authored Blueprint with an eligible UE parent | this page, [Inheritance](Inheritance.md) |
 | `@ue_property=(...)` | field | One reflected property with flags | [Properties](#properties) |
 | `name = ue_properties(...) { var ... }` | field group | Several properties sharing flags/metadata | [Declaration groups](#declaration-groups) |
 | `@ue_component` / `ue_components(...) { }` | field / group | SCS component created for each instance | [Components](Components.md) |

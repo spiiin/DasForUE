@@ -8,6 +8,20 @@ Target environment for every entry: Unreal Engine 5.8.3 (source build),
 daScript 0.6.4 (pinned), Win64 Development. Start at the
 [documentation index](Docs/index.md).
 
+## Unreleased — 2026-11-02
+
+### Added
+
+- Generic DSL Blueprint parents: exact eligible native classes and existing Blueprint
+  generated classes, without adding a C++ host. Existing annotations and native-base
+  markers are retained. Shared checked frame dispatch uses a cooked class-contract
+  export; Actor/component BeginPlay, Tick and EndPlay use reflected events and
+  release managed state. Existing native hosts are preserved. One focused build-agent
+  runtime scenario covers calls, instance isolation, cleanup and body reload.
+  Structural/default reimport, native-only hooks and async physics on the additional
+  parent path remain explicitly refused; specialized compilers/cook/performance are
+  outside this focused acceptance.
+
 ## 0.1.0 — 2026-10-25
 
 The first tagged release. This section covers 2026-10-23 to 2026-10-25: C++ and daScript call each other

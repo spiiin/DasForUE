@@ -1,4 +1,5 @@
 #include "DasScriptHosts.h"
+#include "DasScriptClassData.h"
 #include "DasSubsystems.h"
 #include "DasPawn.h"
 #include "DasCharacter.h"
@@ -16,8 +17,8 @@ bool DasActorNativeParent(const FString& P)
     if (P == TEXT("/Script/DasRuntime.DasProbeActor"))
         return true;
 #endif
-    return P == TEXT("/Script/Engine.Actor") || P == TEXT("/Script/Engine.Pawn") ||
-                                                          P == TEXT("/Script/Engine.Character");
+    auto* Class = DasNativeScriptHost(P);
+    return Class && Class->IsChildOf<AActor>();
 }
 UClass* DasNativeScriptHost(const FString& P)
 {
@@ -43,7 +44,11 @@ UClass* DasNativeScriptHost(const FString& P)
         return UDasDataAsset::StaticClass();
     if (P == TEXT("PrimaryDataAsset") || P == TEXT("/Script/Engine.PrimaryDataAsset"))
         return UDasPrimaryDataAsset::StaticClass();
-    return nullptr;
+    if (!P.StartsWith(TEXT("/")))
+        return nullptr;
+    auto* Class = LoadObject<UClass>(nullptr, *P, nullptr, LOAD_NoWarn);
+    return Class && !Class->HasAnyClassFlags(CLASS_Interface | CLASS_Deprecated | CLASS_NewerVersionExists) ? Class
+                                                                                                            : nullptr;
 }
 bool DasActorHostClass(const UClass* C)
 {
@@ -52,6 +57,15 @@ bool DasActorHostClass(const UClass* C)
 }
 FString* DasHostString(UObject* O, FName N)
 {
+    if (O)
+        if (auto* Data = UDasScriptClassData::Find(O->GetClass()))
+        {
+            if (N == TEXT("AuthoredTypeId"))
+                return &Data->AuthoredTypeId;
+            if (N == TEXT("LifecycleScript"))
+                return &Data->LifecycleScript;
+            return nullptr;
+        }
     if (!O || (!DasActorHostClass(O->GetClass()) && !O->IsA<UDasScriptComponent>() && !O->IsA<UDasSaveGame>() &&
                !O->IsA<UDasDataAsset>() && !O->IsA<UDasPrimaryDataAsset>() && !O->IsA<UDasWorldSubsystem>() &&
                !O->IsA<UDasGameInstanceSubsystem>()))
@@ -71,6 +85,9 @@ FString DasHostLifecycle(const UObject* O)
 }
 TMap<FString, FString>* DasHostContracts(UObject* O)
 {
+    if (O)
+        if (auto* Data = UDasScriptClassData::Find(O->GetClass()))
+            return &Data->DasDefaultSourceContracts;
     if (!O || (!DasActorHostClass(O->GetClass()) && !O->IsA<UDasScriptComponent>() && !O->IsA<UDasSaveGame>() &&
                !O->IsA<UDasDataAsset>() && !O->IsA<UDasPrimaryDataAsset>() && !O->IsA<UDasWorldSubsystem>() &&
                !O->IsA<UDasGameInstanceSubsystem>()))

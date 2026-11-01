@@ -408,3 +408,26 @@ The smoke project's Config/DasIncludeTestFixtures.txt explicitly opts into test 
 See [test source boundary](../../Plugins/DasForUE/Tests/README.md). Runtime probes and
 reflected fixtures are compiled for Editor/test targets only. Ordinary game builds
 exclude them; `runtime-isolation` verifies this with a separate minimal game target.
+
+## Generic Blueprint parents
+
+Queue `test-suite genericparents1 generic-parents repo=<worktree>` through the
+shared build agent. The suite builds once and runs one short automation test,
+`DasForUE.DSL.GenericParents`. It exercises exact GameModeBase and SceneComponent
+parents (annotation and ordinary DAS inheritance), an existing non-DAS Blueprint
+parent, real reflected method calls, pure/const methods, instance isolation,
+reflected actor BeginPlay/Tick/EndPlay, body-only reimport and invalid-parent
+rejection. Existing Actor and PlayerController hosts must remain available.
+It does not run full Foundation, real PIE, packaging, specialized Blueprint
+compiler scenarios or performance measurements.
+
+Verified 2026-11-02 by `generic-parents-20261102k` (exit 0): Editor Development
+build and one automation scenario PASS, with zero failed or warning tests.
+The actual scenario took 0.481 seconds (editor startup/reporting excluded).
+It also verifies actual DAS body replacement while preserving object values,
+EndPlay context-count cleanup, and preservation of the legacy native probe path.
+Receipt: `logs/generic-parents-validation.json`; automation report:
+`logs/generic-parents-report/index.json`. The implementation was checked in
+`C:/src/DasForUE2-blueprint-parents`, isolated from the ongoing PlayerController
+work in main; its base snapshot contains that work. No PIE/packaged or benchmark
+was run.

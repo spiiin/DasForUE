@@ -1,6 +1,9 @@
 #include "DasDSLService.h"
 #include "DasDiagnostics.h"
 #include "DasCharacter.h"
+#include "DasGenericBlueprints.h"
+#include "DasGenericParents.h"
+#include "KismetCompilerModule.h"
 #include "DasPawn.h"
 #include "GameFramework/Controller.h"
 #include "GameFramework/Pawn.h"
@@ -476,6 +479,8 @@ bool ApplyDeclaration(const FString& Script, const FString& Package, const FStri
             }
         }
     }
+    if (!DasCheckBlueprintParent(DeclaredParent, Error))
+        return false;
     if (Created && (!DasInitializeInheritedDefaults(DeclaredParent, Model, Id, Error, true) ||
                     !DasInitializeNativeDefaults(DeclaredParent, Model, Id, Error, true)))
         return false;
@@ -500,9 +505,11 @@ bool ApplyDeclaration(const FString& Script, const FString& Package, const FStri
     if (Created)
     {
         UPackage* P = CreatePackage(*Package);
+        UClass *BlueprintType = nullptr, *GeneratedType = nullptr;
+        FModuleManager::LoadModuleChecked<IKismetCompilerInterface>(
+            TEXT("KismetCompiler")).GetBlueprintTypesForClass(DeclaredParent, BlueprintType, GeneratedType);
         BP = FKismetEditorUtilities::CreateBlueprint(DeclaredParent, P, *FPackageName::GetLongPackageAssetName(Package),
-                                                     BPTYPE_Normal, UBlueprint::StaticClass(),
-                                                     UBlueprintGeneratedClass::StaticClass(), TEXT("DasDSL"));
+                                                     BPTYPE_Normal, BlueprintType, GeneratedType, TEXT("DasDSL"));
     }
     if (!BP)
     {
@@ -520,6 +527,11 @@ bool ApplyDeclaration(const FString& Script, const FString& Package, const FStri
         PriorClass = PriorModel.Classes.FindByPredicate([&](const auto& C) { return C.Id == Id; });
     auto& Metadata = BP->GetOutermost()->GetMetaData();
     const bool BodyOnly = !Created && Metadata.GetValue(BP, TEXT("DasDSLModel")) == Json;
+    if (!Created && !BodyOnly && DasGenericScriptParent(EffectiveDeclaration.NativeParent))
+    {
+        Error = TEXT("Structural/default reimport of a generic-parent Blueprint is deferred; create a new Blueprint");
+        return false;
+    }
     // Pawn and Character declarations migrate like other actors: the rollback snapshot covers every host.
     const bool Preserve = !Created && !BodyOnly && DefaultPolicy == EDasDefaultMigrationPolicy::Refuse;
     TOptional<FKeepPossession> Possession;
@@ -586,6 +598,8 @@ bool ApplyDeclaration(const FString& Script, const FString& Package, const FStri
         }
         return false;
     }
+    if (!DasPrepareGenericBlueprint(BP, EffectiveDeclaration, Schema, Script, BodyOnly, Error))
+        return false;
     // Validate the current Blueprint even when unchanged declarations avoid reinstancing.
     if (!FDasBlueprintService::Apply(BP, Schema, Error, BodyOnly, DefaultPolicy))
     {
@@ -600,6 +614,7 @@ bool ApplyDeclaration(const FString& Script, const FString& Package, const FStri
     if (Rollback && GDasFailStructuralStage == 1)
         return Restore(TEXT("Injected post-compile development failure"));
 #endif
+    DasFinishGenericBlueprint(BP);
     if (Created)
         if (DasActorHostClass(BP->GeneratedClass))
         {

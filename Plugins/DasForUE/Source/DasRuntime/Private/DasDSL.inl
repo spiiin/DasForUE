@@ -235,6 +235,22 @@ FString DSLParameterDirection(const das::VariablePtr& Parameter, const FString& 
     return TEXT("in");
 }
 #include "DasTypeResolution.inl"
+// Parent eligibility differs from the native-only base constraints of object/class reference views.
+FString DSLResolveParent(const FString& Name, const FDSLTypeScope& Scope)
+{
+    DSLCheckReference(Name);
+    if (Name.StartsWith(TEXT("/")) && !Name.StartsWith(TEXT("/Script/")))
+    {
+        if (!FPackageName::IsValidObjectPath(Name))
+            DSLFail(TEXT("Invalid Blueprint parent class path: ") + Name);
+        auto* Class = LoadObject<UClass>(nullptr, *Name, nullptr, LOAD_NoWarn);
+        if (!Class || Class->HasAnyClassFlags(CLASS_Interface | CLASS_Deprecated | CLASS_NewerVersionExists))
+            DSLFail(TEXT("Expected an existing Blueprint parent class: ") + Name);
+        return Class->GetPathName();
+    }
+    return DSLResolveType(EDSLTypeKind::Class, Name, Scope);
+}
+
 // Source-only type tokens lower to the existing checked runtime ABI.
 struct FDSLTypeCallVisitor : das::Visitor
 {
@@ -883,7 +899,7 @@ bool DSLValidateOwner(const das::ProgramPtr& Program, const FString& Entry, UObj
                         OK = false;
                         return;
                     }
-                    const bool ActorAdapter = Self->IsA<ADasActor>() || Self->IsA<UDasScriptComponent>() ||
+                    const bool ActorAdapter = !DasHostIdentity(Self).IsEmpty() || DasActorHostClass(Self->GetClass()) || Self->IsA<UDasScriptComponent>() ||
                                               Self->IsA<UDasSaveGame>() || Self->IsA<UDasDataAsset>() ||
                                               Self->IsA<UDasPrimaryDataAsset>() || Self->IsA<UDasWorldSubsystem>() ||
                                               Self->IsA<UDasGameInstanceSubsystem>();

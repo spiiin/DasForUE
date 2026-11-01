@@ -3,6 +3,7 @@
 #include "DasTypeContracts.h"
 #include "DasCallbackTypes.h"
 #include "DasScriptHosts.h"
+#include "DasGenericParents.h"
 #include "DasAuthoring.h"
 #include "DasValueKinds.h"
 #include "Components/ActorComponent.h"
@@ -1393,8 +1394,11 @@ bool FDasAuthoringModule::ToActorSchema(const FString& ClassId, FDasClassSchema&
         return Fail(Error,
                     TEXT("Subsystem supports Initialize and Deinitialize only, without Actor components/physics"));
     if (!Library && !SaveGame && !DataAsset && !Subsystem &&
-        (!DasActorNativeParent(C->NativeParent) && C->NativeParent != TEXT("/Script/Engine.ActorComponent")))
-        return Fail(Error, TEXT("Class adapter requires an Actor, Pawn, Character, ActorComponent or SaveGame root"));
+        (!DasActorNativeParent(C->NativeParent) && C->NativeParent != TEXT("/Script/Engine.ActorComponent") &&
+                                                                           !DasGenericScriptParent(C->NativeParent)))
+        return Fail(
+            Error,
+            TEXT("Class adapter requires an Actor, Pawn, Character, ActorComponent or SaveGame root"));
     if ((!SaveGame && !DataAsset && !Subsystem && C->Methods.IsEmpty() && C->Callbacks.IsEmpty() && !C->AsyncPhysics) ||
         C->Methods.Num() > 64)
         return Fail(Error, TEXT("Actor adapter requires 1..64 methods"));
@@ -1420,6 +1424,17 @@ bool FDasAuthoringModule::ToActorSchema(const FString& ClassId, FDasClassSchema&
     if (C->NativeParent == TEXT("/Script/DasRuntime.DasProbeActor"))
         Result.Parent = TEXT("DasProbeActor");
 #endif
+    if (DasGenericScriptParent(C->NativeParent))
+    {
+        Result.Parent = *C->NativeParent;
+        if (C->AsyncPhysics)
+            return Fail(Error, TEXT("Async physics requires a native DAS host"));
+        for (const auto& Hook : C->Callbacks)
+            if (Hook.Kind != TEXT("BeginPlay") && Hook.Kind != TEXT("Tick") &&
+                                                                    Hook.Kind != TEXT("EndPlay") &&
+                                                                                      Hook.Kind != TEXT("event"))
+                return Fail(Error, TEXT("This parent has no native DAS hook for ") + Hook.Kind);
+    }
     Result.Interfaces = C->Interfaces;
     Result.Metadata = C->Metadata;
     TArray<const FDasDeclaredMethod*> Methods;
@@ -1513,13 +1528,15 @@ bool FDasAuthoringModule::ToActorSchema(const FString& ClassId, FDasClassSchema&
                                                                ? FString::Printf(TEXT("%.9g"), P.Default.Number)
                                                                : FString::Printf(TEXT("%.17g"), P.Default.Number));
         }
-        Method.Signature = (Result.Parent == TEXT("Pawn") || Result.Parent == TEXT("Character")) || Library ||
-                            SaveGame || DataAsset || Subsystem || M.bConst ||
-                            Result.Parent == TEXT("ActorComponent") || !C->Interfaces.IsEmpty()
-                                                  ? EDasMethodSignature::Frame
-                                              : Action ? EDasMethodSignature::Void
-                                              : Scalar ? ValueKind(M.ReturnType)
-                                                       : EDasMethodSignature::Frame;
+        Method.Signature =
+            (Result.Parent == TEXT("Pawn") || Result.Parent == TEXT("Character")) || Library ||
+                                       SaveGame || DataAsset || Subsystem || DasGenericScriptParent(C->NativeParent) ||
+                                       M.bConst ||
+                                       Result.Parent == TEXT("ActorComponent") || !C->Interfaces.IsEmpty()
+                                                             ? EDasMethodSignature::Frame
+                                                         : Action ? EDasMethodSignature::Void
+                                                         : Scalar ? ValueKind(M.ReturnType)
+                                                                  : EDasMethodSignature::Frame;
         Result.Methods.Add(MoveTemp(Method));
     }
     if (!Result.Methods.IsEmpty())

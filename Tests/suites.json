@@ -7,6 +7,14 @@
       "name": "build"
     },
     {
+      "name": "generic-parents",
+      "kind": "script",
+      "script": "TestGenericParents.ps1",
+      "requires": [
+        "build"
+      ]
+    },
+    {
       "name": "actor-host",
       "kind": "automation",
       "test": "DasForUE.Hosts.ActorIsolation",

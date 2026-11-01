@@ -1,6 +1,6 @@
 #pragma once
 #include "CoreMinimal.h"
-// Fixed, trusted host registry. Reflection accesses only common native bridge storage.
+// Existing native hosts plus exact reflected parents. Generic identity lives in a cooked class contract.
 DASRUNTIME_API bool DasActorNativeParent(const FString& Parent);
 DASRUNTIME_API UClass* DasNativeScriptHost(const FString& Parent);
 DASRUNTIME_API bool DasActorHostClass(const UClass* Class);
