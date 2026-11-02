@@ -707,6 +707,12 @@
       "kind": "script",
       "script": "TestRogueEffects.ps1",
       "comment": "Real-PIE timed action effects, stacking, stun and lifecycle cleanup."
+    },
+    {
+      "name": "rogue-overwhelm",
+      "kind": "script",
+      "script": "TestRogueOverwhelm.ps1",
+      "comment": "Damage windows, stun, on-hit effects and delegate cleanup in real PIE."
     }
   ],
   "presets": {

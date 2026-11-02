@@ -239,11 +239,26 @@ bool FDasBlueprintRollback::GatherScope(UBlueprint* Root, TArray<UBlueprint*>& B
                 }
                 TArray<FAssetData> Data;
                 Registry.GetAssetsByPackageName(P, Data);
+                TArray<FAssetData> Contracts;
+                Data.RemoveAll(
+                    [&](const auto& Item)
+                    {
+                        const bool Companion =
+                            Item.AssetClassPath == UDasScriptClassData::StaticClass()->GetClassPathName() &&
+                            Item.AssetName == TEXT("DasScriptClassData");
+                        if (Companion)
+                            Contracts.Add(Item);
+                        return Companion;
+                    });
                 if (Data.Num() != 1 || (Data[0].AssetClassPath != UBlueprint::StaticClass()->GetClassPathName() &&
                                         Data[0].AssetClassPath != UWorld::StaticClass()->GetClassPathName() &&
                                         !InstanceAsset(Data[0], Root->GeneratedClass)))
                 {
-                    Error = TEXT("Structural migration supports Blueprint, map and DataAsset instance packages only");
+                    FString Kinds;
+                    for (const auto& Item : Data)
+                        Kinds += TEXT(" ") + Item.AssetClassPath.ToString();
+                    Error = FString::Printf(TEXT("Structural migration supports Blueprint, map and DataAsset instance packages only: %s (%d exports:%s)"),
+                        *P.ToString(), Data.Num(), *Kinds);
                     return false;
                 }
                 auto* A = Data[0].GetAsset();
@@ -251,6 +266,18 @@ bool FDasBlueprintRollback::GatherScope(UBlueprint* Root, TArray<UBlueprint*>& B
                 {
                     Error = TEXT("Failed to load structural dependency");
                     return false;
+                }
+                if (!Contracts.IsEmpty())
+                {
+                    auto* Blueprint = Cast<UBlueprint>(A);
+                    auto* Contract = Blueprint ? DasGenericClassData(Blueprint) : nullptr;
+                    if (Contracts.Num() != 1 || !Contract || Contracts[0].GetAsset() != Contract ||
+                        Blueprint->GetOutermost()->GetMetaData().GetValue(Blueprint, TEXT("DasDSLClassId")) !=
+                                                                          Contract->AuthoredTypeId)
+                    {
+                        Error = TEXT("Unowned cooked contract export in structural scope: ") + P.ToString();
+                        return false;
+                    }
                 }
                 Assets.Emplace(A);
                 Enqueue(A);

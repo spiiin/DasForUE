@@ -1,4 +1,6 @@
 #include "DasDSLService.h"
+#include "AssetRegistry/AssetRegistryModule.h"
+#include "Misc/PackageName.h"
 #include "UObject/MetaData.h"
 
 void DasFailStructuralForTesting(int32 Stage);
@@ -33,11 +35,13 @@ bool FDasGenericParentsTest::RunTest(const FString&)
     auto& Runtime = FModuleManager::LoadModuleChecked<FDasRuntimeModule>(TEXT("DasRuntime"));
     const FString Token = FGuid::NewGuid().ToString(EGuidFormats::Digits);
     const FString Root = TEXT("/Game/Tests/DasGenericParents/") + Token;
-    TArray<FString> Scripts;
+    TArray<FString> Scripts, FixtureFiles;
     ON_SCOPE_EXIT
     {
         for (const auto& Script : Scripts)
             IFileManager::Get().Delete(*Runtime.ScriptPath(Script), false, true);
+        for (const auto& File : FixtureFiles)
+            IFileManager::Get().Delete(*File, false, true);
     };
     FString Error;
     auto Apply = [&](const FString& Name, const FString& Source, UBlueprint*& BP)
@@ -228,6 +232,62 @@ bool FDasGenericParentsTest::RunTest(const FString&)
                   FDasDSLService::Reimport(DescriptorChild, Error, EDasDefaultMigrationPolicy::Refuse));
     TestTrue(TEXT("Child contract is canonical after reimport"),
                   ChildContract->OwnerClass == DescriptorChild->GeneratedClass);
+    // A generic-object consumer has a public cooked-contract export beside its
+    // Blueprint. Adding an Actor member must preserve that referring package.
+    UBlueprint *MigrationActor = nullptr, *Consumer = nullptr;
+    const FString ActorSource =
+        Prefix + TEXT("[ue_class(module_id=\"genericparents\",parent=\"Actor\")]\nclass MigrationActor {\n") + Body +
+                      TEXT("}\n");
+    if (!Apply(TEXT("MigrationActor"), ActorSource, MigrationActor))
+        return false;
+    const FString ActorScript = Scripts.Last();
+    const FString ConsumerSource =
+        Prefix +
+        TEXT("require ue_native_gameplay\n") +
+            TEXT("[ue_class(module_id=\"genericparents\",parent=\"/Script/DasRuntime.DasObject\")]\nclass Consumer {\n") +
+                TEXT(" @ue_property=(EditAnywhere,BlueprintReadWrite)\n Target:ActorClass\n defaults=ue_defaults() { self.Target=ue_class_default(\"") +
+                    MigrationActor->GeneratedClass->GetPathName() +
+                    TEXT("\") }\n [ue_function(BlueprintCallable)]\n def Ping(input:int):int { return input }\n}\n");
+    if (!Apply(TEXT("Consumer"), ConsumerSource, Consumer))
+        return false;
+    auto* ConsumerContract = DasGenericClassData(Consumer);
+    FAssetRegistryModule::AssetCreated(ConsumerContract);
+    for (auto* Blueprint : {MigrationActor, Consumer})
+    {
+        const FString File = FPackageName::LongPackageNameToFilename(Blueprint->GetOutermost()->GetName(),
+                                                                     FPackageName::GetAssetPackageExtension());
+        IFileManager::Get().MakeDirectory(*FPaths::GetPath(File), true);
+        FSavePackageArgs Save;
+        Save.TopLevelFlags = RF_Public | RF_Standalone;
+        if (!TestTrue(TEXT("Save structural referencer fixture"),
+                           UPackage::SavePackage(Blueprint->GetOutermost(), Blueprint, *File, Save)))
+            return false;
+        FixtureFiles.Add(File);
+    }
+    auto& Registry = FModuleManager::LoadModuleChecked<FAssetRegistryModule>(TEXT("AssetRegistry")).Get();
+    Registry.ScanModifiedAssetFiles(FixtureFiles);
+    TArray<FAssetData> ConsumerExports;
+    Registry.GetAssetsByPackageName(Consumer->GetOutermost()->GetFName(), ConsumerExports);
+    TestEqual(TEXT("Consumer package has Blueprint and cooked-contract exports"), ConsumerExports.Num(), 2);
+    FString ExtendedActor = ActorSource;
+    ExtendedActor.ReplaceInline(
+        TEXT("class MigrationActor {\n"),
+             TEXT("class MigrationActor {\n @ue_property=(EditAnywhere,BlueprintReadWrite)\n Extra:int=13\n"));
+    FFileHelper::SaveStringToFile(ExtendedActor, *Runtime.ScriptPath(ActorScript),
+                                  FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM);
+    if (!TestTrue(TEXT("Additive Actor migration includes independent generic referencer"),
+                       FDasDSLService::Reimport(MigrationActor, Error, EDasDefaultMigrationPolicy::Refuse)))
+    {
+        AddError(Error);
+        return false;
+    }
+    TestTrue(TEXT("Consumer class value follows Actor reinstancing"),
+                  FindFProperty<FClassProperty>(
+                      Consumer->GeneratedClass,
+                      TEXT("Target"))->GetPropertyValue_InContainer(Consumer->GeneratedClass->GetDefaultObject()) ==
+                      MigrationActor->GeneratedClass);
+    TestTrue(TEXT("Consumer cooked contract remains canonical"),
+                  ConsumerContract->OwnerClass == Consumer->GeneratedClass);
     Runtime.ReleaseObject(LiveMutable.Get());
     Runtime.ReleaseObject(MutableObject.Get());
     Runtime.ReleaseObject(First);

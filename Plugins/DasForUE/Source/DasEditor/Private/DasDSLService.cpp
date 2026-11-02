@@ -563,11 +563,11 @@ bool ApplyDeclaration(const FString& Script, const FString& Package, const FStri
             return false;
         TArray<UBlueprint*> Scope;
         TArray<TStrongObjectPtr<UObject>> Assets;
-        // Adding members to a plain script object leaves contracts of independent
+        // Adding members without changing existing declarations leaves contracts of independent
         // referencing DSL classes unchanged. Snapshot/recompile those assets too;
         // removals, signature changes and default changes retain the stricter guard.
-        bool AdditiveObject = false;
-        if (DasCanReimportGenericBlueprint(BP) && PriorClass)
+        bool AdditiveMembers = false;
+        if (PriorClass)
         {
             auto Common = Declaration;
             Common.Properties.RemoveAll(
@@ -579,10 +579,10 @@ bool ApplyDeclaration(const FString& Script, const FString& Package, const FStri
                 [&](const auto& M)
                 { return !PriorClass->Methods.ContainsByPredicate([&](const auto& Old) { return Old.Id == M.Id; }); });
             const auto Difference = FDasAuthoringModule::Compare(*PriorClass, Common);
-            AdditiveObject = !Difference.bStructural && !Difference.bDefaults && !Difference.bMetadata &&
-                             !Difference.bImplementation;
+            AdditiveMembers = !Difference.bStructural && !Difference.bDefaults && !Difference.bMetadata &&
+                              !Difference.bImplementation;
         }
-        if (!FDasBlueprintRollback::GatherScope(BP, Scope, Assets, Error, false, AdditiveObject))
+        if (!FDasBlueprintRollback::GatherScope(BP, Scope, Assets, Error, false, AdditiveMembers))
             return false;
         Rollback = MakeUnique<FDasBlueprintRollback>();
         if (!Rollback->Prepare(BP, Schema, Scope, Assets, Error))
