@@ -3,6 +3,17 @@ module ue_scene_components public
 require ue_dsl public
 require ue_object_types public
 
+[ue_native_object(path="/Script/Engine.ActorComponent")]
+struct ActorComponentRef { handle:UObjectHandle }
+
+def ActorComponentRef_from(value:UObjectHandle):ActorComponentRef {
+    return ActorComponentRef(handle=ue_cast_nullable_object(value,"/Script/Engine.ActorComponent"))
+}
+
+def ActorComponentRef_raw(value:ActorComponentRef):UObjectHandle {
+    return ue_cast_nullable_object(value.handle,"/Script/Engine.ActorComponent")
+}
+
 [ue_native_object(path="/Script/Engine.SceneComponent")]
 struct SceneComponentRef { handle:UObjectHandle }
 def SceneComponentRef_from(value:UObjectHandle):SceneComponentRef {

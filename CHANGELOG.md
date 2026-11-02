@@ -18,6 +18,13 @@ daScript 0.6.4 (pinned), Win64 Development. Start at the
 
 ### Added
 
+- On-demand typed member calls for native and authored Blueprint interface views,
+  including ref/out and container results, checked signatures and imported native
+  value structs. No generated per-interface method module is required.
+- ActorComponent root bindings for native self methods, checked conversions between
+  nominal views of the same UE class, and typed class values at native class-handle
+  argument boundaries. Mutable output parameters retain exact type checks.
+
 - Detached CollisionHit-to-ApplyPointDamage bridge, checked daScript point-damage
   and hearing-noise helpers, and an opt-in rogue-point-impact PIE suite.
 

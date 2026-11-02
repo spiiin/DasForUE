@@ -36,7 +36,9 @@ public:
             return DSLCall(
                 At, "ue_cast_nullable_object",
                 {new das::ExprField(At, V, "handle"), new das::ExprConstString(At, DSLUtf8(DSLTypedReferencePath(T)))});
-        return DSLCall(At, T->structType->module->name + "::" + T->structType->name + "_raw", {V});
+        return DSLCall(
+            At, "ue_cast_interface",
+            {new das::ExprField(At, V, "handle"), new das::ExprConstString(At, DSLUtf8(DSLTypedReferencePath(T)))});
     }
     das::ExpressionPtr Unpack(const das::LineInfo& At, const das::TypeDeclPtr& T, das::ExpressionPtr V) const override
     {

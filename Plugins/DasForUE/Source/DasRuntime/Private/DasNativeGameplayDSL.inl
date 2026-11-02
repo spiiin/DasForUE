@@ -46,7 +46,33 @@ das::TypeDeclPtr DSLNativeValueType(das::Program* Program, das::Module* Module, 
             if (const auto* Adapter = DasAdapterValueStruct(FindObject<UScriptStruct>(nullptr, *Path)))
                 Source = Adapter->Source;
         if (!Source)
-            DSLFail(TEXT("Native struct not generated: ")+ Path);
+        {
+            // Interface signatures can use a caller-imported native value view
+            // which is not part of the generated native gameplay catalogue.
+            das::StructurePtr View;
+            Program->library.foreach (
+                [&](das::Module* Owner)
+                {
+                    Owner->structures.foreach (
+                        [&](const das::StructurePtr& Candidate)
+                        {
+                            const auto* Annotation = DSLAnnotation(Candidate->annotations, "ue_native_struct");
+                            if (Annotation && DSLString(Annotation->arguments, "path") == Path)
+                            {
+                                if (View && View != Candidate)
+                                    DSLFail(TEXT("Ambiguous native struct view: ")+ Path);
+                                View = Candidate;
+                            }
+                        });
+                    return true;
+                },
+                "*");
+            if (!View)
+                DSLFail(TEXT("Native struct not generated or imported: ")+ Path);
+            auto* T = new das::TypeDecl(das::Type::tStructure, At);
+            T->structType = View;
+            return T;
+        }
         auto Types = Program->thisModuleGroup->findStructure(DSLUtf8(Source), Module);
         if (Types.size() != 1)
             DSLFail(TEXT("Import ue_native_gameplay for native struct: ")+ Path);
@@ -134,20 +160,12 @@ FDasDeclaredLiteral DSLNativeDefault(const FString& Class, const FString& Method
         }
     return D;
 }
-void DSLNativeMethodDescriptor(das::Program* Program, das::Module* Module, const das::TypeDeclPtr& Receiver,
-                               const das::string& Name, const das::LineInfo& At, FDasDeclaredClass& Declaration,
-                               FDasDeclaredMethod& Method, FDSLMethodSourceSignature& Descriptor)
+// Shared checked type lowering for catalogue methods and reflected interfaces.
+void DSLReflectedMethodDescriptor(das::Program* Program, das::Module* Module, UFunction* Function,
+                                  const das::string& Name, const das::LineInfo& At, FDasDeclaredClass& Declaration,
+                                  FDasDeclaredMethod& Method, FDSLMethodSourceSignature& Descriptor,
+                                  bool Interface = false)
 {
-    if (Name.empty() || Name.length() >= NAME_SIZE)
-        DSLFail(TEXT("Invalid native method name"));
-    Declaration.Id = DSLTypedReferencePath(Receiver);
-    Declaration.Name = DSLText(Receiver->structType->name);
-    Declaration.NativeParent = Declaration.Id;
-    const auto* Row = DasNativeGameplayMethod(Declaration.Id, DSLText(Name));
-    auto* Class = FindObject<UClass>(nullptr, *Declaration.Id);
-    auto* Function = Row && Class ? Class->FindFunctionByName(*DSLText(Name)) : nullptr;
-    if (!Function || !CallSignatureKey(Function).Equals(Row->Signature, ESearchCase::IgnoreCase))
-        DSLFail(TEXT("Native method not generated or stale: ")+ Declaration.Id + TEXT(".")+ DSLText(Name));
     Method.Name = DSLText(Name);
     Method.Id = Declaration.Id + TEXT(".")+ Method.Name;
     Method.ReturnType.Kind = TEXT("void");
@@ -158,7 +176,11 @@ void DSLNativeMethodDescriptor(das::Program* Program, das::Module* Module, const
         {
             FDasDeclaredType Type;
             if (!DasNativeGameplayType(*It, Type))
-                DSLFail(TEXT("Unsupported native method parameter"));
+            {
+                FString Error;
+                if (!Interface || !DescribeDasProperty(*It, Type, Error))
+                    DSLFail(Error.IsEmpty() ? TEXT("Unsupported native method parameter") : Error);
+            }
             const auto SourceType = DSLNativeValueType(Program, Module, Type, At);
             const auto Source = DSLMethodSourceName(SourceType);
             if (It->HasAnyPropertyFlags(CPF_ReturnParm))
@@ -189,5 +211,46 @@ void DSLNativeMethodDescriptor(das::Program* Program, das::Module* Module, const
         if (!Trailing)
             Method.Parameters[I].Default = {};
     }
+    if (Interface)
+    {
+        FString Error;
+        if (!ValidateDasSignatureContract(Method, EDasSignatureUse::Interface, Error))
+            DSLFail(Error);
+    }
     Declaration.Methods.Add(Method);
+}
+
+void DSLNativeMethodDescriptor(das::Program* Program, das::Module* Module, const das::TypeDeclPtr& Receiver,
+                               const das::string& Name, const das::LineInfo& At, FDasDeclaredClass& Declaration,
+                               FDasDeclaredMethod& Method, FDSLMethodSourceSignature& Descriptor)
+{
+    if (Name.empty() || Name.length() >= NAME_SIZE)
+        DSLFail(TEXT("Invalid native method name"));
+    Declaration.Id = DSLTypedReferencePath(Receiver);
+    Declaration.Name = DSLText(Receiver->structType->name);
+    Declaration.NativeParent = Declaration.Id;
+    const auto* Row = DasNativeGameplayMethod(Declaration.Id, DSLText(Name));
+    auto* Class = FindObject<UClass>(nullptr, *Declaration.Id);
+    auto* Function = Row && Class ? Class->FindFunctionByName(*DSLText(Name)) : nullptr;
+    if (!Function || !CallSignatureKey(Function).Equals(Row->Signature, ESearchCase::IgnoreCase))
+        DSLFail(TEXT("Native method not generated or stale: ")+ Declaration.Id + TEXT(".")+ DSLText(Name));
+    DSLReflectedMethodDescriptor(Program, Module, Function, Name, At, Declaration, Method, Descriptor);
+}
+
+void DSLInterfaceMethodDescriptor(das::Program* Program, das::Module* Module, const das::TypeDeclPtr& Receiver,
+                                  const das::string& Name, const das::LineInfo& At, FDasDeclaredClass& Declaration,
+                                  FDasDeclaredMethod& Method, FDSLMethodSourceSignature& Descriptor)
+{
+    if (Name.empty() || Name.length() >= NAME_SIZE)
+        DSLFail(TEXT("Invalid interface method name"));
+    Declaration.Id = DSLTypedReferencePath(Receiver);
+    Declaration.Name = DSLText(Receiver->structType->name);
+    Declaration.NativeParent = Declaration.Id;
+    auto* Interface = FindObject<UClass>(nullptr, *Declaration.Id);
+    auto* Function = Interface ? Interface->FindFunctionByName(*DSLText(Name)) : nullptr;
+    if (!Function || !Function->HasAnyFunctionFlags(FUNC_BlueprintCallable) ||
+        Function->HasAnyFunctionFlags(FUNC_Static | FUNC_Net | FUNC_Delegate | FUNC_MulticastDelegate |
+                                      FUNC_EditorOnly))
+        DSLFail(TEXT("Unknown callable interface method: ")+ DSLText(Name));
+    DSLReflectedMethodDescriptor(Program, Module, Function, Name, At, Declaration, Method, Descriptor, true);
 }

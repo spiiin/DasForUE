@@ -20,10 +20,6 @@ require ue_text public
 struct Native_ClothingSimulationInteractorRef_75d9e2c1 { handle:UObjectHandle }
 def Native_ClothingSimulationInteractorRef_75d9e2c1_from(value:UObjectHandle):Native_ClothingSimulationInteractorRef_75d9e2c1 { return Native_ClothingSimulationInteractorRef_75d9e2c1(handle=ue_cast_nullable_object(value,"/Script/ClothingSystemRuntimeInterface.ClothingSimulationInteractor")) }
 
-[ue_native_object(path="/Script/Engine.ActorComponent")]
-struct Native_ActorComponentRef_97441d45 { handle:UObjectHandle }
-def Native_ActorComponentRef_97441d45_from(value:UObjectHandle):Native_ActorComponentRef_97441d45 { return Native_ActorComponentRef_97441d45(handle=ue_cast_nullable_object(value,"/Script/Engine.ActorComponent")) }
-
 [ue_native_object(path="/Script/Engine.AnimInstance")]
 struct Native_AnimInstanceRef_b5f8c607 { handle:UObjectHandle }
 def Native_AnimInstanceRef_b5f8c607_from(value:UObjectHandle):Native_AnimInstanceRef_b5f8c607 { return Native_AnimInstanceRef_b5f8c607(handle=ue_cast_nullable_object(value,"/Script/Engine.AnimInstance")) }

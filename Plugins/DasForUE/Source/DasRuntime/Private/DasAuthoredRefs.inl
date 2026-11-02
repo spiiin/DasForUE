@@ -1235,11 +1235,14 @@ bool DSLEmitReferenceMethod(das::Program* Program, das::Module* Module, const da
         "*");
     if (Exists)
         return false;
+    const bool Interface = DSLTypedInterface(ReceiverType);
     const bool Native = !DSLAuthoredView(ReceiverType);
     FDasDeclaredClass Declaration;
     FDasDeclaredMethod NativeMethod;
     FDSLMethodSourceSignature NativeDescriptor;
-    if (Native)
+    if (Interface)
+        DSLInterfaceMethodDescriptor(Program, Module, ReceiverType, Name, At, Declaration, NativeMethod, NativeDescriptor);
+    else if (Native)
         DSLNativeMethodDescriptor(Program, Module, ReceiverType, Name, At, Declaration, NativeMethod, NativeDescriptor);
     else
         Declaration = DSLReferenceDeclaration(ReceiverType);
@@ -1272,7 +1275,7 @@ bool DSLEmitReferenceMethod(das::Program* Program, das::Module* Module, const da
     const auto* Descriptor = Native ? &NativeDescriptor : DSLMethodSourceSignatures.Find(SourceKey);
     if (!Descriptor || Descriptor->Parameters.size() != size_t(Method->Parameters.Num()))
         DSLFail(TEXT("Missing authored method source signature"));
-    if (Native && DSLEmitRoutedMethod(Program, Module, ReceiverType, Name, At, Declaration.Id, *Method, *Descriptor))
+    if (Native && !Interface && DSLEmitRoutedMethod(Program, Module, ReceiverType, Name, At, Declaration.Id, *Method, *Descriptor))
         return true;
     auto* Fn = new das::Function();
     Fn->at = At;
@@ -1337,12 +1340,20 @@ bool DSLEmitReferenceMethod(das::Program* Program, das::Module* Module, const da
     if (!Native)
         BeginArgs.push_back(Str(Wire));
     auto* Begin = DSLCall(At,
-                          Native              ? "__ue_begin_native_gameplay_call"
+                          Interface           ? "ue_begin_interface_call"
+                          : Native            ? "__ue_begin_native_gameplay_call"
                           : SuperId.IsEmpty() ? "__ue_begin_authored_call"
                                               : "__ue_begin_super_call",
                           {});
     Begin->arguments = std::move(BeginArgs);
     Local("__call", DSLHandleType(*Program->thisModuleGroup, Module, "UCallHandle"), Begin);
+    if (Interface)
+    {
+        auto* Class = FindObject<UClass>(nullptr, *Declaration.Id);
+        auto* Function = Class ? Class->FindFunctionByName(*Method->Name) : nullptr;
+        Block->list.push_back(DSLCall(At, "ue_expect_interface_signature",
+            {CallHandle(), Str(CallSignatureKey(Function))}));
+    }
     auto Read = [&](const FString& DeclaredKind, const FString& Path, const das::TypeDeclPtr& Type)
     {
         const das::string Kind = DSLMethodAdapterKind(DeclaredKind, Type);
@@ -1746,7 +1757,7 @@ struct FUEPropertyPass : das::PassMacro
                 MethodFields.Add(Field);
                 auto Type = Field->value->rtti_isTypeDecl() ? static_cast<das::ExprTypeDecl*>(Field->value)->typeexpr
                                                             : Field->value->type;
-                if (DSLTypedReference(Type) && !DSLTypedInterface(Type))
+                if (DSLTypedReference(Type))
                     Methods.push_back({Type, Field->name, E->at});
             }
             virtual das::ExpressionPtr visit(das::ExprField* E) override

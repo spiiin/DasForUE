@@ -277,9 +277,39 @@ Calls run on the game thread and require a reflected implementation on the
 receiver. Native C++ `Execute_*` implementations without a reflected function are
 not reachable through reflection.
 
-### Explicit typed calls
+### Typed calls without generated method wrappers
 
-Use a typed interface reference with `ue_call(type<DasProbeInterface>, Query, target, 5)`. Names and argument types are checked during compilation; the normal reflected membership and signature checks still run at invocation. See [reflected call macros](../../Reference/LowLevelCalls.md).
+Declare a native interface view with `ue_native_interface`, or a loaded authored
+Blueprint interface with `ue_interface_ref`. The generic `ue_ref` factory checks
+that the object implements the interface. Methods are emitted on demand:
+
+```das
+require ue_native_gameplay
+
+[ue_interface_ref(path="/Game/Example/Types/Interactable.Interactable_C", id="example.Interactable")]
+struct InteractableRef { handle:UObjectHandle }
+
+// Inside a function, after the interface asset has been loaded:
+let target=ue_ref(type<InteractableRef>, actor.handle)
+target.Interact()
+// Equivalent explicit spelling:
+ue_call(type<InteractableRef>, Interact, target)
+```
+
+Names, argument types and ref/out directions are checked at compilation. The
+generated body reuses checked call frames, pins the interface signature, performs
+the normal implementation checks and releases its frame on return or exception.
+Value structs declared by imported `ue_native_struct` views are packed automatically;
+they do not need handwritten argument setters. Unsupported and ambiguous views
+are rejected. Mutable ref/out arguments remain invariant.
+
+The older generated `ue_interface(type<KnownGeneratedView>, handle)` overloads
+remain supported. Use `ue_ref` for a newly declared view; it does not require a
+generated conversion overload or a handwritten `<View>_raw` function.
+
+Static engine calls continue to use their generated API packages, for example
+`require ue_api_math` and `ue_static(KismetMathLibrary.ClassIsChildOf, child, parent)`.
+The generator does not expose arbitrary static native functions implicitly.
 
 ### Natural source values in generated calls
 
@@ -402,8 +432,8 @@ non-implementers are rejected before a field is replaced or a method is invoked.
   supported in interface methods.
 - Arrays and hash containers of authored interface wrappers, and interface hash
   keys/sets, are not supported (arrays of native interface wrappers are).
-- No automatic asset discovery: generated wrappers come from an explicit selection,
-  and interface assets must exist before implementations are applied.
+- No automatic asset discovery: interface assets must exist and be loaded before
+  compiling typed views. Method wrappers can be emitted on demand.
 - Native `Execute_*` fallback for receivers without a reflected implementation is
   not available.
 

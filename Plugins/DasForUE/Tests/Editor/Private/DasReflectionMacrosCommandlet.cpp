@@ -75,6 +75,10 @@ int32 UDasReflectionMacrosCommandlet::Main(const FString& Params)
     Reject(Source.Replace(TEXT("ue_call(type<DasProbeInterface>, Query, target,5)"),
                                TEXT("ue_call(type<DasProbeInterface>, Query, ue_self_object(),5)")),
                           TEXT("no matching functions"), TEXT("raw_receiver_rejected"));
+    Reject(Source.Replace(TEXT("local.Query(5)"), TEXT("local.NoSuchMethod(5)")),
+                          TEXT("NoSuchMethod"), TEXT("unbound_interface_unknown_method_rejected"));
+    Reject(Source.Replace(TEXT("local.Query(5)"), TEXT("ue_call(type<LocalProbeRef>, Query, local, \"wrong\")")),
+                          TEXT("no matching"), TEXT("unbound_interface_wrong_argument_rejected"));
     const FString Descriptor = TEXT("\n[ue_reflected_call(owner=\"/Script/DasRuntime.DasFunctionLibraryFixture\",method=\"Add\",signature=\"@SIGNATURE@\")]\ndef duplicate(a:int;b:int):int{return a+b}\n");
     Reject(Source + Descriptor.Replace(TEXT("@SIGNATURE@"), TEXT("stale")),
                                        TEXT("Reflected signature changed"), TEXT("stale_binding_rejected_at_compile"));
@@ -111,6 +115,8 @@ int32 UDasReflectionMacrosCommandlet::Main(const FString& Params)
         World->DestroyWorld(false);
     };
     World->InitializeActorsForPlay(FURL());
+    Check(R.PreparePrograms(World.Get(), {FPaths::GetCleanFilename(Path)}, Error),
+          TEXT("prepare_isolated_world_program"), Error);
     auto* Actor = World->SpawnActor<ADasReflectionMacroActor>();
     if (!Actor)
         return 2;
@@ -128,6 +134,11 @@ int32 UDasReflectionMacrosCommandlet::Main(const FString& Params)
     Run(4, 17, TEXT("typed_struct_read"));
     Run(5, 1, TEXT("nested_struct_read"));
     Run(6, 3, TEXT("interface_container_result"));
+    Run(7, 42, TEXT("interface_member_without_generated_wrapper"));
+    Run(8, 27, TEXT("interface_ref_out_without_generated_wrapper"));
+    Run(9, 3, TEXT("interface_container_without_generated_wrapper"));
+    Run(10, 42, TEXT("equivalent_native_reference_view_argument"));
+    Run(11, 42, TEXT("typed_class_to_native_class_argument"));
     R.ReleaseObject(Actor);
     const auto NoOwner = R.RunFile(Path, 1);
     Check(!NoOwner.bSucceeded && NoOwner.Error.Contains(TEXT("self is missing")),

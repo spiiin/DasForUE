@@ -13,6 +13,13 @@ struct FUEReferenceUpcastVisitor : das::Visitor
     }
     static int Distance(const das::TypeDeclPtr& From, const das::TypeDeclPtr& To)
     {
+        if (Same(From, To))
+            return -1;
+        // Native reflected class parameters use UEClassHandle as their ABI.
+        // Extract only a checked class capability from a typed class value.
+        if (DSLTypedClass(From) && To && To->baseType == das::Type::tHandle && To->annotation &&
+            To->annotation->name == "UEClassHandle")
+            return 1;
         if (DSLAdaptedReference(From) || DSLAdaptedReference(To))
         {
             const int D =
@@ -25,8 +32,12 @@ struct FUEReferenceUpcastVisitor : das::Visitor
         const FString Source = DSLTypedReferencePath(From), Target = DSLTypedReferencePath(To);
         auto* Child = FindObject<UClass>(nullptr, *Source);
         auto* Parent = FindObject<UClass>(nullptr, *Target);
-        if (!Child || !Parent || Child == Parent || !Child->IsChildOf(Parent))
+        if (!Child || !Parent || !Child->IsChildOf(Parent))
             return -1;
+        // Nominal DAS views of the same native UObject class are equivalent
+        // capabilities; conversion still runs through the checked factory.
+        if (Child == Parent)
+            return 1;
         int N = 0;
         for (auto* C = Child; C && C != Parent; C = C->GetSuperClass())
             ++N;
@@ -38,6 +49,12 @@ struct FUEReferenceUpcastVisitor : das::Visitor
             return false;
         const auto At = Value->at;
         const auto Source = Value->type;
+        if (DSLTypedClass(Source))
+        {
+            Value = DSLClassPack(At, Source, Value);
+            Changed = true;
+            return true;
+        }
         if (DSLAdaptedReference(Source))
         {
             Value = DSLAdaptedReference(Source)->Script->Upcast(At, Source, Target, Value);

@@ -75,6 +75,11 @@
 				"name": "C_Actor_adf65d5b"
 			},
 			{
+				"path": "/Script/Engine.ActorComponent",
+				"module": "ue_scene_components",
+				"name": "ActorComponentRef"
+			},
+			{
 				"path": "/Script/Engine.CameraComponent",
 				"module": "ue_character_control",
 				"name": "CameraComponentRef"
@@ -128,6 +133,11 @@
 				"path": "/Script/Engine.SphereComponent",
 				"module": "ue_pickup_components",
 				"name": "SphereComponentRef"
+			},
+			{
+				"path": "/Script/Engine.SpringArmComponent",
+				"module": "ue_character_control",
+				"name": "SpringArmComponentRef"
 			},
 			{
 				"path": "/Script/Engine.StaticMesh",
@@ -12530,6 +12540,87 @@
 					"signature": "health:IntProperty:0;"
 				},
 				{
+					"kind": "map",
+					"type_path": "",
+					"key":
+					{
+						"kind": "int",
+						"type_path": ""
+					},
+					"value":
+					{
+						"kind": "int",
+						"type_path": ""
+					},
+					"name": "InteropCounts",
+					"declaring_class": "/Script/DasRuntime.DasObjectFixture",
+					"readonly": false,
+					"access":
+					{
+						"native_getter": false,
+						"native_setter": false,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": ""
+					},
+					"signature": "InteropCounts:MapProperty:0[InteropCounts_Key:IntProperty:0;InteropCounts:IntProperty:0;];"
+				},
+				{
+					"kind": "map",
+					"type_path": "",
+					"key":
+					{
+						"kind": "int",
+						"type_path": ""
+					},
+					"value":
+					{
+						"kind": "int",
+						"type_path": ""
+					},
+					"name": "InteropLocked",
+					"declaring_class": "/Script/DasRuntime.DasObjectFixture",
+					"readonly": true,
+					"access":
+					{
+						"native_getter": false,
+						"native_setter": false,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": ""
+					},
+					"signature": "InteropLocked:MapProperty:0[InteropLocked_Key:IntProperty:0;InteropLocked:IntProperty:0;];"
+				},
+				{
+					"kind": "map",
+					"type_path": "",
+					"key":
+					{
+						"kind": "string",
+						"type_path": ""
+					},
+					"value":
+					{
+						"kind": "double",
+						"type_path": ""
+					},
+					"name": "InteropStrings",
+					"declaring_class": "/Script/DasRuntime.DasObjectFixture",
+					"readonly": false,
+					"access":
+					{
+						"native_getter": false,
+						"native_setter": false,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": ""
+					},
+					"signature": "InteropStrings:MapProperty:0[InteropStrings_Key:StrProperty:0;InteropStrings:DoubleProperty:0;];"
+				},
+				{
 					"kind": "int",
 					"type_path": "",
 					"name": "readOnly",
@@ -14194,6 +14285,11 @@
 				{
 					"domain": "field",
 					"name": "Events",
+					"reason": "unsupported_property_type"
+				},
+				{
+					"domain": "field",
+					"name": "InteropBytes",
 					"reason": "unsupported_property_type"
 				},
 				{
@@ -17195,6 +17291,546 @@
 					"domain": "method",
 					"name": "UserConstructionScript",
 					"reason": "requires_adapter_or_nonpublic_policy"
+				}
+			]
+		},
+		{
+			"path": "/Script/Engine.ActorComponent",
+			"fixture": false,
+			"fields": [
+				{
+					"kind": "bool",
+					"type_path": "",
+					"name": "bAutoActivate",
+					"declaring_class": "/Script/Engine.ActorComponent",
+					"readonly": true,
+					"access":
+					{
+						"native_getter": false,
+						"native_setter": false,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": ""
+					},
+					"signature": "bAutoActivate:BoolProperty:0;"
+				},
+				{
+					"kind": "bool",
+					"type_path": "",
+					"name": "bIsEditorOnly",
+					"declaring_class": "/Script/Engine.ActorComponent",
+					"readonly": true,
+					"access":
+					{
+						"native_getter": false,
+						"native_setter": false,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": ""
+					},
+					"signature": "bIsEditorOnly:BoolProperty:0;"
+				},
+				{
+					"kind": "bool",
+					"type_path": "",
+					"name": "bReplicates",
+					"declaring_class": "/Script/Engine.ActorComponent",
+					"readonly": true,
+					"access":
+					{
+						"native_getter": false,
+						"native_setter": false,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": ""
+					},
+					"signature": "bReplicates:BoolProperty:0;"
+				},
+				{
+					"kind": "bool",
+					"type_path": "",
+					"name": "bReplicateUsingRegisteredSubObjectList",
+					"declaring_class": "/Script/Engine.ActorComponent",
+					"readonly": true,
+					"access":
+					{
+						"native_getter": false,
+						"native_setter": false,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": ""
+					},
+					"signature": "bReplicateUsingRegisteredSubObjectList:BoolProperty:0;"
+				},
+				{
+					"kind": "array",
+					"type_path": "",
+					"element":
+					{
+						"kind": "name",
+						"type_path": ""
+					},
+					"name": "ComponentTags",
+					"declaring_class": "/Script/Engine.ActorComponent",
+					"readonly": false,
+					"access":
+					{
+						"native_getter": false,
+						"native_setter": false,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": ""
+					},
+					"signature": "ComponentTags:ArrayProperty:0[ComponentTags:NameProperty:0;];"
+				}
+			],
+			"methods": [
+				{
+					"name": "Activate",
+					"declaring_class": "/Script/Engine.ActorComponent",
+					"signature": "v1;Activate;bReset:BoolProperty:128;",
+					"const": false,
+					"construction_unsafe": true,
+					"parameters": [
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "bReset",
+							"direction": "in",
+							"default_text": "false"
+						}
+					]
+				},
+				{
+					"name": "AddTickPrerequisiteActor",
+					"declaring_class": "/Script/Engine.ActorComponent",
+					"signature": "v1;AddTickPrerequisiteActor;PrerequisiteActor:ObjectProperty:128:/Script/Engine.Actor;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "object",
+							"type_path": "/Script/Engine.Actor",
+							"name": "PrerequisiteActor",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "AddTickPrerequisiteComponent",
+					"declaring_class": "/Script/Engine.ActorComponent",
+					"signature": "v1;AddTickPrerequisiteComponent;PrerequisiteComponent:ObjectProperty:128:/Script/Engine.ActorComponent;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "object",
+							"type_path": "/Script/Engine.ActorComponent",
+							"name": "PrerequisiteComponent",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "ComponentHasTag",
+					"declaring_class": "/Script/Engine.ActorComponent",
+					"signature": "v1;ComponentHasTag;Tag:NameProperty:128;ReturnValue:BoolProperty:1408;",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "name",
+							"type_path": "",
+							"name": "Tag",
+							"direction": "in"
+						},
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "Deactivate",
+					"declaring_class": "/Script/Engine.ActorComponent",
+					"signature": "v1;Deactivate;",
+					"const": false,
+					"construction_unsafe": true,
+					"parameters": []
+				},
+				{
+					"name": "GetComponentTickInterval",
+					"declaring_class": "/Script/Engine.ActorComponent",
+					"signature": "v1;GetComponentTickInterval;ReturnValue:FloatProperty:1408;",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "float",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "GetOwner",
+					"declaring_class": "/Script/Engine.ActorComponent",
+					"signature": "v1;GetOwner;ReturnValue:ObjectProperty:1408:/Script/Engine.Actor;",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "object",
+							"type_path": "/Script/Engine.Actor",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "IsActive",
+					"declaring_class": "/Script/Engine.ActorComponent",
+					"signature": "v1;IsActive;ReturnValue:BoolProperty:1408;",
+					"const": true,
+					"construction_unsafe": true,
+					"parameters": [
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "IsBeingDestroyed",
+					"declaring_class": "/Script/Engine.ActorComponent",
+					"signature": "v1;IsBeingDestroyed;ReturnValue:BoolProperty:1408;",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "IsComponentTickEnabled",
+					"declaring_class": "/Script/Engine.ActorComponent",
+					"signature": "v1;IsComponentTickEnabled;ReturnValue:BoolProperty:1408;",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "K2_DestroyComponent",
+					"declaring_class": "/Script/Engine.ActorComponent",
+					"signature": "v1;K2_DestroyComponent;Object:ObjectProperty:128:/Script/CoreUObject.Object;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "object",
+							"type_path": "/Script/CoreUObject.Object",
+							"name": "Object",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "RemoveTickPrerequisiteActor",
+					"declaring_class": "/Script/Engine.ActorComponent",
+					"signature": "v1;RemoveTickPrerequisiteActor;PrerequisiteActor:ObjectProperty:128:/Script/Engine.Actor;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "object",
+							"type_path": "/Script/Engine.Actor",
+							"name": "PrerequisiteActor",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "RemoveTickPrerequisiteComponent",
+					"declaring_class": "/Script/Engine.ActorComponent",
+					"signature": "v1;RemoveTickPrerequisiteComponent;PrerequisiteComponent:ObjectProperty:128:/Script/Engine.ActorComponent;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "object",
+							"type_path": "/Script/Engine.ActorComponent",
+							"name": "PrerequisiteComponent",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "SetActive",
+					"declaring_class": "/Script/Engine.ActorComponent",
+					"signature": "v1;SetActive;bNewActive:BoolProperty:128;bReset:BoolProperty:128;",
+					"const": false,
+					"construction_unsafe": true,
+					"parameters": [
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "bNewActive",
+							"direction": "in"
+						},
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "bReset",
+							"direction": "in",
+							"default_text": "false"
+						}
+					]
+				},
+				{
+					"name": "SetAutoActivate",
+					"declaring_class": "/Script/Engine.ActorComponent",
+					"signature": "v1;SetAutoActivate;bNewAutoActivate:BoolProperty:128;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "bNewAutoActivate",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "SetComponentTickEnabled",
+					"declaring_class": "/Script/Engine.ActorComponent",
+					"signature": "v1;SetComponentTickEnabled;bEnabled:BoolProperty:128;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "bEnabled",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "SetComponentTickInterval",
+					"declaring_class": "/Script/Engine.ActorComponent",
+					"signature": "v1;SetComponentTickInterval;TickInterval:FloatProperty:128;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "float",
+							"type_path": "",
+							"name": "TickInterval",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "SetComponentTickIntervalAndCooldown",
+					"declaring_class": "/Script/Engine.ActorComponent",
+					"signature": "v1;SetComponentTickIntervalAndCooldown;TickInterval:FloatProperty:128;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "float",
+							"type_path": "",
+							"name": "TickInterval",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "SetIsReplicated",
+					"declaring_class": "/Script/Engine.ActorComponent",
+					"signature": "v1;SetIsReplicated;ShouldReplicate:BoolProperty:128;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "ShouldReplicate",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "SetTickableWhenPaused",
+					"declaring_class": "/Script/Engine.ActorComponent",
+					"signature": "v1;SetTickableWhenPaused;bTickableWhenPaused:BoolProperty:128;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "bTickableWhenPaused",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "SetTickGroup",
+					"declaring_class": "/Script/Engine.ActorComponent",
+					"signature": "v1;SetTickGroup;NewTickGroup:ByteProperty:128:/Script/Engine.ETickingGroup;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "enum",
+							"type_path": "/Script/Engine.ETickingGroup",
+							"name": "NewTickGroup",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "ToggleActive",
+					"declaring_class": "/Script/Engine.ActorComponent",
+					"signature": "v1;ToggleActive;",
+					"const": false,
+					"construction_unsafe": true,
+					"parameters": []
+				}
+			],
+			"skipped": [
+				{
+					"domain": "field",
+					"name": "AssetUserData",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "AssetUserDataEditorOnly",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bCanEverAffectNavigation",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bCreatedByConstructionScript",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bEditableWhenInherited",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bInstanceComponent",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bIsActive",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bIsVisualizationComponent",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bNeedsUCSSerializationIndexEvaluted",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bNetAddressable",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "CreationMethod",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "OnComponentActivated",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "OnComponentDeactivated",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "PrimaryComponentTick",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "UCSModifiedProperties",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "UCSSerializationIndex",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "method",
+					"name": "ExecuteUbergraph",
+					"reason": "requires_adapter_or_nonpublic_policy"
+				},
+				{
+					"domain": "method",
+					"name": "OnRep_IsActive",
+					"reason": "not_public_local_native_instance_callable"
+				},
+				{
+					"domain": "method",
+					"name": "ReceiveAsyncPhysicsTick",
+					"reason": "not_public_local_native_instance_callable"
+				},
+				{
+					"domain": "method",
+					"name": "ReceiveBeginPlay",
+					"reason": "not_public_local_native_instance_callable"
+				},
+				{
+					"domain": "method",
+					"name": "ReceiveEndPlay",
+					"reason": "not_public_local_native_instance_callable"
+				},
+				{
+					"domain": "method",
+					"name": "ReceiveTick",
+					"reason": "not_public_local_native_instance_callable"
 				}
 			]
 		},
@@ -70011,6 +70647,2084 @@
 					"domain": "method",
 					"name": "SetExcludeForSpecificHLODLevels",
 					"reason": "requires_adapter_or_nonpublic_policy"
+				}
+			]
+		},
+		{
+			"path": "/Script/Engine.SpringArmComponent",
+			"fixture": false,
+			"fields": [
+				{
+					"kind": "bool",
+					"type_path": "",
+					"name": "bAbsoluteLocation",
+					"declaring_class": "/Script/Engine.SceneComponent",
+					"readonly": false,
+					"access":
+					{
+						"native_getter": false,
+						"native_setter": false,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": ""
+					},
+					"signature": "bAbsoluteLocation:BoolProperty:0;"
+				},
+				{
+					"kind": "bool",
+					"type_path": "",
+					"name": "bAbsoluteRotation",
+					"declaring_class": "/Script/Engine.SceneComponent",
+					"readonly": false,
+					"access":
+					{
+						"native_getter": false,
+						"native_setter": false,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": ""
+					},
+					"signature": "bAbsoluteRotation:BoolProperty:0;"
+				},
+				{
+					"kind": "bool",
+					"type_path": "",
+					"name": "bAbsoluteScale",
+					"declaring_class": "/Script/Engine.SceneComponent",
+					"readonly": false,
+					"access":
+					{
+						"native_getter": false,
+						"native_setter": false,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": ""
+					},
+					"signature": "bAbsoluteScale:BoolProperty:0;"
+				},
+				{
+					"kind": "bool",
+					"type_path": "",
+					"name": "bAutoActivate",
+					"declaring_class": "/Script/Engine.ActorComponent",
+					"readonly": true,
+					"access":
+					{
+						"native_getter": false,
+						"native_setter": false,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": ""
+					},
+					"signature": "bAutoActivate:BoolProperty:0;"
+				},
+				{
+					"kind": "bool",
+					"type_path": "",
+					"name": "bClampToMaxPhysicsDeltaTime",
+					"declaring_class": "/Script/Engine.SpringArmComponent",
+					"readonly": false,
+					"access":
+					{
+						"native_getter": false,
+						"native_setter": false,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": ""
+					},
+					"signature": "bClampToMaxPhysicsDeltaTime:BoolProperty:0;"
+				},
+				{
+					"kind": "bool",
+					"type_path": "",
+					"name": "bDoCollisionTest",
+					"declaring_class": "/Script/Engine.SpringArmComponent",
+					"readonly": false,
+					"access":
+					{
+						"native_getter": false,
+						"native_setter": false,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": ""
+					},
+					"signature": "bDoCollisionTest:BoolProperty:0;"
+				},
+				{
+					"kind": "bool",
+					"type_path": "",
+					"name": "bDrawDebugLagMarkers",
+					"declaring_class": "/Script/Engine.SpringArmComponent",
+					"readonly": false,
+					"access":
+					{
+						"native_getter": false,
+						"native_setter": false,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": ""
+					},
+					"signature": "bDrawDebugLagMarkers:BoolProperty:0;"
+				},
+				{
+					"kind": "bool",
+					"type_path": "",
+					"name": "bEnableCameraLag",
+					"declaring_class": "/Script/Engine.SpringArmComponent",
+					"readonly": false,
+					"access":
+					{
+						"native_getter": false,
+						"native_setter": false,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": ""
+					},
+					"signature": "bEnableCameraLag:BoolProperty:0;"
+				},
+				{
+					"kind": "bool",
+					"type_path": "",
+					"name": "bEnableCameraRotationLag",
+					"declaring_class": "/Script/Engine.SpringArmComponent",
+					"readonly": false,
+					"access":
+					{
+						"native_getter": false,
+						"native_setter": false,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": ""
+					},
+					"signature": "bEnableCameraRotationLag:BoolProperty:0;"
+				},
+				{
+					"kind": "bool",
+					"type_path": "",
+					"name": "bHiddenInGame",
+					"declaring_class": "/Script/Engine.SceneComponent",
+					"readonly": true,
+					"access":
+					{
+						"native_getter": false,
+						"native_setter": false,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": ""
+					},
+					"signature": "bHiddenInGame:BoolProperty:0;"
+				},
+				{
+					"kind": "bool",
+					"type_path": "",
+					"name": "bInheritPitch",
+					"declaring_class": "/Script/Engine.SpringArmComponent",
+					"readonly": false,
+					"access":
+					{
+						"native_getter": false,
+						"native_setter": false,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": ""
+					},
+					"signature": "bInheritPitch:BoolProperty:0;"
+				},
+				{
+					"kind": "bool",
+					"type_path": "",
+					"name": "bInheritRoll",
+					"declaring_class": "/Script/Engine.SpringArmComponent",
+					"readonly": false,
+					"access":
+					{
+						"native_getter": false,
+						"native_setter": false,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": ""
+					},
+					"signature": "bInheritRoll:BoolProperty:0;"
+				},
+				{
+					"kind": "bool",
+					"type_path": "",
+					"name": "bInheritYaw",
+					"declaring_class": "/Script/Engine.SpringArmComponent",
+					"readonly": false,
+					"access":
+					{
+						"native_getter": false,
+						"native_setter": false,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": ""
+					},
+					"signature": "bInheritYaw:BoolProperty:0;"
+				},
+				{
+					"kind": "bool",
+					"type_path": "",
+					"name": "bIsEditorOnly",
+					"declaring_class": "/Script/Engine.ActorComponent",
+					"readonly": true,
+					"access":
+					{
+						"native_getter": false,
+						"native_setter": false,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": ""
+					},
+					"signature": "bIsEditorOnly:BoolProperty:0;"
+				},
+				{
+					"kind": "bool",
+					"type_path": "",
+					"name": "bReplicates",
+					"declaring_class": "/Script/Engine.ActorComponent",
+					"readonly": true,
+					"access":
+					{
+						"native_getter": false,
+						"native_setter": false,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": ""
+					},
+					"signature": "bReplicates:BoolProperty:0;"
+				},
+				{
+					"kind": "bool",
+					"type_path": "",
+					"name": "bReplicateUsingRegisteredSubObjectList",
+					"declaring_class": "/Script/Engine.ActorComponent",
+					"readonly": true,
+					"access":
+					{
+						"native_getter": false,
+						"native_setter": false,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": ""
+					},
+					"signature": "bReplicateUsingRegisteredSubObjectList:BoolProperty:0;"
+				},
+				{
+					"kind": "bool",
+					"type_path": "",
+					"name": "bShouldUpdatePhysicsVolume",
+					"declaring_class": "/Script/Engine.SceneComponent",
+					"readonly": false,
+					"access":
+					{
+						"native_getter": false,
+						"native_setter": false,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "GetShouldUpdatePhysicsVolume",
+						"setter": "SetShouldUpdatePhysicsVolume"
+					},
+					"signature": "bShouldUpdatePhysicsVolume:BoolProperty:0;"
+				},
+				{
+					"kind": "bool",
+					"type_path": "",
+					"name": "bUseAttachParentBound",
+					"declaring_class": "/Script/Engine.SceneComponent",
+					"readonly": false,
+					"access":
+					{
+						"native_getter": false,
+						"native_setter": false,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": ""
+					},
+					"signature": "bUseAttachParentBound:BoolProperty:0;"
+				},
+				{
+					"kind": "bool",
+					"type_path": "",
+					"name": "bUseCameraLagSubstepping",
+					"declaring_class": "/Script/Engine.SpringArmComponent",
+					"readonly": false,
+					"access":
+					{
+						"native_getter": false,
+						"native_setter": false,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": ""
+					},
+					"signature": "bUseCameraLagSubstepping:BoolProperty:0;"
+				},
+				{
+					"kind": "bool",
+					"type_path": "",
+					"name": "bUsePawnControlRotation",
+					"declaring_class": "/Script/Engine.SpringArmComponent",
+					"readonly": false,
+					"access":
+					{
+						"native_getter": false,
+						"native_setter": false,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": ""
+					},
+					"signature": "bUsePawnControlRotation:BoolProperty:0;"
+				},
+				{
+					"kind": "bool",
+					"type_path": "",
+					"name": "bVisible",
+					"declaring_class": "/Script/Engine.SceneComponent",
+					"readonly": true,
+					"access":
+					{
+						"native_getter": false,
+						"native_setter": false,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": ""
+					},
+					"signature": "bVisible:BoolProperty:0;"
+				},
+				{
+					"kind": "float",
+					"type_path": "",
+					"name": "CameraLagMaxDistance",
+					"declaring_class": "/Script/Engine.SpringArmComponent",
+					"readonly": false,
+					"access":
+					{
+						"native_getter": false,
+						"native_setter": false,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": ""
+					},
+					"signature": "CameraLagMaxDistance:FloatProperty:0;"
+				},
+				{
+					"kind": "float",
+					"type_path": "",
+					"name": "CameraLagMaxTimeStep",
+					"declaring_class": "/Script/Engine.SpringArmComponent",
+					"readonly": false,
+					"access":
+					{
+						"native_getter": false,
+						"native_setter": false,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": ""
+					},
+					"signature": "CameraLagMaxTimeStep:FloatProperty:0;"
+				},
+				{
+					"kind": "float",
+					"type_path": "",
+					"name": "CameraLagSpeed",
+					"declaring_class": "/Script/Engine.SpringArmComponent",
+					"readonly": false,
+					"access":
+					{
+						"native_getter": false,
+						"native_setter": false,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": ""
+					},
+					"signature": "CameraLagSpeed:FloatProperty:0;"
+				},
+				{
+					"kind": "float",
+					"type_path": "",
+					"name": "CameraRotationLagSpeed",
+					"declaring_class": "/Script/Engine.SpringArmComponent",
+					"readonly": false,
+					"access":
+					{
+						"native_getter": false,
+						"native_setter": false,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": ""
+					},
+					"signature": "CameraRotationLagSpeed:FloatProperty:0;"
+				},
+				{
+					"kind": "array",
+					"type_path": "",
+					"element":
+					{
+						"kind": "name",
+						"type_path": ""
+					},
+					"name": "ComponentTags",
+					"declaring_class": "/Script/Engine.ActorComponent",
+					"readonly": false,
+					"access":
+					{
+						"native_getter": false,
+						"native_setter": false,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": ""
+					},
+					"signature": "ComponentTags:ArrayProperty:0[ComponentTags:NameProperty:0;];"
+				},
+				{
+					"kind": "enum",
+					"type_path": "/Script/Engine.EDetailMode",
+					"name": "DetailMode",
+					"declaring_class": "/Script/Engine.SceneComponent",
+					"readonly": true,
+					"access":
+					{
+						"native_getter": false,
+						"native_setter": false,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": ""
+					},
+					"signature": "DetailMode:ByteProperty:0:/Script/Engine.EDetailMode;"
+				},
+				{
+					"kind": "enum",
+					"type_path": "/Script/Engine.EComponentMobility",
+					"name": "Mobility",
+					"declaring_class": "/Script/Engine.SceneComponent",
+					"readonly": true,
+					"access":
+					{
+						"native_getter": false,
+						"native_setter": false,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": ""
+					},
+					"signature": "Mobility:ByteProperty:0:/Script/Engine.EComponentMobility;"
+				},
+				{
+					"kind": "enum",
+					"type_path": "/Script/Engine.ECollisionChannel",
+					"name": "ProbeChannel",
+					"declaring_class": "/Script/Engine.SpringArmComponent",
+					"readonly": false,
+					"access":
+					{
+						"native_getter": false,
+						"native_setter": false,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": ""
+					},
+					"signature": "ProbeChannel:ByteProperty:0:/Script/Engine.ECollisionChannel;"
+				},
+				{
+					"kind": "float",
+					"type_path": "",
+					"name": "ProbeSize",
+					"declaring_class": "/Script/Engine.SpringArmComponent",
+					"readonly": false,
+					"access":
+					{
+						"native_getter": false,
+						"native_setter": false,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": ""
+					},
+					"signature": "ProbeSize:FloatProperty:0;"
+				},
+				{
+					"kind": "struct",
+					"type_path": "/Script/CoreUObject.Vector",
+					"name": "RelativeLocation",
+					"declaring_class": "/Script/Engine.SceneComponent",
+					"readonly": true,
+					"access":
+					{
+						"native_getter": false,
+						"native_setter": false,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": ""
+					},
+					"signature": "RelativeLocation:StructProperty:0:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};"
+				},
+				{
+					"kind": "struct",
+					"type_path": "/Script/CoreUObject.Rotator",
+					"name": "RelativeRotation",
+					"declaring_class": "/Script/Engine.SceneComponent",
+					"readonly": true,
+					"access":
+					{
+						"native_getter": false,
+						"native_setter": false,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": ""
+					},
+					"signature": "RelativeRotation:StructProperty:0:/Script/CoreUObject.Rotator{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;};"
+				},
+				{
+					"kind": "struct",
+					"type_path": "/Script/CoreUObject.Vector",
+					"name": "RelativeScale3D",
+					"declaring_class": "/Script/Engine.SceneComponent",
+					"readonly": true,
+					"access":
+					{
+						"native_getter": false,
+						"native_setter": false,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": ""
+					},
+					"signature": "RelativeScale3D:StructProperty:0:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};"
+				},
+				{
+					"kind": "struct",
+					"type_path": "/Script/CoreUObject.Vector",
+					"name": "SocketOffset",
+					"declaring_class": "/Script/Engine.SpringArmComponent",
+					"readonly": false,
+					"access":
+					{
+						"native_getter": false,
+						"native_setter": false,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": ""
+					},
+					"signature": "SocketOffset:StructProperty:0:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};"
+				},
+				{
+					"kind": "float",
+					"type_path": "",
+					"name": "TargetArmLength",
+					"declaring_class": "/Script/Engine.SpringArmComponent",
+					"readonly": false,
+					"access":
+					{
+						"native_getter": false,
+						"native_setter": false,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": ""
+					},
+					"signature": "TargetArmLength:FloatProperty:0;"
+				},
+				{
+					"kind": "struct",
+					"type_path": "/Script/CoreUObject.Vector",
+					"name": "TargetOffset",
+					"declaring_class": "/Script/Engine.SpringArmComponent",
+					"readonly": false,
+					"access":
+					{
+						"native_getter": false,
+						"native_setter": false,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": ""
+					},
+					"signature": "TargetOffset:StructProperty:0:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};"
+				}
+			],
+			"methods": [
+				{
+					"name": "Activate",
+					"declaring_class": "/Script/Engine.ActorComponent",
+					"signature": "v1;Activate;bReset:BoolProperty:128;",
+					"const": false,
+					"construction_unsafe": true,
+					"parameters": [
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "bReset",
+							"direction": "in",
+							"default_text": "false"
+						}
+					]
+				},
+				{
+					"name": "AddTickPrerequisiteActor",
+					"declaring_class": "/Script/Engine.ActorComponent",
+					"signature": "v1;AddTickPrerequisiteActor;PrerequisiteActor:ObjectProperty:128:/Script/Engine.Actor;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "object",
+							"type_path": "/Script/Engine.Actor",
+							"name": "PrerequisiteActor",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "AddTickPrerequisiteComponent",
+					"declaring_class": "/Script/Engine.ActorComponent",
+					"signature": "v1;AddTickPrerequisiteComponent;PrerequisiteComponent:ObjectProperty:128:/Script/Engine.ActorComponent;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "object",
+							"type_path": "/Script/Engine.ActorComponent",
+							"name": "PrerequisiteComponent",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "ComponentHasTag",
+					"declaring_class": "/Script/Engine.ActorComponent",
+					"signature": "v1;ComponentHasTag;Tag:NameProperty:128;ReturnValue:BoolProperty:1408;",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "name",
+							"type_path": "",
+							"name": "Tag",
+							"direction": "in"
+						},
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "Deactivate",
+					"declaring_class": "/Script/Engine.ActorComponent",
+					"signature": "v1;Deactivate;",
+					"const": false,
+					"construction_unsafe": true,
+					"parameters": []
+				},
+				{
+					"name": "DetachFromParent",
+					"declaring_class": "/Script/Engine.SceneComponent",
+					"signature": "v1;DetachFromParent;bMaintainWorldPosition:BoolProperty:128;bCallModify:BoolProperty:128;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "bMaintainWorldPosition",
+							"direction": "in",
+							"default_text": "false"
+						},
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "bCallModify",
+							"direction": "in",
+							"default_text": "true"
+						}
+					]
+				},
+				{
+					"name": "DoesSocketExist",
+					"declaring_class": "/Script/Engine.SceneComponent",
+					"signature": "v1;DoesSocketExist;InSocketName:NameProperty:128;ReturnValue:BoolProperty:1408;",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "name",
+							"type_path": "",
+							"name": "InSocketName",
+							"direction": "in"
+						},
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "GetAllSocketNames",
+					"declaring_class": "/Script/Engine.SceneComponent",
+					"signature": "v1;GetAllSocketNames;ReturnValue:ArrayProperty:1408[ReturnValue:NameProperty:0;];",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "array",
+							"type_path": "",
+							"element":
+							{
+								"kind": "name",
+								"type_path": ""
+							},
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "GetAttachParent",
+					"declaring_class": "/Script/Engine.SceneComponent",
+					"signature": "v1;GetAttachParent;ReturnValue:ObjectProperty:1408:/Script/Engine.SceneComponent;",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "object",
+							"type_path": "/Script/Engine.SceneComponent",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "GetAttachSocketName",
+					"declaring_class": "/Script/Engine.SceneComponent",
+					"signature": "v1;GetAttachSocketName;ReturnValue:NameProperty:1408;",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "name",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "GetChildComponent",
+					"declaring_class": "/Script/Engine.SceneComponent",
+					"signature": "v1;GetChildComponent;ChildIndex:IntProperty:128;ReturnValue:ObjectProperty:1408:/Script/Engine.SceneComponent;",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "int",
+							"type_path": "",
+							"name": "ChildIndex",
+							"direction": "in"
+						},
+						{
+							"kind": "object",
+							"type_path": "/Script/Engine.SceneComponent",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "GetChildrenComponents",
+					"declaring_class": "/Script/Engine.SceneComponent",
+					"signature": "v1;GetChildrenComponents;bIncludeAllDescendants:BoolProperty:128;Children:ArrayProperty:384[Children:ObjectProperty:0:/Script/Engine.SceneComponent;];",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "bIncludeAllDescendants",
+							"direction": "in"
+						},
+						{
+							"kind": "array",
+							"type_path": "",
+							"element":
+							{
+								"kind": "object",
+								"type_path": "/Script/Engine.SceneComponent"
+							},
+							"name": "Children",
+							"direction": "out"
+						}
+					]
+				},
+				{
+					"name": "GetComponentTickInterval",
+					"declaring_class": "/Script/Engine.ActorComponent",
+					"signature": "v1;GetComponentTickInterval;ReturnValue:FloatProperty:1408;",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "float",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "GetComponentVelocity",
+					"declaring_class": "/Script/Engine.SceneComponent",
+					"signature": "v1;GetComponentVelocity;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "struct",
+							"type_path": "/Script/CoreUObject.Vector",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "GetForwardVector",
+					"declaring_class": "/Script/Engine.SceneComponent",
+					"signature": "v1;GetForwardVector;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "struct",
+							"type_path": "/Script/CoreUObject.Vector",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "GetNumChildrenComponents",
+					"declaring_class": "/Script/Engine.SceneComponent",
+					"signature": "v1;GetNumChildrenComponents;ReturnValue:IntProperty:1408;",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "int",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "GetOwner",
+					"declaring_class": "/Script/Engine.ActorComponent",
+					"signature": "v1;GetOwner;ReturnValue:ObjectProperty:1408:/Script/Engine.Actor;",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "object",
+							"type_path": "/Script/Engine.Actor",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "GetParentComponents",
+					"declaring_class": "/Script/Engine.SceneComponent",
+					"signature": "v1;GetParentComponents;Parents:ArrayProperty:384[Parents:ObjectProperty:0:/Script/Engine.SceneComponent;];",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "array",
+							"type_path": "",
+							"element":
+							{
+								"kind": "object",
+								"type_path": "/Script/Engine.SceneComponent"
+							},
+							"name": "Parents",
+							"direction": "out"
+						}
+					]
+				},
+				{
+					"name": "GetPhysicsVolume",
+					"declaring_class": "/Script/Engine.SceneComponent",
+					"signature": "v1;GetPhysicsVolume;ReturnValue:ObjectProperty:1408:/Script/Engine.PhysicsVolume;",
+					"const": true,
+					"construction_unsafe": true,
+					"parameters": [
+						{
+							"kind": "object",
+							"type_path": "/Script/Engine.PhysicsVolume",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "GetRelativeTransform",
+					"declaring_class": "/Script/Engine.SceneComponent",
+					"signature": "v1;GetRelativeTransform;ReturnValue:StructProperty:1408:/Script/CoreUObject.Transform{Rotation:StructProperty:0:/Script/CoreUObject.Quat{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;};Translation:StructProperty:0:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};Scale3D:StructProperty:0:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};};",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "struct",
+							"type_path": "/Script/CoreUObject.Transform",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "GetRightVector",
+					"declaring_class": "/Script/Engine.SceneComponent",
+					"signature": "v1;GetRightVector;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "struct",
+							"type_path": "/Script/CoreUObject.Vector",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "GetShouldUpdatePhysicsVolume",
+					"declaring_class": "/Script/Engine.SceneComponent",
+					"signature": "v1;GetShouldUpdatePhysicsVolume;ReturnValue:BoolProperty:1408;",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "GetSocketLocation",
+					"declaring_class": "/Script/Engine.SceneComponent",
+					"signature": "v1;GetSocketLocation;InSocketName:NameProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "name",
+							"type_path": "",
+							"name": "InSocketName",
+							"direction": "in"
+						},
+						{
+							"kind": "struct",
+							"type_path": "/Script/CoreUObject.Vector",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "GetSocketRotation",
+					"declaring_class": "/Script/Engine.SceneComponent",
+					"signature": "v1;GetSocketRotation;InSocketName:NameProperty:128;ReturnValue:StructProperty:1408:/Script/CoreUObject.Rotator{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;};",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "name",
+							"type_path": "",
+							"name": "InSocketName",
+							"direction": "in"
+						},
+						{
+							"kind": "struct",
+							"type_path": "/Script/CoreUObject.Rotator",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "GetSocketTransform",
+					"declaring_class": "/Script/Engine.SceneComponent",
+					"signature": "v1;GetSocketTransform;InSocketName:NameProperty:128;TransformSpace:ByteProperty:128:/Script/Engine.ERelativeTransformSpace;ReturnValue:StructProperty:1408:/Script/CoreUObject.Transform{Rotation:StructProperty:0:/Script/CoreUObject.Quat{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;};Translation:StructProperty:0:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};Scale3D:StructProperty:0:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};};",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "name",
+							"type_path": "",
+							"name": "InSocketName",
+							"direction": "in"
+						},
+						{
+							"kind": "enum",
+							"type_path": "/Script/Engine.ERelativeTransformSpace",
+							"name": "TransformSpace",
+							"direction": "in",
+							"default_text": "RTS_World"
+						},
+						{
+							"kind": "struct",
+							"type_path": "/Script/CoreUObject.Transform",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "GetTargetRotation",
+					"declaring_class": "/Script/Engine.SpringArmComponent",
+					"signature": "v1;GetTargetRotation;ReturnValue:StructProperty:1408:/Script/CoreUObject.Rotator{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;};",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "struct",
+							"type_path": "/Script/CoreUObject.Rotator",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "GetUnfixedCameraPosition",
+					"declaring_class": "/Script/Engine.SpringArmComponent",
+					"signature": "v1;GetUnfixedCameraPosition;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "struct",
+							"type_path": "/Script/CoreUObject.Vector",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "GetUpVector",
+					"declaring_class": "/Script/Engine.SceneComponent",
+					"signature": "v1;GetUpVector;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "struct",
+							"type_path": "/Script/CoreUObject.Vector",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "IsActive",
+					"declaring_class": "/Script/Engine.ActorComponent",
+					"signature": "v1;IsActive;ReturnValue:BoolProperty:1408;",
+					"const": true,
+					"construction_unsafe": true,
+					"parameters": [
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "IsAnySimulatingPhysics",
+					"declaring_class": "/Script/Engine.SceneComponent",
+					"signature": "v1;IsAnySimulatingPhysics;ReturnValue:BoolProperty:1408;",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "IsBeingDestroyed",
+					"declaring_class": "/Script/Engine.ActorComponent",
+					"signature": "v1;IsBeingDestroyed;ReturnValue:BoolProperty:1408;",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "IsCollisionFixApplied",
+					"declaring_class": "/Script/Engine.SpringArmComponent",
+					"signature": "v1;IsCollisionFixApplied;ReturnValue:BoolProperty:1408;",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "IsComponentTickEnabled",
+					"declaring_class": "/Script/Engine.ActorComponent",
+					"signature": "v1;IsComponentTickEnabled;ReturnValue:BoolProperty:1408;",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "IsSimulatingPhysics",
+					"declaring_class": "/Script/Engine.SceneComponent",
+					"signature": "v1;IsSimulatingPhysics;BoneName:NameProperty:128;ReturnValue:BoolProperty:1408;",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "name",
+							"type_path": "",
+							"name": "BoneName",
+							"direction": "in",
+							"default_text": "None"
+						},
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "IsVisible",
+					"declaring_class": "/Script/Engine.SceneComponent",
+					"signature": "v1;IsVisible;ReturnValue:BoolProperty:1408;",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "K2_AttachTo",
+					"declaring_class": "/Script/Engine.SceneComponent",
+					"signature": "v1;K2_AttachTo;InParent:ObjectProperty:128:/Script/Engine.SceneComponent;InSocketName:NameProperty:128;AttachType:ByteProperty:128:/Script/Engine.EAttachLocation;bWeldSimulatedBodies:BoolProperty:128;ReturnValue:BoolProperty:1408;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "object",
+							"type_path": "/Script/Engine.SceneComponent",
+							"name": "InParent",
+							"direction": "in"
+						},
+						{
+							"kind": "name",
+							"type_path": "",
+							"name": "InSocketName",
+							"direction": "in",
+							"default_text": "None"
+						},
+						{
+							"kind": "enum",
+							"type_path": "/Script/Engine.EAttachLocation",
+							"name": "AttachType",
+							"direction": "in",
+							"default_text": "KeepRelativeOffset"
+						},
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "bWeldSimulatedBodies",
+							"direction": "in",
+							"default_text": "true"
+						},
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "K2_AttachToComponent",
+					"declaring_class": "/Script/Engine.SceneComponent",
+					"signature": "v1;K2_AttachToComponent;Parent:ObjectProperty:128:/Script/Engine.SceneComponent;SocketName:NameProperty:128;LocationRule:EnumProperty:128:/Script/Engine.EAttachmentRule;RotationRule:EnumProperty:128:/Script/Engine.EAttachmentRule;ScaleRule:EnumProperty:128:/Script/Engine.EAttachmentRule;bWeldSimulatedBodies:BoolProperty:128;ReturnValue:BoolProperty:1408;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "object",
+							"type_path": "/Script/Engine.SceneComponent",
+							"name": "Parent",
+							"direction": "in"
+						},
+						{
+							"kind": "name",
+							"type_path": "",
+							"name": "SocketName",
+							"direction": "in"
+						},
+						{
+							"kind": "enum",
+							"type_path": "/Script/Engine.EAttachmentRule",
+							"name": "LocationRule",
+							"direction": "in"
+						},
+						{
+							"kind": "enum",
+							"type_path": "/Script/Engine.EAttachmentRule",
+							"name": "RotationRule",
+							"direction": "in"
+						},
+						{
+							"kind": "enum",
+							"type_path": "/Script/Engine.EAttachmentRule",
+							"name": "ScaleRule",
+							"direction": "in"
+						},
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "bWeldSimulatedBodies",
+							"direction": "in"
+						},
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "K2_DestroyComponent",
+					"declaring_class": "/Script/Engine.ActorComponent",
+					"signature": "v1;K2_DestroyComponent;Object:ObjectProperty:128:/Script/CoreUObject.Object;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "object",
+							"type_path": "/Script/CoreUObject.Object",
+							"name": "Object",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "K2_DetachFromComponent",
+					"declaring_class": "/Script/Engine.SceneComponent",
+					"signature": "v1;K2_DetachFromComponent;LocationRule:EnumProperty:128:/Script/Engine.EDetachmentRule;RotationRule:EnumProperty:128:/Script/Engine.EDetachmentRule;ScaleRule:EnumProperty:128:/Script/Engine.EDetachmentRule;bCallModify:BoolProperty:128;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "enum",
+							"type_path": "/Script/Engine.EDetachmentRule",
+							"name": "LocationRule",
+							"direction": "in",
+							"default_text": "KeepRelative"
+						},
+						{
+							"kind": "enum",
+							"type_path": "/Script/Engine.EDetachmentRule",
+							"name": "RotationRule",
+							"direction": "in",
+							"default_text": "KeepRelative"
+						},
+						{
+							"kind": "enum",
+							"type_path": "/Script/Engine.EDetachmentRule",
+							"name": "ScaleRule",
+							"direction": "in",
+							"default_text": "KeepRelative"
+						},
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "bCallModify",
+							"direction": "in",
+							"default_text": "true"
+						}
+					]
+				},
+				{
+					"name": "K2_GetComponentLocation",
+					"declaring_class": "/Script/Engine.SceneComponent",
+					"signature": "v1;K2_GetComponentLocation;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "struct",
+							"type_path": "/Script/CoreUObject.Vector",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "K2_GetComponentRotation",
+					"declaring_class": "/Script/Engine.SceneComponent",
+					"signature": "v1;K2_GetComponentRotation;ReturnValue:StructProperty:1408:/Script/CoreUObject.Rotator{Pitch:DoubleProperty:0;Yaw:DoubleProperty:0;Roll:DoubleProperty:0;};",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "struct",
+							"type_path": "/Script/CoreUObject.Rotator",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "K2_GetComponentScale",
+					"declaring_class": "/Script/Engine.SceneComponent",
+					"signature": "v1;K2_GetComponentScale;ReturnValue:StructProperty:1408:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "struct",
+							"type_path": "/Script/CoreUObject.Vector",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "K2_GetComponentToWorld",
+					"declaring_class": "/Script/Engine.SceneComponent",
+					"signature": "v1;K2_GetComponentToWorld;ReturnValue:StructProperty:1408:/Script/CoreUObject.Transform{Rotation:StructProperty:0:/Script/CoreUObject.Quat{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;W:DoubleProperty:0;};Translation:StructProperty:0:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};Scale3D:StructProperty:0:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};};",
+					"const": true,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "struct",
+							"type_path": "/Script/CoreUObject.Transform",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "RemoveTickPrerequisiteActor",
+					"declaring_class": "/Script/Engine.ActorComponent",
+					"signature": "v1;RemoveTickPrerequisiteActor;PrerequisiteActor:ObjectProperty:128:/Script/Engine.Actor;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "object",
+							"type_path": "/Script/Engine.Actor",
+							"name": "PrerequisiteActor",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "RemoveTickPrerequisiteComponent",
+					"declaring_class": "/Script/Engine.ActorComponent",
+					"signature": "v1;RemoveTickPrerequisiteComponent;PrerequisiteComponent:ObjectProperty:128:/Script/Engine.ActorComponent;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "object",
+							"type_path": "/Script/Engine.ActorComponent",
+							"name": "PrerequisiteComponent",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "ResetRelativeTransform",
+					"declaring_class": "/Script/Engine.SceneComponent",
+					"signature": "v1;ResetRelativeTransform;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": []
+				},
+				{
+					"name": "SetAbsolute",
+					"declaring_class": "/Script/Engine.SceneComponent",
+					"signature": "v1;SetAbsolute;bNewAbsoluteLocation:BoolProperty:128;bNewAbsoluteRotation:BoolProperty:128;bNewAbsoluteScale:BoolProperty:128;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "bNewAbsoluteLocation",
+							"direction": "in",
+							"default_text": "false"
+						},
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "bNewAbsoluteRotation",
+							"direction": "in",
+							"default_text": "false"
+						},
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "bNewAbsoluteScale",
+							"direction": "in",
+							"default_text": "false"
+						}
+					]
+				},
+				{
+					"name": "SetActive",
+					"declaring_class": "/Script/Engine.ActorComponent",
+					"signature": "v1;SetActive;bNewActive:BoolProperty:128;bReset:BoolProperty:128;",
+					"const": false,
+					"construction_unsafe": true,
+					"parameters": [
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "bNewActive",
+							"direction": "in"
+						},
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "bReset",
+							"direction": "in",
+							"default_text": "false"
+						}
+					]
+				},
+				{
+					"name": "SetAutoActivate",
+					"declaring_class": "/Script/Engine.ActorComponent",
+					"signature": "v1;SetAutoActivate;bNewAutoActivate:BoolProperty:128;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "bNewAutoActivate",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "SetComponentTickEnabled",
+					"declaring_class": "/Script/Engine.ActorComponent",
+					"signature": "v1;SetComponentTickEnabled;bEnabled:BoolProperty:128;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "bEnabled",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "SetComponentTickInterval",
+					"declaring_class": "/Script/Engine.ActorComponent",
+					"signature": "v1;SetComponentTickInterval;TickInterval:FloatProperty:128;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "float",
+							"type_path": "",
+							"name": "TickInterval",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "SetComponentTickIntervalAndCooldown",
+					"declaring_class": "/Script/Engine.ActorComponent",
+					"signature": "v1;SetComponentTickIntervalAndCooldown;TickInterval:FloatProperty:128;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "float",
+							"type_path": "",
+							"name": "TickInterval",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "SetHiddenInGame",
+					"declaring_class": "/Script/Engine.SceneComponent",
+					"signature": "v1;SetHiddenInGame;NewHidden:BoolProperty:128;bPropagateToChildren:BoolProperty:128;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "NewHidden",
+							"direction": "in"
+						},
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "bPropagateToChildren",
+							"direction": "in",
+							"default_text": "false"
+						}
+					]
+				},
+				{
+					"name": "SetIsReplicated",
+					"declaring_class": "/Script/Engine.ActorComponent",
+					"signature": "v1;SetIsReplicated;ShouldReplicate:BoolProperty:128;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "ShouldReplicate",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "SetMobility",
+					"declaring_class": "/Script/Engine.SceneComponent",
+					"signature": "v1;SetMobility;NewMobility:ByteProperty:128:/Script/Engine.EComponentMobility;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "enum",
+							"type_path": "/Script/Engine.EComponentMobility",
+							"name": "NewMobility",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "SetRelativeScale3D",
+					"declaring_class": "/Script/Engine.SceneComponent",
+					"signature": "v1;SetRelativeScale3D;NewScale3D:StructProperty:128:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "struct",
+							"type_path": "/Script/CoreUObject.Vector",
+							"name": "NewScale3D",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "SetShouldUpdatePhysicsVolume",
+					"declaring_class": "/Script/Engine.SceneComponent",
+					"signature": "v1;SetShouldUpdatePhysicsVolume;bInShouldUpdatePhysicsVolume:BoolProperty:128;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "bInShouldUpdatePhysicsVolume",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "SetTickableWhenPaused",
+					"declaring_class": "/Script/Engine.ActorComponent",
+					"signature": "v1;SetTickableWhenPaused;bTickableWhenPaused:BoolProperty:128;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "bTickableWhenPaused",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "SetTickGroup",
+					"declaring_class": "/Script/Engine.ActorComponent",
+					"signature": "v1;SetTickGroup;NewTickGroup:ByteProperty:128:/Script/Engine.ETickingGroup;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "enum",
+							"type_path": "/Script/Engine.ETickingGroup",
+							"name": "NewTickGroup",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "SetVisibility",
+					"declaring_class": "/Script/Engine.SceneComponent",
+					"signature": "v1;SetVisibility;bNewVisibility:BoolProperty:128;bPropagateToChildren:BoolProperty:128;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "bNewVisibility",
+							"direction": "in"
+						},
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "bPropagateToChildren",
+							"direction": "in",
+							"default_text": "false"
+						}
+					]
+				},
+				{
+					"name": "SetWorldScale3D",
+					"declaring_class": "/Script/Engine.SceneComponent",
+					"signature": "v1;SetWorldScale3D;NewScale:StructProperty:128:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "struct",
+							"type_path": "/Script/CoreUObject.Vector",
+							"name": "NewScale",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "ToggleActive",
+					"declaring_class": "/Script/Engine.ActorComponent",
+					"signature": "v1;ToggleActive;",
+					"const": false,
+					"construction_unsafe": true,
+					"parameters": []
+				},
+				{
+					"name": "ToggleVisibility",
+					"declaring_class": "/Script/Engine.SceneComponent",
+					"signature": "v1;ToggleVisibility;bPropagateToChildren:BoolProperty:128;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "bPropagateToChildren",
+							"direction": "in",
+							"default_text": "false"
+						}
+					]
+				}
+			],
+			"skipped": [
+				{
+					"domain": "field",
+					"name": "AssetUserData",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "AssetUserDataEditorOnly",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "AttachChildren",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "AttachParent",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "AttachSocketName",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bBoundsChangeTriggersStreamingDataRebuild",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bCanEverAffectNavigation",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bComponentToWorldUpdated",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bComputeBoundsOnceForGame",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bComputedBoundsOnceForGame",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bComputeFastLocalBounds",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bCreatedByConstructionScript",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bEditableWhenInherited",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bHiddenEdTemporary",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bInstanceComponent",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bIsActive",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bIsNotRenderAttachmentRoot",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bIsVisualizationComponent",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bNeedsUCSSerializationIndexEvaluted",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bNetAddressable",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bShouldBeAttached",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bShouldSnapLocationWhenAttached",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bShouldSnapRotationWhenAttached",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bShouldSnapScaleWhenAttached",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bVisualizeComponent",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "ClientAttachedChildren",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "ComponentVelocity",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "CreationMethod",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "OnComponentActivated",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "OnComponentDeactivated",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "PhysicsVolume",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "PhysicsVolumeChangedDelegate",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "PrimaryComponentTick",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "UCSModifiedProperties",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "UCSSerializationIndex",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "method",
+					"name": "ExecuteUbergraph",
+					"reason": "requires_adapter_or_nonpublic_policy"
+				},
+				{
+					"domain": "method",
+					"name": "GetSocketQuaternion",
+					"reason": "requires_adapter_or_nonpublic_policy"
+				},
+				{
+					"domain": "method",
+					"name": "IsGroupedComponentMovementEnabled",
+					"reason": "not_public_local_native_instance_callable"
+				},
+				{
+					"domain": "method",
+					"name": "K2_AddLocalOffset",
+					"reason": "unsupported_parameter_type"
+				},
+				{
+					"domain": "method",
+					"name": "K2_AddLocalRotation",
+					"reason": "unsupported_parameter_type"
+				},
+				{
+					"domain": "method",
+					"name": "K2_AddLocalTransform",
+					"reason": "unsupported_parameter_type"
+				},
+				{
+					"domain": "method",
+					"name": "K2_AddRelativeLocation",
+					"reason": "unsupported_parameter_type"
+				},
+				{
+					"domain": "method",
+					"name": "K2_AddRelativeRotation",
+					"reason": "unsupported_parameter_type"
+				},
+				{
+					"domain": "method",
+					"name": "K2_AddWorldOffset",
+					"reason": "unsupported_parameter_type"
+				},
+				{
+					"domain": "method",
+					"name": "K2_AddWorldRotation",
+					"reason": "unsupported_parameter_type"
+				},
+				{
+					"domain": "method",
+					"name": "K2_AddWorldTransform",
+					"reason": "unsupported_parameter_type"
+				},
+				{
+					"domain": "method",
+					"name": "K2_AddWorldTransformKeepScale",
+					"reason": "unsupported_parameter_type"
+				},
+				{
+					"domain": "method",
+					"name": "K2_SetRelativeLocation",
+					"reason": "unsupported_parameter_type"
+				},
+				{
+					"domain": "method",
+					"name": "K2_SetRelativeLocationAndRotation",
+					"reason": "unsupported_parameter_type"
+				},
+				{
+					"domain": "method",
+					"name": "K2_SetRelativeRotation",
+					"reason": "unsupported_parameter_type"
+				},
+				{
+					"domain": "method",
+					"name": "K2_SetRelativeTransform",
+					"reason": "unsupported_parameter_type"
+				},
+				{
+					"domain": "method",
+					"name": "K2_SetWorldLocation",
+					"reason": "unsupported_parameter_type"
+				},
+				{
+					"domain": "method",
+					"name": "K2_SetWorldLocationAndRotation",
+					"reason": "unsupported_parameter_type"
+				},
+				{
+					"domain": "method",
+					"name": "K2_SetWorldRotation",
+					"reason": "unsupported_parameter_type"
+				},
+				{
+					"domain": "method",
+					"name": "K2_SetWorldTransform",
+					"reason": "unsupported_parameter_type"
+				},
+				{
+					"domain": "method",
+					"name": "OnRep_AttachChildren",
+					"reason": "not_public_local_native_instance_callable"
+				},
+				{
+					"domain": "method",
+					"name": "OnRep_AttachParent",
+					"reason": "not_public_local_native_instance_callable"
+				},
+				{
+					"domain": "method",
+					"name": "OnRep_AttachSocketName",
+					"reason": "not_public_local_native_instance_callable"
+				},
+				{
+					"domain": "method",
+					"name": "OnRep_IsActive",
+					"reason": "not_public_local_native_instance_callable"
+				},
+				{
+					"domain": "method",
+					"name": "OnRep_Transform",
+					"reason": "not_public_local_native_instance_callable"
+				},
+				{
+					"domain": "method",
+					"name": "OnRep_Visibility",
+					"reason": "not_public_local_native_instance_callable"
+				},
+				{
+					"domain": "method",
+					"name": "ReceiveAsyncPhysicsTick",
+					"reason": "not_public_local_native_instance_callable"
+				},
+				{
+					"domain": "method",
+					"name": "ReceiveBeginPlay",
+					"reason": "not_public_local_native_instance_callable"
+				},
+				{
+					"domain": "method",
+					"name": "ReceiveEndPlay",
+					"reason": "not_public_local_native_instance_callable"
+				},
+				{
+					"domain": "method",
+					"name": "ReceiveTick",
+					"reason": "not_public_local_native_instance_callable"
 				}
 			]
 		},
