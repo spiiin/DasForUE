@@ -198,9 +198,31 @@ void DSLValidateEventSignature(const FDasDeclaredClass& C, const FDasDeclaredCal
     else
     {
         const auto* Component = C.Components.FindByPredicate([&](const auto& X) { return X.Name == Callback.Source; });
-        if (!Component)
-            DSLFail(TEXT("Unknown event component: ")+ Callback.Source);
-        if (!Component->NativeClass.IsEmpty())
+        if (!Component && Exact)
+        {
+            // Dynamic subscriptions may follow a reflected object-reference property.
+            // The runtime already resolves that property through GetSelfObject and rechecks its delegate.
+            const auto* Field = St->findField(DSLUtf8(Callback.Source));
+            const bool Reflected =
+                C.Properties.ContainsByPredicate([&](const auto& P) { return P.Name == Callback.Source; });
+            if (!Field || !Reflected || Field->classMethod)
+                DSLFail(TEXT("Unknown event component: ") + Callback.Source);
+            auto Type = DSLObjectNormalize(Field->type, Group, St->module);
+            if (DSLAuthoredView(Type))
+            {
+                const auto Decl = DSLReferenceDeclaration(Type);
+                Signature = SignatureFrom(Decl);
+                Native = DasNativeScriptHost(Decl.NativeParent);
+            }
+            else if (DSLTypedObject(Type))
+                Native = FindObject<UClass>(nullptr, *DSLTypedObjectPath(Type));
+            else
+                DSLFail(TEXT("Dynamic event source property requires a native or authored object reference: ") +
+                             Callback.Source);
+        }
+        else if (!Component)
+            DSLFail(TEXT("Unknown event component: ") + Callback.Source);
+        else if (!Component->NativeClass.IsEmpty())
             Native = FindObject<UClass>(nullptr, *Component->NativeClass);
         else
         {

@@ -9,7 +9,7 @@ $Paths={Get-DasValidationPaths $Das -Extra @('Tests/EventChecks/probe.das',
     'Bindings/FoundationExterns.txt',
     'Scripts/TestEventChecks.ps1')}
 Invoke-DasValidation $Das -Run DasEventChecks -Name 'event-check-runtime' `
-    -Marker 'DAS_EVENT_CHECK_RESULT=PASS' -Checks 51 -SourcePaths $Paths `
+    -Marker 'DAS_EVENT_CHECK_RESULT=PASS' -Checks 59 -SourcePaths $Paths `
     -Output 'event-check-validation.json' -SuccessMarker 'DAS_EVENT_CHECK_VALIDATION=PASS' `
     -Mode 'headless Game World, native/authored event signatures, Apply and managed reload' `
     -FailPattern 'DAS_EVENT_CHECK_FAIL|Ensure condition failed|Fatal error:|Log[^:]+: Error:'

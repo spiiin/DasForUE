@@ -615,3 +615,8 @@ directly, gameplay calls skip reflection, and scripts compile ahead of time thro
 
 - Added `UEObjectRef(script, className)` and `UEInterfaceRef(path, optional authoredId)` for one-line reference aliases. Generated handle views reuse the existing annotation, identity, property and dispatch checks, including early class/signature type normalization.
 - Migrated all eight reference declarations in the ActionRoguelike example's seven `*_refs.das` modules; no source-class imports or runtime wrapper objects were added.
+
+### Event subscriptions through typed reference properties
+
+- Dynamic `+=`/`-=` event subscriptions now accept reflected native/authored object-reference properties in addition to self and declared components. Signature checks use the declared source type; runtime source/delegate checks and session-owned cleanup are unchanged.
+- The ActionRoguelike example uses `BindEvents` for permanent health/status notifications and dynamic subscriptions for the running Overwhelm effect. A single base health listener invokes a virtual post-health hook for combat targets, avoiding duplicate hit/death delivery. Handwritten string-based delegate registration/removal was removed.

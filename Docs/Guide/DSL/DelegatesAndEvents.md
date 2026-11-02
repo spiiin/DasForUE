@@ -214,7 +214,18 @@ def OnChanged(value:int):void { self.Score += value }
 def OnHealthChanged(current:float; maximum:float):void { self.RefreshHUD() }
 ```
 
-The source is a native/authored event on self or a declared component. The handler must be a `void` instance method declared on the same class. It becomes a hidden reflected callback automatically; add an explicit `BlueprintCallable` only to expose it in Blueprint. Event names, argument count and exact UE parameter types are checked before Apply, and the actual property/function contract is checked again when binding. Direct calls require exact types; use the declarative queued form below when you need its supported object/class widening. Mutable ref/out event payloads are not supported by this syntax.
+The source is a native/authored event on self, a declared component, or a reflected property holding a native/authored object reference. The handler must be a `void` instance method declared on the same class. It becomes a hidden reflected callback automatically; add an explicit `BlueprintCallable` only to expose it in Blueprint. Event names, argument count and exact UE parameter types are checked before Apply, and the actual property/function contract is checked again when binding. Direct calls require exact types; use the declarative queued form below when you need its supported object/class widening. Mutable ref/out event payloads are not supported by this syntax.
+
+For an object chosen at runtime, keep its typed reference in a reflected property:
+
+```das
+// Watched is a reflected HealthComponentRef property, assigned before listening.
+def StartListening():void { self.Watched.Changed += self.OnHealthChanged }
+
+def StopListening():void { self.Watched.Changed -= self.OnHealthChanged }
+```
+
+The declared reference type supplies the compile-time event contract; binding checks the actual live source again. Detach from the old source before replacing the property: changing a reference does not move an existing subscription. A null or expired source fails to bind. The dynamic property form does not add property sources to declarative `BindEvents`/`ue_event`; those still describe self/owner/declared components.
 
 These are synchronous Unreal multicast subscriptions, so handlers run during broadcast and may make nested calls. Conditions and repeated calls are allowed. Repeating `+=` for the same source/event/handler has no effect. Repeating `-=` is harmless and leaves other handlers on the event untouched. Ordinary arithmetic such as `self.Score += self.Increment` retains its normal meaning.
 

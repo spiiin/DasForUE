@@ -44,9 +44,17 @@ int32 UDasEventChecksCommandlet::Main(const FString& Params)
     {
         IFileManager::Get().Delete(*Path, false, true);
     };
+    bool PrepareWrites = false;
     auto Write = [&](const FString& S)
     {
         FFileHelper::SaveStringToFile(S, *Path, FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM);
+        if (PrepareWrites)
+        {
+            // This isolated world has no editor file-watcher/pre-play preparation pass.
+            // Invalid candidates are intentionally retained for the rejected-reload tests.
+            FString PreparationError;
+            R.PrepareEditorPrograms({File}, PreparationError);
+        }
     };
     auto Compile = [&](const FString& S)
     {
@@ -116,6 +124,8 @@ int32 UDasEventChecksCommandlet::Main(const FString& Params)
         World->DestroyWorld(false);
     };
     World->InitializeActorsForPlay(FURL());
+    Check(R.PreparePrograms(World.Get(), {File}, Error), TEXT("prepare_isolated_event_test_world"), Error);
+    PrepareWrites = true;
     auto* Actor = World->SpawnActor<ADasActor>(BP->GeneratedClass);
     TStrongObjectPtr<ADasActor> Keep(Actor);
     FEditorScriptExecutionGuard AllowScript;
@@ -194,6 +204,17 @@ int32 UDasEventChecksCommandlet::Main(const FString& Params)
         TEXT("[ue_event(source=Health,name=Changed)]"),
              TEXT("[ue_function(BlueprintCallable)]\ndef Listen():void{self.Health.Changed += self.Changed}\n"))),
                   TEXT("dynamic_authored_component_checked_from_source"), Error);
+    const FString AuthoredField = AuthoredComponent.Replace(
+        TEXT("components=ue_components(){var Health:HealthComponentRef}"),
+        TEXT("@ue_property=(BlueprintReadWrite)\nHealth:HealthComponentRef"));
+    const FString AuthoredFieldDynamic = AuthoredField.Replace(
+        TEXT("[ue_event(source=Health,name=Changed)]"),
+        TEXT("[ue_function(BlueprintCallable)]\ndef Listen():void{self.Health.Changed += self.Changed}\n"));
+    Check(Compile(AuthoredFieldDynamic), TEXT("dynamic_authored_reference_property_checked_from_source"), Error);
+    Bad(AuthoredFieldDynamic.Replace(TEXT("maximum:float"), TEXT("maximum:int")),
+        TEXT("dynamic_authored_reference_property_wrong_payload_rejected"), TEXT("exactly matching"));
+    Bad(Dynamic.Replace(TEXT("SceneSource:EventComponentRef"), TEXT("SceneSource:int")),
+        TEXT("dynamic_source_property_wrong_type_rejected"), TEXT("object reference"));
     FDasAuthoringModule DynamicModel;
     Write(Dynamic);
     const bool ModelOK = R.ReadAuthoringScript(Path, DynamicModel, Error);
@@ -281,8 +302,31 @@ int32 UDasEventChecksCommandlet::Main(const FString& Params)
     Listener->ProcessEvent(Listener->FindFunctionChecked(TEXT("Start")), &Enabled);
     Check(Restart.bSucceeded && R.SubscriptionCount(Listener) == 3, TEXT("dynamic_restart_before_destroy"),
                                                                          Restart.Error);
+    auto* ExternalOwner = World->SpawnActor<AActor>();
+    TStrongObjectPtr<AActor> KeepExternalOwner(ExternalOwner);
+    auto* ExternalScene = NewObject<USceneComponent>(ExternalOwner);
+    ExternalOwner->AddInstanceComponent(ExternalScene);
+    ExternalScene->RegisterComponent();
+    FindFProperty<FObjectPropertyBase>(Listener->GetClass(), TEXT("SceneSource"))
+        ->SetObjectPropertyValue_InContainer(Listener, ExternalScene);
+    Invoke(TEXT("StartField"));
+    Invoke(TEXT("StartField"));
+    Check(R.SubscriptionCount(Listener) == 4,
+          TEXT("dynamic_reference_property_add_is_idempotent"), Listener->LastDasError);
+    ExternalScene->OnComponentActivated.Broadcast(ExternalScene, true);
+    Check(Total() == 1147, TEXT("dynamic_reference_property_external_source_delivery"), Listener->LastDasError);
+    Invoke(TEXT("StopField"));
+    Invoke(TEXT("StopField"));
+    ExternalScene->OnComponentActivated.Broadcast(ExternalScene, true);
+    Check(R.SubscriptionCount(Listener) == 3 && Total() == 1147,
+          TEXT("dynamic_reference_property_remove_is_selective_and_idempotent"), Listener->LastDasError);
+    Invoke(TEXT("StartField"));
     Listener->Destroy();
     Pump();
+    ExternalScene->OnComponentActivated.Broadcast(ExternalScene, true);
+    Check(R.SubscriptionCount(Listener) == 0 && Total() == 1147,
+          TEXT("dynamic_reference_property_destroy_detaches_external_source"), Listener->LastDasError);
+    ExternalOwner->Destroy();
     Check(R.SubscriptionCount(Listener) == 0, TEXT("dynamic_destroy_revokes_session_bindings"));
     UE_LOG(LogTemp, Display,
            TEXT("DAS_EVENT_CHECK_RESULT=%s checks=%d"), Failures ? TEXT("FAIL"): TEXT("PASS"), Checks);

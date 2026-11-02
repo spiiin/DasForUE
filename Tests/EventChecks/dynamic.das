@@ -9,6 +9,8 @@ struct DynamicChanged {signature:function<(left:int;right:float):void>}
 class DynamicActor {
  components=ue_components(){var Scene:SceneComponentRef}
  @ue_property=(BlueprintReadWrite)
+ SceneSource:EventComponentRef
+ @ue_property=(BlueprintReadWrite)
  Total:int=0
  @ue_property=(BlueprintReadWrite)
  Delta:int=3
@@ -30,6 +32,11 @@ class DynamicActor {
   self.Changed -= self.OnChanged
   self.Scene.OnComponentActivated -= self.OnActivated
  }
+ [ue_function(BlueprintCallable)]
+ def StartField():void {self.SceneSource.OnComponentActivated += self.OnFieldActivated}
+ [ue_function(BlueprintCallable)]
+ def StopField():void {self.SceneSource.OnComponentActivated -= self.OnFieldActivated}
+ def OnFieldActivated(component:EventComponentRef;reset:bool):void {self.Total+=1000}
  def OnSignal(value:int):void {self.Total+=value}
  def OnOther(value:int):void {self.Total+=value*10}
  def OnChanged(left:int;right:float):void {self.Total+=left+int(right)}
