@@ -45,6 +45,27 @@ class Player : Character {
 
 Triggers: `Triggered`, `Started`, `Ongoing`, `Canceled`, `Completed`. Prefer `TriggerEvent.Member`; string literals now produce `DAS_DSL_STRING_TRIGGER` while the old overloads remain available.
 
+### Declarative bindings
+
+Use `[ue_input]` to keep action and trigger declarations beside each handler:
+
+```das
+[ue_input(action="JumpAction", Started, Completed, Canceled)]
+def OnJump(value:bool):void { /* pressed or released */ }
+
+[ue_input(action="MoveAction", Triggered)]
+def OnMove(value:InputActionValue):void { /* axis movement */ }
+
+def BindControls():void {
+    ue_enhanced_add_context(ue_pawn_controller(ue_character_self()),self.Controls,0)
+    ue_bind_inputs()
+}
+```
+
+`action` names a reflected `InputActionRef` property of the class. Trigger flags are explicit; at least one of `Triggered`, `Started`, `Ongoing`, `Canceled`, `Completed` is required. The compiler checks property names/types, callback signatures, repeated flags and duplicate action/trigger pairs. Supported callback parameters are the same as for `ue_enhanced_bind`; no separate `[ue_function]` annotation is needed.
+
+`ue_bind_inputs()` is class syntax with no arguments. It expands to ordinary checked `ue_enhanced_bind` calls, with no runtime scan of annotations. Call it from an instance method after the input component and referenced assets are ready. It binds the class's annotated handlers, including inherited handlers where the nearest declaration has an annotation. An override declares its own binding explicitly. This expansion does not acquire a mapping context, create assets, wait for possession, or manage a separate bound flag. Existing session ownership, rebind, reload and teardown rules apply. A changed annotation takes effect when setup is called again, under the same reload rules as explicit bind calls.
+
 ### Handler value types
 
 The handler signature selects the transport:

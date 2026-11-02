@@ -683,6 +683,7 @@ FString DSLCallbackKind(const das::TypeDeclPtr& T)
 #include "DasInputNamesDSL.inl"
 #include "DasDSLInlineCallbacks.inl"
 #include "DasDSLMemberAnnotations.inl"
+#include "DasInputBindingsDSL.inl"
 #include "DasHandlerReferencesDSL.inl"
 #include "DasEventChecksDSL.inl"
 #include "DasDSLClassAnnotation.inl"

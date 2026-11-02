@@ -605,3 +605,8 @@ directly, gameplay calls skip reflection, and scripts compile ahead of time thro
 - Support class-reference arrays and map values with native or loaded authored Blueprint base constraints.
 - Resolve `UEClass<AuthoredRef>` to its applied class, refusing missing or ambiguous source bindings.
 - Add focused `container-transport` automation for DSL read/write, subclass validation and unsupported shapes.
+
+### Declarative Enhanced Input bindings
+
+- Added `[ue_input(action="Property", Started, Completed, Canceled)]` and `ue_bind_inputs()` class expansion. The compiler validates action properties, handler signatures, trigger flags and duplicate action/trigger pairs, then reuses the existing checked Enhanced Input binding/dispatch/lifetime path.
+- Migrated the ActionRoguelike character and controller to annotations; input assets and mapping contexts remain editable Unreal resources.

@@ -124,6 +124,7 @@ struct FUEClassAnnotation : das::StructureAnnotation
             DSLNormalizeDelegateReferences(St, Group);
             DSLNormalizeOperationKeys(St, Args);
             DSLNormalizeInlineCallbacks(St, Group);
+            DSLNormalizeInputBindings(St, Group);
             DSLNormalizeMethodReferences(St, Group);
             const auto ManagedHandlers = DSLManagedHandlerNames(St);
             DSLNormalizeIdentityDefaults(St, Group);

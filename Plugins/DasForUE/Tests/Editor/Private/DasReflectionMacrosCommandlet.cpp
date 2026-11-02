@@ -98,6 +98,54 @@ int32 UDasReflectionMacrosCommandlet::Main(const FString& Params)
     Write(ClassSource);
     Check(R.ReadAuthoringScript(Path, Model, Error) && Model.Classes.Num() == 1, TEXT("macro_inside_authored_method"),
                                                                                       Error);
+    const FString InputSource = Source + TEXT(R"DAS(
+require ue_enhanced_input
+[ue_class(module_id="inputmacro", Blueprintable)]
+class InputMacroUser {
+    settings = ue_properties(EditAnywhere) {
+        var JumpAction : InputActionRef
+        var MoveAction : InputActionRef
+    }
+
+    def Bind() : void { ue_bind_inputs() }
+
+    [ue_input(action="JumpAction", Started, Completed, Canceled)]
+    def Jump(value:bool) : void {}
+
+    [ue_input(action="MoveAction", Triggered)]
+    def Move(value:InputActionValue) : void {}
+}
+)DAS");
+    Write(InputSource);
+    Error.Reset();
+    Check(R.ReadAuthoringScript(Path, Model, Error) && Model.Classes.Num() == 1,
+          TEXT("input_annotations_multiple_triggers_compile"), Error);
+    Reject(InputSource.Replace(TEXT("action=\"JumpAction\""), TEXT("action=\"Missing\"")),
+           TEXT("InputActionRef property"), TEXT("input_missing_action_rejected"));
+    Reject(InputSource.Replace(TEXT("var JumpAction : InputActionRef"), TEXT("var JumpAction : int")),
+           TEXT("InputActionRef property"), TEXT("input_wrong_action_type_rejected"));
+    Reject(InputSource.Replace(TEXT("Started, Completed, Canceled"), TEXT("Strated")),
+           TEXT("trigger"), TEXT("input_unknown_trigger_rejected"));
+    Reject(InputSource.Replace(TEXT(", Started, Completed, Canceled"), TEXT("")),
+           TEXT("at least one trigger"), TEXT("input_empty_trigger_set_rejected"));
+    Reject(InputSource.Replace(TEXT("Started, Completed, Canceled"), TEXT("Started, Started")),
+           TEXT("Repeated ue_input"), TEXT("input_repeated_trigger_rejected"));
+    Reject(InputSource.Replace(TEXT("value:bool"), TEXT("value:int")),
+           TEXT("ue_input requires"), TEXT("input_wrong_handler_value_type_rejected"));
+    Reject(InputSource.Replace(TEXT("Jump(value:bool) : void"), TEXT("Jump(var value:bool&) : void")),
+           TEXT("by-value input"), TEXT("input_reference_handler_rejected"));
+    Reject(InputSource.Replace(TEXT("ue_bind_inputs()"), TEXT("ue_bind_inputs(1)")),
+           TEXT("ue_bind_inputs()"), TEXT("input_setup_arguments_rejected"));
+    Reject(InputSource.Replace(TEXT("action=\"MoveAction\", Triggered"), TEXT("action=\"JumpAction\", Started")),
+           TEXT("Duplicate ue_input action/trigger"), TEXT("input_duplicate_action_trigger_rejected"));
+    const FString EmptyInputSource = Source + TEXT(R"DAS(
+require ue_enhanced_input
+[ue_class(module_id="inputmacro", Blueprintable)]
+class EmptyInputUser {
+    def Bind() : void { ue_bind_inputs() }
+}
+)DAS");
+    Reject(EmptyInputSource, TEXT("at least one ue_input handler"), TEXT("input_empty_setup_rejected"));
     Check(R.ValidateIntMethod(R.ScriptPath(TEXT("array_gc_exception_fixture.das")), Error, TEXT("main")),
                               TEXT("unchanged_array_GC_frame_fixture_compiles"), Error);
     for (const TCHAR* Package :

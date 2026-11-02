@@ -129,6 +129,7 @@ public:
         addAnnotation(new FUECallbackFrameAnnotation());
         addAnnotation(new FUEHandlerContractAnnotation());
         addAnnotation(new FUEFunctionAnnotation());
+        addAnnotation(new FUEInputAnnotation());
         addAnnotation(new FUECallbackAnnotation(false));
         addAnnotation(new FUECallbackAnnotation(true));
         addAnnotation(new FUEInterfaceAnnotation());
