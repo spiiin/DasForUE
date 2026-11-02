@@ -42,3 +42,5 @@ Scripts/ue_widget_animation.das
 Scripts/ue_widget_events.das
 Scripts/ue_subsystems.das
 Scripts/ue_vector_math.das
+
+Scripts/ue_asset_optional.das

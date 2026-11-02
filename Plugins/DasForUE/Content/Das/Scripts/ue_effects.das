@@ -63,3 +63,29 @@ def ue_sound_play_2d(sound:SoundBaseRef; volume:float=1.0f; pitch:float=1.0f):vo
     ue_invoke_call(call)
     ue_release_call(call)
 }
+
+// Component helpers remain generic over checked native references, without a catalog dependency.
+def ue_niagara_component_start(component:auto; system:NiagaraSystemRef):void {
+    let receiver=ue_cast_object(component.handle,"/Script/Niagara.NiagaraComponent")
+    let asset=ue_begin_call(receiver,"SetAsset")
+    ue_arg_object(asset,"inasset",system.handle)
+    ue_arg_bool(asset,"bresetexistingoverrideparameters",true)
+    ue_invoke_call(asset)
+    ue_release_call(asset)
+    let activate=ue_begin_call(receiver,"Activate")
+    ue_arg_bool(activate,"breset",true)
+    ue_invoke_call(activate)
+    ue_release_call(activate)
+}
+
+def ue_audio_component_play(component:auto; sound:SoundBaseRef; start:float=0.0f):void {
+    let receiver=ue_cast_object(component.handle,"/Script/Engine.AudioComponent")
+    let asset=ue_begin_call(receiver,"SetSound")
+    ue_arg_object(asset,"newsound",sound.handle)
+    ue_invoke_call(asset)
+    ue_release_call(asset)
+    let play=ue_begin_call(receiver,"Play")
+    ue_arg_float(play,"starttime",start)
+    ue_invoke_call(play)
+    ue_release_call(play)
+}

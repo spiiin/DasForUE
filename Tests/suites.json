@@ -694,6 +694,12 @@
       "kind": "script",
       "script": "TestClassArchive.ps1",
       "comment": "Class reference retirement/restoration, saved assets, null overrides and PIE rollback."
+    },
+    {
+      "name": "rogue-presentation",
+      "kind": "script",
+      "script": "TestRoguePresentation.ps1",
+      "comment": "Opt-in locally acquired Manny/Gideon resources, animation, montage, cast/projectile effects and missing-profile fallback."
     }
   ],
   "presets": {

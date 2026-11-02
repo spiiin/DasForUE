@@ -352,7 +352,8 @@ FString DSLAuthoredClassBasePath(const das::TypeDeclPtr& Type)
         if (Super && DasHostIdentity(Super->GetDefaultObject(false)) == Definition.Id)
             continue;
         if (Base && Base != Candidate)
-            DSLFail(TEXT("Ambiguous authored class base; use ue_class_ref(path=...) to select its asset: ") + Definition.Id);
+            DSLFail(TEXT("Ambiguous authored class base; use ue_class_ref(path=...) to select its asset: ") +
+                         Definition.Id);
         Base = Candidate;
     }
     if (!Base)
@@ -369,7 +370,9 @@ FString DSLAuthoredReferencePath(const das::TypeDeclPtr& Type)
     if (Class.NativeParent == TEXT("/Script/Engine.WorldSubsystem") ||
                                    Class.NativeParent == TEXT("/Script/Engine.GameInstanceSubsystem"))
         return DasNativeScriptHost(Class.NativeParent)->GetPathName();
-    if (auto* Parent = DasNativeScriptHost(Class.NativeParent); Parent && Parent->IsChildOf(UDasObject::StaticClass()))
+    if (auto* Parent = DasNativeScriptHost(Class.NativeParent);
+        Parent && (Parent->IsChildOf(UDasObject::StaticClass()) || Parent->IsChildOf(UDasDataAsset::StaticClass()) ||
+                   Parent->IsChildOf(UDasPrimaryDataAsset::StaticClass())))
         return Parent->GetPathName();
     DSLFail(TEXT("Authored signature reference requires a supported script host"));
 }
