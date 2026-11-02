@@ -1,4 +1,5 @@
 #include "DasGenericBlueprints.h"
+#include "DasObject.h"
 #include "DasScriptClassData.h"
 #include "DasAuthoring.h"
 #include "DasSchema.h"
@@ -16,6 +17,7 @@
 #include "Kismet2/KismetEditorUtilities.h"
 #include "UObject/MetaData.h"
 #include "UObject/Package.h"
+#include "UObject/UObjectIterator.h"
 
 bool DasCheckBlueprintParent(UClass* Parent, FString& Error)
 {
@@ -30,6 +32,12 @@ bool DasCheckBlueprintParent(UClass* Parent, FString& Error)
 UDasScriptClassData* DasGenericClassData(UBlueprint* BP)
 {
     return BP ? FindObject<UDasScriptClassData>(BP->GetOutermost(), TEXT("DasScriptClassData")) : nullptr;
+}
+bool DasCanReimportGenericBlueprint(UBlueprint* BP)
+{
+    // Plain script objects have no generated lifecycle graph to rebuild. Other
+    // generic native parents keep their existing structural migration guard.
+    return BP && BP->ParentClass && BP->ParentClass->IsChildOf<UDasObject>() && DasGenericClassData(BP);
 }
 bool DasWireGenericOwner(UK2Node_CallFunction* Call, UBlueprint* BP)
 {
@@ -60,8 +68,19 @@ bool DasPrepareGenericBlueprint(UBlueprint* BP, const FDasDeclaredClass& Class, 
     }
     if (Data)
     {
-        Error = TEXT("Structural reimport of a generic-parent Blueprint is deferred; create a new Blueprint");
-        return false;
+        if (!DasCanReimportGenericBlueprint(BP))
+        {
+            Error = TEXT("Structural reimport of this generic parent is not supported");
+            return false;
+        }
+        Data->Modify();
+        Data->AuthoredTypeId = Class.Id;
+        Data->LifecycleScript = Script;
+        Data->MethodScripts.Reset();
+        for (const auto& Method : Schema.EffectiveMethods())
+            Data->MethodScripts.Add(Method.EntryPoint, Method.ScriptFile);
+        Data->LifecycleMask = 0;
+        return true;
     }
     if (FindObject<UObject>(BP->GetOutermost(), TEXT("DasScriptClassData")))
     {
@@ -165,9 +184,22 @@ bool DasPrepareGenericBlueprint(UBlueprint* BP, const FDasDeclaredClass& Class, 
 }
 void DasFinishGenericBlueprint(UBlueprint* BP)
 {
-    if (auto* Data = DasGenericClassData(BP))
+    // Recompilation can replace the generated class of a dependent Blueprint,
+    // not just the explicitly imported one. Its cooked contract must follow
+    // that replacement, or inherited default ownership loses the child's ID.
+    for (TObjectIterator<UBlueprint> It; It; ++It)
     {
-        Data->OwnerClass = BP->GeneratedClass;
-        Data->MarkPackageDirty();
+        auto* Candidate = *It;
+        auto* Data = DasGenericClassData(Candidate);
+        if (!Data || !Candidate->GeneratedClass)
+            continue;
+        if (Candidate != BP &&
+            Candidate->GetOutermost()->GetMetaData().GetValue(Candidate, TEXT("DasDSLClassId")) != Data->AuthoredTypeId)
+            continue;
+        if (Data->OwnerClass != Candidate->GeneratedClass)
+        {
+            Data->OwnerClass = Candidate->GeneratedClass;
+            Data->MarkPackageDirty();
+        }
     }
 }

@@ -1,4 +1,7 @@
 #include "DasDSLService.h"
+#include "UObject/MetaData.h"
+
+void DasFailStructuralForTesting(int32 Stage);
 #include "DasScriptHosts.h"
 #include "DasGenericParents.h"
 #include "DasScriptClassData.h"
@@ -49,6 +52,11 @@ bool FDasGenericParentsTest::RunTest(const FString&)
             AddError(Error);
             return false;
         }
+        if (!Runtime.PrepareEditorPrograms({Script}, Error))
+        {
+            AddError(Error);
+            return false;
+        }
         return true;
     };
     const FString Prefix = TEXT("options gen2\nrequire ue_dsl\n");
@@ -92,6 +100,7 @@ bool FDasGenericParentsTest::RunTest(const FString&)
         World->DestroyWorld(false);
     };
     World->InitializeActorsForPlay(FURL());
+    TestTrue(TEXT("Prepare programs for isolated game world"), Runtime.PreparePrograms(World.Get(), Scripts, Error));
     auto* First = World->SpawnActor<AGameModeBase>(Mode->GeneratedClass);
     auto* Second = World->SpawnActor<AGameModeBase>(Mode->GeneratedClass);
     if (!TestNotNull(TEXT("Spawn generic owner"), First) || !TestNotNull(TEXT("Spawn independent owner"), Second))
@@ -137,6 +146,90 @@ bool FDasGenericParentsTest::RunTest(const FString&)
     TestEqual(TEXT("Generic UObject-derived component executes same bridge"), Call(C.Get(), TEXT("Add"), 2), 9);
     auto* Derived = World->SpawnActor<AGameModeBase>(Existing->GeneratedClass);
     TestEqual(TEXT("External Blueprint parent executes DAS child"), Call(Derived, TEXT("Add"), 3), 10);
+    // Plain ScriptObject structural updates must preserve the cooked contract
+    // transactionally, including a failed apply after Blueprint compilation.
+    UBlueprint* Mutable = nullptr;
+    const FString MutableSource =
+        Prefix +
+        TEXT("[ue_class(module_id=\"genericparents\",parent=\"/Script/DasRuntime.DasObject\")]\nclass Mutable {\n") +
+             Body + TEXT("}\n");
+    if (!Apply(TEXT("Mutable"), MutableSource, Mutable))
+        return false;
+    const FString MutableScript = Scripts.Last();
+    auto* Contract = DasGenericClassData(Mutable);
+    if (!TestNotNull(TEXT("ScriptObject cooked contract"), Contract))
+        return false;
+    TStrongObjectPtr<UObject> LiveMutable(NewObject<UObject>(First, Mutable->GeneratedClass));
+    FindFProperty<FIntProperty>(LiveMutable->GetClass(),
+                                TEXT("Score"))->SetPropertyValue_InContainer(LiveMutable.Get(), 41);
+    const auto ReplacementHandle = FCoreUObjectDelegates::OnObjectsReplaced.AddLambda(
+        [&](const TMap<UObject*, UObject*>& Replacements)
+        {
+            if (auto* Replacement = Replacements.Find(LiveMutable.Get()))
+                LiveMutable.Reset(*Replacement);
+        });
+    ON_SCOPE_EXIT
+    {
+        FCoreUObjectDelegates::OnObjectsReplaced.Remove(ReplacementHandle);
+    };
+    const auto PriorMethods = Contract->MethodScripts;
+    const FString PriorModel = Mutable->GetOutermost()->GetMetaData().GetValue(Mutable, TEXT("DasDSLModel"));
+    FString NewSource = MutableSource;
+    NewSource.ReplaceInline(
+        TEXT("class Mutable {\n"),
+             TEXT("class Mutable {\n @ue_property=(EditAnywhere,BlueprintReadWrite)\n Bonus:int=11\n")
+                 TEXT(" [ue_function(BlueprintCallable)]\n def Extra(input:int):int { return self.Bonus+input }\n"));
+    TestTrue(TEXT("Write ScriptObject structural update"),
+                  FFileHelper::SaveStringToFile(NewSource, *Runtime.ScriptPath(MutableScript),
+                                                FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM));
+    DasFailStructuralForTesting(2);
+    const bool FailedApply = FDasDSLService::Reimport(Mutable, Error, EDasDefaultMigrationPolicy::Refuse);
+    DasFailStructuralForTesting(0);
+    TestFalse(TEXT("Injected ScriptObject migration rolls back"), FailedApply);
+    TestTrue(TEXT("Rollback restores cooked method map"),
+                  Contract->MethodScripts.OrderIndependentCompareEqual(PriorMethods));
+    TestEqual(TEXT("Rollback restores declaration"),
+                   FString(Mutable->GetOutermost()->GetMetaData().GetValue(Mutable, TEXT("DasDSLModel"))), PriorModel);
+    TestTrue(TEXT("Rollback contract owns restored generated class"), Contract->OwnerClass == Mutable->GeneratedClass);
+    TestEqual(TEXT("Rollback retains live object value"),
+                   FindFProperty<FIntProperty>(
+                       LiveMutable->GetClass(), TEXT("Score"))->GetPropertyValue_InContainer(LiveMutable.Get()), 41);
+    TestNull(TEXT("Rollback removes new field"), Mutable->GeneratedClass->FindPropertyByName(TEXT("Bonus")));
+    TestNull(TEXT("Rollback removes new method"), Mutable->GeneratedClass->FindFunctionByName(TEXT("Extra")));
+    Error.Reset();
+    if (!TestTrue(TEXT("ScriptObject structural reimport succeeds"),
+                       FDasDSLService::Reimport(Mutable, Error, EDasDefaultMigrationPolicy::Refuse)))
+    {
+        AddError(Error);
+        return false;
+    }
+    TestTrue(TEXT("Updated contract owns generated class"), Contract->OwnerClass == Mutable->GeneratedClass);
+    TestEqual(TEXT("Updated cooked method map includes new entry"), Contract->MethodScripts.Num(),
+                   PriorMethods.Num() + 1);
+    TestTrue(TEXT("Prepare migrated ScriptObject"), Runtime.PreparePrograms(World.Get(), {MutableScript}, Error));
+    TStrongObjectPtr<UObject> MutableObject(NewObject<UObject>(First, Mutable->GeneratedClass));
+    TestEqual(TEXT("New method executes via migrated cooked contract"), Call(MutableObject.Get(), TEXT("Extra"), 3),
+                                                                             14);
+    TestEqual(TEXT("Existing method still executes"), Call(MutableObject.Get(), TEXT("Add"), 2), 9);
+    TestEqual(TEXT("Structural update retains live object state"), Call(LiveMutable.Get(), TEXT("Add"), 1), 42);
+    TestEqual(TEXT("New default reaches live object"), Call(LiveMutable.Get(), TEXT("Extra"), 1), 12);
+    UBlueprint* DescriptorChild = nullptr;
+    if (!Apply(TEXT("DescriptorChild"),
+            Prefix +
+                TEXT("[ue_class(module_id=\"genericparents\",parent=\"") + Mutable->GeneratedClass->GetPathName() +
+                    TEXT("\")]\nclass DescriptorChild {\n [ue_function(BlueprintCallable)]\n def Ping(input:int):int { return input }\n}\n"),
+                        DescriptorChild))
+        return false;
+    auto* ChildContract = DasGenericClassData(DescriptorChild);
+    if (!TestNotNull(TEXT("Child cooked contract"), ChildContract))
+        return false;
+    ChildContract->OwnerClass = Mutable->GeneratedClass;
+    TestTrue(TEXT("Reimport repairs a stale direct contract before identity preflight"),
+                  FDasDSLService::Reimport(DescriptorChild, Error, EDasDefaultMigrationPolicy::Refuse));
+    TestTrue(TEXT("Child contract is canonical after reimport"),
+                  ChildContract->OwnerClass == DescriptorChild->GeneratedClass);
+    Runtime.ReleaseObject(LiveMutable.Get());
+    Runtime.ReleaseObject(MutableObject.Get());
     Runtime.ReleaseObject(First);
     Runtime.ReleaseObject(Second);
     Runtime.ReleaseObject(C.Get());
@@ -154,18 +247,20 @@ bool FDasGenericParentsTest::RunTest(const FString&)
                                                 FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM));
     TestTrue(TEXT("Body-only reimport retains descriptor"),
                   FDasDSLService::Reimport(Mode, Error, EDasDefaultMigrationPolicy::Automatic));
+    TestTrue(TEXT("Prepare updated generic body"), Runtime.PreparePrograms(World.Get(), {Scripts[0]}, Error));
     TestTrue(TEXT("Reimport retains exact native parent"), Mode->ParentClass == AGameModeBase::StaticClass());
     TestEqual(TEXT("Updated body preserves object values"), Call(First, TEXT("Add"), 1), 125);
     Runtime.ReleaseObject(First);
     // Verify a supported native host remains available alongside the generic path.
     TestTrue(
         TEXT("Existing Actor and PlayerController hosts retained"),
-             DasNativeScriptHost(TEXT("Actor"))->GetPathName() ==
-                                 TEXT("/Script/DasRuntime.DasActor") &&
-                                      DasNativeScriptHost(TEXT("/Script/Engine.PlayerController"))->IsChildOf<APlayerController>());
+             DasNativeScriptHost(
+                 TEXT("Actor"))->GetPathName() ==
+                 TEXT("/Script/DasRuntime.DasActor") &&
+                      DasNativeScriptHost(TEXT("/Script/Engine.PlayerController"))->IsChildOf<APlayerController>());
 #if DAS_WITH_TEST_PROBES
     TestFalse(TEXT("Existing probe stays on its native host path"),
-        DasGenericScriptParent(TEXT("/Script/DasRuntime.DasProbeActor")));
+                   DasGenericScriptParent(TEXT("/Script/DasRuntime.DasProbeActor")));
 #endif
     AddInfo(TEXT("DAS_GENERIC_PARENTS=PASS"));
     return true;

@@ -700,6 +700,12 @@
       "kind": "script",
       "script": "TestRoguePresentation.ps1",
       "comment": "Opt-in locally acquired Manny/Gideon resources, animation, montage, cast/projectile effects and missing-profile fallback."
+    },
+    {
+      "name": "rogue-effects",
+      "kind": "script",
+      "script": "TestRogueEffects.ps1",
+      "comment": "Real-PIE timed action effects, stacking, stun and lifecycle cleanup."
     }
   ],
   "presets": {

@@ -1,4 +1,6 @@
 #include "DasBlueprintRollback.h"
+#include "DasGenericBlueprints.h"
+#include "DasScriptClassData.h"
 #include "DasContainerTypes.h"
 #include "DasAuthoredInterfaceClass.h"
 #include "K2Node_FunctionResult.h"
@@ -126,6 +128,8 @@ struct FDasBlueprintRollback::FImpl
         TObjectPtr<UClass> Parent;
         TStrongObjectPtr<UBlueprint> BP;
         TStrongObjectPtr<UClass> OriginalClass;
+        TStrongObjectPtr<UDasScriptClassData> GenericData;
+        TArray<uint8> GenericContract;
         TArray<FBPVariableDescription> Variables;
         TArray<TObjectPtr<UEdGraph>> Functions, Uber, Delegates, Macros;
         FString Display, Description, Category;
@@ -338,6 +342,11 @@ bool FDasBlueprintRollback::Prepare(UBlueprint* Root, const FDasClassSchema& Sch
         FImpl::FBlueprint Image;
         Image.BP.Reset(B);
         Image.OriginalClass.Reset(B->GeneratedClass);
+        if (auto* Data = DasGenericClassData(B))
+        {
+            Image.GenericData.Reset(Data);
+            FObjectWriter(Data, Image.GenericContract);
+        }
         if (const auto* Interface = Cast<UDasAuthoredInterfaceClass>(B->GeneratedClass))
         {
             Image.InterfaceStableId = Interface->StableId;
@@ -520,6 +529,8 @@ bool FDasBlueprintRollback::Restore(FString& Error)
         for (auto* G : Current)
             if (!S.Graphs.ContainsByPredicate([&](const auto& Old) { return Old.Graph.Get() == G; }))
                 FBlueprintEditorUtils::RemoveGraph(B, G, EGraphRemoveFlags::MarkTransient);
+        if (I.GenericData.IsValid())
+            FObjectReader(I.GenericData.Get(), I.GenericContract);
         B->NewVariables = I.Variables;
         B->FunctionGraphs = I.Functions;
         B->UbergraphPages = I.Uber;
@@ -624,6 +635,8 @@ bool FDasBlueprintRollback::Restore(FString& Error)
         FKismetEditorUtilities::CompileBlueprint(B);
         FBlueprintCompilationManager::FlushCompilationQueueAndReinstance();
         OK &= B->GeneratedClass && B->Status != BS_Error;
+        if (I.GenericData.IsValid())
+            I.GenericData->OwnerClass = B->GeneratedClass;
     }
     OK &= S.Pins.Restore(PinError);
     for (auto& I : S.Objects)

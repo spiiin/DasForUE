@@ -2,6 +2,7 @@
 #include "DasDiagnostics.h"
 #include "DasCharacter.h"
 #include "DasGenericBlueprints.h"
+#include "DasScriptClassData.h"
 #include "DasGenericParents.h"
 #include "KismetCompilerModule.h"
 #include "DasPawn.h"
@@ -197,11 +198,24 @@ bool ApplyDeclaration(const FString& Script, const FString& Package, const FStri
     const bool Created = !BP;
     if (!Created && BP->GeneratedClass)
     {
+        // A dependent compile can leave the direct contract on the old class.
+        // Repair only the export whose stable identity agrees with both the
+        // stored import and this request; never borrow or rewrite a parent ID.
+        if (auto* Data = DasGenericClassData(BP))
+            if (Data->AuthoredTypeId == Id &&
+                BP->GetOutermost()->GetMetaData().GetValue(BP, TEXT("DasDSLClassId")) == Id &&
+                                                           Data->OwnerClass != BP->GeneratedClass)
+            {
+                Data->OwnerClass = BP->GeneratedClass;
+                Data->MarkPackageDirty();
+            }
         const UObject* CDO = BP->GeneratedClass->GetDefaultObject();
         const FString ExistingIdentity = DasHostIdentity(CDO);
         if (!ExistingIdentity.IsEmpty() && ExistingIdentity != Id)
         {
-            Error = TEXT("Cooked authored identity differs from import declaration");
+            Error = FString::Printf(
+                TEXT("Cooked authored identity differs from import declaration (stored %s, requested %s)"),
+                     *ExistingIdentity, *Id);
             return false;
         }
     }
@@ -528,7 +542,8 @@ bool ApplyDeclaration(const FString& Script, const FString& Package, const FStri
         PriorClass = PriorModel.Classes.FindByPredicate([&](const auto& C) { return C.Id == Id; });
     auto& Metadata = BP->GetOutermost()->GetMetaData();
     const bool BodyOnly = !Created && Metadata.GetValue(BP, TEXT("DasDSLModel")) == Json;
-    if (!Created && !BodyOnly && DasGenericScriptParent(EffectiveDeclaration.NativeParent))
+    if (!Created && !BodyOnly && DasGenericScriptParent(EffectiveDeclaration.NativeParent) &&
+        !DasCanReimportGenericBlueprint(BP))
     {
         Error = TEXT("Structural/default reimport of a generic-parent Blueprint is deferred; create a new Blueprint");
         return false;
@@ -548,7 +563,26 @@ bool ApplyDeclaration(const FString& Script, const FString& Package, const FStri
             return false;
         TArray<UBlueprint*> Scope;
         TArray<TStrongObjectPtr<UObject>> Assets;
-        if (!FDasBlueprintRollback::GatherScope(BP, Scope, Assets, Error))
+        // Adding members to a plain script object leaves contracts of independent
+        // referencing DSL classes unchanged. Snapshot/recompile those assets too;
+        // removals, signature changes and default changes retain the stricter guard.
+        bool AdditiveObject = false;
+        if (DasCanReimportGenericBlueprint(BP) && PriorClass)
+        {
+            auto Common = Declaration;
+            Common.Properties.RemoveAll(
+                [&](const auto& P)
+                {
+                    return !PriorClass->Properties.ContainsByPredicate([&](const auto& Old) { return Old.Id == P.Id; });
+                });
+            Common.Methods.RemoveAll(
+                [&](const auto& M)
+                { return !PriorClass->Methods.ContainsByPredicate([&](const auto& Old) { return Old.Id == M.Id; }); });
+            const auto Difference = FDasAuthoringModule::Compare(*PriorClass, Common);
+            AdditiveObject = !Difference.bStructural && !Difference.bDefaults && !Difference.bMetadata &&
+                             !Difference.bImplementation;
+        }
+        if (!FDasBlueprintRollback::GatherScope(BP, Scope, Assets, Error, false, AdditiveObject))
             return false;
         Rollback = MakeUnique<FDasBlueprintRollback>();
         if (!Rollback->Prepare(BP, Schema, Scope, Assets, Error))
@@ -600,7 +634,14 @@ bool ApplyDeclaration(const FString& Script, const FString& Package, const FStri
         return false;
     }
     if (!DasPrepareGenericBlueprint(BP, EffectiveDeclaration, Schema, Script, BodyOnly, Error))
+    {
+        if (Rollback)
+        {
+            const FString Reason = Error;
+            return Restore(Reason);
+        }
         return false;
+    }
     // Validate the current Blueprint even when unchanged declarations avoid reinstancing.
     if (!FDasBlueprintService::Apply(BP, Schema, Error, BodyOnly, DefaultPolicy))
     {
