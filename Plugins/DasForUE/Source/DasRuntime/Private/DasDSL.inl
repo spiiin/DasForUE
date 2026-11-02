@@ -983,9 +983,17 @@ bool DSLValidateOwner(const das::ProgramPtr& Program, const FString& Entry, UObj
                             }
                             continue;
                         }
+                        // Blueprint compilation also applies InstancedReference for
+                        // object classes declared DefaultToInstanced (ActorComponent,
+                        // for example), even without an explicit DSL Instanced flag.
+                        const auto* ObjectProperty = CastField<FObjectPropertyBase>(Actual);
+                        const bool ImplicitInstanced = P.Type.GetKind() == EDasTypeKind::Object &&
+                            ObjectProperty && ObjectProperty->PropertyClass &&
+                            ObjectProperty->PropertyClass->HasAnyClassFlags(CLASS_DefaultToInstanced);
+                        const bool ExpectedInstanced = P.bInstanced || ImplicitInstanced;
                         if (!DSLPropertyMatches(Actual, P.Type.Kind) ||
                             P.bReadOnly != Actual->HasAnyPropertyFlags(CPF_BlueprintReadOnly) ||
-                            P.bInstanced != Actual->HasAnyPropertyFlags(CPF_InstancedReference))
+                            ExpectedInstanced != Actual->HasAnyPropertyFlags(CPF_InstancedReference))
                         {
                             Error = TEXT("DSL property differs from owner; apply/reimport Blueprint: ")+ P.Name;
                             OK = false;

@@ -217,6 +217,33 @@ bool FDasGenericParentsTest::RunTest(const FString&)
     TestEqual(TEXT("Existing method still executes"), Call(MutableObject.Get(), TEXT("Add"), 2), 9);
     TestEqual(TEXT("Structural update retains live object state"), Call(LiveMutable.Get(), TEXT("Add"), 1), 42);
     TestEqual(TEXT("New default reaches live object"), Call(LiveMutable.Get(), TEXT("Extra"), 1), 12);
+    // A borrowed component reference acquires UE's implicit InstancedReference
+    // flag because ActorComponent is DefaultToInstanced; it is still a valid
+    // ordinary reflected DAS object field without an explicit Instanced marker.
+    UBlueprint* ComponentReference = nullptr;
+    if (!Apply(TEXT("ComponentReference"),
+            Prefix +
+                TEXT("require ue_object_types\n") +
+                    TEXT("[ue_native_object(path=\"/Script/Engine.ActorComponent\")]\nstruct BorrowedComponentRef { handle:UObjectHandle }\n") +
+                        TEXT("[ue_class(module_id=\"genericparents\",parent=\"ScriptObject\")]\nclass ComponentReference {\n") +
+                            TEXT(" @ue_property=(BlueprintReadWrite)\n ComponentState:BorrowedComponentRef\n") +
+                                TEXT(" [ue_function(BlueprintCallable)]\n def ReadComponent(input:int):int { if(ue_is_valid(self.ComponentState)) { return input }; return 0 }\n}\n"),
+                                    ComponentReference))
+        return false;
+    auto* ComponentField =
+        FindFProperty<FObjectPropertyBase>(ComponentReference->GeneratedClass, TEXT("ComponentState"));
+    if (!TestNotNull(TEXT("Borrowed ActorComponent reference property"), ComponentField))
+        return false;
+    TestTrue(TEXT("UE adds implicit instanced flag for component class"),
+                  ComponentField->HasAnyPropertyFlags(CPF_InstancedReference));
+    TestTrue(TEXT("Prepare borrowed component reference program"),
+                  Runtime.PreparePrograms(World.Get(), {Scripts.Last()}, Error));
+    TStrongObjectPtr<UObject> ReferenceObject(NewObject<UObject>(First, ComponentReference->GeneratedClass));
+    auto* BorrowedComponent = NewObject<USceneComponent>(First);
+    ComponentField->SetObjectPropertyValue_InContainer(ReferenceObject.Get(), BorrowedComponent);
+    TestEqual(TEXT("Implicitly instanced component reference passes owner validation"),
+                   Call(ReferenceObject.Get(), TEXT("ReadComponent"), 42), 42);
+
     UBlueprint* DescriptorChild = nullptr;
     if (!Apply(TEXT("DescriptorChild"),
             Prefix +
