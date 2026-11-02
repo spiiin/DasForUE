@@ -289,6 +289,8 @@ struct FUEAuthoredRefAnnotation : das::StructureAnnotation
     }
 };
 
+#include "DasReferenceTypeMacros.inl"
+
 bool DSLAuthoredView(const das::TypeDeclPtr& T)
 {
     return T && T->baseType == das::Type::tStructure && T->structType &&

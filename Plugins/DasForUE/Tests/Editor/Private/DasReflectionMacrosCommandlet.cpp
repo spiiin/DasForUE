@@ -86,6 +86,30 @@ int32 UDasReflectionMacrosCommandlet::Main(const FString& Params)
     Reject(Source.Replace(TEXT("ue_arg(call, next_field_name(nameReads), hit)"),
                                TEXT("ue_arg(call, \"Value\", PlainArgRecord(Value=1))")),
                           TEXT("supported by-value types"), TEXT("generic_arg_plain_struct_rejected"));
+    Reject(Source.Replace(TEXT("UEInterfaceRef(\"/Script/DasRuntime.DasProbeInterface\")"),
+                          TEXT("UEInterfaceRef(33)")),
+           TEXT("string literals"), TEXT("reference_macro_nonliteral_rejected"));
+    Reject(Source.Replace(TEXT("UEInterfaceRef(\"/Script/DasRuntime.DasProbeInterface\")"),
+                          TEXT("UEInterfaceRef(\"/Script/Engine.Actor\")")),
+           TEXT("loaded interface"), TEXT("reference_macro_object_as_interface_rejected"));
+    Reject(Source.Replace(TEXT("UEInterfaceRef(\"/Script/DasRuntime.DasProbeInterface\")"),
+                          TEXT("UEInterfaceRef(\"/Script/DasRuntime.DasProbeInterface\", \"wrong.Id\")")),
+           TEXT("identity mismatch"), TEXT("reference_macro_authored_interface_identity_rejected"));
+    Reject(Source.Replace(TEXT("UEInterfaceRef(\"/Script/DasRuntime.DasProbeInterface\")"),
+                          TEXT("UEInterfaceRef()")),
+           TEXT("Expected UEObjectRef"), TEXT("reference_macro_arity_rejected"));
+    Reject(Source.Replace(TEXT("UEObjectRef(\"ue_inheritance_base.das\", \"BaseCounter\")"),
+                          TEXT("UEObjectRef(\"../ue_inheritance_base.das\", \"BaseCounter\")")),
+           TEXT("local authored source filename"), TEXT("reference_macro_nonlocal_source_rejected"));
+    Reject(Source.Replace(TEXT("UEObjectRef(\"ue_inheritance_base.das\", \"BaseCounter\")"),
+                          TEXT("UEObjectRef(\"ue_inheritance_base.das\", \"MissingCounter\")")),
+           TEXT("Unknown authored reference class"), TEXT("reference_macro_unknown_authored_class_rejected"));
+    Reject(Source.Replace(TEXT("UEObjectRef(\"ue_inheritance_base.das\", \"BaseCounter\")"),
+                          TEXT("UEObjectRef(\"ue_inheritance_base.das\", \"\")")),
+           TEXT("requires type"), TEXT("reference_macro_empty_authored_class_rejected"));
+    Reject(Source.Replace(TEXT("UEObjectRef(\"ue_inheritance_base.das\", \"BaseCounter\")"),
+                          TEXT("UEObjectRef(\"ue_inheritance_base.das\", 33)")),
+           TEXT("string literals"), TEXT("reference_macro_class_argument_type_rejected"));
     const FString Descriptor = TEXT("\n[ue_reflected_call(owner=\"/Script/DasRuntime.DasFunctionLibraryFixture\",method=\"Add\",signature=\"@SIGNATURE@\")]\ndef duplicate(a:int;b:int):int{return a+b}\n");
     Reject(Source + Descriptor.Replace(TEXT("@SIGNATURE@"), TEXT("stale")),
                                        TEXT("Reflected signature changed"), TEXT("stale_binding_rejected_at_compile"));
@@ -146,6 +170,23 @@ class EmptyInputUser {
 }
 )DAS");
     Reject(EmptyInputSource, TEXT("at least one ue_input handler"), TEXT("input_empty_setup_rejected"));
+    const FString ReferenceClassSource = Source + TEXT(R"DAS(
+require ue_dsl
+[ue_class(module_id="refmacro", Blueprintable)]
+class ReferenceMacroUser {
+    settings=ue_properties(EditAnywhere) {
+        var Counter : CounterRef
+        var Interface : LocalProbeRef
+    }
+
+    [ue_function(BlueprintCallable)]
+    def GetCounter():CounterRef { return self.Counter }
+}
+)DAS");
+    Write(ReferenceClassSource);
+    Error.Reset();
+    Check(R.ReadAuthoringScript(Path, Model, Error) && Model.Classes.Num() == 1,
+          TEXT("reference_macros_in_authored_signature_and_properties"), Error);
     Check(R.ValidateIntMethod(R.ScriptPath(TEXT("array_gc_exception_fixture.das")), Error, TEXT("main")),
                               TEXT("unchanged_array_GC_frame_fixture_compiles"), Error);
     for (const TCHAR* Package :
@@ -202,6 +243,9 @@ class EmptyInputUser {
     Run(14, 3, TEXT("generic_arg_array_carrier"));
     Run(16, 42, TEXT("generic_arg_math_value"));
     Run(17, 42, TEXT("generic_arg_typed_class"));
+    Run(18, 42, TEXT("reference_macro_repeated_alias_interface_dispatch"));
+    Run(19, 42, TEXT("reference_macro_authored_nullable_constructor"));
+    Run(20, 42, TEXT("reference_macro_authored_runtime_identity_rejected"));
     R.ReleaseObject(Actor);
     const auto NoOwner = R.RunFile(Path, 1);
     Check(!NoOwner.bSucceeded && NoOwner.Error.Contains(TEXT("self is missing")),

@@ -78,6 +78,8 @@ public:
         addAnnotation(new FUEObjectTypeAnnotation());
         addAnnotation(new FUEAuthoredRefAnnotation());
         addTypeMacro(new FUEObjectTypeMacro());
+        addTypeMacro(new FUEReferenceTypeMacro(true));
+        addTypeMacro(new FUEReferenceTypeMacro(false));
         addTypeMacro(new FUEObjectKeyTypeMacro());
         addAnnotation(new FUEClassTypeAnnotation());
         addTypeMacro(new FUEClassTypeMacro());

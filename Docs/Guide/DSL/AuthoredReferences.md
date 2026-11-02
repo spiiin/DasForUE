@@ -18,21 +18,33 @@ options gen2
 module ue_actor_refs public
 require ue_dsl public
 
-[ue_object_ref(script="dsl_actor_component_owner.das", type="ComponentOwner")]
-struct ComponentOwnerRef { handle : UObjectHandle }
+typedef ComponentOwnerRef = UEObjectRef("dsl_actor_component_owner.das", "ComponentOwner")
 ```
 
-- `script` is the local plugin script file and `type` the short class name; no
-  Unreal paths or stable IDs are needed. With a source catalog you can write
+- The macro arguments are the local plugin script filename and short class name; no
+  Unreal paths or stable IDs are needed. The explicit `[ue_object_ref(script="...", type="...")]`
+  struct form remains available for custom nominal views and source catalogs. With a source catalog you can write
   `[ue_object_ref(type="CounterActor")]` or pick a catalog with
   `catalog="my_catalog.json"` (see [ModulesAndTypeIdentity.md](ModulesAndTypeIdentity.md)).
   `script` and `catalog` together are rejected.
 - Fields, methods and read-only rules come from the named source class. Adding a
   new authored class needs only a new view declaration.
-- Views are nominal: two view structs for the same class are distinct types. A
-  `typedef` can alias an existing view.
+- The macro generates the same checked one-handle view as `ue_object_ref`, with no extra runtime wrapper or source import. Repeated macro aliases with the same descriptor reuse the generated nominal type when visible in the module group. Declare shared aliases once and import their module; independently generated copies in separate modules are rejected if ambiguous.
+- Explicit view structs remain nominal: two handwritten structs for the same class are distinct types. A `typedef` can alias an existing view.
 - Imports are explicit: `require` the view module wherever you use it. Views of the
   current class and cyclic Actor/Component references are supported.
+
+## Interface type macros
+
+```das
+// Native interface: loaded native path.
+typedef InteractableRef = UEInterfaceRef("/Script/MyModule.Interactable")
+
+// Authored interface: loaded asset path plus its stable authored ID.
+typedef GameInteractableRef = UEInterfaceRef("/Game/Types/Interactable.Interactable_C", "game.Interactable")
+```
+
+`UEInterfaceRef` generates the existing `ue_native_interface` or `ue_interface_ref` view. It validates the loaded interface and, for authored interfaces, its stable ID. It does not load/import or create an interface asset. Both macros accept string literals, and work through the ordinary `ue_ref`, property/signature and checked dispatch paths. Use the shared aliases in dedicated reference modules to preserve cyclic source dependencies. A view still holds a weak handle; reflected properties determine Unreal GC ownership.
 
 ## Obtaining a view
 

@@ -286,8 +286,7 @@ that the object implements the interface. Methods are emitted on demand:
 ```das
 require ue_native_gameplay
 
-[ue_interface_ref(path="/Game/Example/Types/Interactable.Interactable_C", id="example.Interactable")]
-struct InteractableRef { handle:UObjectHandle }
+typedef InteractableRef = UEInterfaceRef("/Game/Example/Types/Interactable.Interactable_C", "example.Interactable")
 
 // Inside a function, after the interface asset has been loaded:
 let target=ue_ref(type<InteractableRef>, actor.handle)

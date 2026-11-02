@@ -4,8 +4,9 @@ require ue_native_gameplay
 require ue_library_generated
 require ue_projectile_components
 // This view deliberately has no generated method wrappers.
-[ue_native_interface(path="/Script/DasRuntime.DasProbeInterface")]
-struct LocalProbeRef { handle:UObjectHandle }
+typedef LocalProbeRef = UEInterfaceRef("/Script/DasRuntime.DasProbeInterface")
+typedef RepeatedProbeRef = UEInterfaceRef("/Script/DasRuntime.DasProbeInterface")
+typedef CounterRef = UEObjectRef("ue_inheritance_base.das", "BaseCounter")
 
 [ue_native_object(path="/Script/Engine.Actor")]
 struct LocalActorRef { handle:UObjectHandle }
@@ -125,6 +126,23 @@ def main(mode:int):int {
         let result=ue_result_class(call,"ReturnValue")
         ue_release_call(call)
         return ue_class_path(result)=="/Script/Engine.Actor" ? 42 : -1
+    }
+    if (mode == 18) {
+        let first = ue_ref(type<LocalProbeRef>, ue_self_object())
+        let same:RepeatedProbeRef = first
+        return same.Query(5)
+    }
+    if (mode == 19) {
+        let empty=CounterRef()
+        return ue_is_valid(empty) ? -1 : 42
+    }
+    if (mode == 20) {
+        var rejected=false
+        try {
+            let counter=ue_ref(type<CounterRef>,ue_self_object())
+            verify(ue_is_valid(counter))
+        } recover { rejected=true }
+        return rejected ? 42 : -1
     }
     let payload = DasCallPayload(Count=17,Metrics=DasCallMetrics(Ratio=1.0f))
     if (mode == 4) { return ue_struct_get(payload, Count) }

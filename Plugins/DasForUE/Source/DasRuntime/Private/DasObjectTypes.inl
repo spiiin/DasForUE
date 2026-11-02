@@ -60,6 +60,8 @@ das::TypeDeclPtr DSLObjectCopyType(const das::TypeDeclPtr& T)
     das::TypeDecl::clone(C, T);
     return C;
 }
+bool DSLReferenceTypeMacro(const das::TypeDeclPtr&);
+das::TypeDeclPtr DSLExpandReferenceType(const das::TypeDeclPtr&, das::ModuleGroup&, das::Module*);
 das::TypeDeclPtr DSLObjectNormalize(const das::TypeDeclPtr& T, das::ModuleGroup& Group, das::Module* Module,
                                     int32 Depth = 0)
 {
@@ -67,6 +69,8 @@ das::TypeDeclPtr DSLObjectNormalize(const das::TypeDeclPtr& T, das::ModuleGroup&
         return T;
     if (Depth > 16)
         DSLFail(TEXT("Typed object alias depth exceeds 16"));
+    if (DSLReferenceTypeMacro(T))
+        return DSLExpandReferenceType(T, Group, Module);
     if (T->baseType == das::Type::tFixedArray)
     {
         auto Element = DSLObjectNormalize(T->firstType, Group, Module, Depth + 1);
