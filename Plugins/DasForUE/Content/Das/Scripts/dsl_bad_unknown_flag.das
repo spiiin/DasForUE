@@ -1,5 +1,6 @@
 options gen2
 require ue_dsl
+
 [ue_class(module_id="example",id="example.counter",parent="/Script/Engine.Actor",UnknownFlag,DisplayName="Counter DSL",ToolTip="Authored class metadata")]
 class Counter {
     @ue_property=(EditAnywhere,BlueprintReadWrite)

@@ -347,3 +347,15 @@ Try it: `Scripts/TestDefaultsMerge.ps1`, `Scripts/TestDSLRenameScopePIE.ps1`,
 
 See also: [Apply and hot reload](ApplyAndHotReload.md) · [Defaults](../DSL/Defaults.md) ·
 [Enums](../DSL/Enums.md) · [Structs](../DSL/Structs.md) · [Classes](../DSL/Classes.md)
+
+
+## Authored interface contracts
+
+`Das.DSL.Interfaces.Apply <source.das> /Game/<folder>` migrates an existing contract
+in place outside PIE. Save matching DAS implementations first. The importer
+regenerates owned bridges (including event/function conversions), refreshes
+compatible Blueprint consumers and preserves CDO overrides. Stable method IDs
+allow renames; collisions, incompatible connected pins/defaults and unrelated
+source-layout changes are refused. Compiler/source failures restore the captured
+scope; save affected packages only after success. See
+[interface migration](../DSL/Interfaces.md#migrating-an-existing-contract).

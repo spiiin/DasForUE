@@ -1,6 +1,7 @@
 options gen2
 options gc
 require ue_dsl
+
 [ue_class(module_id="retire",Blueprintable)]
 class RetireFields {
     @ue_property=(EditAnywhere,BlueprintReadWrite)

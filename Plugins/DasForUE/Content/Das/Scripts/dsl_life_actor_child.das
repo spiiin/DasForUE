@@ -1,5 +1,6 @@
 options gen2
 require ue_life_actor_base
+
 [ue_class(module_id="lifefamily",Blueprintable)]
 class ChildLifeActor : BaseLifeActor {
     components=ue_components(VisibleAnywhere,BlueprintReadOnly) {
@@ -34,6 +35,7 @@ class ChildLifeActor : BaseLifeActor {
         self.ChildEnds+=1
         Super.EndPlay(reason)
     }
+
     [ue_function(BlueprintCallable)]
     def Probe(input:int):int {
         return self.BaseBegins+self.Behavior.BaseBegins+self.Behavior.ChildBegins

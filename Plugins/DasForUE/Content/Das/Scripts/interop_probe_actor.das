@@ -22,6 +22,7 @@ class InteropProbe : Actor {
         for (i in range(0,count)) { sum+=self.Echo(i) }
         return sum
     }
+
     [ue_function(BlueprintCallable)]
     def AuthoredCalls(count:int):int {
         let peer=ue_ref(type<InteropProbeRef>,ue_self_object())
@@ -36,6 +37,7 @@ class InteropProbe : Actor {
         for (i in range(0,count)) { sum+=self.Value }
         return sum
     }
+
     [ue_function(BlueprintCallable)]
     def NativeFieldReads(count:int):int {
         // InitialLifeSpan is BlueprintReadOnly and 0 on a spawned actor; + 7 keeps the checksum.

@@ -169,6 +169,8 @@ bool FDasClassSchema::Validate(FString& Error) const
                                  TEXT("DasProbeActor") &&
 #endif
                                      Parent !=
+                                         TEXT("PlayerController") &&
+                                             Parent !=
                                                  TEXT("Pawn") &&
                                                      Parent !=
                                                          TEXT("Character") &&
@@ -186,7 +188,7 @@ bool FDasClassSchema::Validate(FString& Error) const
                                                                                                          Parent
                                                                                                              .ToString())))
     {
-        Error = TEXT("Expected a named Actor, Pawn, Character, ActorComponent or function-library schema");
+        Error = TEXT("Expected a named Actor, Pawn, Character, PlayerController, ActorComponent or function-library schema");
         return false;
     }
     auto ValidMeta = [&](const TMap<FString, FString>& Values, bool Method = false, bool Field = false)
@@ -233,6 +235,8 @@ bool FDasClassSchema::Validate(FString& Error) const
                                                    Parent ==
                                                        TEXT("GameInstanceSubsystem") ||
                                                             Parent ==
+                                                                TEXT("PlayerController") ||
+                                                                     Parent ==
                                                                          TEXT("Pawn") || Parent == TEXT("Character")) &&
                                                                               AllMethods.ContainsByPredicate(
                                                                                   [](const auto& M)
@@ -241,7 +245,7 @@ bool FDasClassSchema::Validate(FString& Error) const
                                                                                              EDasMethodSignature::Frame;
                                                                                   }))
     {
-        Error = TEXT("Pawn/Character hosts require the frame method ABI");
+        Error = TEXT("Pawn/Character/PlayerController hosts require the frame method ABI");
         return false;
     }
     if (Parent == TEXT("FunctionLibrary") && (!Fields.IsEmpty() || !ParentStableId.IsEmpty()))

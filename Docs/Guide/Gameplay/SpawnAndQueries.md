@@ -16,7 +16,7 @@ Full form, with transform, owner and collision handling:
 
 ```das
 let pose=ue_transform(ue_vector(125.0lf,250.0lf,375.0lf),ue_rotator(0.0lf,30.0lf,0.0lf),ue_vector(1.0lf,1.0lf,1.0lf))
-self.Spawned=ue_actor_spawn(type<SpawnTargetRef>,self.SpawnClass,pose,owner,"AlwaysSpawn")
+self.Spawned=ue_actor_spawn(type<SpawnTargetRef>,self.SpawnClass,pose,owner,"AlwaysSpawn",instigator)
 ```
 
 | Argument | Default | Rules |
@@ -25,6 +25,7 @@ self.Spawned=ue_actor_spawn(type<SpawnTargetRef>,self.SpawnClass,pose,owner,"Alw
 | class handle | required | Must already be loaded (a class property can hold the serialized reference). Rechecked for native inheritance and the authored stable ID. Native classes, compatible Blueprint subclasses and authored Actor classes are accepted. |
 | transform | identity | Finite, with normalized rotation. |
 | owner | null | When given, a live Actor in the script owner's game world. |
+| instigator (sixth argument) | null | When given, a live Pawn in the script owner's world; set before construction and BeginPlay. |
 | collision rule | `"AlwaysSpawn"` | `AlwaysSpawn`, `AdjustIfPossibleButAlwaysSpawn`, `AdjustIfPossibleButDontSpawnIfColliding`, `DontSpawnIfColliding`. |
 
 Unreal applies the collision rule; a native spawn failure returns a null reference.
@@ -35,7 +36,7 @@ Unreal applies the collision rule; a native spawn failure returns a null referen
 - Spawning is refused during event binding and EndPlay, on templates, and in non-game worlds.
 - Spawned Actors are world-owned and tracked weakly per script owner (up to 1024 live entries). They survive VM replacement and session release.
 - `ue_actor_destroy_handle` only destroys Actors spawned by the **same** owner. Level-placed/native Actors and Actors spawned by another owner are refused. Handles become invalid after destruction.
-- Instigator, deferred-spawn customization, network roles and replication options are not provided.
+- Deferred-spawn customization, network roles and replication options are not provided. The optional sixth argument supplies Instigator through FActorSpawnParameters before FinishSpawning; Owner is independent.
 
 ## Finding Actors and components
 
@@ -61,3 +62,17 @@ for(value in components) {
 These are explicit scans, not cached engine indexes. Interface queries, tag and radius filters, explicit generated-class filters and cross-world queries are not provided here. For radius queries use `ue_sphere_overlap` from [Gameplay services](GameplayServices.md); the generated World/Actor API also exposes engine functions such as `GetAllActorsOfClass` (see [World, Actor and Components API](../../Api/WorldActorComponents.md)).
 
 See also: [Object and class references](../DSL/ObjectAndClassReferences.md), [Lifecycle](../DSL/Lifecycle.md), [Gameplay services](GameplayServices.md)
+
+
+`ue_actor_destroy_self():bool` destroys only the active script owner's Actor in its live game world. It authorizes the nested Actor/component EndPlay transition when called from a managed callback. Construction, event collection and EndPlay calls are refused. Use it for an authored Actor's self destruction; `ue_actor_destroy_handle` keeps its existing creator-only permissions.
+
+
+`ue_actor_destroy_self_next_tick():bool` schedules the script owner's Actor for
+native destruction on the next world timer tick. It uses the same live game-world,
+construction/bind/EndPlay restrictions as `ue_actor_destroy_self()`. Use it when a
+callback emits queued notifications that carry the source Actor (for example
+`OnTakeAnyDamage`): the source must remain alive until those snapshots drain.
+The timer holds a weak owner; ending the world or destroying the Actor first is
+safe. The return value means the request was accepted, not that destruction has
+already happened. Suppress repeated gameplay effects separately (for example a
+projectile's `HasImpacted` flag).

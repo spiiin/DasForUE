@@ -1,5 +1,6 @@
 options gen2
 require ue_dsl
+
 [ue_class(module_id="initfailure",Blueprintable)]
 class FailingInitializer {
     @ue_property=(EditAnywhere,BlueprintReadWrite)

@@ -5,6 +5,7 @@ require ue_object_types
 struct MergeMeshRef { handle:UObjectHandle }
 [ue_object_ref(script="dsl_defaults_merge_worker.das",type="MergeWorker")]
 struct MergeWorkerRef { handle:UObjectHandle }
+
 [ue_class(module_id="defaultsmerge",Blueprintable)]
 class MergeActor {
     properties=ue_properties(EditAnywhere,BlueprintReadWrite) {
@@ -29,6 +30,7 @@ class MergeActor {
         self.Worker.Bonus=52
         self.OtherWorker.Bonus=52
     }
+
     [ue_function(BlueprintCallable)]
     def Read(input:int):int { return self.Auto+self.Manual+input }
 }

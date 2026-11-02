@@ -5,6 +5,7 @@ require ue_object_types
 struct DefaultsMeshRef { handle:UObjectHandle }
 [ue_object_ref(script="dsl_extended_defaults_worker.das",type="DefaultsWorker")]
 struct DefaultsWorkerRef { handle:UObjectHandle }
+
 [ue_class(module_id="extendeddefaults",Blueprintable)]
 class ExtendedDefaults {
     properties=ue_properties(EditAnywhere,BlueprintReadWrite) {
@@ -39,6 +40,7 @@ class ExtendedDefaults {
         self.Worker.Visual=ue_asset_default("/Engine/BasicShapes/Cube.Cube")
         self.Worker.SpawnType=ue_class_default("/Script/Engine.StaticMeshActor")
     }
+
     [ue_function(BlueprintPure)]
     def VerifyDefaults():bool {
         return self.CDOPoints==31 && self.CDOLabel=="from defaults" && self.CDOMove.x==2.0lf && ue_object_valid(self.CDOAsset.handle) && ue_class_path(self.CDOActorClass)=="/Script/Engine.StaticMeshActor" && ue_struct_get_float(self.CDOColor,"R")==0.25

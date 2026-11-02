@@ -1,6 +1,7 @@
 options gen2
 require ue_dsl
 require ue_object_types
+
 [ue_class(module_id="badextendeddefaults",Blueprintable)]
 class BadDefaults {
     @ue_property=(EditAnywhere,BlueprintReadWrite)
@@ -15,6 +16,7 @@ class BadDefaults {
         self.Value=1
         self.Value=2
     }
+
     [ue_function(BlueprintCallable)]
     def Ping():int { return self.Value }
 }

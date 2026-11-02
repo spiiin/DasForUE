@@ -13,7 +13,7 @@ bool DSLComponentField(das::Structure::FieldDeclaration& F, FDasDeclaredClass& C
     if (!Marked)
         return false;
     if (!DasActorNativeParent(C.NativeParent))
-        DSLFail(TEXT("Component fields require Actor, Pawn or Character parent"));
+        DSLFail(TEXT("Component fields require Actor, Pawn, Character or PlayerController parent"));
     if (F.init)
         DSLFail(TEXT("Component fields are initialized by Unreal; omit the initializer"));
     if (!F.type || F.type->ref || F.type->baseType != das::Type::tStructure || !F.type->structType)

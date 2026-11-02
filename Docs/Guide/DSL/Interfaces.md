@@ -98,9 +98,37 @@ Das.DSL.Interfaces.Apply dsl_interface_definition.das /Game/DasInterfaces
 
 This creates real Blueprint Interface assets and marks them dirty — **save them**
 in the editor. Reapplying an identical definition reuses the same objects;
-metadata-only changes (Category, DisplayName, ToolTip) update in place. Conflicting
-packages and structural contract changes are rejected before modification. The
-stable ID and contract survive cooking.
+metadata-only changes (Category, DisplayName, ToolTip) update in place. Structural
+changes use the checked migration below; conflicting package types and changed
+interface identities remain errors. The stable ID and contract survive cooking.
+
+### Migrating an existing contract
+
+Stop PIE, save the changed interface stub and its matching DAS implementations,
+then run the same `Das.DSL.Interfaces.Apply` command. The importer does not rewrite
+DAS function bodies for you. It compiles the candidate contract, validates affected
+DAS sources, rebuilds implementation bridges and refreshes dependent Blueprint
+messages/graphs in one transaction. Existing assets keep their paths and stable
+identities; CDO overrides are preserved. Save the dirty packages after success.
+
+Supported operations include adding methods, removing unused methods, compatible
+parameter/result changes, and converting generated DAS implementations between
+void interface events and functions with results. For a method rename, retain its
+explicit `ue_function(id="...")`; otherwise it is a removal plus an addition.
+Stable-ID renames update interface implementations and message references. A
+collision with an existing graph is refused before mutation.
+
+Connected Blueprint pins must remain compatible. Removing/retyping a connected
+pin or discarding its custom default is refused with the node/pin path. Unrelated
+DAS field, component, layout or default changes must be applied separately; this
+operation updates only the interface methods. Hand-authored branches attached to
+a generated interface-event bridge are protected rather than erased.
+
+The migration snapshots the interface, dependent graphs, editable pins,
+references, metadata and package dirty flags. A failed source check or compiler
+step restores them. Changes remain in memory until saved; there is no editor Undo
+transaction. Scope is limited to the supported /Game Blueprint/map dependency
+closure (256 packages); World Partition/streaming scope is refused.
 
 ### Implementing an authored interface
 
@@ -154,8 +182,9 @@ class ScoreActor {
 ```
 
 Inputs (including arrays and strings) are copied into owned values. Event nodes keep
-stable member IDs across reimport. Removing or renaming an event is a structural
-change and is rejected.
+stable member IDs across reimport. Direct implementation reimport still refuses
+destructive event removal/rename; migrate the authored contract and matching DAS
+sources together with `Das.DSL.Interfaces.Apply`.
 
 ## Calling interfaces
 
@@ -362,8 +391,11 @@ non-implementers are rejected before a field is replaced or a method is invoked.
 
 ## Limits
 
-- Interface membership and structural contract changes on existing assets
-  (adding, removing or retyping methods, switching purity) are rejected.
+- Removing interface membership or changing an interface asset's stable identity
+  is refused. Structural contract migration requires stopped PIE, compatible
+  consumers and matching DAS implementation sources (see above).
+- Execution/pure-shape changes on connected nodes, incompatible connected pin
+  changes and hand-authored generated-bridge branches require explicit graph edits.
 - Interface inheritance is not supported.
 - Method names must be unique across all interfaces of one class.
 - Static, latent, RPC/network methods and delegate-valued parameters are not

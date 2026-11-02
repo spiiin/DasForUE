@@ -3076,6 +3076,7 @@ bool RunDasFoundationTests(FString& Report)
 #include "DasCommentTooltipTests.inl"
 #include "DasDelegateValueTests.inl"
 #include "DasInheritanceTests.inl"
+#include "DasVectorMathTests.inl"
     const auto Recovery = Run(TEXT("smoke.das"));
     Expect(Recovery.bSucceeded && Recovery.Value == 42, TEXT("recovery_after_failures"), Recovery.Error);
     Report += FString::Printf(TEXT("DAS_FOUNDATION_RESULT=%s failures=%d\n"),

@@ -23,6 +23,7 @@ class BuiltinValuesExample : SaveGame {
         var Rotations:array<UEQuat>
         var Palette:table<string;UELinearColor>
     }
+
     [ue_function(BlueprintCallable)]
     def Echo(rotation:UEQuat; tint:UELinearColor; packed:UEColor):UEQuat {
         self.Rotation=rotation
@@ -30,11 +31,13 @@ class BuiltinValuesExample : SaveGame {
         self.Packed=packed
         return self.Rotation
     }
+
     [ue_function(BlueprintCallable)]
     def Mutate(var tint:UELinearColor&; @ue_out var previous:UEColor&):void {
         previous=self.Packed
         tint=ue_lerp(tint,self.Tint,0.5lf)
     }
+
     [ue_function(BlueprintCallable)]
     def Exercise():bool {
         self.Rotation=ue_quat(ue_rotator(10.0lf,20.0lf,30.0lf))

@@ -2,6 +2,7 @@ options gen2
 module dsl_enemy_character public
 require ue_native_gameplay public
 require ue_ai public
+
 [ue_class(Blueprintable)]
 class EnemyCharacter : Character {
     settings=ue_properties(EditAnywhere,BlueprintReadWrite) {
@@ -31,6 +32,7 @@ class EnemyCharacter : Character {
         self.Label.K2_SetText(ue_text_invariant("Enemy"))
         ue_timer_start("brain",0.25f,"Think",true)
     }
+
     [ue_function(BlueprintCallable)]
     def Think():void {
         if(!self.Enabled || !ue_is_valid(self.Target)) { ue_ai_move_cancel("chase");return }
@@ -49,13 +51,16 @@ class EnemyCharacter : Character {
             ue_ai_move_to_actor("chase",controller,self.Target,"OnMoveFinished",40.0f)
         }
     }
+
     [ue_function(BlueprintCallable)]
     def OnMoveFinished(result:MoveResult):void {
         self.MoveCompletions+=1
         self.LastMoveCode=int(result.Code)
     }
+
     [ue_function(BlueprintCallable)]
     def StopBrain():void { self.Enabled=false;ue_timer_cancel("brain");ue_ai_move_cancel("chase") }
+
     [ue_function(BlueprintCallable)]
     def ResumeBrain():void { self.Enabled=true;ue_timer_start("brain",0.25f,"Think",true) }
 }

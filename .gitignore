@@ -78,3 +78,17 @@ __pycache__/
 /Examples/CleanGameplay/Content/CleanGameplay/
 /Examples/CleanGameplay/Build/Windows/FileOpenOrder/
 /Examples/CleanGameplay/Config/DefaultInput.ini
+
+# External ActionRoguelike port test staging; canonical sources live in the port project.
+/Tests/DasForUESmoke/Content/DasRogue/
+/Tests/DasForUESmoke/Content/Das/Scripts/rogue_interaction.das
+/Tests/DasForUESmoke/Content/Das/Scripts/rogue_interaction_interface.das
+/Tests/DasForUESmoke/Content/Das/Scripts/rogue_item_chest.das
+/Tests/DasForUESmoke/Content/Das/Scripts/rogue_item_chest_observer.das
+
+/Tests/DasForUESmoke/Content/Das/Scripts/rogue_refs.das
+/Tests/DasForUESmoke/Content/Das/Scripts/rogue_interaction_component.das
+/Tests/DasForUESmoke/Content/Das/Scripts/rogue_player_controller.das
+
+/Tests/DasForUESmoke/Content/Das/Scripts/rogue_projectile*.das
+/Tests/DasForUESmoke/Content/Das/Scripts/rogue_*.das

@@ -4,6 +4,7 @@ require ue_dsl
 require ue_object_types
 [ue_object_ref(script="dsl_dynamic_lifecycle.das",type="DynamicLife")]
 struct SpawnLifeRef { handle:UObjectHandle }
+
 [ue_class(module_id="spawntarget",Blueprintable)]
 class SpawnTarget : InitActorMiddle {
     @ue_component
@@ -23,18 +24,23 @@ class SpawnTarget : InitActorMiddle {
 
     @ue_property=(EditAnywhere,BlueprintReadWrite)
     SelectedClass:ActorClass
+
     [ue_function(BlueprintCallable)]
     def EchoClass(value:ActorClass):ActorClass { self.SelectedClass=value; return self.SelectedClass }
+
     [ue_function(BlueprintCallable)]
     def EchoAnyClass(value:ObjectClass):ObjectClass { return value }
+
     [ue_function(BlueprintCallable,out="output",ref="changed")]
     def ClassOutputs(value:ActorClass; var output:ActorClass&; var changed:ActorClass&):ActorClass {
         output=value
         changed=default<ActorClass>
         return value
     }
+
     [ue_function(BlueprintCallable,return_class="/Script/Engine.Actor")]
     def BadClassResult():UEClassHandle { return ue_class_loaded(type<ObjectRef>,"/Script/Engine.SceneComponent") }
+
     [ue_function(BlueprintCallable,arg_output_class="/Script/Engine.Actor",out="output")]
     def BadClassOutput(var output:UEClassHandle&):void { output=ue_class_loaded(type<ObjectRef>,"/Script/Engine.SceneComponent") }
 

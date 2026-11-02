@@ -30,6 +30,7 @@
 #include "DasDataAssets.h"
 #include "DasPrimaryAssets.h"
 #include "DasSaveGame.h"
+#include "DasObject.h"
 #include "DasSubsystems.h"
 #include "Engine/GameInstance.h"
 #include "DasSaveGameProxy.h"
@@ -42,6 +43,7 @@
 #include "Components/AudioComponent.h"
 #include "Sound/SoundBase.h"
 #include "NiagaraComponent.h"
+#include "NiagaraFunctionLibrary.h"
 #include "NiagaraSystem.h"
 #include "DasMontageProxy.h"
 #include "Animation/AnimInstance.h"
@@ -88,10 +90,13 @@
 #include "DasSoftReferences.h"
 #include "UObject/ObjectKey.h"
 #include "DasPawn.h"
+#include "DasPlayerController.h"
+#include "DasScriptHosts.h"
 #include "DasCharacter.h"
 #include "DasNativeReferenceFields.h"
 #include "DasNativeGameplayTypes.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "GameFramework/ProjectileMovementComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "DasScriptHosts.h"
@@ -1259,6 +1264,7 @@ bool FDasRuntimeModule::BeginPreserveContextsForReinstance(UClass* RootClass)
         };
         RememberLifecycle(Cast<ADasActor>(S->Owner.Get()));
         RememberLifecycle(Cast<ADasPawn>(S->Owner.Get()));
+        RememberLifecycle(Cast<ADasPlayerController>(S->Owner.Get()));
         RememberLifecycle(Cast<ADasCharacter>(S->Owner.Get()));
         ClearSessionTimers(*S);
         S->Bindings.Empty();
@@ -1287,6 +1293,7 @@ void FDasRuntimeModule::EndPreserveContextsForReinstance(const FString& Approved
             };
             RestoreLifecycle(Cast<ADasActor>(Saved->Owner.Get()));
             RestoreLifecycle(Cast<ADasPawn>(Saved->Owner.Get()));
+            RestoreLifecycle(Cast<ADasPlayerController>(Saved->Owner.Get()));
             RestoreLifecycle(Cast<ADasCharacter>(Saved->Owner.Get()));
             if (Saved->bReinstanceOwnerInScope)
                 Saved->ApprovedDSLDeclaration = ApprovedDeclaration;

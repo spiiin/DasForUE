@@ -1,6 +1,7 @@
 options gen2
 require ue_dsl
 require ue_object_types
+
 [ue_class(module_id="badextendeddefaults",Blueprintable)]
 class BadDefaults {
     @ue_property=(EditAnywhere,BlueprintReadWrite)
@@ -14,6 +15,7 @@ class BadDefaults {
     defaults=ue_defaults() {
         self.Asset=ue_asset_default("/Game/DoesNotExist.DoesNotExist")
     }
+
     [ue_function(BlueprintCallable)]
     def Ping():int { return self.Value }
 }

@@ -6,6 +6,7 @@ require ue_scene_components
 struct SpawnTargetRef { handle:UObjectHandle }
 [ue_object_ref(script="dsl_dynamic_lifecycle.das",type="DynamicLife")]
 struct SpawnLifeRef { handle:UObjectHandle }
+
 [ue_class(module_id="spawndriver",Blueprintable)]
 class SpawnDriver {
     @ue_property=(EditAnywhere,BlueprintReadWrite)
@@ -15,6 +16,7 @@ class SpawnDriver {
     Spawned:SpawnTargetRef
     @ue_property=(EditAnywhere,BlueprintReadWrite)
     ForeignActor:ActorRef
+
     [ue_function(BlueprintCallable)]
     def Spawn(input:bool):bool {
         let owner=ue_ref(type<ActorRef>,ue_self_object())
@@ -22,6 +24,7 @@ class SpawnDriver {
         self.Spawned=ue_actor_spawn(type<SpawnTargetRef>,self.SpawnClass,pose,owner,"AlwaysSpawn")
         return ue_object_valid(self.Spawned.handle) && self.Spawned.Begins==1
     }
+
     [ue_function(BlueprintCallable)]
     def Native(input:bool):bool {
         let klass=ue_class_loaded(type<ActorRef>,"/Script/Engine.Actor")
@@ -29,41 +32,49 @@ class SpawnDriver {
         let valid=ue_object_valid(actor.handle)
         return valid && ue_actor_destroy_handle(actor.handle) && !ue_object_valid(actor.handle)
     }
+
     [ue_function(BlueprintCallable)]
     def WrongClass(input:bool):bool {
         let klass=ue_class_loaded(type<ObjectRef>,"/Script/Engine.SceneComponent")
         let actor=ue_actor_spawn(type<ActorRef>,klass)
         return ue_object_valid(actor.handle)
     }
+
     [ue_function(BlueprintCallable)]
     def WrongCollision(input:bool):bool {
         let owner=ue_ref(type<ActorRef>,ue_self_object())
         let actor=ue_actor_spawn(type<SpawnTargetRef>,self.SpawnClass,ue_transform_identity(),owner,"Invalid")
         return ue_object_valid(actor.handle)
     }
+
     [ue_function(BlueprintCallable)]
     def ForeignDestroy(input:bool):bool { return ue_actor_destroy_handle(ue_self_object()) }
+
     [ue_function(BlueprintCallable)]
     def QueryEmpty(input:bool):bool {
         let actor=ue_ref(type<ActorRef>,ue_self_object())
         return !ue_object_valid(ue_actor_find(type<SpawnTargetRef>).handle) && length(ue_actor_find_all(type<SpawnTargetRef>))==0 && !ue_object_valid(ue_component_find(type<SpawnLifeRef>,actor).handle) && length(ue_component_find_all(type<SpawnLifeRef>,actor))==0
     }
+
     [ue_function(BlueprintCallable)]
     def QueryInterrupted(input:bool):bool {
         let snapshot=__ue_query_begin(ue_self_object(),"/Script/Engine.Actor","",false)
         panic("query unwind fixture")
         return false
     }
+
     [ue_function(BlueprintCallable)]
     def QueryForeign(input:bool):bool {
         let values=ue_component_find_all(type<SceneComponentRef>,self.ForeignActor)
         return length(values)>0
     }
+
     [ue_function(BlueprintCallable)]
     def SpawnExtra(input:bool):bool {
         let extra=ue_actor_spawn(type<SpawnTargetRef>,self.SpawnClass)
         return extra.Begins==1
     }
+
     [ue_function(BlueprintCallable)]
     def QueryMatches(input:bool):bool {
         let first=ue_actor_find(type<SpawnTargetRef>)
@@ -75,6 +86,7 @@ class SpawnDriver {
         let allActors=ue_actor_find_all(type<ActorRef>)
         return ue_object_valid(first.handle) && first.Begins==1 && length(actors)==2 && actors[0].Begins==1 && actors[1].Begins==1 && component.Begins==1 && length(components)==1 && components[0].Begins==1 && length(scenes)>=1 && ue_scene_valid(scenes[0]) && length(allActors)>=3
     }
+
     [ue_function(BlueprintCallable)]
     def Remove(input:bool):bool {
         let actor=self.Spawned
@@ -101,6 +113,7 @@ class SpawnDriver {
         let componentOK=ue_class_path(api.Life.EchoClass(actorClass))=="/Script/Engine.Actor" && ue_class_path(api.Life.EchoAnyClass(componentClass))=="/Script/Engine.SceneComponent"
         return fieldOK && actorOK && componentOK && !ue_class_valid(api.EchoClass(default<ActorClass>))
     }
+
     [ue_function(BlueprintCallable)]
     def WrongClassMethod(input:bool):bool {
         let value=self.Spawned.EchoClass(ue_class_cast(type<ActorClass>,ue_class_loaded(type<ObjectRef>,"/Script/Engine.SceneComponent")))

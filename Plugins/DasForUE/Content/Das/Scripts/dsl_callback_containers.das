@@ -1,6 +1,7 @@
 options gen2
 require ue_probe_actor
 require ue_callback_container_signals
+
 [ue_class(Blueprintable,type_folder="/Game/DasCallbackObjects/Types")]
 class ContainerCallbackActor : ProbeActor {
     properties=ue_properties(BlueprintReadWrite) {
@@ -113,61 +114,78 @@ class ContainerCallbackActor : ProbeActor {
     }
     def UpdateReady():void { self.Ready=self.PreservedRuns==1 && self.RejectedReplacements==1 && self.ShapesNext==1 && self.ShapesEvents==1 && self.MixedRuns==3 && self.MixedNext==1 && self.MixedEvents==1 && self.MixedUnexpected==0 && self.Next==8 && self.Events==8 && self.NativeStatesRuns==3 && self.StatesRuns==3 && self.RecordsRuns==3 && self.MathRuns==3 && self.RecordMapRuns==3 && self.TextsRuns==3 && self.StatesSetRuns==3 && self.IntsRuns==3 }
     def CheckNativeStates(var value:array<CallbackNativeState>):void { if(length(value)!=2 || value[0]!=CallbackNativeState.Active || value[1]!=CallbackNativeState.Paused) { self.Errors+=1 } }
+
     [ue_function(BlueprintCallable)]
     def RepeatNativeStates(var value:array<CallbackNativeState>):void { self.CheckNativeStates(value);clear(value);self.NativeStatesRuns+=1;if(self.NativeStatesRuns==3) { ue_timer_cancel("NativeStates") };self.UpdateReady() }
+
     [ue_function(BlueprintCallable)]
     def NextNativeStates(var value:array<CallbackNativeState>):void { self.CheckNativeStates(value);self.NativeStatesChanged.Broadcast(value);clear(value);self.Next+=1;self.UpdateReady() }
     [ue_event(name="NativeStatesChanged")]
     def OnNativeStates(var value:array<CallbackNativeState>):void { self.CheckNativeStates(value);clear(value);self.Events+=1;self.UpdateReady() }
     def CheckStates(var value:array<CallbackState>):void { if(length(value)!=2 || value[0]!=CallbackState.Active || value[1]!=CallbackState.Idle) { self.Errors+=1 } }
+
     [ue_function(BlueprintCallable)]
     def RepeatStates(var value:array<CallbackState>):void { self.CheckStates(value);clear(value);self.StatesRuns+=1;if(self.StatesRuns==3) { ue_timer_cancel("States") };self.UpdateReady() }
+
     [ue_function(BlueprintCallable)]
     def NextStates(var value:array<CallbackState>):void { self.CheckStates(value);self.StatesChanged.Broadcast(value);clear(value);self.Next+=1;self.UpdateReady() }
     [ue_event(name="StatesChanged")]
     def OnStates(var value:array<CallbackState>):void { self.CheckStates(value);clear(value);self.Events+=1;self.UpdateReady() }
     def CheckRecords(var value:array<CallbackRecord>):void { if(length(value)!=1 || value[0].Score!=17 || value[0].Mode!=CallbackState.Active || ue_text_key(value[0].Title)!="Title" || length(value[0].Values)!=1 || value[0].Values[0]!=5) { self.Errors+=1 } }
+
     [ue_function(BlueprintCallable)]
     def RepeatRecords(var value:array<CallbackRecord>):void { self.CheckRecords(value);clear(value);self.RecordsRuns+=1;if(self.RecordsRuns==3) { ue_timer_cancel("Records") };self.UpdateReady() }
+
     [ue_function(BlueprintCallable)]
     def NextRecords(var value:array<CallbackRecord>):void { self.CheckRecords(value);self.RecordsChanged.Broadcast(value);clear(value);self.Next+=1;self.UpdateReady() }
     [ue_event(name="RecordsChanged")]
     def OnRecords(var value:array<CallbackRecord>):void { self.CheckRecords(value);clear(value);self.Events+=1;self.UpdateReady() }
     def CheckMath(var value:array<CallbackNativeRecord>):void { if(length(value)!=1 || value[0].X!=1.25lf) { self.Errors+=1 } }
+
     [ue_function(BlueprintCallable)]
     def RepeatMath(var value:array<CallbackNativeRecord>):void { self.CheckMath(value);clear(value);self.MathRuns+=1;if(self.MathRuns==3) { ue_timer_cancel("Math") };self.UpdateReady() }
+
     [ue_function(BlueprintCallable)]
     def NextMath(var value:array<CallbackNativeRecord>):void { self.CheckMath(value);self.MathChanged.Broadcast(value);clear(value);self.Next+=1;self.UpdateReady() }
     [ue_event(name="MathChanged")]
     def OnMath(var value:array<CallbackNativeRecord>):void { self.CheckMath(value);clear(value);self.Events+=1;self.UpdateReady() }
     def CheckRecordMap(var value:table<string;CallbackRecord>):void { if(length(value)!=1 || value["saved"].Score!=17 || length(value["saved"].Values)!=1 || ue_text_key(value["saved"].Title)!="Title") { self.Errors+=1 } }
+
     [ue_function(BlueprintCallable)]
     def RepeatRecordMap(var value:table<string;CallbackRecord>):void { self.CheckRecordMap(value);clear(value);self.RecordMapRuns+=1;if(self.RecordMapRuns==3) { ue_timer_cancel("RecordMap") };self.UpdateReady() }
+
     [ue_function(BlueprintCallable)]
     def NextRecordMap(var value:table<string;CallbackRecord>):void { self.CheckRecordMap(value);self.RecordMapChanged.Broadcast(value);clear(value);self.Next+=1;self.UpdateReady() }
     [ue_event(name="RecordMapChanged")]
     def OnRecordMap(var value:table<string;CallbackRecord>):void { self.CheckRecordMap(value);clear(value);self.Events+=1;self.UpdateReady() }
     def CheckTexts(var value:table<int;FText>):void { if(length(value)!=1 || ue_text_namespace(value[7])!="ContainerCallback" || ue_text_key(value[7])!="Text") { self.Errors+=1 } }
+
     [ue_function(BlueprintCallable)]
     def RepeatTexts(var value:table<int;FText>):void { self.CheckTexts(value);clear(value);self.TextsRuns+=1;if(self.TextsRuns==3) { ue_timer_cancel("Texts") };self.UpdateReady() }
+
     [ue_function(BlueprintCallable)]
     def NextTexts(var value:table<int;FText>):void { self.CheckTexts(value);self.TextsChanged.Broadcast(value);clear(value);self.Next+=1;self.UpdateReady() }
     [ue_event(name="TextsChanged")]
     def OnTexts(var value:table<int;FText>):void { self.CheckTexts(value);clear(value);self.Events+=1;self.UpdateReady() }
     def CheckStatesSet(var value:table<CallbackState>):void { if(length(value)!=2 || !key_exists(value,CallbackState.Active) || !key_exists(value,CallbackState.Idle)) { self.Errors+=1 } }
+
     [ue_function(BlueprintCallable)]
     def RepeatStatesSet(var value:table<CallbackState>):void { self.CheckStatesSet(value);clear(value);self.StatesSetRuns+=1;if(self.StatesSetRuns==3) { ue_timer_cancel("StatesSet") };self.UpdateReady() }
+
     [ue_function(BlueprintCallable)]
     def NextStatesSet(var value:table<CallbackState>):void { self.CheckStatesSet(value);self.StatesSetChanged.Broadcast(value);clear(value);self.Next+=1;self.UpdateReady() }
     [ue_event(name="StatesSetChanged")]
     def OnStatesSet(var value:table<CallbackState>):void { self.CheckStatesSet(value);clear(value);self.Events+=1;self.UpdateReady() }
     def CheckInts(var value:table<int>):void { if(length(value)!=2 || !key_exists(value,5) || !key_exists(value,9)) { self.Errors+=1 } }
+
     [ue_function(BlueprintCallable)]
     def RepeatInts(var value:table<int>):void { self.CheckInts(value);clear(value);self.IntsRuns+=1;if(self.IntsRuns==3) { ue_timer_cancel("Ints") };self.UpdateReady() }
+
     [ue_function(BlueprintCallable)]
     def NextInts(var value:table<int>):void { self.CheckInts(value);self.IntsChanged.Broadcast(value);clear(value);self.Next+=1;self.UpdateReady() }
     [ue_event(name="IntsChanged")]
     def OnInts(var value:table<int>):void { self.CheckInts(value);clear(value);self.Events+=1;self.UpdateReady() }
+
     [ue_function(BlueprintCallable)]
     def ArmReferences(target:CallbackObjectRef):void {
         var mixedWeights:array<int> = [3,7]
@@ -187,12 +205,16 @@ class ContainerCallbackActor : ProbeActor {
     }
     def CheckObjects(value:array<CallbackObjectRef>):void { if(length(value)!=1 || !ue_object_valid(value[0].handle)) { self.Errors+=1 } }
     def CheckObjectMap(var value:table<string;CallbackObjectRef>):void { if(length(value)!=1 || !ue_object_valid(value["saved"].handle)) { self.Errors+=1 } }
+
     [ue_function(BlueprintCallable)]
     def RepeatObjects(var value:array<CallbackObjectRef>):void { self.CheckObjects(value);clear(value);self.RefArrays+=1;if(self.RefArrays==3) { ue_timer_cancel("ref-array") } }
+
     [ue_function(BlueprintCallable)]
     def NextObjects(var value:array<CallbackObjectRef>):void { self.CheckObjects(value);clear(value);self.RefNext+=1 }
+
     [ue_function(BlueprintCallable)]
     def RepeatObjectMap(var value:table<string;CallbackObjectRef>):void { self.CheckObjectMap(value);clear(value);self.RefMaps+=1;if(self.RefMaps==3) { ue_timer_cancel("ref-map") } }
+
     [ue_function(BlueprintCallable)]
     def NextObjectMap(var value:table<string;CallbackObjectRef>):void { self.CheckObjectMap(value);clear(value);self.RefNext+=1 }
     [ue_event(name="ObjectsChanged")]
@@ -205,11 +227,13 @@ class ContainerCallbackActor : ProbeActor {
     def CheckMixed(number:int;text:FText;flag:uint8;mode:CallbackState;var record:CallbackRecord;var values:array<int>):void {
         if(number!=17 || flag!=uint8(255) || mode!=CallbackState.Active || ue_text_key(text)!="Saved" || ue_text_namespace(text)!="MultiCallback" || record.Score!=17 || length(record.Values)!=1 || record.Values[0]!=5 || length(values)!=2 || values[0]!=3 || values[1]!=7) { self.Errors+=1 }
     }
+
     [ue_function(BlueprintCallable)]
     def RepeatMixed(number:int;text:FText;flag:uint8;mode:CallbackState;var record:CallbackRecord;var values:array<int>):void {
         self.CheckMixed(number,text,flag,mode,record,values);clear(record.Values);clear(values)
         self.MixedRuns+=1;if(self.MixedRuns==3) { ue_timer_cancel("mixed-repeat") };self.UpdateReady()
     }
+
     [ue_function(BlueprintCallable)]
     def NextMixed(number:int;text:FText;flag:uint8;mode:CallbackState;var record:CallbackRecord;var values:array<int>):void {
         self.CheckMixed(number,text,flag,mode,record,values);self.MixedChanged.Broadcast(number,text,flag,mode,record,values)
@@ -219,18 +243,22 @@ class ContainerCallbackActor : ProbeActor {
     def OnMixed(number:int;text:FText;flag:uint8;mode:CallbackState;var record:CallbackRecord;var values:array<int>):void {
         self.CheckMixed(number,text,flag,mode,record,values);clear(record.Values);clear(values);self.MixedEvents+=1;self.UpdateReady()
     }
+
     [ue_function(BlueprintCallable)]
     def PreservedMixed(number:int;text:FText):void {
         if(number!=17 || ue_text_key(text)!="Saved") { self.Errors+=1 }
         self.PreservedRuns+=1;self.UpdateReady()
     }
+
     [ue_function(BlueprintCallable)]
     def CancelledMixed(number:int;text:FText):void { self.MixedUnexpected+=1 }
+
     [ue_function(BlueprintCallable)]
     def RepeatReferenceMixed(target:CallbackObjectRef;text:FText;var weights:array<int>):void {
         if(!ue_object_valid(target.handle) || ue_text_key(text)!="Reference" || length(weights)!=2 || weights[0]!=3 || weights[1]!=7) { self.Errors+=1 }
         clear(weights);self.RefMixedRuns+=1;if(self.RefMixedRuns==3) { ue_timer_cancel("ref-mixed") }
     }
+
     [ue_function(BlueprintCallable)]
     def NextReferenceMixed(target:CallbackObjectRef;text:FText;var weights:array<int>):void {
         if(!ue_object_valid(target.handle) || ue_text_key(text)!="Reference" || length(weights)!=2 || weights[0]!=3 || weights[1]!=7) { self.Errors+=1 }
@@ -244,6 +272,7 @@ class ContainerCallbackActor : ProbeActor {
     def CheckShapes(position:UEVector;tag:UENameValue;var texts:table<int;FText>;var states:table<CallbackState>):void {
         if(position.x!=1.25lf || ue_name_text(tag)!="Mixed" || length(texts)!=1 || ue_text_key(texts[7])!="Shape" || length(states)!=2 || !key_exists(states,CallbackState.Active)) { self.Errors+=1 }
     }
+
     [ue_function(BlueprintCallable)]
     def NextShapes(position:UEVector;tag:UENameValue;var texts:table<int;FText>;var states:table<CallbackState>):void {
         self.CheckShapes(position,tag,texts,states);self.ShapesChanged.Broadcast(position,tag,texts,states)

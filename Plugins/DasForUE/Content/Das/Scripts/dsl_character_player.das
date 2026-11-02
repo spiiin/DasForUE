@@ -20,12 +20,16 @@ class PlayerCharacter : Character {
     def BeginPlay():void { self.Score+=3 }
     def Tick(delta:float):void { self.Ticks+=1 }
     def EndPlay(reason:int):void { self.Ends+=1 }
+
     [ue_function(BlueprintPure,BlueprintEvent)]
     def const Query(value:int=2):int { return self.Score+value }
+
     [ue_function(BlueprintCallable)]
     def Probe():int { return self.Query() }
+
     [ue_function(BlueprintCallable)]
     def NativeHeight(value:float):float { self.BaseEyeHeight=value;return self.BaseEyeHeight }
+
     [ue_function(BlueprintCallable)]
     def Adjust(var total:int&; @ue_out var doubled:int&):int {
         total+=self.Score

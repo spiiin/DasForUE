@@ -33,3 +33,12 @@ def ue_character_controls_ready(pawn:CharacterRef):bool { return __ue_character_
 def ue_character_move(pawn:CharacterRef; forward:float; right:float):void { __ue_character_move(pawn.handle,forward,right) }
 def ue_character_look(pawn:CharacterRef; yaw:float; pitch:float):void { __ue_character_look(pawn.handle,yaw,pitch) }
 def ue_character_jump(pawn:CharacterRef; held:bool):void { __ue_character_jump(pawn.handle,held) }
+
+// Explicit controller operations, checked against the script owner's game world.
+def ue_player_controls_ready(player:PlayerControllerRef):bool { return __ue_player_controls_ready(player.handle) }
+def ue_controller_set_team(player:PlayerControllerRef; team:int):void { __ue_controller_set_team(player.handle,team) }
+
+// Native third-person camera boom; compatible with authored component defaults.
+[ue_native_object(path="/Script/Engine.SpringArmComponent")]
+struct SpringArmComponentRef { handle:UObjectHandle }
+def SpringArmComponentRef_from(value:UObjectHandle):SpringArmComponentRef { return SpringArmComponentRef(handle=ue_cast_nullable_object(value,"/Script/Engine.SpringArmComponent")) }

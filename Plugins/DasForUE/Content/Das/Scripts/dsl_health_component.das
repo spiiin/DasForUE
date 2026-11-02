@@ -23,6 +23,7 @@ class HealthComponent : ActorComponent {
         if(amount>=self.Current) { self.Current=0.0f } else { self.Current-=amount }
         self.Changed.Broadcast(self.Current,self.Maximum)
     }
+
     [ue_function(BlueprintCallable)]
     def Heal(amount:float):void {
         verify(amount<=3.402823466e38f,"Healing amount must be finite")

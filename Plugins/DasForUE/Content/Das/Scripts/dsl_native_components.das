@@ -28,6 +28,7 @@ class NativeOwner {
         self.Child.bHiddenInGame = true
         self.Behavior.Bonus = 42
     }
+
     [ue_function(BlueprintCallable)]
     def HasPivot(input:bool):bool {
         let actor=ue_ref(type<ActorRef>,ue_self_object())

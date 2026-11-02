@@ -5,6 +5,7 @@ require ue_probe_actor
 struct ConstructionCallWorkerRef { handle:UObjectHandle }
 [ue_object_ref(script="ue_inheritance_base.das",type="BaseCounter")]
 struct ConstructionCallPeerRef { handle:UObjectHandle }
+
 [ue_class(module_id="constructioncalls",Blueprintable)]
 class ConstructionCalls : ProbeActor {
     @ue_component

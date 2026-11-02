@@ -1,4 +1,5 @@
 #include "DasCallbackTypes.h"
+#include "Engine/HitResult.h"
 #include "DasTypeAdapters.h"
 #include "InputActionValue.h"
 #include "DasSoftReferences.h"
@@ -268,6 +269,9 @@ const FDasCallbackType* DasCallbackTypeForProperty(const FProperty* Property)
 {
     if (!Property || Property->ArrayDim != 1)
         return nullptr;
+    // A HitResult source is accepted only through the explicit owned collision projection.
+    if (auto* Hit = CastField<FStructProperty>(Property); Hit && Hit->Struct == FHitResult::StaticStruct())
+        return FindDasCallbackType(TEXT("struct"));
     switch (DasPropertyKind(Property))
     {
     case EDasTypeKind::Enum:

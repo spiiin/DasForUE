@@ -43,6 +43,7 @@ class GASPlaygroundPlayer : Character {
         if(!self.ControlsBound) { self.BindControls() }
         self.SyncAim()
     }
+
     [ue_function(BlueprintCallable)]
     def BindControls():void {
         ue_enhanced_add_context(ue_pawn_controller(ue_character_self()),self.Controls,0)
@@ -64,12 +65,14 @@ class GASPlaygroundPlayer : Character {
             actor.K2_TeleportTo(self.Camera.K2_GetComponentLocation(),self.Camera.K2_GetComponentRotation())
         }
     }
+
     [ue_function(BlueprintCallable)]
     def OnMove(value:InputActionValue):void {
         let axis=ue_input_axis2d(value)
         self.MoveEvents+=1
         ue_character_move(ue_character_self(),float(axis.y),float(axis.x))
     }
+
     [ue_function(BlueprintCallable)]
     def OnLook(value:InputActionValue):void {
         let axis=ue_input_axis2d(value)
@@ -77,17 +80,20 @@ class GASPlaygroundPlayer : Character {
         self.AddControllerYawInput(float(axis.x))
         self.AddControllerPitchInput(float(axis.y))
     }
+
     [ue_function(BlueprintCallable)]
     def OnJump(value:bool):void {
         self.JumpEvents+=1
         if(value) { self.Jump() } else { self.StopJumping() }
     }
+
     [ue_function(BlueprintCallable)]
     def OnAim(value:bool):void {
         self.AimEvents+=1
         self.SyncAim()
         if(value) { self.Caster.BeginAim() } else { self.Caster.CancelAim() }
     }
+
     [ue_function(BlueprintCallable)]
     def OnConfirm(value:bool):void {
         if(!value) { return }
@@ -95,6 +101,7 @@ class GASPlaygroundPlayer : Character {
         self.SyncAim()
         self.Caster.ConfirmAim()
     }
+
     [ue_function(BlueprintCallable)]
     def OnCancel(value:bool):void {
         if(!value) { return }

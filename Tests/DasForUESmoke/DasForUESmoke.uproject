@@ -27,6 +27,10 @@
     {
       "Name": "PropertyAccessEditor",
       "Enabled": true
+    },
+    {
+      "Name": "ContentBrowserAssetDataSource",
+      "Enabled": true
     }
   ],
   "DisableEnginePluginsByDefault": true

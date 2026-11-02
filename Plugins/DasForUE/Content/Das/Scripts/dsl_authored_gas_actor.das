@@ -20,10 +20,12 @@ class AuthoredGASActor : Actor {
         ue_gas_add_attributes(self.Abilities,self.Attributes)
         self.LastHealth=ue_gas_value(self.Abilities,"CombatAttributes","Health")
     }
+
     [ue_function(BlueprintCallable)]
     def Heal():bool {
         return ue_gas_apply(self.Abilities,ue_gas_make_spec(self.Abilities,self.Healing)).Applied
     }
+
     [ue_function(BlueprintCallable)]
     def RestoreWithCostAndCooldown():bool {
         return ue_gas_activate_ability(ue_gas_give_ability(self.Abilities,self.Restoration))

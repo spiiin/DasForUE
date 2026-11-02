@@ -109,3 +109,30 @@ bool ScriptEffectActive(const char* Name, das::Context* C)
             return B->EffectProxy->IsLive() && !B->EffectProxy->Queued;
     return false;
 }
+
+// World-owned one-shot effects intentionally outlive the script owner.
+bool ScriptEffectBurst(const FDasObjectHandle& SoundHandle, const FDasObjectHandle& SystemHandle,
+                       const FTransform& Transform, float Volume, float Pitch, das::Context* C)
+{
+    auto* W = GameplayWorld(C);
+    ManagedOwnerSession(C);
+    if (Transform.ContainsNaN() || !Transform.GetRotation().IsNormalized() || !FMath::IsFinite(Volume) ||
+        Volume < 0.f || Volume > 16.f || !FMath::IsFinite(Pitch) || Pitch <= 0.f || Pitch > 4.f)
+        C->throw_error("effect burst requires finite transform, volume 0..16 and pitch (0,4]");
+    auto* Sound = SoundHandle.Token ? Cast<USoundBase>(ResolveObject(SoundHandle, C)) : nullptr;
+    auto* System = SystemHandle.Token ? Cast<UNiagaraSystem>(ResolveObject(SystemHandle, C)) : nullptr;
+    if ((SoundHandle.Token && !Sound) || (SystemHandle.Token && !System))
+        C->throw_error("effect burst assets must be SoundBase and NiagaraSystem");
+    if (W->GetNetMode() == NM_DedicatedServer)
+        return false;
+    bool Played = false;
+    if (Sound)
+    {
+        UGameplayStatics::PlaySoundAtLocation(W, Sound, Transform.GetLocation(), Transform.Rotator(), Volume, Pitch);
+        Played = true;
+    }
+    if (System && System->IsReadyToRun())
+        Played |= UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+                      W, System, Transform.GetLocation(), Transform.Rotator(), Transform.GetScale3D()) != nullptr;
+    return Played;
+}

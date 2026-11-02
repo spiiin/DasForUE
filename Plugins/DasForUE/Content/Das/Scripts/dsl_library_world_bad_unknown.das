@@ -6,16 +6,22 @@ require ue_object_types
 require ue_library_generated
 [ue_library(Category="Examples")]
 class GameValues {
+
     [ue_function(BlueprintPure)]
     def static EchoVector(value:UEVector):UEVector { return value }
+
     [ue_function(BlueprintPure)]
     def static EchoTransform(value:UETransform):UETransform { return value }
+
     [ue_function(BlueprintPure)]
     def static EchoActor(value:ActorRef):ActorRef { return value }
+
     [ue_function(BlueprintPure)]
     def static EchoClass(value:ActorClass):ActorClass { return value }
+
     [ue_function(BlueprintPure)]
     def static EchoArray(value:array<int>):array<int> { return <- clone(value) }
+
     [ue_function(BlueprintCallable)]
     def static Append(var values:array<int>&; @ue_out var result:UEVector&):int {
         push(values,7)

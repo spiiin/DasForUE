@@ -11,6 +11,7 @@ class ItemDefinition : PrimaryDataAsset {
         // Loaded with the UI bundle; an empty reference adds no dependency.
         var @AssetBundles="UI" Icon:SoftObject
     }
+
     [ue_function(BlueprintPure)]
     def ComputeValue(amount:int):int {return self.Score+amount}
 }

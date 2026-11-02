@@ -1,4 +1,5 @@
 #include "DasBlueprintService.h"
+#include "DasBlueprintRollback.h"
 #include "DasTypePins.h"
 #include "DasBlueprintDefaults.h"
 #include "DasPropertyTypes.h"
@@ -35,6 +36,7 @@
 #include "K2Node_CallFunction.h"
 #include "K2Node_CallParentFunction.h"
 #include "K2Node_MakeArray.h"
+#include "K2Node_Self.h"
 #include "K2Node_MakeStruct.h"
 #include "K2Node_BreakStruct.h"
 #include "K2Node_DynamicCast.h"
@@ -136,12 +138,15 @@ bool AdapterCall(const UK2Node_CallFunction* Call)
             T == UDasScriptComponent::StaticClass()->FindFunctionByName(Name) ||
             T == DasNativeScriptHost(
                      TEXT("Pawn"))->FindFunctionByName(Name) ||
-                     T == DasNativeScriptHost(TEXT("Character"))->FindFunctionByName(Name) ||
-                                              T == UDasSaveGame::StaticClass()->FindFunctionByName(Name) ||
-                                              T == UDasWorldSubsystem::StaticClass()->FindFunctionByName(Name) ||
-                                              T == UDasGameInstanceSubsystem::StaticClass()->FindFunctionByName(Name) ||
-                                              T == UDasDataAsset::StaticClass()->FindFunctionByName(Name) ||
-                                              T == UDasPrimaryDataAsset::StaticClass()->FindFunctionByName(Name))
+                     T == DasNativeScriptHost(
+                              TEXT("Character"))->FindFunctionByName(Name) ||
+                              T == DasNativeScriptHost(
+                                       TEXT("PlayerController"))->FindFunctionByName(Name) ||
+                                       T == UDasSaveGame::StaticClass()->FindFunctionByName(Name) ||
+                                       T == UDasWorldSubsystem::StaticClass()->FindFunctionByName(Name) ||
+                                       T == UDasGameInstanceSubsystem::StaticClass()->FindFunctionByName(Name) ||
+                                       T == UDasDataAsset::StaticClass()->FindFunctionByName(Name) ||
+                                       T == UDasPrimaryDataAsset::StaticClass()->FindFunctionByName(Name))
             return true;
     return false;
 }
@@ -465,6 +470,48 @@ UK2Node_CallFunction* DasInterfaceEventAdapter(UK2Node_Event* E)
         return nullptr;
     auto* Call = Cast<UK2Node_CallFunction>(Then->LinkedTo[0]->GetOwningNode());
     return Call && AdapterCall(Call) && Call->FindPin(TEXT("ScriptFile")) ? Call : nullptr;
+}
+// An owned event bridge is a closed, generated component. Refuse hand-added
+// execution/data branches rather than erasing them while changing its signature.
+static bool DasCollectInterfaceBridge(UK2Node_Event* Event, TArray<UEdGraphNode*>& Nodes, FString& Error)
+{
+    auto* Call = DasInterfaceEventAdapter(Event);
+    if (!Call)
+    {
+        Error = TEXT("Interface event has no owned DAS adapter");
+        return false;
+    }
+    for (auto* Pin : Call->Pins)
+        if (Pin->Direction == EGPD_Output && !Pin->LinkedTo.IsEmpty())
+        {
+            Error = TEXT("Interface adapter has hand-authored output/execution links: ") + Call->GetPathName();
+            return false;
+        }
+    TArray<UEdGraphNode*> Component = {Event, Call};
+    for (int32 I = 0; I < Component.Num(); ++I)
+    {
+        if (Component.Num() > 256)
+        {
+            Error = TEXT("Interface adapter component is too large");
+            return false;
+        }
+        for (auto* Pin : Component[I]->Pins)
+            for (auto* Linked : Pin->LinkedTo)
+            {
+                auto* Node = Linked->GetOwningNode();
+                if (Component.Contains(Node))
+                    continue;
+                if (!Cast<UK2Node_MakeArray>(Node) && !Cast<UK2Node_MakeStruct>(Node) && !Cast<UK2Node_Self>(Node))
+                {
+                    Error = TEXT("Interface adapter has hand-authored data links: ") + Node->GetPathName();
+                    return false;
+                }
+                Component.Add(Node);
+            }
+    }
+    for (auto* Node : Component)
+        Nodes.AddUnique(Node);
+    return true;
 }
 bool DasHasMethod(UBlueprint* BP, FName Name)
 {
@@ -1006,7 +1053,11 @@ bool FDasBlueprintService::Apply(UBlueprint* BP, const FDasClassSchema& Schema, 
         return false;
     }
     const bool MigrateDefaults = DefaultPolicy == EDasDefaultMigrationPolicy::PreserveInstances;
-    const bool CheckDefaultValues = !MigrateDefaults && DefaultPolicy != EDasDefaultMigrationPolicy::PreserveOverrides;
+    // Interface batches have already refused source field/default changes. Existing
+    // CDO overrides therefore belong to the user, not to a default-value migration.
+    const bool CheckDefaultValues = !MigrateDefaults &&
+                                    DefaultPolicy != EDasDefaultMigrationPolicy::PreserveOverrides &&
+                                    !FDasBlueprintMigrationBatch::Contains(BP);
     if (DefaultPolicy != EDasDefaultMigrationPolicy::Refuse && !MigrateDefaults &&
         !(bValidateOnly && DefaultPolicy == EDasDefaultMigrationPolicy::PreserveOverrides))
     {
@@ -1065,13 +1116,14 @@ bool FDasBlueprintService::Apply(UBlueprint* BP, const FDasClassSchema& Schema, 
     // Blueprints that still call them fail the scope compile, which rolls the change back.
     TArray<UEdGraph*> StaleGraphs;
     TSet<FName> RebuildGraphs;
+    TArray<UEdGraphNode*> BatchInterfaceNodes;
     for (UEdGraph* Graph : DasOwnedMethodGraphs(BP))
     {
         const FString Prior = BP->GetOutermost()->GetMetaData().GetValue(Graph, TEXT("DasMemberId"));
         if (!Prior.IsEmpty() && !Methods.ContainsByPredicate(
                                     [&](const auto& M) { return M.StableId == Prior && M.Name == Graph->GetFName(); }))
         {
-            if (!BP->FunctionGraphs.Contains(Graph))
+            if (!BP->FunctionGraphs.Contains(Graph) && !FDasBlueprintMigrationBatch::Contains(BP))
             {
                 Error = TEXT("Interface event removal/rename requires migration");
                 return false;
@@ -1344,7 +1396,11 @@ bool FDasBlueprintService::Apply(UBlueprint* BP, const FDasClassSchema& Schema, 
                 Error = TEXT("Existing method is not a supported daScript adapter graph");
                 return false;
             }
-            if (!MethodShape(Function, *Decl) || StaleGraphs.Contains(Graph))
+            // Interface compilation can update the UFunction before its DAS frame
+            // graph is rebuilt. Its reflected signature alone is no longer evidence
+            // that the argument/result-packing bridge is current.
+            if (FDasBlueprintMigrationBatch::Contains(BP) || !MethodShape(Function, *Decl) ||
+                StaleGraphs.Contains(Graph))
                 RebuildGraphs.Add(Graph->GetFName());
         }
     for (UEdGraph* G : BP->UbergraphPages)
@@ -1354,6 +1410,12 @@ bool FDasBlueprintService::Apply(UBlueprint* BP, const FDasClassSchema& Schema, 
                 const FString Id = BP->GetOutermost()->GetMetaData().GetValue(Event, TEXT("DasMemberId"));
                 const auto* Method = Methods.FindByPredicate(
                     [&](const auto& M) { return M.Name == Event->EventReference.GetMemberName(); });
+                if (!Id.IsEmpty() && FDasBlueprintMigrationBatch::Contains(BP))
+                {
+                    if (!DasCollectInterfaceBridge(Event, BatchInterfaceNodes, Error))
+                        return false;
+                    continue;
+                }
                 if (!Id.IsEmpty() && (!Method || Method->StableId != Id))
                 {
                     Error = TEXT("Interface event removal/rename requires migration");
@@ -1381,6 +1443,11 @@ bool FDasBlueprintService::Apply(UBlueprint* BP, const FDasClassSchema& Schema, 
             }
     if (bValidateOnly)
         return true;
+    for (auto* Node : BatchInterfaceNodes)
+    {
+        Node->BreakAllNodeLinks();
+        Node->GetGraph()->RemoveNode(Node);
+    }
     for (FName Name : StaleEvents)
     {
         // Only the description: nodes that still use the event fail the compile and roll back intact.
@@ -1391,7 +1458,8 @@ bool FDasBlueprintService::Apply(UBlueprint* BP, const FDasClassSchema& Schema, 
     }
     for (UEdGraph* Graph : DasOwnedMethodGraphs(BP))
         if (StaleGraphs.Contains(Graph) ||
-            (RebuildGraphs.Contains(Graph->GetFName()) && BP->FunctionGraphs.Contains(Graph)))
+            (RebuildGraphs.Contains(Graph->GetFName()) &&
+             (BP->FunctionGraphs.Contains(Graph) || FDasBlueprintMigrationBatch::Contains(BP))))
             DasDetachGraph(BP, Graph);
     if (!DasEnsureSingleSignatures(BP, Schema, Error))
         return false;

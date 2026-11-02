@@ -2,6 +2,7 @@ options gen2
 require ue_scene_components
 [ue_object_ref(script="dsl_cooked_component.das",type="CookedBehavior")]
 struct CookedComponentRef { handle:UObjectHandle }
+
 [ue_class(parent="/Script/DasRuntime.DasProbeActor",module_id="cookednative",Blueprintable)]
 class CookedNativeOwner {
     @ue_component
@@ -21,6 +22,7 @@ class CookedNativeOwner {
         self.Child.bHiddenInGame=true
         self.Behavior.Bonus=42
     }
+
     [ue_function(BlueprintCallable)]
     def Read(input:int):int { return self.Behavior.GetBonus(input) }
 }

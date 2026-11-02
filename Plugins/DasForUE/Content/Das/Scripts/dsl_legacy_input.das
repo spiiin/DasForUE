@@ -18,14 +18,19 @@ class InputActor {
         ue_input_bind_action("Jump","Released","OnJumpReleased",true,false)
         ue_input_bind_axis("MoveForward","OnMove",true,false)
     }
+
     [ue_function(BlueprintCallable)]
     def OnJumpPressed():void { self.JumpCount += 1; self.JumpHeld = true }
+
     [ue_function(BlueprintCallable)]
     def OnJumpReleased():void { self.JumpHeld = false }
+
     [ue_function(BlueprintCallable)]
     def OnMove(value:float):void { self.MoveValue = value }
+
     [ue_function(BlueprintCallable)]
     def InputReady():bool { return ue_input_is_available() }
+
     [ue_function(BlueprintCallable)]
     def UnbindControls():int { return ue_input_unbind_all() }
 }

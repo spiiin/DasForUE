@@ -339,3 +339,8 @@ See also: [Lifecycle.md](Lifecycle.md) ·
 [Timers.md](../Gameplay/Timers.md) · [Interfaces.md](Interfaces.md) ·
 [AuthoredReferences.md](AuthoredReferences.md) ·
 [ObjectAndClassReferences.md](ObjectAndClassReferences.md)
+
+
+### Native collision payloads
+
+Import `ue_projectile_components` and use `CollisionHit` for the native FHitResult argument in multi-argument `ue_event` handlers (for example OnComponentHit or OnProjectileBounce). The runtime projects it into the owned `FDasCollisionHit` snapshot before queueing. It carries blocking/penetration flags, time/distance, vectors, indices, bone names and Actor/Component/PhysMaterial references. Internal ActorInstanceHandle and PhysicsObject handles stay native. Non-finite hit data is rejected; the queue pins referenced objects and drops events whose references become invalid. `UEHitResult` remains the opaque transport for direct Collision API calls.

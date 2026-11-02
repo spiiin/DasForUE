@@ -2,6 +2,7 @@ options gen2
 options gc
 require ue_text_byte_container_types
 require ue_object_keys
+
 [ue_class(type_folder="/Game/DasTextByteContainers/Types",Blueprintable)]
 class TextByteContainers : Actor {
     properties=ue_properties(EditAnywhere,BlueprintReadWrite) {
@@ -32,15 +33,19 @@ class TextByteContainers : Actor {
         var ByteStructs:table<uint8;TextByteBag>
         var Bag:TextByteBag = TextByteBag()
     }
+
     [ue_function(BlueprintCallable)]
     def EchoBytes(value:array<uint8>):array<uint8> { return <- clone(value) }
+
     [ue_function(BlueprintCallable)]
     def EchoTexts(value:table<string;FText>):table<string;FText> { return <- clone(value) }
+
     [ue_function(BlueprintCallable)]
     def Adjust(var bytes:array<uint8>&; @ue_out var texts:array<FText>&):void {
         push(bytes,uint8(255))
         push(texts,ue_text("Containers","Output","Output"))
     }
+
     [ue_function(BlueprintCallable)]
     def Reverse(var texts:array<FText>&; @ue_out var bytes:table<string;uint8>&):table<uint8> {
         push(texts,ue_text_invariant("Appended"))

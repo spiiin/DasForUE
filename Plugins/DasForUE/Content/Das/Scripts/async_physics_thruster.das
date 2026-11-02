@@ -9,6 +9,7 @@ def physics_flag(body:UObjectHandle; method:string; argument:string; value:bool)
     ue_invoke_call(call)
     ue_release_call(call)
 }
+
 [ue_class(module_id="asyncphysicsdsl",Blueprintable),
  ue_async_physics(script="async_physics_thruster_tick.das",body_0="Body")]
 class Thruster {
@@ -48,6 +49,7 @@ class Thruster {
         self.Running=ue_async_physics_running()
         if(ue_async_physics_has_output()) { self.PhysicsSeconds=ue_async_physics_output(0) }
     }
+
     [ue_function(BlueprintCallable)]
     def SetForce(value:double):void { ue_async_physics_set_input(0,value) }
 }

@@ -1398,7 +1398,7 @@ bool FDasAuthoringModule::ToActorSchema(const FString& ClassId, FDasClassSchema&
                                                                            !DasGenericScriptParent(C->NativeParent)))
         return Fail(
             Error,
-            TEXT("Class adapter requires an Actor, Pawn, Character, ActorComponent or SaveGame root"));
+            TEXT("Class adapter requires an Actor, Pawn, Character, PlayerController, ActorComponent or SaveGame root"));
     if ((!SaveGame && !DataAsset && !Subsystem && C->Methods.IsEmpty() && C->Callbacks.IsEmpty() && !C->AsyncPhysics) ||
         C->Methods.Num() > 64)
         return Fail(Error, TEXT("Actor adapter requires 1..64 methods"));
@@ -1424,6 +1424,10 @@ bool FDasAuthoringModule::ToActorSchema(const FString& ClassId, FDasClassSchema&
     if (C->NativeParent == TEXT("/Script/DasRuntime.DasProbeActor"))
         Result.Parent = TEXT("DasProbeActor");
 #endif
+    // Adapter schemas contain owned members. Inherited interfaces already live on the parent
+    // Blueprint; adding them again would require inherited methods as new child implementations.
+    if (C->NativeParent == TEXT("/Script/Engine.PlayerController"))
+        Result.Parent = TEXT("PlayerController");
     if (DasGenericScriptParent(C->NativeParent))
     {
         Result.Parent = *C->NativeParent;
@@ -1435,7 +1439,7 @@ bool FDasAuthoringModule::ToActorSchema(const FString& ClassId, FDasClassSchema&
                                                                                       Hook.Kind != TEXT("event"))
                 return Fail(Error, TEXT("This parent has no native DAS hook for ") + Hook.Kind);
     }
-    Result.Interfaces = C->Interfaces;
+    Result.Interfaces = Declared->Interfaces;
     Result.Metadata = C->Metadata;
     TArray<const FDasDeclaredMethod*> Methods;
     for (const auto& M : Declared->Methods)
@@ -1529,7 +1533,8 @@ bool FDasAuthoringModule::ToActorSchema(const FString& ClassId, FDasClassSchema&
                                                                : FString::Printf(TEXT("%.17g"), P.Default.Number));
         }
         Method.Signature =
-            (Result.Parent == TEXT("Pawn") || Result.Parent == TEXT("Character")) || Library ||
+            (Result.Parent == TEXT("PlayerController") ||
+                                   Result.Parent == TEXT("Pawn") || Result.Parent == TEXT("Character")) || Library ||
                                        SaveGame || DataAsset || Subsystem || DasGenericScriptParent(C->NativeParent) ||
                                        M.bConst ||
                                        Result.Parent == TEXT("ActorComponent") || !C->Interfaces.IsEmpty()

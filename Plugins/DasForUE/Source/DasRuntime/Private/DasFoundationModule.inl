@@ -173,6 +173,18 @@ public:
                              });
             }
         {
+            auto* Macro = new FUEObjectNewFactory();
+            ownedCallMacros.push_back(das::unique_ptr<das::CallMacro>(Macro));
+            Macro->module = this;
+            addCallMacro(Macro->name,
+                         [Macro](const das::LineInfo& At) -> das::ExprLooksLikeCall*
+                         {
+                             auto* Expression = new das::ExprCallMacro(At, Macro->name);
+                             Expression->macro = Macro;
+                             return Expression;
+                         });
+        }
+        {
             auto* Macro = new FUEActorSpawnFactory();
             ownedCallMacros.push_back(das::unique_ptr<das::CallMacro>(Macro));
             Macro->module = this;
@@ -504,6 +516,13 @@ public:
                                                           das::SideEffects::modifyExternal, "CharacterControlsReady");
         AddUEExtern<DAS_BIND_FUN(CharacterPossess)>(*this, Library, "__ue_pawn_possess",
                                                     das::SideEffects::modifyExternal, "CharacterPossess");
+        AddUEExtern<DAS_BIND_FUN(ProjectileMovementLaunch)>(*this, Library, "__ue_projectile_movement_launch",
+                                                            das::SideEffects::modifyExternal,
+                                                            "ProjectileMovementLaunch");
+        AddUEExtern<DAS_BIND_FUN(PlayerControlsReady)>(*this, Library, "__ue_player_controls_ready",
+                                                       das::SideEffects::modifyExternal, "PlayerControlsReady");
+        AddUEExtern<DAS_BIND_FUN(ControllerSetTeam)>(*this, Library, "__ue_controller_set_team",
+                                                     das::SideEffects::modifyExternal, "ControllerSetTeam");
         // Scalar property accessors for self, authored and native references (DasScalarAccessors.inl).
 #define DAS_REGISTER_SCALAR_ACCESSORS(Suffix, SelfKind, RefKind)                                                       \
     AddUEExtern<DAS_BIND_FUN(GetSelfScalar<SelfKind>)>(*this, Library, "ue_get_self_" #Suffix,                         \
@@ -701,6 +720,8 @@ public:
                                                   "ScriptAICancel");
         AddUEExtern<DAS_BIND_FUN(ScriptAIActive)>(*this, Library, "__ue_ai_active", das::SideEffects::modifyExternal,
                                                   "ScriptAIActive");
+        AddUEExtern<DAS_BIND_FUN(ScriptEffectBurst)>(*this, Library, "__ue_effect_burst",
+                                                     das::SideEffects::modifyExternal, "ScriptEffectBurst");
         AddUEExtern<DAS_BIND_FUN(ScriptEffectPlay)>(*this, Library, "__ue_effect_play",
                                                     das::SideEffects::modifyExternal, "ScriptEffectPlay");
         AddUEExtern<DAS_BIND_FUN(ScriptEffectStop)>(*this, Library, "__ue_effect_stop",
@@ -1119,6 +1140,19 @@ public:
                                                "ClassLoaded");
         AddUEExtern<DAS_BIND_FUN(ActorSpawn), das::SimNode_ExtFuncCallAndCopyOrMove>(
             *this, Library, "__ue_actor_spawn", das::SideEffects::modifyExternal, "ActorSpawn");
+        AddUEExtern<DAS_BIND_FUN(ActorSpawnInstigated), das::SimNode_ExtFuncCallAndCopyOrMove>(
+            *this, Library, "__ue_actor_spawn_instigated", das::SideEffects::modifyExternal, "ActorSpawnInstigated");
+        AddUEExtern<DAS_BIND_FUN(ScriptObjectNew), das::SimNode_ExtFuncCallAndCopyOrMove>(
+            *this, Library, "__ue_object_new", das::SideEffects::modifyExternal, "ScriptObjectNew");
+        AddUEExtern<DAS_BIND_FUN(ScriptObjectOuter), das::SimNode_ExtFuncCallAndCopyOrMove>(
+            *this, Library, "ue_object_outer", das::SideEffects::accessExternal, "ScriptObjectOuter");
+        AddUEExtern<DAS_BIND_FUN(WorldSeconds)>(*this, Library, "ue_world_seconds", das::SideEffects::accessExternal,
+                                                "WorldSeconds");
+        AddUEExtern<DAS_BIND_FUN(ActorDestroySelfNextTick)>(*this, Library, "ue_actor_destroy_self_next_tick",
+                                                            das::SideEffects::modifyExternal,
+                                                            "ActorDestroySelfNextTick");
+        AddUEExtern<DAS_BIND_FUN(ActorDestroySelf)>(*this, Library, "ue_actor_destroy_self",
+                                                    das::SideEffects::modifyExternal, "ActorDestroySelf");
         AddUEExtern<DAS_BIND_FUN(ActorDestroy)>(*this, Library, "ue_actor_destroy_handle",
                                                 das::SideEffects::modifyExternal, "ActorDestroy");
         AddUEExtern<DAS_BIND_FUN(ObjectFindByType), das::SimNode_ExtFuncCallAndCopyOrMove>(

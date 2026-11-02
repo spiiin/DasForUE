@@ -45,6 +45,9 @@ int32 ArchiveCount(UObject* O)
 }
 void ArchiveExtraValues(UObject* O, int32 Score)
 {
+    FindFProperty<FClassProperty>(
+        O->GetClass(),
+        TEXT("ActorKind"))->SetObjectPropertyValue_InContainer(O, Score == 77 ? nullptr : ADasActor::StaticClass());
     FindFProperty<FByteProperty>(O->GetClass(), TEXT("Priority"))->SetPropertyValue_InContainer(O, uint8(Score));
     FindFProperty<FTextProperty>(
         O->GetClass(),
@@ -62,6 +65,11 @@ void ArchiveExtraValues(UObject* O, int32 Score)
 bool ArchiveExtraMatches(UObject* O, int32 Score, bool Default = false)
 {
     if (!O)
+        return false;
+    auto* Kind = FindFProperty<FClassProperty>(O->GetClass(), TEXT("ActorKind"));
+    if (!Kind || Kind->GetObjectPropertyValue_InContainer(O) != (Default       ? AActor::StaticClass()
+                                                                 : Score == 77 ? nullptr
+                                                                               : ADasActor::StaticClass()))
         return false;
     auto* Byte = FindFProperty<FByteProperty>(O->GetClass(), TEXT("Priority"));
     auto* Text = FindFProperty<FTextProperty>(O->GetClass(), TEXT("Title"));
@@ -153,9 +161,12 @@ int32 RunDasArchiveProbe(const FString& Params)
     UWorld* World = nullptr;
     FString Original;
     FFileHelper::LoadFileToString(Original, *Runtime.ScriptPath(TEXT("dsl_retired_fields.das")));
-    Original.ReplaceInline(TEXT("require ue_dsl"), TEXT("require ue_dsl\nrequire ue_text"));
+    Original.ReplaceInline(TEXT("require ue_dsl"), TEXT("require ue_dsl\nrequire ue_text\nrequire ue_object_types"));
     Original.ReplaceInline(TEXT("    //RetireEnd"),
-        TEXT("    @ue_property=(EditAnywhere,BlueprintReadWrite)\n    Priority:uint8=uint8(255)\n    @ue_property=(EditAnywhere,BlueprintReadWrite)\n    Title:FText=ue_text(\"ArchiveProbe\",\"Initial\",\"Initial 世界\")\n    @ue_property=(EditAnywhere,BlueprintReadWrite)\n    Numbers:array<int> = [1,2]\n    @ue_property=(EditAnywhere,BlueprintReadWrite)\n    UniqueNumbers:table<int> = {3,4}\n    @ue_property=(EditAnywhere,BlueprintReadWrite)\n    Counts:table<string;int> = {\"Initial\"=>5}\n    //RetireEnd"));
+        TEXT("    @ue_property=(EditAnywhere,BlueprintReadWrite)\n    Priority:uint8=uint8(255)\n    @ue_property=(EditAnywhere,BlueprintReadWrite)\n    ActorKind:ActorClass\n    @ue_property=(EditAnywhere,BlueprintReadWrite)\n    Title:FText=ue_text(\"ArchiveProbe\",\"Initial\",\"Initial 世界\")\n    @ue_property=(EditAnywhere,BlueprintReadWrite)\n    Numbers:array<int> = [1,2]\n    @ue_property=(EditAnywhere,BlueprintReadWrite)\n    UniqueNumbers:table<int> = {3,4}\n    @ue_property=(EditAnywhere,BlueprintReadWrite)\n    Counts:table<string;int> = {\"Initial\"=>5}\n    //RetireEnd"));
+    const int32 Body = Original.Find(TEXT("    //RetireEnd"));
+    Original.InsertAt(
+        Body, TEXT("\n    defaults = ue_defaults() { self.ActorKind = ue_class_default(\"/Script/Engine.Actor\") }\n"));
     FString Removed = Original;
     const int32 A = Removed.Find(TEXT("    //RetireBegin")), B = Removed.Find(TEXT("    //RetireEnd"));
     Removed.RemoveAt(A, B - A + FString(TEXT("    //RetireEnd")).Len());

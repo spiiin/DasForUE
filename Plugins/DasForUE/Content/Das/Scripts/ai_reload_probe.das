@@ -2,8 +2,10 @@ options gen2
 require ue_ai
 var @ue_state events:int = 0
 var @ue_state code:int = -1
+
 [ue_class(module_id="aimovereload",Blueprintable)]
 class AIMoveCallbacks : Actor {
+
     [ue_function(BlueprintCallable)]
     def Received(result:MoveResult):void {
         events = (events+1)

@@ -382,6 +382,7 @@ def exercise_names(api:ValueDriverRef):int {
     if (length(api.CopyNameScores(empty))!=0 || length(api.CopyNameTags(emptyTags))!=0) { return -103 }
     return 1
 }
+
 [ue_class(module_id="methodvalues", type_registry="REGISTRY", Blueprintable,parent="/Script/DasRuntime.DasProbeActor")]
 class ValueDriver {
     @ue_property=(EditAnywhere,BlueprintReadWrite)
@@ -400,18 +401,25 @@ class ValueDriver {
     EnumNativeEnums:table<SpawnCollision;SpawnCollision>
     @ue_property=(EditAnywhere,BlueprintReadWrite)
     EnumObjects:table<MethodState;ActorRef>
+
     [ue_function(BlueprintCallable)]
     def CopyEnumMap(values:table<MethodState;int>):table<MethodState;int> { return <- clone(values) }
+
     [ue_function(BlueprintCallable)]
     def CopyNativeEnumMap(values:table<SpawnCollision;int>):table<SpawnCollision;int> { return <- clone(values) }
+
     [ue_function(BlueprintCallable)]
     def CopyEnumVectors(values:table<MethodState;UEVector>):table<MethodState;UEVector> { return <- clone(values) }
+
     [ue_function(BlueprintCallable)]
     def RefEnumMap(var values:table<MethodState;int>&; @ue_out var previous:table<MethodState;int>&):void { previous := values; values[MethodState.Active]=99 }
+
     [ue_function(BlueprintCallable)]
     def RefNativeEnumMap(var values:table<SpawnCollision;int>&; @ue_out var previous:table<SpawnCollision;int>&):void { previous := values; values[SpawnCollision.DontSpawnIfColliding]=99 }
+
     [ue_function(BlueprintCallable)]
     def FailEnumMap(var values:table<MethodState;int>&):void { values[MethodState.Active]=1000; panic("enum map rollback") }
+
     [ue_function(BlueprintCallable)]
     def SeedEnumMaps(value:ActorRef):bool {
         self.EnumScores[MethodState.Idle]=7
@@ -428,8 +436,10 @@ class ValueDriver {
 
     @ue_property=(EditAnywhere, BlueprintReadWrite)
     AuthoredKeys:table<ValueTargetKey>
+
     [ue_function(BlueprintCallable)]
     def CopyAuthoredKeys(values:table<ValueTargetKey>):table<ValueTargetKey> { return <- clone(values) }
+
     [ue_function(BlueprintCallable)]
     def SeedAuthoredKeys(value:ValueTargetRef):void { insert(self.AuthoredKeys,ue_key(value)) }
 
@@ -451,16 +461,22 @@ class ValueDriver {
     GCHashSet:table<ObjectKey>
     @ue_property=(EditAnywhere, BlueprintReadWrite)
     GCHashMap:table<ObjectKey;int>
+
     [ue_function(BlueprintCallable)]
     def CopyObjectSet(values:table<ActorKey>):table<ActorKey> { return <- clone(values) }
+
     [ue_function(BlueprintCallable)]
     def CopyObjectMap(values:table<ActorKey;int>):table<ActorKey;int> { return <- clone(values) }
+
     [ue_function(BlueprintCallable)]
     def CopyObjectVectors(values:table<ActorKey;UEVector>):table<ActorKey;UEVector> { return <- clone(values) }
+
     [ue_function(BlueprintCallable)]
     def RefObjectSet(var values:table<ActorKey>&; @ue_out var previous:table<ActorKey>&):void { previous := values; insert(values,default<ActorKey>) }
+
     [ue_function(BlueprintCallable)]
     def RefObjectMap(var values:table<ActorKey;int>&; @ue_out var previous:table<ActorKey;int>&):void { previous := values; values[default<ActorKey>]=99 }
+
     [ue_function(BlueprintCallable)]
     def SeedObjectHashes(value:ActorRef):void {
         clear(self.ActorKeys)
@@ -472,8 +488,10 @@ class ValueDriver {
         self.ObjectNativeEnums[ue_key(value)]=SpawnCollision.AlwaysSpawn
         self.ObjectReferences[ue_key(value)]=value
     }
+
     [ue_function(BlueprintCallable)]
     def HoldHashObject(value:ObjectRef):void { insert(self.GCHashSet,ue_key(value)); self.GCHashMap[ue_key(value)]=7 }
+
     [ue_function(BlueprintCallable)]
     def ClearHashObject():void { clear(self.GCHashSet); clear(self.GCHashMap) }
 
@@ -483,20 +501,25 @@ class ValueDriver {
     LockedEnumStates:table<MethodState>
     @ue_property=(EditAnywhere, BlueprintReadWrite)
     NativeStates:table<SpawnCollision>
+
     [ue_function(BlueprintCallable)]
     def CopyEnumSet(values:table<MethodState>):table<MethodState> { return <- clone(values) }
+
     [ue_function(BlueprintCallable)]
     def CopyNativeEnumSet(values:table<SpawnCollision>):table<SpawnCollision> { return <- clone(values) }
+
     [ue_function(BlueprintCallable)]
     def RefEnumSet(var values:table<MethodState>&; @ue_out var previous:table<MethodState>&):void {
         previous := values
         insert(values,MethodState.Active)
     }
+
     [ue_function(BlueprintCallable)]
     def RefNativeEnumSet(var values:table<SpawnCollision>&; @ue_out var previous:table<SpawnCollision>&):void {
         previous := values
         insert(values,SpawnCollision.DontSpawnIfColliding)
     }
+
     [ue_function(BlueprintCallable)]
     def SeedEnumSets():bool {
         clear(self.EnumStates)
@@ -519,22 +542,28 @@ class ValueDriver {
     LockedNames:table<UENameValue>
     @ue_property=(EditAnywhere, BlueprintReadWrite)
     NameVectors:table<UENameValue;UEVector>
+
     [ue_function(BlueprintCallable)]
     def CopyNameScores(values:table<UENameValue;int>):table<UENameValue;int> { return <- clone(values) }
+
     [ue_function(BlueprintCallable)]
     def CopyNameTags(values:table<UENameValue>):table<UENameValue> { return <- clone(values) }
+
     [ue_function(BlueprintCallable)]
     def CopyNameVectors(values:table<UENameValue;UEVector>):table<UENameValue;UEVector> { return <- clone(values) }
+
     [ue_function(BlueprintCallable)]
     def RefNameScores(var values:table<UENameValue;int>&; @ue_out var previous:table<UENameValue;int>&):void {
         previous := values
         values[ue_name_value("Updated")]=99
     }
+
     [ue_function(BlueprintCallable)]
     def RefNameTags(var values:table<UENameValue>&; @ue_out var previous:table<UENameValue>&):void {
         previous := values
         insert(values,ue_name_value("Updated"))
     }
+
     [ue_function(BlueprintCallable)]
     def SeedNames():void {
         self.NameScores[ue_name_value("Unit_3")]=7
@@ -554,6 +583,7 @@ class ValueDriver {
         api.DirectPartners := empty
         return (rejected && length(api.DirectPartners)==0) ? 1 : 0
     }
+
     [ue_function(BlueprintCallable)]
     def RejectNativeAuthoredField(target:UObjectHandle):int {
         let api=ue_ref(type<ValueTargetRef>,target)
@@ -562,6 +592,7 @@ class ValueDriver {
         api.Partner=default<ValueTargetRef>
         return (rejected && !ue_object_valid(api.Partner.handle)) ? 1 : 0
     }
+
     [ue_function(BlueprintCallable)]
     def ExpiredNativeFields(target:UObjectHandle):int {
         let api=ue_ref(type<ValueTargetRef>,target)
@@ -574,6 +605,7 @@ class ValueDriver {
         api.NativeActor=default<ActorRef>
         return (!ue_object_is_a(expired.handle,"Actor") && !ue_object_is_a(expiredNested.handle,"Actor") && !ue_object_is_a(api.Settings.Point.Owner.handle,"Actor") && !ue_object_is_a(api.NativeActor.handle,"Actor")) ? 1 : 0
     }
+
     [ue_function(BlueprintCallable)]
     def Exercise(target:UObjectHandle):int {
         let api=ue_ref(type<ValueDriverRef>,ue_self_object())

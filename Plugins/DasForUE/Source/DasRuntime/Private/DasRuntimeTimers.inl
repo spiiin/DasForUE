@@ -18,6 +18,7 @@ struct FCompiledProgram
     das::FileAccessPtr Access;
     das::ProgramPtr Program;
     FString CompileError;
+    TFunction<void()> RestoreReferenceMetadata;
     uint64 CheckedEpoch = 0;
     double CheckedAt = 0;
     bool bSimulating = false;

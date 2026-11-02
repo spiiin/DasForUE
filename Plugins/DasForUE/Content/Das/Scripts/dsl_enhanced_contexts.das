@@ -22,10 +22,13 @@ class MappingContextActor {
         ue_enhanced_bind(self.JumpAction,"Triggered","OnJump")
         ue_enhanced_bind(self.JumpAction,"Completed","OnJump")
     }
+
     [ue_function(BlueprintCallable)]
     def OnJump(value:bool):void { self.JumpHeld = value }
+
     [ue_function(BlueprintCallable)]
     def ClearOwned():int { return ue_enhanced_clear_contexts() }
+
     [ue_function(BlueprintCallable)]
     def ContextActive():bool { return ue_enhanced_has_context(self.Player,self.Controls) }
 }

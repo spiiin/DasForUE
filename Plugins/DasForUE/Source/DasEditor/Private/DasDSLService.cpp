@@ -5,6 +5,7 @@
 #include "DasGenericParents.h"
 #include "KismetCompilerModule.h"
 #include "DasPawn.h"
+#include "DasPlayerController.h"
 #include "GameFramework/Controller.h"
 #include "GameFramework/Pawn.h"
 #include "GameFramework/PlayerState.h"
@@ -2066,6 +2067,8 @@ TMap<FString, FDasScalarValue>* RetiredValues(UObject* O)
 {
     if (auto* A = Cast<ADasActor>(O))
         return &A->RetiredDasValues;
+    if (auto* PC = Cast<ADasPlayerController>(O))
+        return &PC->RetiredDasValues;
     if (auto* P = Cast<ADasPawn>(O))
         return &P->RetiredDasValues;
     if (auto* C = Cast<ADasCharacter>(O))
@@ -2119,12 +2122,6 @@ bool FDasDSLService::ReimportArchivedFields(UBlueprint* BP, bool Restore, bool I
     if (Previous.ParentStableId != Candidate.ParentStableId)
     {
         Error = TEXT("Changing the parent together with a field migration is deferred; save them separately");
-        return false;
-    }
-    if (Previous.Fields.ContainsByPredicate([](const FDasFieldSchema& F) { return F.Kind == EDasScalarKind::Class; }) ||
-        Candidate.Fields.ContainsByPredicate([](const FDasFieldSchema& F) { return F.Kind == EDasScalarKind::Class; }))
-    {
-        Error = TEXT("Retired-field migration of class references is deferred");
         return false;
     }
     for (const auto& M : Candidate.EffectiveMethods())
@@ -2485,6 +2482,11 @@ bool FDasDSLService::ReimportArchivedFields(UBlueprint* BP, bool Restore, bool I
                           (IsValid(V->ObjectValue.Get()) &&
                            !DasReferenceMatches(V->ObjectValue.Get(),
                                                 FindObject<UClass>(nullptr, *A.Field.ObjectClass))))) ||
+                        (A.Field.Kind == EDasScalarKind::Class &&
+                         (V->ObjectClass != A.Field.ObjectClass ||
+                          (V->ClassValue &&
+                           (!IsValid(V->ClassValue.Get()) ||
+                            !V->ClassValue->IsChildOf(FindObject<UClass>(nullptr, *A.Field.ObjectClass)))))) ||
                         (A.Field.Kind == EDasScalarKind::Struct &&
                          (!V->StructValue.IsValid() ||
                           V->StructValue.GetScriptStruct()->GetPathName() != A.Field.StructPath ||

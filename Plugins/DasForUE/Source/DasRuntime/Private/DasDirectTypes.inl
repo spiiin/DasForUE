@@ -739,10 +739,10 @@ void DSLEnsureStructHelpers(const das::TypeDeclPtr& InputType, const FString& Pa
             ULoop->at = At;
             ULoop->list.push_back(DSLCall(
                 At, "push",
-                {Target(),
-                 DSLDirectUnpack(At, Child,
-                                 DSLCall(At, ClassValue ? "__ue_struct_get_class" : "ue_struct_get_object", {new das::ExprVar(At, "value"), IndexPath()}),
-                                 ObjectPath)}));
+                {Target(), DSLDirectUnpack(At, Child,
+                                           DSLCall(At, ClassValue ? "__ue_struct_get_class" : "ue_struct_get_object",
+                                                   {new das::ExprVar(At, "value"), IndexPath()}),
+                                           ObjectPath)}));
             UnpackBody->list.push_back(
                 Loop(DSLCall(At, "ue_struct_array_size", {new das::ExprVar(At, "value"), Name()}), ULoop));
         }

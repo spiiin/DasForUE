@@ -405,13 +405,14 @@ UScriptStruct* ResolveEnumSetCarrier(const FString& Path)
 }
 
 const FString ReferenceArrayPrefix = TEXT("/Script/DasRuntime.DasReferenceArray_");
-UScriptStruct* ReferenceArrayCarrier(UClass* Element)
+const FString ClassArrayPrefix = TEXT("/Script/DasRuntime.DasClassArray_");
+UScriptStruct* ReferenceArrayCarrier(UClass* Element, bool Class = false)
 {
     if (!IsInGameThread() || !IsValid(Element) || !Element->GetPathName().StartsWith(TEXT("/Script/")))
         return nullptr;
     const FTCHARToUTF8 Text(*Element->GetPathName());
     const TCHAR* Digits = TEXT("0123456789ABCDEF");
-    FString Path = ReferenceArrayPrefix;
+    FString Path = Class ? ClassArrayPrefix : ReferenceArrayPrefix;
     for (int32 I = 0; I < Text.Length(); ++I)
     {
         const uint8 Byte = uint8(Text.Get()[I]);
@@ -420,13 +421,15 @@ UScriptStruct* ReferenceArrayCarrier(UClass* Element)
     }
     if (Path.Len() >= NAME_SIZE)
         return nullptr;
-    return RegisteredCarrier(Path, CarrierShape(TEXT("array"), CarrierLeaf(TEXT("object"), Element->GetPathName())));
+    return RegisteredCarrier(
+        Path, CarrierShape(TEXT("array"), CarrierLeaf(Class ? TEXT("class") : TEXT("object"), Element->GetPathName())));
 }
 UScriptStruct* ResolveReferenceArrayCarrier(const FString& Path)
 {
-    if (!Path.StartsWith(ReferenceArrayPrefix) || Path.Len() >= NAME_SIZE)
+    const bool Class = Path.StartsWith(ClassArrayPrefix);
+    if ((!Class && !Path.StartsWith(ReferenceArrayPrefix)) || Path.Len() >= NAME_SIZE)
         return nullptr;
-    const FString Hex = Path.RightChop(ReferenceArrayPrefix.Len());
+    const FString Hex = Path.RightChop(Class ? ClassArrayPrefix.Len() : ReferenceArrayPrefix.Len());
     if (Hex.IsEmpty() || Hex.Len() % 2)
         return nullptr;
     auto Digit = [](TCHAR C)
@@ -448,7 +451,7 @@ UScriptStruct* ResolveReferenceArrayCarrier(const FString& Path)
     auto* C = FindObject<UClass>(nullptr, *ClassPath);
     if (!C)
         C = LoadObject<UClass>(nullptr, *ClassPath, nullptr, LOAD_NoWarn);
-    auto* S = ReferenceArrayCarrier(C);
+    auto* S = ReferenceArrayCarrier(C, Class);
     return S && S->GetPathName() == Path ? S : nullptr;
 }
 
@@ -777,8 +780,10 @@ static UScriptStruct* LegacyContainerCarrier(const FDasDeclaredType& Type)
                                                   Type.Value->Kind == TEXT("struct"))
         return StructMapCarrier(FindObject<UScriptStruct>(nullptr, *Type.Value->TypePath),
                                 Type.Key->Kind == TEXT("string"));
-    if (Type.Kind == TEXT("array") && Type.Element && Type.Element->Kind == TEXT("object"))
-        return ReferenceArrayCarrier(FindObject<UClass>(nullptr, *Type.Element->TypePath));
+    if (Type.Kind == TEXT("array") && Type.Element &&
+                          (Type.Element->Kind == TEXT("object") || Type.Element->Kind == TEXT("class")))
+        return ReferenceArrayCarrier(FindObject<UClass>(nullptr, *Type.Element->TypePath),
+                                     Type.Element->Kind == TEXT("class"));
     if (Type.Kind == TEXT("array") && Type.Element && Type.Element->Kind == TEXT("enum"))
         return EnumArrayCarrier(FindObject<UEnum>(nullptr, *Type.Element->TypePath), Storage(Type.Element) == 1);
     if (Type.Kind == TEXT("array") && Type.Element && Type.Element->Kind == TEXT("struct"))
@@ -844,7 +849,7 @@ FProperty* DasContainerProperty(const FString& Path)
         auto* S = ResolveStructMapCarrier(Path);
         return S ? S->FindPropertyByName(TEXT("Values")) : nullptr;
     }
-    if (Path.StartsWith(ReferenceArrayPrefix))
+    if (Path.StartsWith(ReferenceArrayPrefix) || Path.StartsWith(ClassArrayPrefix))
     {
         auto* S = ResolveReferenceArrayCarrier(Path);
         return S ? S->FindPropertyByName(TEXT("Values")) : nullptr;

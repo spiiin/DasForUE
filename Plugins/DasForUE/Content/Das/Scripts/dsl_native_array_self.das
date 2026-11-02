@@ -9,8 +9,10 @@ enum NativeMobility {
     Stationary=1
     Movable=2
 }
+
 [ue_class(module_id="nativearrays",Blueprintable)]
 class NativeArraySelf : ProbeActor {
+
     [ue_function(BlueprintCallable)]
     def EnumKeys():bool {
         if (self.DasNativeArrayEnumKeys[SpawnCollision.AlwaysSpawn]!=321) { return false }
@@ -67,6 +69,7 @@ class NativeArraySelf : ProbeActor {
         try { ue_key(type<NativePawnKey>,actor.handle) } recover { wrong=true }
         return rejected && wrong && length(self.DasNativeArrayPawnSet)==1 && self.DasNativeArrayObjectKeys[key]==8 && self.DasNativeArrayObjectKeys[nil]==42 && self.DasNativeArrayObjectVectors[key].x==5.0lf && ue_object_valid(ue_key_ref(key).handle)
     }
+
     [ue_function(BlueprintCallable)]
     def ExpiredObjectHashes():bool {
         var rejectedSet=false
@@ -121,6 +124,7 @@ class NativeArraySelf : ProbeActor {
         erase(self.DasNativeArrayEnums,1)
         return rejected && length(self.DasNativeArrayEnums)==1 && self.DasNativeArrayEnums[0]==SpawnCollision.AdjustIfPossibleButAlwaysSpawn
     }
+
     [ue_function(BlueprintCallable)]
     def Bytes():bool {
         clear(self.DasNativeArrayBytes)
@@ -128,6 +132,7 @@ class NativeArraySelf : ProbeActor {
         self.DasNativeArrayBytes[0]=NativeMobility.Stationary
         return self.DasNativeArrayBytes[0]==NativeMobility.Stationary
     }
+
     [ue_function(BlueprintCallable)]
     def Vectors():bool {
         clear(self.DasNativeArrayVectors)
@@ -141,6 +146,7 @@ class NativeArraySelf : ProbeActor {
         try { self.DasNativeArrayVectors[999]=ue_vector(0.0lf,0.0lf,0.0lf) } recover { rejected=true }
         return rejected && self.DasNativeArrayVectors[0].x==10.0lf && self.DasNativeArrayVectors[0].y==77.0lf
     }
+
     [ue_function(BlueprintCallable)]
     def Rotators():bool {
         clear(self.DasNativeArrayRotators)
@@ -148,12 +154,14 @@ class NativeArraySelf : ProbeActor {
         self.DasNativeArrayRotators[0].yaw+=8.0lf
         return self.DasNativeArrayRotators[0].yaw==10.0lf
     }
+
     [ue_function(BlueprintCallable)]
     def Transforms():bool {
         clear(self.DasNativeArrayTransforms)
         push(self.DasNativeArrayTransforms,ue_transform_identity())
         return ue_transform_scale(self.DasNativeArrayTransforms[0]).x==1.0lf
     }
+
     [ue_function(BlueprintCallable)]
     def Points():bool {
         clear(self.DasNativeArrayPoints)
@@ -168,6 +176,7 @@ class NativeArraySelf : ProbeActor {
         try { self.DasNativeArrayPoints := mixed } recover { wholeRejected=true }
         return rejected && wholeRejected && length(self.DasNativeArrayPoints)==1 && ue_struct_get_int(self.DasNativeArrayPoints[0],"X")==12
     }
+
     [ue_function(BlueprintCallable)]
     def Objects():bool {
         clear(self.DasNativeArrayObjects)
@@ -184,6 +193,7 @@ class NativeArraySelf : ProbeActor {
         try { self.DasNativeArrayPawns[0]=NativePawnRef(handle=ue_self_object()) } recover { rejected=true }
         return rejected && length(self.DasNativeArrayPawns)==2 && ue_object_valid(NativePawnRef_raw(self.DasNativeArrayPawns[0])) && !ue_object_valid(NativePawnRef_raw(self.DasNativeArrayPawns[1]))
     }
+
     [ue_function(BlueprintCallable)]
     def Maps():bool {
         clear(self.DasNativeArrayIntMap)
@@ -202,6 +212,7 @@ class NativeArraySelf : ProbeActor {
         self.DasNativeArrayNameMap[7]=ue_name_value("Native")
         return length(self.DasNativeArrayIntMap)==1 && self.DasNativeArrayIntMap[1]==99 && self.DasNativeArrayDoubleMap["speed"]==5.0lf
     }
+
     [ue_function(BlueprintCallable)]
     def MapValues():bool {
         clear(self.DasNativeArrayVectorMap)
@@ -228,6 +239,7 @@ class NativeArraySelf : ProbeActor {
         try { self.DasNativeArrayPawnMap[1]=NativePawnRef(handle=ue_self_object()) } recover { objectRejected=true }
         return enumRejected && structRejected && objectRejected && length(self.DasNativeArrayEnumMap)==1 && self.DasNativeArrayEnumMap[1]==SpawnCollision.AlwaysSpawn && length(self.DasNativeArrayPointMap)==1 && ue_struct_get_int(self.DasNativeArrayPointMap[1],"X")==12 && self.DasNativeArrayVectorMap["origin"].x==10.0lf && ue_object_valid(NativePawnRef_raw(self.DasNativeArrayPawnMap[1]))
     }
+
     [ue_function(BlueprintCallable)]
     def Sets():bool {
         clear(self.DasNativeArrayIntSet)
@@ -246,6 +258,7 @@ class NativeArraySelf : ProbeActor {
         erase(self.DasNativeArrayStringSet,"beta")
         return length(self.DasNativeArrayIntSet)==2 && key_exists(self.DasNativeArrayIntSet,10) && key_exists(self.DasNativeArrayIntSet,30) && length(self.DasNativeArrayStringSet)==1 && key_exists(self.DasNativeArrayStringSet,"alpha")
     }
+
     [ue_function(BlueprintCallable)]
     def NameKeys():bool {
         if(self.DasNativeArrayNameKeys[ue_name_value("pRESET_3")]!=321) { return false }
@@ -281,6 +294,7 @@ class NativeArraySelf : ProbeActor {
         self.DasNativeArrayNameSet := names
         return length(self.DasNativeArrayNameKeys)==5 && self.DasNativeArrayNameKeys[ue_name_value("unit")]==9 && self.DasNativeArrayNameKeys[ue_name_value("UNIT_1")]==20 && self.DasNativeArrayNameKeys[ue_name_value("Unit_01")]==30 && self.DasNativeArrayNameKeys[ue_name_value("none")]==41 && length(self.DasNativeArrayNameSet)==6 && key_exists(self.DasNativeArrayNameSet,ue_name_value("unit")) && key_exists(self.DasNativeArrayNameSet,ue_name_value("EXTRA"))
     }
+
     [ue_function(BlueprintCallable)]
     def NameValues():bool {
         let key=ue_name_value("Value_1")

@@ -77,6 +77,7 @@ class ComputedDefaults : Actor {
         self.Asset=ue_asset_default(default_asset())
         self.Pivot.RelativeLocation=ue_vector(0.0lf,0.0lf,double(self.Derived))
     }
+
     [ue_function(BlueprintCallable)]
     def Read(input:int):int { return self.Score+self.Derived+input }
 }

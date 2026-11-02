@@ -1,9 +1,9 @@
-param([string]$Engine = 'C:\src\unreal\UnrealEngine')
+param([string]$Engine = 'C:\src\unreal\UnrealEngine', [switch]$SkipBuild)
 $ErrorActionPreference = 'Stop'
 Import-Module (Join-Path $PSScriptRoot 'DasTest.psm1') -Force
 $Das = Get-DasContext -Engine $Engine
 $Repo = $Das.Repo
-Invoke-DasBuild $Das -Name 'Authoring probe'
+if(!$SkipBuild) { Invoke-DasBuild $Das -Name 'Authoring probe' }
 $ProbeId = [Guid]::NewGuid().ToString('N')
 try {
 foreach ($Phase in @('Create','Remove','ReopenRemoved','Restore','ReopenRestored')) {

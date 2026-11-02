@@ -24,8 +24,10 @@ struct Tree {
     @ue_property=(EditAnywhere, BlueprintReadWrite)
     Right : Branch = Branch()
 }
+
 [ue_class(module_id="nested", type_registry="REGISTRY", Blueprintable)]
 class NestedActor {
+
     [ue_function(BlueprintCallable)]
     def Seed():void {
         var data = Tree()
@@ -37,6 +39,7 @@ class NestedActor {
         push_clone(data.Items, item)
         self.Config <- data
     }
+
     [ue_function(BlueprintCallable)]
     def ArraySum():int {
         var total = 0
@@ -45,11 +48,13 @@ class NestedActor {
     }
     @ue_property=(EditAnywhere, BlueprintReadWrite)
     Config : Tree = Tree()
+
     [ue_function(BlueprintCallable)]
     def Bump(amount:int):int {
         self.Config.Left.Inner.Count += amount
         return <- clone(self.Config).Left.Inner.Count
     }
+
     [ue_function(BlueprintCallable)]
     def Echo(value:Tree):Tree {
         var result <- clone(value)
@@ -57,8 +62,10 @@ class NestedActor {
         result.Right.Inner.Title = "Nested 世界"
         return <- result
     }
+
     [ue_function(BlueprintCallable)]
     def Replace(value:Tree):void { self.Config <- clone(value) }
+
     [ue_function(BlueprintCallable)]
     def Get():Tree { return <- clone(self.Config) }
 }

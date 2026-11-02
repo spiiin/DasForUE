@@ -75,12 +75,14 @@ class PlayableCharacter : Character {
         if (!self.ControlsBound) { self.BindControls() }
         if(!ue_widget_visible(self.HUD)) { self.SetupHUD() }
     }
+
     [ue_function(BlueprintCallable)]
     def AddScore(amount:int):void {
         self.Score+=amount
         self.Label.K2_SetText(ue_text_invariant("Score: {self.Score}"))
         self.RefreshHUD()
     }
+
     [ue_function(BlueprintCallable)]
     def BindControls():void {
         let pawn=ue_character_self()
@@ -95,12 +97,14 @@ class PlayableCharacter : Character {
         if(ue_is_valid(self.UIAction)) { ue_enhanced_bind(self.UIAction,TriggerEvent.Started,self.OnToggleUI) }
         self.ControlsBound=true
     }
+
     [ue_function(BlueprintCallable)]
     def OnMove(value:InputActionValue):void {
         let axis=ue_input_axis2d(value)
         self.MoveEvents+=1
         ue_character_move(ue_character_self(),float(axis.y),float(axis.x))
     }
+
     [ue_function(BlueprintCallable)]
     def OnLook(value:InputActionValue):void {
         let axis=ue_input_axis2d(value)
@@ -108,11 +112,13 @@ class PlayableCharacter : Character {
         self.AddControllerYawInput(float(axis.x))
         self.AddControllerPitchInput(float(axis.y))
     }
+
     [ue_function(BlueprintCallable)]
     def OnJump(value:bool):void {
         self.JumpEvents+=1
         if (value) { self.Jump() } else { self.StopJumping() }
     }
+
     [ue_function(BlueprintCallable)]
     def SetupHUD():void {
         if(ue_widget_visible(self.HUD)) { return }
@@ -140,24 +146,31 @@ class PlayableCharacter : Character {
         let point=ue_vector(start.x+forward.x*100.0lf,start.y+forward.y*100.0lf,start.z+forward.z*100.0lf)
         if(ue_effect_at("hurt",self.HurtSound,self.HurtVFX,point,self.OnHurtEffectFinished,0.25f,0.7f,0.2f)) { self.HurtEffectsStarted+=1 }
     }
+
     [ue_function(BlueprintCallable)]
     def OnHurtEffectFinished():void { self.HurtEffectsFinished+=1 }
+
     [ue_function(BlueprintCallable)]
     def HurtFromHUD():void { self.HUDClicks+=1;self.ReceiveDamage(25.0f) }
+
     [ue_function(BlueprintCallable)]
     def Heal(amount:float):bool { return ue_gas_heal(self.Abilities,amount) }
+
     [ue_function(BlueprintCallable)]
     def ReceiveDamage(amount:float):void {
         ue_apply_damage(ue_self_actor(),amount,ue_self_actor(),ue_pawn_controller(ue_character_self()))
     }
+
     [ue_function(BlueprintCallable)]
     def OnHurt(pressed:bool):void { if(pressed) { self.ReceiveDamage(25.0f) } }
+
     [ue_function(BlueprintCallable)]
     def OnToggleUI(pressed:bool):void {
         if(!pressed || !ue_widget_visible(self.HUD)) { return }
         self.UIOpen=!self.UIOpen
         ue_widget_input(self.HUD,self.UIOpen)
     }
+
     [ue_function(BlueprintCallable)]
     def OnInteract(pressed:bool):void {
         if(!pressed) { return }
@@ -168,8 +181,10 @@ class PlayableCharacter : Character {
         let target=ue_hit_actor(hit)
         if(hit.blocking_hit && ue_interact(target,ue_self_actor())) { self.Interactions+=1 }
     }
+
     [ue_function(BlueprintCallable)]
     def TakeControl(player:PlayerControllerRef):bool { return ue_pawn_possess(player,ue_character_self()) }
+
     [ue_function(BlueprintCallable)]
     def SetSpeed(value:float):float {
         return set_movement_speed(self.CharacterMovement,value)

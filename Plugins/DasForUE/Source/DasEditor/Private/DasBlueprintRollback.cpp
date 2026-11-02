@@ -1,7 +1,12 @@
 #include "DasBlueprintRollback.h"
 #include "DasContainerTypes.h"
+#include "DasAuthoredInterfaceClass.h"
+#include "K2Node_FunctionResult.h"
+#include "K2Node_Event.h"
+#include "K2Node_EditablePinBase.h"
 #include "DasNumericGraphMigration.h"
 #include "DasActor.h"
+#include "DasPlayerController.h"
 #include "DasPropertyValues.h"
 #include "DasSoftReferences.h"
 #include "Engine/Blueprint.h"
@@ -24,6 +29,25 @@
 #include "UObject/StrProperty.h"
 #include "Misc/PackageName.h"
 #include "Modules/ModuleManager.h"
+namespace
+{
+thread_local const TSet<const UBlueprint*>* ActiveBlueprintMigrationBatch = nullptr;
+}
+FDasBlueprintMigrationBatch::FDasBlueprintMigrationBatch(const TArray<UBlueprint*>& Scope)
+{
+    for (auto* Blueprint : Scope)
+        Allowed.Add(Blueprint);
+    Previous = ActiveBlueprintMigrationBatch;
+    ActiveBlueprintMigrationBatch = &Allowed;
+}
+FDasBlueprintMigrationBatch::~FDasBlueprintMigrationBatch()
+{
+    ActiveBlueprintMigrationBatch = Previous;
+}
+bool FDasBlueprintMigrationBatch::Contains(const UBlueprint* Blueprint)
+{
+    return ActiveBlueprintMigrationBatch && ActiveBlueprintMigrationBatch->Contains(Blueprint);
+}
 namespace
 {
 TMap<FName, FString> RollbackMetadata(UObject* O)
@@ -72,6 +96,7 @@ struct FDasBlueprintRollback::FImpl
     {
         TStrongObjectPtr<UK2Node> Node;
         FMemberReference Reference;
+        TArray<TSharedPtr<FUserPinInfo>> UserPins;
         decltype(UK2Node_FunctionEntry::MetaData) EntryMetadata;
     };
     struct FGraph
@@ -104,6 +129,7 @@ struct FDasBlueprintRollback::FImpl
         TArray<FBPVariableDescription> Variables;
         TArray<TObjectPtr<UEdGraph>> Functions, Uber, Delegates, Macros;
         FString Display, Description, Category;
+        FString InterfaceStableId, InterfaceContract;
         TMap<FName, FString> Metadata, ClassMetadata;
         TMap<FName, TMap<FName, FString>> FunctionMetadata;
     };
@@ -139,7 +165,8 @@ bool FDasBlueprintRollback::InstanceAsset(const FAssetData& Data, const UClass* 
     return Root && Class && Class->IsChildOf(Root) && Class->IsChildOf(UDataAsset::StaticClass());
 }
 bool FDasBlueprintRollback::GatherScope(UBlueprint* Root, TArray<UBlueprint*>& BPs,
-                                        TArray<TStrongObjectPtr<UObject>>& Assets, FString& Error, bool DefaultsOnly)
+                                        TArray<TStrongObjectPtr<UObject>>& Assets, FString& Error, bool DefaultsOnly,
+                                        bool AllowIndependentSources)
 {
     BPs.Add(Root);
     auto& Registry = FModuleManager::LoadModuleChecked<FAssetRegistryModule>(TEXT("AssetRegistry")).Get();
@@ -254,7 +281,10 @@ bool FDasBlueprintRollback::GatherScope(UBlueprint* Root, TArray<UBlueprint*>& B
         }
         // Authored children are recompiled with their parent; other Blueprints with their own DSL source are
         // migrated through their own source.
-        if (!DefaultsOnly && B != Root && !B->GeneratedClass->IsChildOf(Root->GeneratedClass) &&
+        if (!DefaultsOnly && !AllowIndependentSources &&
+            !(ActiveBlueprintMigrationBatch && ActiveBlueprintMigrationBatch->Contains(Root) &&
+              ActiveBlueprintMigrationBatch->Contains(B)) &&
+            B != Root && !B->GeneratedClass->IsChildOf(Root->GeneratedClass) &&
             !B->GetOutermost()->GetMetaData().GetValue(B, TEXT("DasDSLSource")).IsEmpty())
         {
             Error = FString::Printf(TEXT("Independent DSL sources need their own migration: %s"), *B->GetName());
@@ -308,6 +338,11 @@ bool FDasBlueprintRollback::Prepare(UBlueprint* Root, const FDasClassSchema& Sch
         FImpl::FBlueprint Image;
         Image.BP.Reset(B);
         Image.OriginalClass.Reset(B->GeneratedClass);
+        if (const auto* Interface = Cast<UDasAuthoredInterfaceClass>(B->GeneratedClass))
+        {
+            Image.InterfaceStableId = Interface->StableId;
+            Image.InterfaceContract = Interface->ContractJson;
+        }
         Image.Variables = B->NewVariables;
         Image.Functions = B->FunctionGraphs;
         Image.Uber = B->UbergraphPages;
@@ -360,9 +395,19 @@ bool FDasBlueprintRollback::Prepare(UBlueprint* Root, const FDasClassSchema& Sch
                     else if (auto* C = Cast<UK2Node_CallFunction>(Node))
                         N.Reference = C->FunctionReference;
                     else if (auto* Entry = Cast<UK2Node_FunctionEntry>(Node))
+                    {
+                        N.Reference = Entry->FunctionReference;
                         N.EntryMetadata = Entry->MetaData;
-                    else
+                    }
+                    else if (auto* Result = Cast<UK2Node_FunctionResult>(Node))
+                        N.Reference = Result->FunctionReference;
+                    else if (auto* Event = Cast<UK2Node_Event>(Node))
+                        N.Reference = Event->EventReference;
+                    else if (!Cast<UK2Node_EditablePinBase>(Node))
                         continue;
+                    if (auto* Editable = Cast<UK2Node_EditablePinBase>(Node))
+                        for (const auto& Pin : Editable->UserDefinedPins)
+                            N.UserPins.Add(MakeShared<FUserPinInfo>(*Pin));
                     S.Nodes.Add(MoveTemp(N));
                 }
         }
@@ -412,6 +457,8 @@ bool FDasBlueprintRollback::Prepare(UBlueprint* Root, const FDasClassSchema& Sch
             }
             if (auto* A = Cast<ADasActor>(O))
                 Image.Archive = A->RetiredDasValues;
+            else if (auto* PC = Cast<ADasPlayerController>(O))
+                Image.Archive = PC->RetiredDasValues;
             S.Objects.Add(MoveTemp(Image));
             Remember(O);
         }
@@ -546,7 +593,20 @@ bool FDasBlueprintRollback::Restore(FString& Error)
         else if (auto* C = Cast<UK2Node_CallFunction>(I.Node.Get()))
             C->FunctionReference = I.Reference;
         else if (auto* E = Cast<UK2Node_FunctionEntry>(I.Node.Get()))
+        {
+            E->FunctionReference = I.Reference;
             E->MetaData = I.EntryMetadata;
+        }
+        else if (auto* Result = Cast<UK2Node_FunctionResult>(I.Node.Get()))
+            Result->FunctionReference = I.Reference;
+        else if (auto* Event = Cast<UK2Node_Event>(I.Node.Get()))
+            Event->EventReference = I.Reference;
+        if (auto* Editable = Cast<UK2Node_EditablePinBase>(I.Node.Get()))
+        {
+            Editable->UserDefinedPins.Reset();
+            for (const auto& Pin : I.UserPins)
+                Editable->UserDefinedPins.Add(MakeShared<FUserPinInfo>(*Pin));
+        }
     }
     bool OK = true;
     FString PinError;
@@ -554,6 +614,12 @@ bool FDasBlueprintRollback::Restore(FString& Error)
     for (auto& I : S.Blueprints)
     {
         auto* B = I.BP.Get();
+        if (auto* Interface = Cast<UDasAuthoredInterfaceClass>(B->GeneratedClass))
+        {
+            Interface->StableId = I.InterfaceStableId;
+            Interface->ContractJson = I.InterfaceContract;
+            CastChecked<UDasAuthoredInterfaceBlueprint>(B)->StableId = I.InterfaceStableId;
+        }
         FBlueprintEditorUtils::MarkBlueprintAsStructurallyModified(B);
         FKismetEditorUtilities::CompileBlueprint(B);
         FBlueprintCompilationManager::FlushCompilationQueueAndReinstance();
@@ -572,6 +638,8 @@ bool FDasBlueprintRollback::Restore(FString& Error)
                                      : RollbackValue(I.Object.Get(), S.Fields[N].Name, I.Values[N]);
         if (auto* A = Cast<ADasActor>(I.Object.Get()))
             A->RetiredDasValues = I.Archive;
+        else if (auto* PC = Cast<ADasPlayerController>(I.Object.Get()))
+            PC->RetiredDasValues = I.Archive;
     }
     for (auto& I : S.Blueprints)
     {
@@ -580,6 +648,12 @@ bool FDasBlueprintRollback::Restore(FString& Error)
         {
             OK = false;
             continue;
+        }
+        if (auto* Interface = Cast<UDasAuthoredInterfaceClass>(B->GeneratedClass))
+        {
+            Interface->StableId = I.InterfaceStableId;
+            Interface->ContractJson = I.InterfaceContract;
+            CastChecked<UDasAuthoredInterfaceBlueprint>(B)->StableId = I.InterfaceStableId;
         }
         B->GetOutermost()->GetMetaData().SetObjectValues(B->GeneratedClass, I.ClassMetadata);
         for (const auto& M : I.FunctionMetadata)

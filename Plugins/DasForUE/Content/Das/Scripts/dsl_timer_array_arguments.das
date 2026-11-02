@@ -23,13 +23,16 @@ class TimerArrayActor {
         push(messages,"Timer 世界")
         ue_timer_start("messages",0.5,"ApplyMessages",false,messages)
     }
+
     [ue_function(BlueprintCallable)]
     def ApplyScores(var values:array<int>):void {
         for (value in values) { self.Score += value }
         clear(values) // Only this delivery's owned DAS copy is modified.
     }
+
     [ue_function(BlueprintCallable)]
     def ApplyWeights(values:array<double>):void { self.Weights := values }
+
     [ue_function(BlueprintCallable)]
     def ApplyMessages(values:array<string>):void { self.Messages := values }
 }

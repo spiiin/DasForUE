@@ -1,5 +1,6 @@
 options gen2
 require ue_dsl
+
 [ue_class(module_id="groups",Blueprintable)]
 class GroupCounter {
     @ue_property=(EditAnywhere,BlueprintReadWrite)
@@ -14,6 +15,7 @@ class GroupCounter {
     Title:string="Counter"
     @ue_property=(BlueprintReadOnly)
     Ready:bool=false
+
     [ue_function(BlueprintCallable)]
     def Evaluate(input:int):int { return self.Score+input }
 }

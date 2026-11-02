@@ -42,6 +42,7 @@ class GameplayActor : Actor {
             ue_scene_set_relative_transform(self.Pivot,ue_transform(position,ue_transform_rotation(current),ue_transform_scale(current)))
         }
     }
+
     [ue_function(BlueprintCallable)]
     def SetupControls():void {
         if (!ue_enhanced_has_context(self.Player,self.Controls)) {
@@ -52,22 +53,31 @@ class GameplayActor : Actor {
         ue_enhanced_bind(self.MoveAction,TriggerEvent.Triggered,"OnMove")
         ue_enhanced_bind(self.MoveAction,TriggerEvent.Completed,"OnMove")
     }
+
     [ue_function(BlueprintCallable)]
     def OnJump(value:bool):void { if (value) { self.OnDasSignal.Broadcast(1) } }
+
     [ue_function(BlueprintCallable)]
     def OnMove(value:UEVector2D):void { self.Move = value }
+
     [ue_function(BlueprintCallable)]
     def OnReady():void { self.Ready = true }
+
     [ue_function(BlueprintCallable)]
     def OnLoaded(value:ObjectRef):void { self.Loaded = value; self.LoadSucceeded = ue_object_valid(value.handle) }
+
     [ue_function(BlueprintCallable)]
     def StartLoad():void { ue_asset_load_async("asset",self.AssetPath,"OnLoaded") }
+
     [ue_function(BlueprintCallable)]
     def CancelPending():void { ue_asset_cancel_all(); ue_latent_cancel_all() }
+
     [ue_function(BlueprintCallable)]
     def GetSeconds():float { return self.Behavior.Seconds }
+
     [ue_function(BlueprintCallable)]
     def PauseScore():bool { return self.Behavior.StopScore() }
+
     [ue_function(BlueprintCallable)]
     def ResumeScore():void { self.Behavior.StartScore() }
 }

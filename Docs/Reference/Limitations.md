@@ -22,7 +22,7 @@ This page collects the limitations that still apply to DasForUE2, grouped by are
   - replacing an inherited component node with a subclass (an Unreal engine constraint);
   - structural or default changes to classes that contain events/delegate fields or direct containers, and to component declarations on already imported or composed actors;
   - structural updates of an existing function-library asset (create a new asset);
-  - changes to an existing interface contract or membership;
+  - removing interface membership or changing interface stable identity; interface signature migration is supported with the checks in [Interfaces](../Guide/DSL/Interfaces.md#migrating-an-existing-contract);
   - container definition and graph repair migrations; broad dependent Blueprint/map migration.
 - Migrations are not recorded as Unreal editor transactions (no undo).
 - Generated bindings and the native registry belong to one engine/API version; regenerate after engine or source changes.
@@ -67,7 +67,7 @@ This page collects the limitations that still apply to DasForUE2, grouped by are
 
 ## Gameplay services
 
-- Spawning: no Instigator, deferred caller customization or network roles; spawning is forbidden in `bind_events`, `EndPlay`, templates and non-game worlds.
+- Spawning: no deferred caller customization or network roles; spawning is forbidden in `bind_events`, `EndPlay`, templates and non-game worlds.
 - Scene components created by script: only components created by the same owner can be destroyed; tracking is bounded to 1024 live entries; ownership transfer on reinstancing is not provided.
 - Effects: a Niagara system that is not ready yet, an empty asset pair or a dedicated server makes `ue_effect_at`/`ue_effect_play` return `false`; delayed start is not implemented.
 - Input: mapping contexts are not persisted to user settings; there is no automatic transfer across possession changes or world travel, and no general possession lifecycle hooks.

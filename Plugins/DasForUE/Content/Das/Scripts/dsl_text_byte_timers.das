@@ -1,6 +1,7 @@
 options gen2
 require ue_probe_actor
 require ue_callback_value_signals
+
 [ue_class(Blueprintable,type_folder="/Game/DasCallbackObjects/Types")]
 class TextByteTimerActor : ProbeActor {
     properties=ue_properties(BlueprintReadWrite) {
@@ -50,6 +51,7 @@ class TextByteTimerActor : ProbeActor {
     ReferenceChanged:CallbackReferenceSignal
     @ue_property=(BlueprintAssignable)
     ObjectChanged:CallbackObjectSignal
+
     [ue_function(BlueprintCallable)]
     def ArmObjects(value:CallbackObjectRef):void {
         // This dynamically spawned fixture tests object captures; the placed
@@ -69,18 +71,22 @@ class TextByteTimerActor : ProbeActor {
         self.ObjectChanged.Broadcast(value)
         clear(record.Targets); clear(record.Lookup)
     }
+
     [ue_function(BlueprintCallable)]
     def CancelledObject(value:CallbackObjectRef):void { self.CancelledObjectRuns+=1 }
+
     [ue_function(BlueprintCallable)]
     def ReceiveObject(value:CallbackObjectRef):void {
         if(!ue_object_valid(value.handle)) { self.Errors+=1 }
         self.ObjectRuns+=1
         if(self.ObjectRuns>=3) { ue_timer_cancel("object-repeat") }
     }
+
     [ue_function(BlueprintCallable)]
     def ReceiveObjectNext(value:CallbackObjectRef):void {
         if(!ue_object_valid(value.handle)) { self.Errors+=1 };self.ObjectNext+=1
     }
+
     [ue_function(BlueprintCallable)]
     def ReceiveReferencesNext(var value:CallbackReferenceRecord):void {
         self.CheckReferences(value);clear(value.Targets);clear(value.Lookup);self.ReferenceNext+=1
@@ -90,6 +96,7 @@ class TextByteTimerActor : ProbeActor {
         if(length(value.Targets)==1 && !ue_object_valid(value.Targets[0].handle)) { self.Errors+=1 }
         if(!ue_object_valid(value.Lookup["saved"].handle)) { self.Errors+=1 }
     }
+
     [ue_function(BlueprintCallable)]
     def ReceiveReferences(var value:CallbackReferenceRecord):void {
         self.CheckReferences(value); clear(value.Targets); clear(value.Lookup)
@@ -164,62 +171,87 @@ class TextByteTimerActor : ProbeActor {
     def UpdateReady():void {
         self.Ready=self.StateRuns==3 && self.RecordRuns==3 && self.ValueNext==4 && self.ValueEvents>=4 && self.EventCopyOK && self.FloatRuns==3 && self.BoolRuns==3 && self.NameRuns==3 && self.ArrayNext==3 && self.ByteCalls==2 && self.ByteRuns==3 && self.TextRuns==3 && self.BytesRuns==3 && self.TextsRuns==3 && self.BytesNext==1 && self.TextsNext==1 && self.PausedCalls==1 && self.InvariantCalls==1 && ue_text_key(self.LastText)=="Source" && ue_text_key(self.Replacement)=="Replacement"
     }
+
     [ue_function(BlueprintCallable)]
     def ObserveByte(value:uint8):void { self.ByteCalls+=1; self.ByteSum+=int(value); self.UpdateReady() }
+
     [ue_function(BlueprintCallable)]
     def ObserveText(value:FText):void { self.LastText=value; if(ue_text_key(value)!="Source") { self.Errors+=1 }; self.UpdateReady() }
+
     [ue_function(BlueprintCallable)]
     def ObserveInvariant(value:FText):void { if(!ue_text_is_invariant(value) || ue_text_to_string(value)!="Invariant") { self.Errors+=1 }; self.InvariantCalls+=1; self.UpdateReady() }
+
     [ue_function(BlueprintCallable)]
     def RepeatByte(value:uint8):void { if(value!=uint8(255)) { self.Errors+=1 }; self.ByteRuns+=1; if(self.ByteRuns==3) { ue_timer_cancel("byte-repeat") }; self.UpdateReady() }
+
     [ue_function(BlueprintCallable)]
     def RepeatText(value:FText):void { if(ue_text_namespace(value)!="TimerCapture" || ue_text_key(value)!="Source") { self.Errors+=1 }; self.TextRuns+=1; if(self.TextRuns==3) { ue_timer_cancel("text-repeat") }; self.UpdateReady() }
+
     [ue_function(BlueprintCallable)]
     def RepeatBytes(var values:array<uint8>):void { self.CheckBytes(values); clear(values); self.BytesRuns+=1; if(self.BytesRuns==3) { ue_timer_cancel("bytes-repeat") }; self.UpdateReady() }
+
     [ue_function(BlueprintCallable)]
     def RepeatTexts(var values:array<FText>):void { self.CheckTexts(values); clear(values); self.TextsRuns+=1; if(self.TextsRuns==3) { ue_timer_cancel("texts-repeat") }; self.UpdateReady() }
     def CheckBytes(values:array<uint8>):void { if(length(values)!=2 || values[0]!=uint8(0) || values[1]!=uint8(255)) { self.Errors+=1 } }
     def CheckTexts(values:array<FText>):void { if(length(values)!=2 || ue_text_key(values[0])!="Source" || ue_text_namespace(values[0])!="TimerCapture" || !ue_text_is_invariant(values[1])) { self.Errors+=1 } }
+
     [ue_function(BlueprintCallable)]
     def NextBytes(values:array<uint8>):void { self.CheckBytes(values); self.BytesNext+=1; self.UpdateReady() }
+
     [ue_function(BlueprintCallable)]
     def NextTexts(values:array<FText>):void { self.CheckTexts(values); self.TextsNext+=1; self.UpdateReady() }
+
     [ue_function(BlueprintCallable)]
     def ObserveReplacement(value:FText):void { self.Replacement=value; self.UpdateReady() }
+
     [ue_function(BlueprintCallable)]
     def MustNotRun(value:FText):void { self.Unexpected+=1 }
+
     [ue_function(BlueprintCallable)]
     def Resume():void { ue_timer_resume("paused") }
+
     [ue_function(BlueprintCallable)]
     def ObservePaused(value:uint8):void { if(value!=uint8(7)) { self.Errors+=1 }; self.PausedCalls+=1; self.UpdateReady() }
     def CheckFloats(values:array<float>):void { if(length(values)!=2 || values[0]!=1.25f || values[1]!=-2.5f) { self.Errors+=1 } }
+
     [ue_function(BlueprintCallable)]
     def RepeatFloats(var values:array<float>):void { self.CheckFloats(values); clear(values); self.FloatRuns+=1; if(self.FloatRuns==3) { ue_timer_cancel("float-array") }; self.UpdateReady() }
+
     [ue_function(BlueprintCallable)]
     def NextFloats(values:array<float>):void { self.CheckFloats(values); self.ArrayNext+=1; self.UpdateReady() }
     def CheckBools(values:array<bool>):void { if(length(values)!=2 || !values[0] || values[1]) { self.Errors+=1 } }
+
     [ue_function(BlueprintCallable)]
     def RepeatBools(var values:array<bool>):void { self.CheckBools(values); clear(values); self.BoolRuns+=1; if(self.BoolRuns==3) { ue_timer_cancel("bool-array") }; self.UpdateReady() }
+
     [ue_function(BlueprintCallable)]
     def NextBools(values:array<bool>):void { self.CheckBools(values); self.ArrayNext+=1; self.UpdateReady() }
     def CheckNames(values:array<UENameValue>):void { if(length(values)!=2 || ue_name_text(values[0])!="First" || ue_name_text(values[1])!="Second") { self.Errors+=1 } }
+
     [ue_function(BlueprintCallable)]
     def RepeatNames(var values:array<UENameValue>):void { self.CheckNames(values); clear(values); self.NameRuns+=1; if(self.NameRuns==3) { ue_timer_cancel("name-array") }; self.UpdateReady() }
+
     [ue_function(BlueprintCallable)]
     def NextNames(values:array<UENameValue>):void { self.CheckNames(values); self.ArrayNext+=1; self.UpdateReady() }
     def CheckRecord(value:CallbackRecord):void {
         if(value.Score!=17 || value.Mode!=CallbackState.Active || ue_text_namespace(value.Title)!="CallbackValue" || ue_text_key(value.Title)!="Record" || length(value.Values)!=2 || value.Values[0]!=5 || value.Values[1]!=9) { self.Errors+=1 }
     }
+
     [ue_function(BlueprintCallable)]
     def RepeatState(value:CallbackState):void { if(value!=CallbackState.Active) { self.Errors+=1 }; self.StateRuns+=1; if(self.StateRuns==3) { ue_timer_cancel("state") }; self.UpdateReady() }
+
     [ue_function(BlueprintCallable)]
     def RepeatRecord(var value:CallbackRecord):void { self.CheckRecord(value); clear(value.Values); self.RecordRuns+=1; if(self.RecordRuns==3) { ue_timer_cancel("record") }; self.UpdateReady() }
+
     [ue_function(BlueprintCallable)]
     def NextState(value:CallbackState):void { if(value!=CallbackState.Active) { self.Errors+=1 }; self.ValueNext+=1; self.UpdateReady() }
+
     [ue_function(BlueprintCallable)]
     def NextRecord(value:CallbackRecord):void { self.CheckRecord(value); self.ValueNext+=1; self.UpdateReady() }
+
     [ue_function(BlueprintCallable)]
     def NextNativeState(value:CallbackNativeState):void { if(value!=CallbackNativeState.Active) { self.Errors+=1 }; self.ValueNext+=1; self.UpdateReady() }
+
     [ue_function(BlueprintCallable)]
     def NextNativeRecord(value:CallbackNativeRecord):void { if(value.X!=1.25lf) { self.Errors+=1 }; self.ValueNext+=1; self.UpdateReady() }
     [ue_event(name="StateChanged")]
@@ -234,6 +266,7 @@ class TextByteTimerActor : ProbeActor {
     def OnNativeState(value:CallbackNativeState):void { if(value!=CallbackNativeState.Active) { self.Errors+=1 }; self.ValueEvents+=1; self.UpdateReady() }
     [ue_event(name="NativeRecordChanged")]
     def OnNativeRecord(value:CallbackNativeRecord):void { if(value.X!=1.25lf) { self.Errors+=1 }; self.ValueEvents+=1; self.UpdateReady() }
+
     [ue_function(BlueprintCallable)]
     def EmitValues():void {
         var record = CallbackRecord()
@@ -248,10 +281,13 @@ class TextByteTimerActor : ProbeActor {
         clear(record.Values); record.Score=99
         self.UpdateReady()
     }
+
     [ue_function(BlueprintCallable)]
     def MustStateNotRun(value:CallbackState):void { self.Unexpected+=1 }
+
     [ue_function(BlueprintCallable)]
     def MustRecordNotRun(value:CallbackRecord):void { self.Unexpected+=1 }
+
     [ue_function(BlueprintCallable)]
     def ArmPending():void {
         ue_timer_start("pending-state",1000.0f,"MustStateNotRun",false,CallbackState.Active)

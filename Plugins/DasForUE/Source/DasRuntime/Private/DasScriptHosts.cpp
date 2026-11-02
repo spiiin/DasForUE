@@ -2,6 +2,7 @@
 #include "DasScriptClassData.h"
 #include "DasSubsystems.h"
 #include "DasPawn.h"
+#include "DasPlayerController.h"
 #include "DasCharacter.h"
 #include "DasActor.h"
 #if DAS_WITH_TEST_PROBES
@@ -32,6 +33,8 @@ UClass* DasNativeScriptHost(const FString& P)
 #endif
     if (P == TEXT("Actor") || P == TEXT("/Script/Engine.Actor"))
         return ADasActor::StaticClass();
+    if (P == TEXT("PlayerController") || P == TEXT("/Script/Engine.PlayerController"))
+        return ADasPlayerController::StaticClass();
     if (P == TEXT("Pawn") || P == TEXT("/Script/Engine.Pawn"))
         return ADasPawn::StaticClass();
     if (P == TEXT("Character") || P == TEXT("/Script/Engine.Character"))
@@ -52,8 +55,8 @@ UClass* DasNativeScriptHost(const FString& P)
 }
 bool DasActorHostClass(const UClass* C)
 {
-    return C && (C->IsChildOf(ADasActor::StaticClass()) || C->IsChildOf(ADasPawn::StaticClass()) ||
-                 C->IsChildOf(ADasCharacter::StaticClass()));
+    return C && (C->IsChildOf(ADasActor::StaticClass()) || C->IsChildOf(ADasPlayerController::StaticClass()) ||
+                 C->IsChildOf(ADasPawn::StaticClass()) || C->IsChildOf(ADasCharacter::StaticClass()));
 }
 FString* DasHostString(UObject* O, FName N)
 {

@@ -688,7 +688,7 @@
 			"leaf": false,
 			"reference_value": false,
 			"native_policy": null,
-			"container_value_policy": false,
+			"container_value_policy": true,
 			"default_policy": "explicit",
 			"default_kind": "",
 			"container_slots": [],
@@ -734,23 +734,23 @@
 						},
 						"array_element":
 						{
-							"state": "unsupported",
-							"reason": "Unsupported container child type: array "
+							"state": "supported",
+							"reason": ""
 						},
 						"map_value":
 						{
-							"state": "unsupported",
-							"reason": "Unsupported container child type: map "
+							"state": "supported",
+							"reason": ""
 						},
 						"map_key":
 						{
 							"state": "unsupported",
-							"reason": "Unsupported container child type: map "
+							"reason": "Unsupported container hash key: map "
 						},
 						"set_element":
 						{
 							"state": "unsupported",
-							"reason": "Unsupported container child type: set "
+							"reason": "Unsupported container hash key: set "
 						}
 					},
 					"uses":

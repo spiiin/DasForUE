@@ -12,6 +12,7 @@ Invoke-DasBuild (Get-DasContext -Engine $Engine) -BuildArguments @(
 if ($LASTEXITCODE) { throw 'Registry editor build failed' }
 $ProbeId = [Guid]::NewGuid().ToString('N')
 $ModeArgs = @(); if ($TypeSyntax) { $ModeArgs += '-TypeSyntax' } if ($TypedObjects) { $ModeArgs += '-TypedObjects' } if ($AuthoredInterface) { $ModeArgs += '-AuthoredInterface' }; if ($Interfaces) { $AuthoredArray = $true; $ModeArgs += '-Interfaces' }; if ($OutRef) { $AuthoredArray = $true; $ModeArgs += '-OutRef' }; if ($ContainerCalls) { $AuthoredArray = $true; $ModeArgs += '-ContainerCalls' }; if ($ScalarMap) { $StringMap = $true; $ModeArgs += '-ScalarMap' }; if ($AuthoredSet) { $AuthoredArray = $true; $ModeArgs += '-AuthoredSet' }; if ($StringMap) { $AuthoredMap = $true; $ModeArgs += '-StringMap' }; if ($AuthoredMap) { $AuthoredArray = $true; $ModeArgs += '-AuthoredMap' }; if ($PrimitiveArray) { $AuthoredArray = $true; $ModeArgs += '-PrimitiveArray' }; if ($AuthoredArray) { $AuthoredNested = $true; $ModeArgs += '-AuthoredArray' }; if ($StructArray) { $StructNested = $true; $ModeArgs += '-StructArray' }; if ($AuthoredNested) { $ModeArgs += '-AuthoredNested' }; if ($StructNested) { $StructFields = $true; $ModeArgs += '-StructNested' }; if ($StructNumeric) { if ($StructDrop) { throw 'Numeric conversion and drop are separate probes' }; $StructFields = $true; $ModeArgs += '-StructNumeric' }; if ($StructDrop) { $StructFields = $true; $ModeArgs += '-StructDrop' }; if ($EnumAppend) { $ModeArgs += '-EnumAppend' }; if ($EnumGraphs) { $ModeArgs += '-EnumGraphs' }; if ($EnumNodes) { $ModeArgs += '-EnumNodes' }; if ($EnumRename) { $ModeArgs += '-EnumRename' }; if ($EnumValues) { $ModeArgs += '-EnumValues' }; if ($StructFields) { $ModeArgs += '-StructFields' }
+if ($AuthoredInterface) { $ModeArgs += @('-NoZenAutoLaunch','-ddc=NoZenLocalFallback') }
 $Base = '/Game/DasFrameAssetProbe/Registered_' + $ProbeId
 try {
     foreach ($Phase in @('Create','Reopen')) {
@@ -25,7 +26,7 @@ try {
             $WrapperIR = Join-Path $WrapperStage ('Authored_' + $ProbeId + '.json')
             $WrapperPath = $Base + '/Types/CounterContract.CounterContract_C'
             @{ functions = @('Query','Label','Stats','EchoState','EchoSettings','EchoDetails','EchoEvents','RefActor','RefEvents','RefState','RefSettings') | ForEach-Object { @{class=$WrapperPath;function=$_;alias=('ue_contract_' + $_)} } } | ConvertTo-Json -Depth 6 | Set-Content -LiteralPath $WrapperSelection -Encoding utf8
-            & (Join-Path $Engine 'Engine\Binaries\Win64\UnrealEditor-Cmd.exe') $Project -run=DasExport "-Selection=$WrapperSelection" "-Output=$WrapperIR" -unattended -NullRHI -nosplash -stdout "-abslog=$Logs\authored-wrapper-export.log"
+            & (Join-Path $Engine 'Engine\Binaries\Win64\UnrealEditor-Cmd.exe') $Project -run=DasExport -NoZenAutoLaunch -ddc=NoZenLocalFallback "-Selection=$WrapperSelection" "-Output=$WrapperIR" -unattended -NullRHI -nosplash -stdout "-abslog=$Logs\authored-wrapper-export.log"
             if ($LASTEXITCODE) { throw 'Authored interface export failed' }
             & 'C:\Python312\python.exe' (Join-Path $Repo 'Scripts\GenerateAuthoredInterfaceProbe.py') $WrapperIR (Join-Path $Repo 'Plugins\DasForUE\Content\Das\Scripts') $ProbeId
             if ($LASTEXITCODE) { throw 'Authored wrapper generation failed' }

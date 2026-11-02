@@ -1,5 +1,6 @@
 options gen2
 require ue_delegate_examples
+
 [ue_class(module_id="singledelegate",Blueprintable)]
 class SingleDelegateActor {
     @ue_property=(BlueprintReadWrite)
@@ -8,17 +9,22 @@ class SingleDelegateActor {
     Copy:FScoreQuery
     @ue_property=(BlueprintReadWrite)
     Score:int=0
+
     [ue_function(BlueprintCallable)]
     def Handler(value:int):int { self.Score+=value; return self.Score }
+
     [ue_function(BlueprintCallable)]
     def Bind():void {
         self.Callback=ue_bind(type<FScoreQuery>,ue_self_object(),"Handler")
         self.Copy=self.Callback
     }
+
     [ue_function(BlueprintCallable)]
     def Invoke(value:int):int { return self.Callback.Execute(value) }
+
     [ue_function(BlueprintCallable)]
     def Clear():void { self.Callback=FScoreQuery() }
+
     [ue_function(BlueprintCallable)]
     def InvokeCopy(value:int):int { return self.Copy.Execute(value) }
 
@@ -30,8 +36,10 @@ class SingleDelegateActor {
     // Returns an independent copy of the received binding.
     [ue_function(BlueprintCallable)]
     def EchoCallback(callback:FScoreQuery):FScoreQuery { return callback }
+
     [ue_function(BlueprintCallable)]
     def GetCallback():FScoreQuery { return self.Copy }
+
     [ue_function(BlueprintCallable)]
     def StoreCallback(callback:FScoreQuery):void { self.Callback=callback }
 
@@ -49,10 +57,13 @@ class SingleDelegateActor {
         Description=Text
         return Count*2
     }
+
     [ue_function(BlueprintCallable)]
     def FirstCount(var Counter:int&):void { Counter+=2 }
+
     [ue_function(BlueprintCallable)]
     def SecondCount(var Counter:int&):void { Counter+=4 }
+
     [ue_function(BlueprintCallable)]
     def ProbeRefOut():int {
         self.Mutation=ue_bind(type<FValueMutation>,ue_self_object(),"Mutate")
@@ -78,6 +89,7 @@ class SingleDelegateActor {
         Previous <- clone(Values)
         Values[0]+=10.0lf
     }
+
     [ue_function(BlueprintCallable)]
     def ProbeRefArray():int {
         let callback=ue_bind(type<FArrayMutation>,ue_self_object(),"MutateArray")

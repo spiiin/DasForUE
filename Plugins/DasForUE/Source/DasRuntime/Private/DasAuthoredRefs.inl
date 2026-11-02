@@ -115,7 +115,8 @@ struct FDSLDeclarationCompileScope
 };
 void EnsureDasNativeModules(); // DasNativeBinds.inl
 auto DSLCompile(const char* File, const das::FileAccessPtr& Access, das::TextWriter& Output, das::ModuleGroup& Group,
-                const das::CodeOfPolicies& Policies = das::CodeOfPolicies())
+                const das::CodeOfPolicies& Policies = das::CodeOfPolicies(),
+                TFunction<void()>* RestoreReferenceMetadata = nullptr)
 {
     // Native modules registered by code modules since the last compilation become requirable now.
     EnsureDasNativeModules();
@@ -127,10 +128,40 @@ auto DSLCompile(const char* File, const das::FileAccessPtr& Access, das::TextWri
     const auto MethodsBefore = DSLMethodSourceSignatures;
     const auto PropertiesBefore = DSLPropertySourceSignatures;
     const auto CatalogBefore = DSLSourceCatalogExpectedIds;
+    // A cached program must restore compiler-only descriptors just as a nested compile does.
+    // Store names/value models only; no AST pointers may escape the ModuleGroup.
+    auto CaptureReferenceMetadata = [&]()
+    {
+        if (!RestoreReferenceMetadata)
+            return;
+        TMap<FString, FDSLMethodSourceSignature> Methods;
+        TMap<FString, FDSLPropertySourceSignature> Properties;
+        TMap<FString, FDasDeclaredClass> References;
+        for (const auto& Pair : DSLMethodSourceSignatures)
+            if (!MethodsBefore.Contains(Pair.Key))
+                Methods.Add(Pair.Key, Pair.Value);
+        for (const auto& Pair : DSLPropertySourceSignatures)
+            if (!PropertiesBefore.Contains(Pair.Key))
+                Properties.Add(Pair.Key, Pair.Value);
+        for (const auto& Pair : DSLActiveRefDeclarations)
+            if (!ReferenceBefore.Contains(Pair.Key))
+                References.Add(Pair.Key, Pair.Value);
+        *RestoreReferenceMetadata =
+            [Methods = MoveTemp(Methods), Properties = MoveTemp(Properties), References = MoveTemp(References)]()
+        {
+            DSLMethodSourceSignatures.Append(Methods);
+            DSLPropertySourceSignatures.Append(Properties);
+            DSLActiveRefDeclarations.Append(References);
+        };
+    };
     auto Program = das::compileDaScript(File, Access, Output, Group, Policies);
     DSLDiagnosticGenerated(Program);
     if (!Program || Program->failed() || Computed.Pending.IsEmpty())
+    {
+        if (Program && !Program->failed())
+            CaptureReferenceMetadata();
         return Program;
+    }
     DSLEvaluateComputedDefaults(Program, Output);
     Computed.Resolved = true;
     Computed.SourceFields.Reset();
@@ -152,6 +183,8 @@ auto DSLCompile(const char* File, const das::FileAccessPtr& Access, das::TextWri
     Diagnostics.RebuiltGroup();
     auto Resolved = das::compileDaScript(File, Access, Output, Group, Policies);
     DSLDiagnosticGenerated(Resolved);
+    if (Resolved && !Resolved->failed())
+        CaptureReferenceMetadata();
     return Resolved;
 }
 
@@ -336,7 +369,9 @@ FString DSLAuthoredReferencePath(const das::TypeDeclPtr& Type)
     if (Class.NativeParent == TEXT("/Script/Engine.WorldSubsystem") ||
                                    Class.NativeParent == TEXT("/Script/Engine.GameInstanceSubsystem"))
         return DasNativeScriptHost(Class.NativeParent)->GetPathName();
-    DSLFail(TEXT("Authored signature reference requires an Actor/Component/Subsystem host"));
+    if (auto* Parent = DasNativeScriptHost(Class.NativeParent); Parent && Parent->IsChildOf(UDasObject::StaticClass()))
+        return Parent->GetPathName();
+    DSLFail(TEXT("Authored signature reference requires a supported script host"));
 }
 das::ExpressionPtr DSLAuthoredPack(const das::LineInfo& At, const das::TypeDeclPtr& Type, das::ExpressionPtr Value)
 {
@@ -414,6 +449,39 @@ struct FUEClassLoadedFactory : das::CallMacro
 };
 #include "DasObjectQueryMacros.inl"
 #include "DasDataTableDSL.inl"
+struct FUEObjectNewFactory : das::CallMacro
+{
+    FUEObjectNewFactory() : CallMacro("ue_object_new") {}
+    virtual bool canVisitArguments(das::ExprCallMacro*, int Index) override { return Index != 0; }
+    virtual das::ExpressionPtr visit(das::Program* P, das::Module* M, das::ExprCallMacro* E) override
+    {
+        try
+        {
+            if (E->arguments.size() != 3 || !E->arguments[0]->rtti_isTypeDecl())
+                DSLFail(TEXT("Expected ue_object_new(type<Ref>, classHandle, outer)"));
+            auto Type =
+                DSLObjectNormalize(static_cast<das::ExprTypeDecl*>(E->arguments[0])->typeexpr, *P->thisModuleGroup, M);
+            if (!DSLTypedReference(Type) || DSLTypedInterface(Type))
+                DSLFail(TEXT("Object creation requires a native or authored object reference"));
+            const FString Base = DSLTypedReferencePath(Type);
+            auto* Class = FindObject<UClass>(nullptr, *Base);
+            if (!Class || Class->IsChildOf(AActor::StaticClass()) || Class->IsChildOf(UActorComponent::StaticClass()))
+                DSLFail(TEXT("Use actor/component creation for Actor and ActorComponent classes"));
+            const FString Id = DSLAuthoredView(Type) ? DSLReferenceDeclaration(Type).Id : FString();
+            auto* Call =
+                DSLCall(E->at, "__ue_object_new",
+                        {DSLClassArgument(E->at, E->arguments[1]), new das::ExprField(E->at, E->arguments[2], "handle"),
+                         new das::ExprConstString(E->at, DSLUtf8(Base)), new das::ExprConstString(E->at, DSLUtf8(Id))});
+            return DSLAuthoredView(Type) ? DSLAuthoredUnpack(E->at, Type, Call)
+                                         : DSLDirectUnpack(E->at, Type, Call, Base);
+        }
+        catch (const std::exception& Error)
+        {
+            P->error("Object creation failed", Error.what(), "", E->at, das::CompilationError::invalid_type);
+            return nullptr;
+        }
+    }
+};
 struct FUEActorSpawnFactory : das::CallMacro
 {
     FUEActorSpawnFactory() : CallMacro("ue_actor_spawn") {}
@@ -422,8 +490,8 @@ struct FUEActorSpawnFactory : das::CallMacro
     {
         try
         {
-            if (E->arguments.size() < 2 || E->arguments.size() > 5 || !E->arguments[0]->rtti_isTypeDecl())
-                DSLFail(TEXT("Expected ue_actor_spawn(type<ActorRef>, classHandle[, transform, owner, collision])"));
+            if (E->arguments.size() < 2 || E->arguments.size() > 6 || !E->arguments[0]->rtti_isTypeDecl())
+                DSLFail(TEXT("Expected ue_actor_spawn(type<ActorRef>, classHandle[, transform, owner, collision, instigator])"));
             auto T =
                 DSLObjectNormalize(static_cast<das::ExprTypeDecl*>(E->arguments[0])->typeexpr, *P->thisModuleGroup, M);
             if (!DSLTypedReference(T) || DSLTypedInterface(T))
@@ -434,7 +502,7 @@ struct FUEActorSpawnFactory : das::CallMacro
                 DSLFail(TEXT("Expected Actor reference"));
             const FString Id = DSLAuthoredView(T) ? DSLReferenceDeclaration(T).Id : FString();
             auto* Call = DSLCall(
-                E->at, "__ue_actor_spawn",
+                E->at, "__ue_actor_spawn_instigated",
                 {DSLClassArgument(E->at, E->arguments[1]),
                  E->arguments.size() > 2 ? E->arguments[2]
                                          : static_cast<das::ExpressionPtr>(DSLCall(E->at, "ue_transform_identity", {})),
@@ -442,6 +510,10 @@ struct FUEActorSpawnFactory : das::CallMacro
                      ? static_cast<das::ExpressionPtr>(new das::ExprField(E->at, E->arguments[3], "handle"))
                      : static_cast<das::ExpressionPtr>(DSLCall(
                            E->at, "ue_object_value", {new das::ExprConstString(E->at, "/Script/Engine.Actor")})),
+                 E->arguments.size() > 5
+                     ? static_cast<das::ExpressionPtr>(new das::ExprField(E->at, E->arguments[5], "handle"))
+                     : static_cast<das::ExpressionPtr>(
+                           DSLCall(E->at, "ue_object_value", {new das::ExprConstString(E->at, "/Script/Engine.Pawn")})),
                  E->arguments.size() > 4
                      ? E->arguments[4]
                      : static_cast<das::ExpressionPtr>(new das::ExprConstString(E->at, "AlwaysSpawn")),

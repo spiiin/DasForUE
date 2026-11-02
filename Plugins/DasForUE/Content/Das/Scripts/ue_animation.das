@@ -29,3 +29,15 @@ def ue_montage_stop(name:string; blend_out:float=0.1f):bool { return __ue_montag
 // Cancel revokes callbacks and stops only this owned playback instance, silently.
 def ue_montage_cancel(name:string):bool { return __ue_montage_cancel(name) }
 def ue_montage_playing(name:string):bool { return __ue_montage_playing(name) }
+
+// Direct character playback without a managed completion subscription.
+def ue_character_play_montage(character:CharacterRef; montage:AnimMontageRef; rate:float=1.0f; section:UENameValue=ue_name_value("None")):float {
+    let call=ue_begin_call(character.handle,"PlayAnimMontage")
+    ue_arg_object(call,"animmontage",montage.handle)
+    ue_arg_float(call,"inplayrate",rate)
+    __ue_method_arg_name(call,"startsectionname",section)
+    ue_invoke_call(call)
+    let duration=ue_result_float(call,"returnvalue")
+    ue_release_call(call)
+    return duration
+}

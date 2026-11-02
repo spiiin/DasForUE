@@ -63,6 +63,7 @@ class PlayablePickup : Actor {
         self.MeshWasLoaded=ue_soft_is_loaded(self.MeshAsset)
         ue_soft_load_async("mesh",self.MeshAsset,"OnMeshLoaded")
     }
+
     [ue_function(BlueprintCallable)]
     def OnMeshLoaded(mesh:StaticMeshRef):void {
         self.MeshCallbacks+=1
@@ -81,6 +82,7 @@ class PlayablePickup : Actor {
         self.OverlapEvents+=1
         self.Interact(other)
     }
+
     [ue_function(BlueprintCallable)]
     def Interact(interactor:ActorRef):void {
         if(!self.Available || !ue_is_valid(interactor) || !ue_is_valid(self.Collector)) { return }
@@ -95,8 +97,10 @@ class PlayablePickup : Actor {
         if(ue_effect_at("pickup",self.PickupSound,self.PickupVFX,self.Trigger.K2_GetComponentLocation(),"OnPickupEffectFinished",0.35f,1.4f,0.4f)) { self.EffectsStarted+=1 }
         ue_timer_start("respawn",self.RespawnSeconds,"Restore",false)
     }
+
     [ue_function(BlueprintCallable)]
     def OnPickupEffectFinished():void { self.EffectsFinished+=1 }
+
     [ue_function(BlueprintCallable)]
     def Restore():void {
         if(self.Available || !self.MeshReady) { return }

@@ -19,6 +19,11 @@
 #include "Kismet2/KismetEditorUtilities.h"
 #include "BlueprintCompilationManager.h"
 #include "K2Node_Event.h"
+#include "K2Node_Message.h"
+#include "K2Node_Self.h"
+#include "HAL/IConsoleManager.h"
+#include "Misc/ScopeExit.h"
+#include "HAL/FileManager.h"
 #include "K2Node_FunctionEntry.h"
 #include "K2Node_FunctionResult.h"
 #include "EdGraphSchema_K2.h"
@@ -41,7 +46,8 @@ bool SaveAuthoredInterfaceAsset(UObject* O)
 }
 namespace
 {
-UBlueprint* CreateAuthoredWrapperReceiver(UClass* Interface, const FString& Package, FString& Error)
+UBlueprint* CreateAuthoredWrapperReceiver(UClass* Interface, const FString& Package, FString& Error,
+                                          bool AddPureConsumer = true)
 {
     auto* BP = FKismetEditorUtilities::CreateBlueprint(
         AActor::StaticClass(), CreatePackage(*Package),
@@ -119,9 +125,273 @@ UBlueprint* CreateAuthoredWrapperReceiver(UClass* Interface, const FString& Pack
         Error = TEXT("Wrapper receiver compile failed");
         return nullptr;
     }
-    if (!AddDasPureConsumerGraph(BP, Interface->FindFunctionByName(TEXT("Query")), Error))
+    if (AddPureConsumer && !AddDasPureConsumerGraph(BP, Interface->FindFunctionByName(TEXT("Query")), Error))
         return nullptr;
     return BP;
+}
+}
+namespace
+{
+bool RunInterfaceMigrationRegression(FDasRuntimeModule& Runtime, const FString& Id, FString& Error)
+{
+    const FString Source = TEXT("dsl_interface_migration_") + Id + TEXT(".das");
+    const FString File = Runtime.ScriptPath(Source);
+    FString PreviousSource;
+    const bool Existed = FFileHelper::LoadFileToString(PreviousSource, *File);
+    ON_SCOPE_EXIT
+    {
+        if (Existed)
+            FFileHelper::SaveStringToFile(PreviousSource, *File, FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM);
+        else
+            IFileManager::Get().Delete(*File);
+    };
+    bool Passed = true;
+    auto Check = [&](bool Value, const TCHAR* Name)
+    {
+        Passed &= Value;
+        UE_LOG(LogTemp, Display,
+               TEXT("DAS_INTERFACE_MIGRATION_TEST %s %s: %s"),
+                    Value ? TEXT("PASS") : TEXT("FAIL"), Name, Value ? TEXT("") : *Error);
+        return Value;
+    };
+    const FString Module = TEXT("migration_") + Id;
+    const FString Folder = TEXT("/Game/DasFrameAssetProbe/Migration_") + Id;
+    auto SourceFor = [&](const FString& Signature, const FString& Extra = FString())
+    {
+        return TEXT("options gen2\nrequire ue_dsl\n[ue_interface(module_id=\"") + Module +
+            TEXT("\",BlueprintType)]\nclass MigrationContract {\n[ue_function(BlueprintCallable)]\ndef Query(") +
+                 Signature + TEXT(" {}\n") + Extra + TEXT("}\n");
+    };
+    auto Apply = [&](const FString& Text, TArray<UBlueprint*>& Out)
+    {
+        Error.Reset();
+        return FFileHelper::SaveStringToFile(Text, *File, FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM) &&
+               FDasInterfaceService::Apply(Source, Folder, Out, Error);
+    };
+    TArray<UBlueprint*> Out;
+    if (!Check(Apply(SourceFor(TEXT("input:int):void")), Out), TEXT("create_void_contract")))
+        return false;
+    UBlueprint* Interface = Out[0];
+    const FString StableId = CastChecked<UDasAuthoredInterfaceClass>(Interface->GeneratedClass)->StableId;
+    if (!Check(Apply(
+            SourceFor(TEXT("input:int):bool")), Out) && Out[0] == Interface &&
+            CastField<FBoolProperty>(Interface->GeneratedClass->FindFunctionByName(TEXT("Query"))->GetReturnProperty()),
+                                     TEXT("void_to_bool_in_place")))
+        return false;
+    if (!Check(Apply(
+            SourceFor(TEXT("input:int):int"), TEXT("[ue_function(BlueprintCallable)] def Unused():bool {}\n")), Out),
+            TEXT("add_method_and_change_return")) ||
+            !Check(Apply(SourceFor(TEXT("input:int):int")), Out) &&
+                         !Interface->GeneratedClass->FindFunctionByName(TEXT("Unused")), TEXT("remove_unused_method")))
+        return false;
+    auto* Receiver = CreateAuthoredWrapperReceiver(Interface->GeneratedClass, Folder + TEXT("/Receiver"), Error, false);
+    if (!Check(Receiver != nullptr, TEXT("create_Blueprint_implementation")))
+        return false;
+    FEdGraphPinType Int;
+    Int.PinCategory = UEdGraphSchema_K2::PC_Int;
+    FBlueprintEditorUtils::AddMemberVariable(Receiver, TEXT("Score"), Int, TEXT("321"));
+    auto* Graph = FBlueprintEditorUtils::CreateNewGraph(Receiver, TEXT("InvokeQuery"), UEdGraph::StaticClass(),
+                                                                       UEdGraphSchema_K2::StaticClass());
+    FBlueprintEditorUtils::AddFunctionGraph<UClass>(Receiver, Graph, false, nullptr);
+    TArray<UK2Node_FunctionEntry*> Entries;
+    TArray<UK2Node_FunctionResult*> Results;
+    Graph->GetNodesOfClass(Entries);
+    Graph->GetNodesOfClass(Results);
+    if (Results.IsEmpty())
+    {
+        FGraphNodeCreator<UK2Node_FunctionResult> Creator(*Graph);
+        Creator.CreateNode();
+        Creator.Finalize();
+        Graph->GetNodesOfClass(Results);
+    }
+    auto* Entry = Entries[0];
+    Entry->AddExtraFlags(FUNC_Public | FUNC_BlueprintCallable);
+    auto* Value = Entry->CreateUserDefinedPin(TEXT("Value"), Int, EGPD_Output);
+    auto* ResultPin = Results[0]->CreateUserDefinedPin(UEdGraphSchema_K2::PN_ReturnValue, Int, EGPD_Input);
+    auto* Message = NewObject<UK2Node_Message>(Graph);
+    Graph->AddNode(Message, false, false);
+    Message->CreateNewGuid();
+    Message->FunctionReference.SetExternalMember(TEXT("Query"), Interface->GeneratedClass);
+    Message->AllocateDefaultPins();
+    auto* Self = NewObject<UK2Node_Self>(Graph);
+    Graph->AddNode(Self, false, false);
+    Self->CreateNewGuid();
+    Self->AllocateDefaultPins();
+    const auto* Schema = Graph->GetSchema();
+    Schema->TryCreateConnection(Self->FindPinChecked(UEdGraphSchema_K2::PN_Self),
+                                Message->FindPinChecked(UEdGraphSchema_K2::PN_Self));
+    Schema->TryCreateConnection(Value, Message->FindPinChecked(TEXT("input")));
+    Schema->TryCreateConnection(Message->FindPinChecked(UEdGraphSchema_K2::PN_ReturnValue), ResultPin);
+    Schema->TryCreateConnection(Entry->FindPinChecked(UEdGraphSchema_K2::PN_Then),
+                                Message->FindPinChecked(UEdGraphSchema_K2::PN_Execute));
+    Schema->TryCreateConnection(Message->FindPinChecked(UEdGraphSchema_K2::PN_Then),
+                                Results[0]->FindPinChecked(UEdGraphSchema_K2::PN_Execute));
+    FKismetEditorUtilities::CompileBlueprint(Receiver);
+    if (!Check(Receiver->Status != BS_Error, TEXT("compile_connected_message_caller")))
+        return false;
+    const FString Good = SourceFor(TEXT("input:int; bias:int):int"));
+    if (!Check(Apply(Good, Out), TEXT("add_parameter_with_implementation_and_caller")))
+        return false;
+    Check(Message->FindPin(TEXT("bias")) != nullptr &&
+                           Message->FindPinChecked(TEXT("input"))->LinkedTo.Num() == 1,
+                                                   TEXT("new_pin_created_existing_wire_preserved"));
+    auto* Score = FindFProperty<FIntProperty>(Receiver->GeneratedClass, TEXT("Score"));
+    Check(Score && Score->GetPropertyValue_InContainer(Receiver->GeneratedClass->GetDefaultObject()) == 321,
+          TEXT("receiver_default_preserved"));
+    const auto* Identity = CastChecked<UDasAuthoredInterfaceClass>(Interface->GeneratedClass);
+    Check(Identity->StableId == StableId, TEXT("interface_stable_identity_preserved"));
+    const FString SavedWire = Identity->ContractJson;
+    Interface->GetOutermost()->SetDirtyFlag(false);
+    Receiver->GetOutermost()->SetDirtyFlag(false);
+    Check(!Apply(SourceFor(TEXT("input:string; bias:int):int")), Out) &&
+                 Error.Contains(TEXT("connected pin")) &&
+                                CastChecked<UDasAuthoredInterfaceClass>(Interface->GeneratedClass)->ContractJson ==
+                                    SavedWire &&
+                                !Interface->GetOutermost()->IsDirty() && !Receiver->GetOutermost()->IsDirty(),
+                                TEXT("incompatible_connected_pin_rejected_without_mutation"));
+    auto* Failure = IConsoleManager::Get().FindConsoleVariable(TEXT("das.InterfaceMigrationFailAfterMutation"));
+    if (!Check(Failure != nullptr, TEXT("rollback_injection_available")))
+        return false;
+    const int32 OldFailure = Failure->GetInt();
+    Failure->Set(1, ECVF_SetByCode);
+    const bool Failed = !Apply(SourceFor(TEXT("input:int; bias:int; extra:int):int")), Out);
+    Failure->Set(OldFailure, ECVF_SetByCode);
+    Check(Failed && Error.Contains(TEXT("Injected interface migration failure")) &&
+                                   !Error.Contains(TEXT("rollback failed")), TEXT("failure_after_mutation_rolls_back"));
+    Check(CastChecked<UDasAuthoredInterfaceClass>(Interface->GeneratedClass)->ContractJson == SavedWire &&
+          Interface->GeneratedClass->FindFunctionByName(
+              TEXT("Query"))
+                  ->FindPropertyByName(
+                      TEXT("extra")) == nullptr &&
+                      !Message->FindPin(
+                          TEXT("extra")) &&
+                          Message->FindPinChecked(TEXT("input"))->LinkedTo.Num() == 1 &&
+                                                  !Interface->GetOutermost()->IsDirty() &&
+                                                  !Receiver->GetOutermost()->IsDirty(),
+                                                  TEXT("rollback_restores_contract_pins_wires_and_dirty_flags"));
+    Check(Apply(Good, Out), TEXT("idempotent_reimport_after_rollback"));
+    FDasAuthoringModule RenameModel;
+    Check(FDasAuthoringModule::FromJson(
+              CastChecked<UDasAuthoredInterfaceClass>(Interface->GeneratedClass)->ContractJson, RenameModel, Error),
+          TEXT("read_stable_method_identity_for_rename"));
+    const FString MethodId = RenameModel.Classes[0].Methods[0].Id;
+    const FString RenameBase =
+        Good.Replace(TEXT("[ue_function(BlueprintCallable)]\ndef Query"),
+                          *(TEXT("[ue_function(id=\"") + MethodId + TEXT("\",BlueprintCallable)]\ndef Query")));
+    const FString Renamed = RenameBase.Replace(TEXT("def Query("), TEXT("def RenamedQuery("));
+    auto* Conflict = FBlueprintEditorUtils::CreateNewGraph(Receiver, TEXT("RenamedQuery"), UEdGraph::StaticClass(),
+                                                                          UEdGraphSchema_K2::StaticClass());
+    FBlueprintEditorUtils::AddFunctionGraph<UClass>(Receiver, Conflict, false, nullptr);
+    FKismetEditorUtilities::CompileBlueprint(Receiver);
+    Check(!Apply(Renamed, Out) && Error.Contains(TEXT("conflicts with an existing graph")) &&
+                                                 Receiver->FunctionGraphs.Contains(Conflict) &&
+                                                 Interface->GeneratedClass->FindFunctionByName(
+                                                     TEXT("Query")), TEXT("rename_conflict_preserves_existing_graph"));
+    FBlueprintEditorUtils::RemoveGraph(Receiver, Conflict, EGraphRemoveFlags::MarkTransient);
+    FKismetEditorUtilities::CompileBlueprint(Receiver);
+    if (!Check(Apply(Renamed, Out) &&
+               Message->FunctionReference.GetMemberName() ==
+                   TEXT("RenamedQuery") &&
+                        Receiver->GeneratedClass->FindFunctionByName(
+                            TEXT("RenamedQuery")) &&
+                            Message->FindPinChecked(TEXT("input"))->LinkedTo.Num() == 1,
+                                                    TEXT("stable_method_rename_updates_implementation_and_message")))
+        return false;
+    if (!Check(Apply(RenameBase, Out) &&
+               Message->FunctionReference.GetMemberName() == TEXT("Query"), TEXT("stable_method_rename_back")))
+        return false;
+    const FString BatchFolder = Folder + TEXT("/Batch");
+    const FString ActorSource = TEXT("dsl_interface_migration_") + Id + TEXT("_actor.das");
+    const FString ActorFile = Runtime.ScriptPath(ActorSource);
+    FString BeforeActorSource;
+    const bool ActorExisted = FFileHelper::LoadFileToString(BeforeActorSource, *ActorFile);
+    ON_SCOPE_EXIT
+    {
+        if (ActorExisted)
+            FFileHelper::SaveStringToFile(BeforeActorSource, *ActorFile,
+                                          FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM);
+        else
+            IFileManager::Get().Delete(*ActorFile);
+    };
+    auto BatchInterface = [&](const FString& Result)
+    {
+        return SourceFor(TEXT("input:int):") + Result).Replace(TEXT("MigrationContract"), TEXT("BatchContract"));
+    };
+    auto BatchActor = [&](const FString& Result)
+    {
+        const FString Body = Result == TEXT("void")
+                             ? TEXT(" { self.Score+=input }\n}\n")
+                             : Result == TEXT("bool")
+                                   ? TEXT(" { return input>0 }\n}\n")
+                                   : Result == TEXT("int") ? TEXT(" { return input+self.Score }\n}\n")
+                                                           : TEXT(" { return double(input+self.Score) }\n}\n");
+        return TEXT("options gen2\nrequire ue_native_gameplay\n[ue_class(module_id=\"") + Module +
+                    TEXT("\",Blueprintable),ue_implements(interface=\"") + BatchFolder +
+                         TEXT("/BatchContract.BatchContract_C\")]\nclass BatchActor : Actor {\n") +
+                              TEXT("settings=ue_properties(EditAnywhere,BlueprintReadWrite) { var Score:int=321 }\n") +
+                                   TEXT("[ue_function(BlueprintEvent)] def Query(input:int):") + Result + Body;
+    };
+    TArray<UBlueprint*> BatchOut;
+    Check(FFileHelper::SaveStringToFile(BatchInterface(TEXT("int")), *File,
+                                                       FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM) &&
+                                        FDasInterfaceService::Apply(Source, BatchFolder, BatchOut, Error),
+                                        TEXT("create_joint_migration_interface"));
+    UBlueprint* Actor = nullptr;
+    if (!Check(FFileHelper::SaveStringToFile(
+            BatchActor(TEXT("int")), *ActorFile, FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM) &&
+            FDasDSLService::Apply(ActorSource, BatchFolder +
+                                                   TEXT("/BP_BatchActor"), Module + TEXT(".BatchActor"), Actor, Error),
+                                                   TEXT("create_joint_migration_DSL_actor")))
+        return false;
+    auto* InitialScore = FindFProperty<FIntProperty>(Actor->GeneratedClass, TEXT("Score"));
+    InitialScore->SetPropertyValue_InContainer(Actor->GeneratedClass->GetDefaultObject(), 777);
+    Check(FFileHelper::SaveStringToFile(
+        BatchActor(TEXT("double")), *ActorFile, FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM) &&
+        FFileHelper::SaveStringToFile(BatchInterface(TEXT("double")), *File,
+                                                     FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM),
+                                      TEXT("write_updated_interface_and_implementation"));
+    Failure->Set(1, ECVF_SetByCode);
+    const bool JointFailed = !FDasInterfaceService::Apply(Source, BatchFolder, BatchOut, Error);
+    Failure->Set(OldFailure, ECVF_SetByCode);
+    Check(JointFailed &&
+          !Error.Contains(
+              TEXT("rollback failed")) &&
+              CastField<FIntProperty>(
+                  Actor->GeneratedClass->FindFunctionByName(TEXT("Query"))->GetReturnProperty()) &&
+                  FindFProperty<FIntProperty>(
+                      Actor->GeneratedClass,
+                      TEXT("Score"))->GetPropertyValue_InContainer(Actor->GeneratedClass->GetDefaultObject()) == 777,
+                      TEXT("joint_source_migration_rollback_restores_bridge_and_override"));
+    Check(FFileHelper::SaveStringToFile(
+        BatchActor(TEXT("double")), *ActorFile, FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM) &&
+        FFileHelper::SaveStringToFile(BatchInterface(TEXT("double")), *File,
+                                                     FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM) &&
+                                      FDasInterfaceService::Apply(Source, BatchFolder, BatchOut, Error),
+                                      TEXT("joint_interface_and_DSL_source_signature_migration"));
+    Check(CastField<FDoubleProperty>(
+        Actor->GeneratedClass->FindFunctionByName(TEXT("Query"))->GetReturnProperty()) &&
+        FindFProperty<FIntProperty>(
+            Actor->GeneratedClass,
+            TEXT("Score"))->GetPropertyValue_InContainer(Actor->GeneratedClass->GetDefaultObject()) == 777,
+            TEXT("joint_migration_rebuilds_bridge_preserves_CDO_override"));
+    for (const FString Result : {FString(TEXT("void")), FString(TEXT("bool"))})
+    {
+        if (!Check(FFileHelper::SaveStringToFile(BatchActor(Result), *ActorFile,
+                                                 FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM) &&
+                       FFileHelper::SaveStringToFile(BatchInterface(Result), *File,
+                                                     FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM) &&
+                       FDasInterfaceService::Apply(Source, BatchFolder, BatchOut, Error),
+                   Result == TEXT("void") ? TEXT("DAS_function_to_interface_event")
+                                          : TEXT("DAS_interface_event_to_bool_function")))
+            return false;
+        auto* Return = Actor->GeneratedClass->FindFunctionByName(TEXT("Query"))->GetReturnProperty();
+        Check((Result == TEXT("void") ? Return == nullptr : CastField<FBoolProperty>(Return) != nullptr) &&
+               FindFProperty<FIntProperty>(
+                   Actor->GeneratedClass,
+                   TEXT("Score"))->GetPropertyValue_InContainer(Actor->GeneratedClass->GetDefaultObject()) == 777,
+                   TEXT("event_function_conversion_preserves_signature_and_override"));
+    }
+    return Passed;
 }
 }
 int32 RunDasAuthoredInterfaceProbe(const FString& Id, const FString& Phase)
@@ -148,6 +418,9 @@ int32 RunDasAuthoredInterfaceProbe(const FString& Id, const FString& Phase)
     UDasTypeRegistry* ValueRegistry = nullptr;
     if (Phase == TEXT("Create"))
     {
+        Check(RunInterfaceMigrationRegression(R, Id, Error), TEXT("structural_interface_migration_regression"));
+        if (!Pass)
+            return 1;
         TArray<UObject*> ValueTypes;
         Check(FDasTypeService::Apply(TEXT("ue_interface_values.das"), Base + TEXT("/ValueTypes"), ValueTypes, Error) &&
                                           ValueTypes.Num() == 3,
@@ -283,8 +556,9 @@ int32 RunDasAuthoredInterfaceProbe(const FString& Id, const FString& Phase)
               TEXT("write_changed_interface_contract"));
         TArray<UBlueprint*> Rejected;
         Check(!FDasInterfaceService::Apply(Definition, Base + TEXT("/Types"), Rejected, Error) &&
-                                           Error.Contains(TEXT("structural policy")),
-                                                          TEXT("changed_interface_contract_refused_before_mutation"));
+                                           (Error.Contains(TEXT("DSL source")) ||
+                                                           Error.Contains(TEXT("Interface migration would discard"))),
+                                            TEXT("incompatible_interface_consumer_preserved_on_refusal"));
         FDasAuthoringModule Bad;
         const FString Unknown = Good.Replace(TEXT("@ue_out var Total"), TEXT("@ue_unknown var Total"));
         Check(FFileHelper::SaveStringToFile(Unknown, *R.ScriptPath(Definition),

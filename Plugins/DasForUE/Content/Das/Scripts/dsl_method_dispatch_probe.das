@@ -19,8 +19,10 @@ class DispatchProbe {
         if (depth<=0) { return self.Score }
         return self.Recurse(depth-1)
     }
+
     [ue_function(BlueprintCallable)]
     def Twice(input:int):int { return input*2 }
+
     [ue_function(BlueprintCallable)]
     def Exercise(input:int):int {
         let score=self.Add(input)
@@ -31,8 +33,10 @@ class DispatchProbe {
         if (self.Recurse(4)!=score || self.Twice(3)!=6) { return -1 }
         return score+value+self.Sum(values)
     }
+
     [ue_function(BlueprintEvent)]
     def Hook(input:int):int { self.Score+=input; return self.Score }
+
     [ue_function(BlueprintCallable)]
     def Query(input:int):int { return self.Hook(input) }
 }

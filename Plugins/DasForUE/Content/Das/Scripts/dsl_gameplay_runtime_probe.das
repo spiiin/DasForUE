@@ -62,25 +62,33 @@ class GameplayRuntimeProbe {
         try { ue_scene_world_transform(child) } recover { destroyedRejected=true }
         self.SceneOK=cycleRejected && destroyedRejected && attached && position.x==1.0lf && position.y==2.0lf && position.z==3.0lf && destroyedChild && destroyedRoot && !ue_scene_valid(child)
     }
+
     [ue_function(BlueprintCallable)]
     def Pulse():void { self.Pulses += 1 }
+
     [ue_function(BlueprintCallable)]
     def Snapshot(values:array<int>):void {
         for (value in values) { self.SnapshotSum += value }
     }
+
     [ue_function(BlueprintCallable)]
     def Next(value:UEVector2D):void { self.NextSum=int(value.x+value.y) }
+
     [ue_function(BlueprintCallable)]
     def Ready():void { self.Delays += 1 }
+
     [ue_function(BlueprintCallable)]
     def Cancelled():void { self.CancelledCalls += 1 }
+
     [ue_function(BlueprintCallable)]
     def Loaded(value:ObjectRef):void {
         self.Loads += 1
         self.LoadOK=ue_object_valid(value.handle)
     }
+
     [ue_function(BlueprintCallable)]
     def Stop():void { ue_timer_cancel("repeat") }
+
     [ue_function(BlueprintCallable)]
     def ArmPending():void {
         ue_timer_next_tick("destroyed","Cancelled")

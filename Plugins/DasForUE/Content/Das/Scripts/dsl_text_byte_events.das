@@ -2,6 +2,7 @@ options gen2
 require ue_probe_actor
 require ue_text_byte_delegates
 require ue_interface_reentry_values
+
 [ue_class(Blueprintable), ue_implements(interface="/Game/DasTextByteEvents/Types/TextByteContract.TextByteContract_C")]
 class TextByteEvents : ProbeActor {
     @ue_property=(BlueprintReadWrite)
@@ -18,10 +19,13 @@ class TextByteEvents : ProbeActor {
     LastText:FText=ue_text_invariant("")
     @ue_property=(BlueprintReadWrite)
     Seen:int=0
+
     [ue_function(BlueprintCallable)]
     def EchoByte(value:uint8):uint8 { return value }
+
     [ue_function(BlueprintCallable)]
     def EchoText(value:FText):FText { return value }
+
     [ue_function(BlueprintCallable)]
     def Change(var number:uint8&; var title:FText&;
                @ue_out var previous:uint8&; @ue_out var oldTitle:FText&):FText {
@@ -31,19 +35,24 @@ class TextByteEvents : ProbeActor {
         title=ue_text("TextByteEvents","Changed","Changed text")
         return oldTitle
     }
+
     [ue_function(BlueprintCallable)]
     def ChangeArrays(var numbers:array<uint8>&; @ue_out var messages:array<FText>&):void {
         push(numbers,uint8(255))
         messages <- [ue_text("TextByteEvents","Array","Array text"), ue_text_invariant("Invariant")]
     }
+
     [ue_function(BlueprintCallable)]
     def RunText(callback:TextQuery; value:FText):FText { return callback.Execute(value) }
+
     [ue_function(BlueprintCallable)]
     def RunByte(callback:ByteQuery; value:uint8):uint8 { return callback.Execute(value) }
+
     [ue_function(BlueprintCallable)]
     def OnChanged(number:uint8; title:FText):void {
         self.LastByte=number; self.LastText=title; self.Seen+=1
     }
+
     [ue_function(BlueprintCallable)]
     def OnRefChanged(var number:uint8&; var title:FText&):void {
         number=uint8(255); title=ue_text_invariant("ref changed")
@@ -79,8 +88,10 @@ class TextByteEvents : ProbeActor {
         if(length(value)!=2 || ue_name_text(value[0])!="First" || ue_name_text(value[1])!="Second") { panic("Names event payload") }
         clear(value); self.Seen+=1
     }
+
     [ue_function(BlueprintCallable)]
     def ProbeInterface():bool { return test_interface_values(ue_self_object()) }
+
     [ue_function(BlueprintCallable)]
     def Probe():bool {
         let original=ue_text("TextByteEvents","Source","Original text")

@@ -23,20 +23,24 @@ class StructMapActor {
     def Put(name:string; entry:MapEntry):void {
         insert_clone(self.Entries,name,entry)
     }
+
     [ue_function(BlueprintCallable)]
     def Increase(name:string; amount:int):void {
         self.Entries[name].Score += amount
         push(self.Entries[name].Samples,double(amount))
         self.Entries[name].Position.x += double(amount)
     }
+
     [ue_function(BlueprintCallable)]
     def PutPosition(index:int; position:UEVector):void {
         insert_clone(self.Positions,index,position)
     }
+
     [ue_function(BlueprintCallable)]
     def CopyEntries(values:table<string;MapEntry>):table<string;MapEntry> {
         return <- clone(values)
     }
+
     [ue_function(BlueprintCallable)]
     def ReplaceEntries(var values:table<string;MapEntry>&;
                        @ue_out var previous:table<string;MapEntry>&):void {

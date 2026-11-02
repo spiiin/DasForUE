@@ -67,3 +67,37 @@ void CharacterJump(const FDasObjectHandle& H, bool Held, das::Context* C)
     else
         P->StopJumping();
 }
+
+bool PlayerControlsReady(const FDasObjectHandle& H, das::Context* C)
+{
+    auto* PC = CharacterControlObject<APlayerController>(H, C);
+    return PC->IsLocalController() && PC->GetLocalPlayer() &&
+           PC->GetLocalPlayer()->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>() &&
+           Cast<UEnhancedPlayerInput>(PC->PlayerInput) && Cast<UEnhancedInputComponent>(PC->InputComponent);
+}
+void ControllerSetTeam(const FDasObjectHandle& H, int32 TeamId, das::Context* C)
+{
+    auto* PC = CharacterControlObject<APlayerController>(H, C, true);
+    auto* Agent = Cast<IGenericTeamAgentInterface>(PC);
+    if (!Agent || TeamId < 0 || TeamId > 255)
+        C->throw_error("controller team requires IGenericTeamAgentInterface and a byte team id");
+    Agent->SetGenericTeamId(FGenericTeamId(static_cast<uint8>(TeamId)));
+}
+
+// Bind the swept component and initialize velocity after SCS registration.
+void ProjectileMovementLaunch(const FDasObjectHandle& Movement, const FDasObjectHandle& Updated,
+                              const FVector& LocalVelocity, float GravityScale, das::Context* C)
+{
+    auto* M = CharacterControlObject<UProjectileMovementComponent>(Movement, C, true);
+    auto* U = CharacterControlObject<USceneComponent>(Updated, C, true);
+    if (!M->GetOwner() || M->GetOwner() != U->GetOwner() || LocalVelocity.ContainsNaN() ||
+        !FMath::IsFinite(GravityScale) ||
+        (!FMath::IsFinite(LocalVelocity.Size()) || LocalVelocity.Size() > TNumericLimits<float>::Max()))
+        C->throw_error("projectile launch requires same-owner components and finite velocity/gravity");
+    M->SetUpdatedComponent(U);
+    M->ProjectileGravityScale = GravityScale;
+    M->InitialSpeed = LocalVelocity.Size();
+    M->SetVelocityInLocalSpace(LocalVelocity);
+    M->UpdateComponentVelocity();
+    M->Activate(true);
+}

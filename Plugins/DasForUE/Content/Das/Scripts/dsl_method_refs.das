@@ -12,6 +12,7 @@ class MethodRefActor : Actor {
         ue_timer_next_tick("once",self.Pulse)
         ue_latent_delay("ready",0.5f,self.Pulse)
     }
+
     [ue_function(BlueprintCallable)]
     def Pulse():void { self.Pulses+=1 }
 }

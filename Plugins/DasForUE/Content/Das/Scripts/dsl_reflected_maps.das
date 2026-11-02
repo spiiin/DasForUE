@@ -33,30 +33,37 @@ class ReflectedMapActor {
         insert(self.States,name,MapStatus.Active)
         self.Catalog.States[name] = MapStatus.Waiting
     }
+
     [ue_function(BlueprintCallable)]
     def PutActor(name:string; actor:ActorRef) {
         insert(self.Actors,name,actor)
     }
+
     [ue_function(BlueprintCallable)]
     def PutEvent(name:string; events:DasEventInterface) {
         insert(self.Events,name,events)
     }
+
     [ue_function(BlueprintCallable)]
     def CopyStates(values:table<int;MapStatus>):table<int;MapStatus> {
         return <- clone(values)
     }
+
     [ue_function(BlueprintCallable)]
     def CopyActors(values:table<string;ActorRef>):table<string;ActorRef> {
         return <- clone(values)
     }
+
     [ue_function(BlueprintCallable)]
     def CopyEvents(values:table<int;DasEventInterface>):table<int;DasEventInterface> {
         return <- clone(values)
     }
+
     [ue_function(BlueprintCallable)]
     def CopyAuthored(values:table<string;StructMapActorRef>):table<string;StructMapActorRef> {
         return <- clone(values)
     }
+
     [ue_function(BlueprintCallable)]
     def ReplaceStates(var values:table<string;MapStatus>&;
                       @ue_out var previous:table<string;MapStatus>&) {
@@ -64,6 +71,7 @@ class ReflectedMapActor {
         self.States := values
         clear(values)
     }
+
     [ue_function(BlueprintCallable)]
     def ReplaceActors(var values:table<string;ActorRef>&;
                       @ue_out var previous:table<string;ActorRef>&) {
@@ -71,6 +79,7 @@ class ReflectedMapActor {
         self.Actors := values
         clear(values)
     }
+
     [ue_function(BlueprintCallable)]
     def ReplaceAuthored(var values:table<string;StructMapActorRef>&;
                         @ue_out var previous:table<string;StructMapActorRef>&) {

@@ -1,6 +1,7 @@
 options gen2
 options gc
 require ue_dsl
+
 [ue_interface(module_id="authoredinterface", BlueprintType, out="Stats.Total")]
 class CounterContract {
     def abstract Query(Input:int):int

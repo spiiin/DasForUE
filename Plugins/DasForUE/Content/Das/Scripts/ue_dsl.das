@@ -6,6 +6,8 @@ require ue_foundation public
 // These declarations do not construct Unreal objects or expose native virtuals.
 [ue_native_base(path="/Script/Engine.Actor")]
 class Actor {}
+[ue_native_base(path="/Script/Engine.PlayerController")]
+class PlayerController {}
 [ue_native_base(path="/Script/Engine.Pawn")]
 class Pawn {}
 [ue_native_base(path="/Script/Engine.Character")]
@@ -41,3 +43,6 @@ def ue_delegate_name(method:UENameValue):string { return ue_name_text(method) }
 class WorldSubsystem {}
 [ue_native_base(path="/Script/Engine.GameInstanceSubsystem")]
 class GameInstanceSubsystem {}
+
+[ue_native_base(path="/Script/DasRuntime.DasObject")]
+class ScriptObject {}

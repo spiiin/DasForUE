@@ -30,3 +30,10 @@ def ue_scene_destroy(value:SceneComponentRef):bool { return __ue_scene_destroy(S
 def ue_scene_get(actor:ActorRef; name:string):SceneComponentRef { return SceneComponentRef_from(__ue_scene_get(ue_cast_nullable_object(actor.handle,"/Script/Engine.Actor"),name)) }
 
 def ue_scene_get_or_create(actor:ActorRef; name:string):SceneComponentRef { return SceneComponentRef_from(__ue_scene_get_or_create(ue_cast_nullable_object(actor.handle,"/Script/Engine.Actor"),name)) }
+
+// Update the actual scene transform instead of writing the reflected rotation field.
+// Preserve the component translation and scale, including designer overrides.
+def ue_scene_set_relative_rotation(value:SceneComponentRef; rotation:UERotator; teleport:bool=false):void {
+    let current=ue_scene_relative_transform(value)
+    ue_scene_set_relative_transform(value,ue_transform(ue_transform_translation(current),rotation,ue_transform_scale(current)),teleport)
+}

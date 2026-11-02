@@ -23,6 +23,7 @@ var executed:int=0
 var active:int=0
 var ongoing:int=0
 var removed:int=0
+
 [ue_class]
 class CueAssetExample : Actor {
     @ue_component

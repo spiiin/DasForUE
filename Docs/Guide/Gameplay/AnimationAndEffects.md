@@ -115,3 +115,21 @@ Examples: `dsl_playable_pickup.das` plays a sound and burst on pickup; `dsl_play
 - Montage support does not include visible-pose/root-motion guarantees or networked playback.
 
 See also: [Asset loading](../Data/AssetLoading.md), [Gameplay services](GameplayServices.md), [Callback arguments](CallbackArguments.md), [Soft references](../DSL/SoftReferences.md)
+
+
+## World-owned bursts
+
+`ue_effect_burst(sound, system, transform, volume=1.0f, pitch=1.0f):bool` starts auto-destroyed sound/Niagara instances through Unreal's world APIs. They survive the script owner's Destroy/EndPlay, as required for projectile impact effects. Empty pairs and dedicated servers return false; unavailable Niagara systems are skipped. Arguments use the same type/finite-value and volume/pitch checks as managed effects.
+
+Bursts have no script completion callback, effect name or stop handle. Use finite one-shot resources: looping systems/sounds need the managed API above. World teardown is still handled by Unreal.
+
+
+### Direct cast presentation
+
+`ue_character_play_montage(character, montage, rate=1, section=ue_name_value("None"))`
+calls Character.PlayAnimMontage and returns its duration. It does not register
+completion callbacks; use ue_montage_play when those are required.
+`ue_niagara_spawn_attached(system, component, socket)` snaps an auto-destroying
+Niagara component to the attachment point. `ue_sound_play_2d(sound, volume=1,
+pitch=1)` plays a fire-and-forget 2D sound. These helpers use reflected calls with
+the current script world; referenced assets must already be loaded.

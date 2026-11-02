@@ -99,7 +99,8 @@ TSharedPtr<FCompiledProgram> AcquireCompiledProgram(const FString& Path, bool bA
         {
             const int32 Mode = bPreparation ? 0 : CVarScriptChangeCheck.GetValueOnGameThread();
             const bool Full = Mode != 2 && (Mode == 0 || Cached->CheckedEpoch != ScriptSourceEpoch);
-            bool Changed = false, Polled = false;
+            // Reflected dependencies may have appeared since a failed editor preparation.
+            bool Changed = bPreparation && !Cached->CompileError.IsEmpty(), Polled = false;
             if (Full)
             {
                 for (const auto& Source : Cached->Sources)
@@ -124,6 +125,8 @@ TSharedPtr<FCompiledProgram> AcquireCompiledProgram(const FString& Path, bool bA
                     Cached->CheckedAt = FPlatformTime::Seconds();
                 ++PersistentCompileCacheHits;
                 RetainCompiledProgram(Cached);
+                if (DSLDeclarationCompileDepth > 0 && Cached->RestoreReferenceMetadata)
+                    Cached->RestoreReferenceMetadata();
                 return Cached;
             }
             ResidentCompiledPrograms.Remove(Cached);
@@ -154,7 +157,8 @@ TSharedPtr<FCompiledProgram> AcquireCompiledProgram(const FString& Path, bool bA
         else
         {
             ++PersistentCompileCount;
-            Compiled->Program = DSLCompile(Utf8Path.Get(), Access, Output, Compiled->Modules);
+            Compiled->Program = DSLCompile(Utf8Path.Get(), Access, Output, Compiled->Modules, das::CodeOfPolicies(),
+                                           &Compiled->RestoreReferenceMetadata);
         }
         if (Compiled->CompileError.IsEmpty() && (!Compiled->Program || Compiled->Program->failed()))
             Compiled->CompileError = Errors(Compiled->Program, Output);

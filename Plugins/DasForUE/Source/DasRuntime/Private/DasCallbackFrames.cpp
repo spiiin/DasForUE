@@ -1,6 +1,7 @@
 #include "DasInterfaceContracts.h"
 #include "DasCallbackFrames.h"
 #include "DasPerceptionTypes.h"
+#include "DasCollisionTypes.h"
 #include "DasCallbackTypes.h"
 #include "DasTypeContracts.h"
 #include "DasDelegateSignatures.h"
@@ -48,7 +49,7 @@ bool Compatible(FProperty* Source, FProperty* Target)
         return DasEnumPropertyType(Source) == Expected;
     if (auto* Expected = CastField<FStructProperty>(Target))
         return DasCallbackSnapshotForProperty(Source) == Expected->Struct ||
-               CanProjectDasAIStimulus(Source, Expected->Struct);
+               CanProjectDasAIStimulus(Source, Expected->Struct) || CanProjectDasCollisionHit(Source, Expected->Struct);
     return DasPropertyKind(Source) == DasPropertyKind(Target) && Source->SameType(Target);
 }
 }
@@ -174,7 +175,13 @@ bool CaptureDasCallbackFrame(UFunction* Signature, const void* Memory, UScriptSt
     {
         FDasScalarValue Input;
         const auto* Expected = CastField<FStructProperty>(*Target);
-        if (Expected && CanProjectDasAIStimulus(Source[I], Expected->Struct))
+        if (Expected && CanProjectDasCollisionHit(Source[I], Expected->Struct))
+        {
+            if (!ReadDasCollisionHitCallback(Source[I], Source[I]->ContainerPtrToValuePtr<void>(Memory),
+                                             Expected->Struct, Input, Error))
+                return false;
+        }
+        else if (Expected && CanProjectDasAIStimulus(Source[I], Expected->Struct))
         {
             if (!ReadDasAIStimulusCallback(Source[I], Source[I]->ContainerPtrToValuePtr<void>(Memory), Expected->Struct,
                                            Input, Error))

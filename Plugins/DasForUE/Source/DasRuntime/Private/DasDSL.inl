@@ -423,6 +423,8 @@ FDasDeclaredType DSLContainerType(const das::TypeDeclPtr& T, const FString& Fold
         }
         else if (Slot.bHashKey && Child->GetKind() == EDasTypeKind::Object)
             DSLFail(TEXT("Use UEObjectKey<Reference> for UObject table keys"));
+        else if (!Slot.bHashKey && DSLTypedClass(Source))
+            Child->TypePath = DSLTypedClassPath(Source);
         else if (!Slot.bHashKey && DSLTypedReference(Source))
         {
             if (DSLAuthoredView(Source))
@@ -843,7 +845,8 @@ bool DSLValidateOwner(const das::ProgramPtr& Program, const FString& Entry, UObj
                         OK = false;
                         return;
                     }
-                    const bool ActorAdapter = !DasHostIdentity(Self).IsEmpty() || DasActorHostClass(Self->GetClass()) || Self->IsA<UDasScriptComponent>() ||
+                    const bool ActorAdapter = !DasHostIdentity(Self).IsEmpty() || DasActorHostClass(Self->GetClass()) || Self->IsA<ADasActor>() || Self->IsA<ADasPlayerController>() ||
+                                              Self->IsA<UDasScriptComponent>() ||
                                               Self->IsA<UDasSaveGame>() || Self->IsA<UDasDataAsset>() ||
                                               Self->IsA<UDasPrimaryDataAsset>() || Self->IsA<UDasWorldSubsystem>() ||
                                               Self->IsA<UDasGameInstanceSubsystem>();

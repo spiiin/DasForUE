@@ -2,6 +2,7 @@ options gen2
 require ue_dsl
 require dsl_class_callback_interface
 require ue_class_callback_signals
+
 [ue_class(Blueprintable,type_folder="/Game/DasClassCallbacks/Types"), ue_implements(interface=ClassContract)]
 class ClassCallbackActor : Actor {
     properties=ue_properties(BlueprintReadWrite) {
@@ -20,8 +21,10 @@ class ClassCallbackActor : Actor {
     Changed:ClassSignal
     @ue_property=(BlueprintAssignable)
     MixedChanged:MixedClassSignal
+
     [ue_function(BlueprintCallable)]
     def EchoClass(value:ActorClass):ActorClass { self.Calls+=1;return value }
+
     [ue_function(BlueprintCallable)]
     def ChangeClass(var value:ActorClass&; @ue_out var previous:ActorClass&):ActorClass {
         previous=value;value=default<ActorClass>;return previous
@@ -55,21 +58,26 @@ class ClassCallbackActor : Actor {
     def MixedClassChanged(value:ActorClass; number:int):void {
         if(ue_class_path(value)!="/Script/Engine.StaticMeshActor" || number!=17) { self.Errors+=1 };self.MixedEvents+=1
     }
+
     [ue_function(BlueprintCallable)]
     def NextClass(value:ActorClass):void {
         if(ue_class_path(value)!="/Script/Engine.StaticMeshActor") { self.Errors+=1 };self.Next+=1
     }
+
     [ue_function(BlueprintCallable)]
     def NextMixed(value:ActorClass; number:int):void {
         if(ue_class_path(value)!="/Script/Engine.StaticMeshActor" || number!=17) { self.Errors+=1 };self.MixedNext+=1
     }
+
     [ue_function(BlueprintCallable)]
     def NullClass(value:ActorClass):void { if(ue_class_valid(value)) { self.Errors+=1 };self.Nulls+=1 }
+
     [ue_function(BlueprintCallable)]
     def RepeatClass(value:ActorClass):void {
         if(ue_class_path(value)!="/Script/Engine.StaticMeshActor") { self.Errors+=1 };self.Repeats+=1
         if(self.Repeats==3) { ue_timer_cancel("class-repeat") }
     }
+
     [ue_function(BlueprintCallable)]
     def Cancelled(value:ActorClass):void { self.Errors+=1 }
 }

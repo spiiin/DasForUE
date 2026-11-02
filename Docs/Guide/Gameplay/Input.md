@@ -166,3 +166,32 @@ ue_widget_SetNavigationRuleCustom(widget,direction,endpoint)
 - Elapsed/triggered-time handler parameters are not exposed.
 
 See also: [Gameplay services](GameplayServices.md), [Widget events](../UMG/WidgetEvents.md), [Apply and hot reload](../Workflow/ApplyAndHotReload.md), [UMG and Input API](../../Api/UMGInput.md), [Examples](../GettingStarted/Examples.md)
+
+## Authored PlayerController
+
+`class MyController : PlayerController` uses the generic `ADasPlayerController` host.
+Configure its generated class as GameMode's PlayerControllerClass. A controller can
+own an authored interaction ActorComponent through an ordinary `@ue_component` field.
+
+Use `ue_player_controls_ready(player)` from `ue_character_control` before acquiring
+a MappingContext or binding input. It checks the local player, Enhanced Input subsystem,
+EnhancedPlayerInput and the controller's EnhancedInputComponent. BeginPlay may run
+before those are ready, so retry setup from Tick until it succeeds. The normal session
+input cleanup and reload restoration apply to this host too.
+
+`ue_controller_set_team(player, team)` sets a byte team ID through the engine's
+IGenericTeamAgentInterface. The host starts with NoTeam; choose the gameplay team in
+script. Both operations require a live controller in the script owner's game world;
+team mutation is rejected during construction, subscription collection and EndPlay.
+
+
+## Third-person camera component
+
+`SpringArmComponentRef` in `ue_character_control` names the native Engine
+SpringArmComponent for authored SCS composition. Attach a CameraComponentRef
+with `@Attach="Boom"` and `@AttachSocket="SpringEndpoint"`; authored component
+defaults may set TargetArmLength and bUsePawnControlRotation. This uses the
+existing native component/default machinery and the engine camera collision.
+For a Character with SCS components, configure its native CharacterMovement
+subobject in script BeginPlay; combined native-subobject defaults and SCS
+composition remain outside the current defaults identity policy.

@@ -2,8 +2,9 @@
 // optional generated Engine catalog. They retain canonical source/layout checks.
 const FDasNativeGameplayStruct* DasAdapterValueStruct(UScriptStruct* Type)
 {
+    const bool Collision = Type && Type->GetPathName() == TEXT("/Script/DasRuntime.DasCollisionHit");
     const bool Stimulus = Type && Type->GetPathName() == TEXT("/Script/DasRuntime.DasAIStimulus");
-    if (Type != FDasMontageEvent::StaticStruct() && Type != FDasMoveResult::StaticStruct() && !Stimulus)
+    if (Type != FDasMontageEvent::StaticStruct() && Type != FDasMoveResult::StaticStruct() && !Stimulus && !Collision)
         return nullptr;
     struct FRow
     {
@@ -16,6 +17,12 @@ const FDasNativeGameplayStruct* DasAdapterValueStruct(UScriptStruct* Type)
             Value.Signature = *Signature;
         }
     };
+    if (Collision)
+    {
+        static const FRow View(Type, TEXT("/Script/DasRuntime.DasCollisionHit"),
+                                          TEXT("ue_projectile_components::CollisionHit"));
+        return &View.Value;
+    }
     if (Stimulus)
     {
         static const FRow View(Type, TEXT("/Script/DasRuntime.DasAIStimulus"), TEXT("ue_perception::AIStimulus"));

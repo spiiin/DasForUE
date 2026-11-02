@@ -2,6 +2,7 @@ options gen2
 require ue_probe_actor
 require ue_dsl
 require ue_component_types
+
 [ue_class(Blueprintable)]
 class ComponentOwner : ProbeActor {
     components = ue_components(VisibleAnywhere, BlueprintReadOnly, Category="Components") {
@@ -22,32 +23,40 @@ class ComponentOwner : ProbeActor {
 
     [ue_function(BlueprintCallable)]
     def ReadBehaviorBonus():int { return self.Behavior.Bonus }
+
     [ue_function(BlueprintCallable)]
     def ConfigureBehavior(bonus:int):void { self.Behavior.Bonus = bonus }
+
     [ue_function(BlueprintCallable)]
     def AddBehaviorBonus(amount:int):int {
         self.Behavior.Bonus += amount
         let behavior = self.Behavior
         return behavior.Bonus
     }
+
     [ue_function(BlueprintCallable)]
     def CallBehavior(input:int):int { return self.Behavior.Evaluate(input) }
+
     [ue_function(BlueprintCallable)]
     def CallBehaviorRef(input:int):int {
         var value=input
         let result=self.Behavior.Accumulate(value)
         return result+value
     }
+
     [ue_function(BlueprintCallable)]
     def CallBehaviorOut(input:int):int {
         var value=-1
         self.Behavior.MakeScore(input,value)
         return value
     }
+
     [ue_function(BlueprintCallable)]
     def Bounce(input:int):int { return self.Behavior.Bounce(input) }
+
     [ue_function(BlueprintCallable)]
     def CallBehaviorHelper(input:int):int { return self.Behavior.EvaluateViaHelper(input) }
+
     [ue_function(BlueprintCallable)]
     def CallValues():int {
         var ratio=1.5
@@ -63,12 +72,14 @@ class ComponentOwner : ProbeActor {
                 ue_names_equal(key,ue_name_value("Changed")) && ue_enum_number(mode)==7 &&
                 ue_struct_get_int(payload,"Count")==31 && ue_object_is_a(actor,"Actor")) ? 1 : 0
     }
+
     [ue_function(BlueprintCallable)]
     def FailurePreservesRef():int {
         var value=7
         try { self.Behavior.FailAfterWrite(value) } recover { return value }
         return -1
     }
+
     [ue_function(BlueprintCallable)]
     def RepeatFailure():int {
         for (index in range(300)) {
@@ -78,8 +89,10 @@ class ComponentOwner : ProbeActor {
         }
         return 1
     }
+
     [ue_function(BlueprintCallable)]
     def CallViaOwner(input:int):int { return self.Behavior.EvaluateThroughOwner(input) }
+
     [ue_function(BlueprintCallable)]
     def RoundtripComponent():int { return self.Behavior.EchoComponent(self.Behavior).Bonus }
     def BeginPlay() { self.Begins += 1; self.Score += 100 }

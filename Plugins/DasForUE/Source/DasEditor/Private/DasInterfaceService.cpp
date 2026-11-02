@@ -1,4 +1,8 @@
 #include "DasInterfaceService.h"
+#include "DasInterfaceMigration.h"
+#include "DasBlueprintRollback.h"
+#include "BlueprintCompilationManager.h"
+#include "HAL/IConsoleManager.h"
 #include "DasDiagnostics.h"
 
 #include "DasTypeContracts.h"
@@ -23,6 +27,12 @@
 #include "Kismet2/KismetReinstanceUtilities.h"
 namespace
 {
+#if WITH_DEV_AUTOMATION_TESTS
+TAutoConsoleVariable<int32>
+    InterfaceMigrationFailAfterMutation(TEXT("das.InterfaceMigrationFailAfterMutation"), 0,
+                                             TEXT("Inject interface migration rollback in tests."));
+#endif
+
 void ApplyInterfaceMethodMetadata(UBlueprint* BP, const FDasDeclaredClass& Definition)
 {
     for (const auto& M : Definition.Methods)
@@ -57,6 +67,65 @@ FEdGraphPinType AuthoredInterfacePin(const FDasDeclaredType& Type)
 {
     return DasTypePinChecked(Type);
 }
+bool BuildInterfaceGraphs(UBlueprint* BP, const FDasDeclaredClass& C, const TMap<FString, FGuid>& PriorGuids,
+                          FString& Error)
+{
+    for (const auto& M : C.Methods)
+    {
+        auto* G = FBlueprintEditorUtils::CreateNewGraph(BP, *M.Name, UEdGraph::StaticClass(),
+                                                        UEdGraphSchema_K2::StaticClass());
+        FBlueprintEditorUtils::AddFunctionGraph<UClass>(BP, G, false, nullptr);
+        TArray<UK2Node_FunctionEntry*> Entries;
+        TArray<UK2Node_FunctionResult*> Results;
+        G->GetNodesOfClass(Entries);
+        G->GetNodesOfClass(Results);
+        if (Entries.Num() != 1)
+        {
+            Error = TEXT("Interface entry missing");
+            return false;
+        }
+        auto* Entry = Entries[0];
+        Entry->AddExtraFlags(FUNC_BlueprintCallable | FUNC_BlueprintEvent | FUNC_Event | FUNC_Public);
+        if (M.bPure)
+            Entry->AddExtraFlags(FUNC_BlueprintPure);
+        if (M.bConst)
+            Entry->AddExtraFlags(FUNC_Const);
+        Entry->MetaData.SetMetaData(TEXT("DasFunctionConst"), FString(M.bConst ? TEXT("true"): TEXT("false")));
+        Entry->MetaData.SetMetaData(TEXT("DasFunctionKind"), FString(TEXT("Event")));
+        Entry->MetaData.SetMetaData(TEXT("DasFunctionPure"), FString(M.bPure ? TEXT("true"): TEXT("false")));
+        for (const auto& Pair : M.Metadata)
+            Entry->MetaData.SetMetaData(*Pair.Key, FString(Pair.Value));
+        UK2Node_FunctionResult* Result = Results.Num() ? Results[0] : nullptr;
+        if (!Result)
+        {
+            FGraphNodeCreator<UK2Node_FunctionResult> Creator(*G);
+            Result = Creator.CreateNode();
+            Creator.Finalize();
+        }
+        G->GetSchema()->TryCreateConnection(Entry->FindPinChecked(UEdGraphSchema_K2::PN_Then),
+                                            Result->FindPinChecked(UEdGraphSchema_K2::PN_Execute));
+        for (const auto& P : M.Parameters)
+        {
+            auto Pin = AuthoredInterfacePin(P.Type);
+            if (P.Direction == TEXT("out"))
+                Result->CreateUserDefinedPin(*P.Name, Pin, EGPD_Input);
+            else
+            {
+                Pin.bIsReference = P.Direction == TEXT("inout");
+                Pin.bIsConst = P.Direction == TEXT("in") && P.Type.Kind == TEXT("array");
+                Entry->CreateUserDefinedPin(*P.Name, Pin, EGPD_Output);
+            }
+        }
+        if (M.ReturnType.Kind != TEXT("void"))
+            Result->CreateUserDefinedPin(UEdGraphSchema_K2::PN_ReturnValue, AuthoredInterfacePin(M.ReturnType),
+                                         EGPD_Input);
+        BP->GetOutermost()->GetMetaData().SetValue(G, TEXT("DasMemberId"), *M.Id);
+        if (const auto* Guid = PriorGuids.Find(M.Id))
+            G->GraphGuid = *Guid;
+    }
+    return true;
+}
+
 }
 class FDasAuthoredInterfaceCompiler : public FKismetCompilerContext
 {
@@ -108,6 +177,8 @@ bool FDasInterfaceService::Apply(const FString& Script, const FString& Folder, T
         const FDasDeclaredClass* Definition;
         FString Package;
         UBlueprint* Existing;
+        FDasDeclaredClass Before;
+        bool Structural = false;
     };
     TArray<FTarget> Targets;
     for (const auto& C : Model.Classes)
@@ -123,30 +194,32 @@ bool FDasInterfaceService::Apply(const FString& Script, const FString& Folder, T
             Error = TEXT("Authored interface package conflict");
             return false;
         }
+        FDasDeclaredClass Before;
+        bool Structural = false;
         if (BP)
         {
             auto* Class = Cast<UDasAuthoredInterfaceClass>(BP->GeneratedClass);
-            if (BP->BlueprintType != BPTYPE_Interface || !Class || Class->StableId != C.Id)
+            if (BP->BlueprintType != BPTYPE_Interface || !Class || !BP->IsA<UDasAuthoredInterfaceBlueprint>() ||
+                Class->StableId != C.Id)
             {
-                Error = TEXT("Changed interface definition requires a later structural policy");
+                Error = TEXT("Existing interface identity/type does not match the source declaration");
                 return false;
             }
-            if (Class->ContractJson != Wire)
+            FDasAuthoringModule Previous;
+            if (!FDasAuthoringModule::FromJson(Class->ContractJson, Previous, Error) || Previous.Id != Model.Id)
             {
-                FDasAuthoringModule Previous;
-                if (!FDasAuthoringModule::FromJson(Class->ContractJson, Previous, Error) || Previous.Id != Model.Id)
-                {
-                    Error = TEXT("Interface stored contract identity is invalid");
-                    return false;
-                }
-                const auto* Old = Previous.Classes.FindByPredicate([&](const auto& Item) { return Item.Id == C.Id; });
-                if (!Old || FDasAuthoringModule::Compare(*Old, C).bStructural)
-                {
-                    Error = TEXT("Changed interface definition requires a later structural policy");
-                    return false;
-                }
+                Error = TEXT("Interface stored contract identity is invalid");
+                return false;
             }
-            for (const auto& M : C.Methods)
+            const auto* Old = Previous.Classes.FindByPredicate([&](const auto& Item) { return Item.Id == C.Id; });
+            if (!Old)
+            {
+                Error = TEXT("Interface stored declaration is missing");
+                return false;
+            }
+            Before = *Old;
+            Structural = FDasAuthoringModule::Compare(Before, C).bStructural;
+            for (const auto& M : Before.Methods)
             {
                 UEdGraph* Graph = nullptr;
                 for (UEdGraph* Candidate : BP->FunctionGraphs)
@@ -162,10 +235,29 @@ bool FDasInterfaceService::Apply(const FString& Script, const FString& Folder, T
                 }
             }
         }
-        Targets.Add({&C, Package, BP});
+        Targets.Add({&C, Package, BP, MoveTemp(Before), Structural});
+    }
+    TArray<FDasInterfaceChange> Changes;
+    for (const auto& Target : Targets)
+        if (Target.Structural)
+            Changes.Add({Target.Existing, Target.Before, *Target.Definition});
+    TArray<UBlueprint*> Scope;
+    TArray<TStrongObjectPtr<UObject>> Assets;
+    TUniquePtr<FDasBlueprintRollback> Snapshot;
+    if (!Changes.IsEmpty())
+    {
+        if (!PrepareDasInterfaceMigration(Changes, Scope, Assets, Error))
+            return false;
+        for (const auto& Target : Targets)
+            if (Target.Existing)
+                Scope.AddUnique(Target.Existing);
+        Snapshot = MakeUnique<FDasBlueprintRollback>();
+        FDasClassSchema NoFields;
+        if (!Snapshot->Prepare(Changes[0].Blueprint, NoFields, Scope, Assets, Error))
+            return false;
     }
     TArray<UBlueprint*> Created;
-    auto Fail = [&](const TCHAR* Why)
+    auto Fail = [&](FString Why)
     {
         for (auto* BP : Created)
         {
@@ -176,7 +268,15 @@ bool FDasInterfaceService::Apply(const FString& Script, const FString& Folder, T
             BP->Rename(*RejectedName.ToString(), GetTransientPackage(), REN_DontCreateRedirectors | REN_DoNotDirty);
         }
         Out.Reset();
-        Error = Why;
+        if (Snapshot)
+        {
+            FString RestoreError;
+            if (!Snapshot->Restore(RestoreError))
+                Why += TEXT("; rollback failed: ") + RestoreError;
+            else
+                UE_LOG(LogTemp, Display, TEXT("DAS_INTERFACE_ROLLBACK=PASS"));
+        }
+        Error = MoveTemp(Why);
         return false;
     };
     for (const auto& Target : Targets)
@@ -185,9 +285,37 @@ bool FDasInterfaceService::Apply(const FString& Script, const FString& Folder, T
         {
             auto* Existing = CastChecked<UDasAuthoredInterfaceBlueprint>(Target.Existing);
             auto* Class = CastChecked<UDasAuthoredInterfaceClass>(Existing->GeneratedClass);
-            if (Class->ContractJson != Wire || Existing->StableId != Target.Definition->Id)
+            if (Target.Structural)
+            {
+                TMap<FString, FGuid> PriorGuids;
+                for (UEdGraph* Graph : Existing->FunctionGraphs)
+                    PriorGuids.Add(Existing->GetOutermost()->GetMetaData().GetValue(Graph, TEXT("DasMemberId")),
+                                                                                    Graph->GraphGuid);
+                const auto PriorGraphs = Existing->FunctionGraphs;
+                Existing->FunctionGraphs.Reset();
+                for (UEdGraph* Graph : PriorGraphs)
+                {
+                    const auto Detached = MakeUniqueObjectName(GetTransientPackage(), Graph->GetClass(),
+                                                               TEXT("PreviousInterfaceSignature"));
+                    Graph->Rename(*Detached.ToString(), GetTransientPackage(),
+                                  REN_DontCreateRedirectors | REN_DoNotDirty);
+                    Graph->SetFlags(RF_Transient);
+                }
+                if (!BuildInterfaceGraphs(Existing, *Target.Definition, PriorGuids, Error))
+                    return Fail(Error);
+                FBlueprintEditorUtils::MarkBlueprintAsStructurallyModified(Existing);
+                FKismetEditorUtilities::CompileBlueprint(Existing);
+                FBlueprintCompilationManager::FlushCompilationQueueAndReinstance();
+                if (Existing->Status == BS_Error || !Existing->GeneratedClass)
+                    return Fail(TEXT("Changed interface compilation failed"));
+                Class = Cast<UDasAuthoredInterfaceClass>(Existing->GeneratedClass);
+                if (!Class || !Class->HasAnyClassFlags(CLASS_Interface))
+                    return Fail(TEXT("Changed interface generated class mismatch"));
+            }
+            if (Target.Structural || Class->ContractJson != Wire || Existing->StableId != Target.Definition->Id)
             {
                 ApplyInterfaceMethodMetadata(Existing, *Target.Definition);
+                Class->StableId = Target.Definition->Id;
                 Class->ContractJson = Wire;
                 Existing->StableId = Target.Definition->Id;
                 Existing->GetOutermost()->GetMetaData().SetValue(Existing, TEXT("DasInterfaceSource"), *Script);
@@ -203,54 +331,8 @@ bool FDasInterfaceService::Apply(const FString& Script, const FString& Folder, T
         if (!BP)
             return Fail(TEXT("Authored interface creation failed"));
         Created.Add(BP);
-        for (const auto& M : C.Methods)
-        {
-            auto* G = FBlueprintEditorUtils::CreateNewGraph(BP, *M.Name, UEdGraph::StaticClass(),
-                                                            UEdGraphSchema_K2::StaticClass());
-            FBlueprintEditorUtils::AddFunctionGraph<UClass>(BP, G, false, nullptr);
-            TArray<UK2Node_FunctionEntry*> Entries;
-            TArray<UK2Node_FunctionResult*> Results;
-            G->GetNodesOfClass(Entries);
-            G->GetNodesOfClass(Results);
-            if (Entries.Num() != 1)
-                return Fail(TEXT("Interface entry missing"));
-            auto* Entry = Entries[0];
-            Entry->AddExtraFlags(FUNC_BlueprintCallable | FUNC_BlueprintEvent | FUNC_Event | FUNC_Public);
-            if (M.bPure)
-                Entry->AddExtraFlags(FUNC_BlueprintPure);
-            if (M.bConst)
-                Entry->AddExtraFlags(FUNC_Const);
-            Entry->MetaData.SetMetaData(TEXT("DasFunctionConst"), FString(M.bConst ? TEXT("true"): TEXT("false")));
-            Entry->MetaData.SetMetaData(TEXT("DasFunctionKind"), FString(TEXT("Event")));
-            Entry->MetaData.SetMetaData(TEXT("DasFunctionPure"), FString(M.bPure ? TEXT("true"): TEXT("false")));
-            for (const auto& Pair : M.Metadata)
-                Entry->MetaData.SetMetaData(*Pair.Key, FString(Pair.Value));
-            UK2Node_FunctionResult* Result = Results.Num() ? Results[0] : nullptr;
-            if (!Result)
-            {
-                FGraphNodeCreator<UK2Node_FunctionResult> Creator(*G);
-                Result = Creator.CreateNode();
-                Creator.Finalize();
-            }
-            G->GetSchema()->TryCreateConnection(Entry->FindPinChecked(UEdGraphSchema_K2::PN_Then),
-                                                Result->FindPinChecked(UEdGraphSchema_K2::PN_Execute));
-            for (const auto& P : M.Parameters)
-            {
-                auto Pin = AuthoredInterfacePin(P.Type);
-                if (P.Direction == TEXT("out"))
-                    Result->CreateUserDefinedPin(*P.Name, Pin, EGPD_Input);
-                else
-                {
-                    Pin.bIsReference = P.Direction == TEXT("inout");
-                    Pin.bIsConst = P.Direction == TEXT("in") && P.Type.Kind == TEXT("array");
-                    Entry->CreateUserDefinedPin(*P.Name, Pin, EGPD_Output);
-                }
-            }
-            if (M.ReturnType.Kind != TEXT("void"))
-                Result->CreateUserDefinedPin(UEdGraphSchema_K2::PN_ReturnValue, AuthoredInterfacePin(M.ReturnType),
-                                             EGPD_Input);
-            BP->GetOutermost()->GetMetaData().SetValue(G, TEXT("DasMemberId"), *M.Id);
-        }
+        if (!BuildInterfaceGraphs(BP, C, {}, Error))
+            return Fail(Error);
         FKismetEditorUtilities::CompileBlueprint(BP);
         if (BP->Status == BS_Error)
             return Fail(TEXT("Authored interface compilation failed"));
@@ -266,6 +348,19 @@ bool FDasInterfaceService::Apply(const FString& Script, const FString& Folder, T
         Meta.SetValue(BP, TEXT("DasInterfaceSource"), *Script);
         BP->MarkPackageDirty();
         Out.Add(BP);
+    }
+    if (Snapshot)
+    {
+        if (!RefreshDasInterfaceConsumers(Changes, Scope, Error))
+            return Fail(Error);
+#if WITH_DEV_AUTOMATION_TESTS
+        if (InterfaceMigrationFailAfterMutation.GetValueOnGameThread())
+            return Fail(TEXT("Injected interface migration failure"));
+#endif
+        if (!Snapshot->Finish(Error))
+            return Fail(Error);
+        UE_LOG(LogTemp, Display,
+               TEXT("DAS_INTERFACE_MIGRATION=PASS interfaces=%d blueprints=%d"), Changes.Num(), Scope.Num());
     }
     for (auto* BP : Created)
         FAssetRegistryModule::AssetCreated(BP);

@@ -18,12 +18,16 @@ class TimerArgumentActor {
         ue_timer_start("message",0.5,"SetMessage",false,"Timer 世界")
         ue_timer_start("position",0.5,"SetPosition",false,ue_vector(1.0lf,2.0lf,3.0lf))
     }
+
     [ue_function(BlueprintCallable)]
     def AddScore(amount:int):void { self.Score += amount }
+
     [ue_function(BlueprintCallable)]
     def SetEnabled(value:bool):void { self.Enabled = value }
+
     [ue_function(BlueprintCallable)]
     def SetMessage(value:string):void { self.Message = value }
+
     [ue_function(BlueprintCallable)]
     def SetPosition(value:UEVector):void { self.Position = value }
 }

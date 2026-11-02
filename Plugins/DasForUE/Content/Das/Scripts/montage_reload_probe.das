@@ -1,8 +1,10 @@
 options gen2
 require ue_animation
 var @ue_state events:int = 0
+
 [ue_class(module_id="montagereload",Blueprintable)]
 class MontageReloadCallbacks : Actor {
+
     [ue_function(BlueprintCallable)]
     def Received(event:MontageEvent):void { events = (events+1) }
 }

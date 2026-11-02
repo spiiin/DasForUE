@@ -11,6 +11,7 @@ class GroupCounter {
     status = ue_properties(BlueprintReadOnly) {
         var Ready:bool=false
     }
+
     [ue_function(BlueprintCallable)]
     def Evaluate(input:int):int { return self.Score+input }
 }

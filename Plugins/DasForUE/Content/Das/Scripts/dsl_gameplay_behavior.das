@@ -13,6 +13,7 @@ class GameplayBehavior : ActorComponent {
         ue_timer_start("score",1.0,"Pulse",true,1)
     }
     def Tick(delta:float):void { self.Seconds += delta }
+
     [ue_function(BlueprintCallable)]
     def Pulse(amount:int):void {
         let owner = ue_owner(type<GameplayActorRef>)
@@ -24,8 +25,10 @@ class GameplayBehavior : ActorComponent {
         let owner = ue_owner(type<GameplayActorRef>)
         owner.Score += value
     }
+
     [ue_function(BlueprintCallable)]
     def StopScore():bool { return ue_timer_cancel("score") }
+
     [ue_function(BlueprintCallable)]
     def StartScore():void { ue_timer_start("score",1.0,"Pulse",true,1) }
 }

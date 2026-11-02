@@ -51,6 +51,7 @@ class SelfContainerActor {
         clear(self.Labels)
         return total
     }
+
     [ue_function(BlueprintCallable)]
     def Tables(key:string; id:int):bool {
         insert(self.Weights, key, 1.5lf)
@@ -65,6 +66,7 @@ class SelfContainerActor {
         clear(self.Counts)
         return removed
     }
+
     [ue_function(BlueprintCallable)]
     def Fallback():int {
         push(self.Points, ue_vector(1.0lf, 2.0lf, 3.0lf))

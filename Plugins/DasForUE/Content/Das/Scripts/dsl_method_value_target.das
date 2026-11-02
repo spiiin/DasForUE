@@ -5,6 +5,7 @@ require ue_method_values
 require ue_object_types
 require METHOD_REFS_MODULE
 def multi_counted_index(var counter:int&):int { counter += 1; return 0 }
+
 [ue_class(module_id="methodvalues", type_registry="REGISTRY", Blueprintable),
  ue_implements(interface="/Script/DasRuntime.DasEventInterface")]
 class ValueTarget {
@@ -30,6 +31,7 @@ class ValueTarget {
     LockedState:MethodState=MethodState.Idle
     @ue_property=(EditAnywhere, BlueprintReadOnly)
     LockedSettings:MethodSettings=MethodSettings()
+
     [ue_function(BlueprintCallable)]
     def ChangeNestedMathFields():int {
         self.Settings.Point.Position.x += 4.0lf
@@ -37,21 +39,25 @@ class ValueTarget {
         self.Settings.Orientation.yaw *= 2.0lf
         return (self.Settings.Point.Position.x==5.0lf && self.Settings.Point.Position.y==8.0lf && self.Settings.Orientation.yaw==40.0lf && self.Settings.Total==3 && self.Settings.Point.Count==2 && ue_transform_scale(self.Settings.Pose).x==1.0lf) ? 1 : 0
     }
+
     [ue_function(BlueprintCallable)]
     def ReadNestedMathFields():int {
         return (self.Settings.Point.Position.x==5.0lf && self.Settings.Point.Position.y==8.0lf && self.Settings.Orientation.yaw==40.0lf && self.Settings.Total==3 && self.Settings.Point.Count==2 && ue_transform_scale(self.Settings.Pose).x==1.0lf && self.LockedSettings.Point.Position.x==1.0lf) ? 1 : 0
     }
+
     [ue_function(BlueprintCallable)]
     def SetSelfEnum(value:MethodState):int {
         self.Settings.Point.Mode=value
         return (self.Settings.Point.Mode==value && self.Settings.Point.Count==2 && self.Settings.Point.Position.x==5.0lf) ? 1 : 0
     }
+
     [ue_function(BlueprintCallable)]
     def SetSelfReferences(owner:ActorRef; events:DasEventInterface):int {
         self.Settings.Point.Owner=owner
         self.Settings.Point.Events=events
         return (ue_object_is_a(self.Settings.Point.Owner.handle,"Actor")==ue_object_is_a(owner.handle,"Actor") && DasEventInterface_valid(self.Settings.Point.Events)==DasEventInterface_valid(events) && self.Settings.Point.Count==2 && self.Settings.Point.Position.x==5.0lf) ? 1 : 0
     }
+
     [ue_function(BlueprintCallable)]
     def ReplaceSelfValues(point:MethodPoint; settings:MethodSettings; vector:UEVector; rotation:UERotator; transform:UETransform):int {
         self.Settings.Point=point
@@ -61,6 +67,7 @@ class ValueTarget {
         self.Envelope.Payload := settings
         return (self.Settings.Point.Count==point.Count && self.Settings.Point.Mode==point.Mode && self.Settings.Point.Position.x==vector.x && self.Settings.Orientation.yaw==rotation.yaw && ue_transform_scale(self.Settings.Pose).x==ue_transform_scale(transform).x && self.Settings.Total==3 && self.Envelope.Sentinel==91 && length(self.Envelope.Payload.Items)==length(settings.Items)) ? 1 : 0
     }
+
     [ue_function(BlueprintCallable)]
     def ReplaceSelfContainers(items:array<MethodPoint>; weights:table<string;double>; tags:table<string>):int {
         self.Settings.Items := items
@@ -68,6 +75,7 @@ class ValueTarget {
         self.Settings.Tags := tags
         return (length(self.Settings.Items)==length(items) && length(self.Settings.Weights)==length(weights) && length(self.Settings.Tags)==length(tags) && self.Settings.Point.Count==2 && self.Settings.Total==3) ? 1 : 0
     }
+
     [ue_function(BlueprintCallable)]
     def ReplaceLocalSamples():int {
         var values:array<double>
@@ -81,8 +89,10 @@ class ValueTarget {
         try { self.Settings.Samples := huge } recover { rejected=true }
         return (rejected && length(self.Settings.Samples)==2 && self.Settings.Samples[0]==1.5lf && self.Settings.Samples[1]==2.5lf && self.Settings.Total==3) ? 1 : 0
     }
+
     [ue_function(BlueprintCallable)]
     def SetSelfPeer(value:ValueTargetRef):void { self.Partner=value }
+
     [ue_function(BlueprintCallable)]
     def MutateSelfContainers():int {
         insert(self.Settings.Tags,"operation")
@@ -111,6 +121,7 @@ class ValueTarget {
     Groups:array<MethodGroup>
     @ue_property=(EditAnywhere, BlueprintReadOnly)
     LockedGroups:array<MethodGroup>
+
     [ue_function(BlueprintCallable)]
     def MultiIndexContainers():int {
         push_clone(self.Groups,MethodGroup())
@@ -151,28 +162,35 @@ class ValueTarget {
     DirectTransforms:array<UETransform>
     @ue_property=(EditAnywhere, BlueprintReadOnly)
     LockedVectors:array<UEVector>
+
     [ue_function(BlueprintCallable)]
     def CopyVectors(values:array<UEVector>):array<UEVector> { return <- clone(values) }
+
     [ue_function(BlueprintCallable)]
     def CopyRotators(values:array<UERotator>):array<UERotator> { return <- clone(values) }
+
     [ue_function(BlueprintCallable)]
     def CopyTransforms(values:array<UETransform>):array<UETransform> { return <- clone(values) }
+
     [ue_function(BlueprintCallable)]
     def RefVectors(var values:array<UEVector>&; @ue_out var previous:array<UEVector>&):void {
         previous <- clone(values)
         values[0].x += 3.0lf
         push(values,ue_vector(7.0lf,8.0lf,9.0lf))
     }
+
     [ue_function(BlueprintCallable)]
     def RefRotators(var values:array<UERotator>&; @ue_out var previous:array<UERotator>&):void {
         previous <- clone(values)
         values[0].yaw += 10.0lf
     }
+
     [ue_function(BlueprintCallable)]
     def RefTransforms(var values:array<UETransform>&; @ue_out var previous:array<UETransform>&):void {
         previous <- clone(values)
         values[0]=ue_transform(ue_vector(8.0lf,9.0lf,10.0lf),ue_rotator(0.0lf,0.0lf,0.0lf),ue_vector(2.0lf,2.0lf,2.0lf))
     }
+
     [ue_function(BlueprintCallable)]
     def MathArrays():int {
         push(self.DirectVectors,ue_vector(1.0lf,2.0lf,3.0lf))
@@ -192,19 +210,23 @@ class ValueTarget {
     DirectStates:array<MethodState>
     @ue_property=(EditAnywhere, BlueprintReadOnly)
     LockedStates:array<MethodState>
+
     [ue_function(BlueprintCallable)]
     def CopyStates(values:array<MethodState>):array<MethodState> { return <- clone(values) }
+
     [ue_function(BlueprintCallable)]
     def RefStates(var values:array<MethodState>&; @ue_out var previous:array<MethodState>&):void {
         previous <- clone(values)
         values[0]=MethodState.Idle
         push(values,MethodState.Active)
     }
+
     [ue_function(BlueprintCallable)]
     def FailStates(var values:array<MethodState>&):void {
         values[0]=MethodState.Idle
         panic("enum array failure")
     }
+
     [ue_function(BlueprintCallable)]
     def EnumArrays():int {
         push(self.DirectStates,MethodState.Active)
@@ -225,26 +247,32 @@ class ValueTarget {
     DirectEventRefs:array<DasEventInterface>
     @ue_property=(EditAnywhere, BlueprintReadOnly)
     LockedActors:array<ActorRef>
+
     [ue_function(BlueprintCallable)]
     def CopyActors(values:array<ActorRef>):array<ActorRef> { return <- clone(values) }
+
     [ue_function(BlueprintCallable)]
     def CopyEventRefs(values:array<DasEventInterface>):array<DasEventInterface> { return <- clone(values) }
+
     [ue_function(BlueprintCallable)]
     def RefActors(var values:array<ActorRef>&; @ue_out var previous:array<ActorRef>&):void {
         previous <- clone(values)
         values[0]=default<ActorRef>
         push(values,default<ActorRef>)
     }
+
     [ue_function(BlueprintCallable)]
     def RefEventRefs(var values:array<DasEventInterface>&; @ue_out var previous:array<DasEventInterface>&):void {
         previous <- clone(values)
         values[0]=default<DasEventInterface>
     }
+
     [ue_function(BlueprintCallable)]
     def FailActors(var values:array<ActorRef>&):void {
         values[0]=default<ActorRef>
         panic("reference array failure")
     }
+
     [ue_function(BlueprintCallable)]
     def ReferenceArrays(actor:ActorRef; events:DasEventInterface):int {
         push(self.DirectActors,actor)
@@ -261,10 +289,12 @@ class ValueTarget {
     DirectPartners:array<ValueTargetRef>
     @ue_property=(EditAnywhere, BlueprintReadOnly)
     LockedPartners:array<ValueTargetRef>
+
     [ue_function(BlueprintCallable)]
     def CopyPartners(values:array<ValueTargetRef>):array<ValueTargetRef> { return <- clone(values) }
     @ue_property=(EditAnywhere, BlueprintReadWrite)
     AlternativePartners:array<AlternativeTargetRef>
+
     [ue_function(BlueprintCallable)]
     def RefPartners(var values:array<ValueTargetRef>&; @ue_out var previous:array<ValueTargetRef>&; fail:bool):void {
         previous <- clone(values)
@@ -272,6 +302,7 @@ class ValueTarget {
         if (fail) { panic("authored reference array failure") }
         push(values,default<ValueTargetRef>)
     }
+
     [ue_function(BlueprintCallable)]
     def AuthoredReferenceArrays(value:ValueTargetRef):int {
         push(self.DirectPartners,value)
@@ -279,6 +310,7 @@ class ValueTarget {
         self.DirectPartners[1l]=value
         return (ue_object_valid(self.DirectPartners[0].handle) && ue_object_valid(self.DirectPartners[1].handle)) ? 1 : 0
     }
+
     [ue_function(BlueprintCallable)]
     def DirectContainers():int {
         if (length(self.DirectSamples)!=0 || length(self.DirectPoints)!=0 || length(self.DirectWeights)!=0 || length(self.DirectTags)!=0) { return 0 }
@@ -293,6 +325,7 @@ class ValueTarget {
         try { self.DirectSamples[99]=1.0lf } recover { invalid=true }
         return (invalid && self.DirectSamples[0]==5.0lf && self.DirectPoints[0].Count==31 && self.DirectWeights["direct"]==7.0lf && key_exists(self.DirectTags,"direct") && length(self.LockedDirect)==0) ? 1 : 0
     }
+
     [ue_function(BlueprintCallable)]
     def IndexedContainers():int {
         push(self.Settings.Samples,2.0lf)
@@ -317,6 +350,7 @@ class ValueTarget {
         pop(self.Settings.Samples)
         return (length(self.Settings.Samples)==1 && self.Settings.Samples[0]==5.0lf && self.Settings.Total==3) ? 1 : 0
     }
+
     [ue_function(BlueprintCallable)]
     def FailNestedMath():void {
         self.Settings.Point.Position.x *= 1.0e308lf
@@ -327,10 +361,12 @@ class ValueTarget {
     Pose:UETransform=ue_transform_identity()
     @ue_property=(EditAnywhere, BlueprintReadOnly)
     LockedPosition:UEVector
+
     [ue_function(BlueprintCallable)]
     def ReadMathFields():int {
         return (self.Position.x==1.0lf && self.Position.y==2.0lf && self.Orientation.yaw==20.0lf && ue_transform_scale(self.Pose).x==1.0lf && self.LockedPosition.x==0.0lf) ? 1 : 0
     }
+
     [ue_function(BlueprintCallable)]
     def ChangeMathFields():UEVector {
         self.Position.x += 4.0lf
@@ -342,17 +378,22 @@ class ValueTarget {
 
     [ue_function(BlueprintCallable)]
     def Notify(Amount:int):void {}
+
     [ue_function(BlueprintCallable)]
     def ResetCounter():void {}
+
     [ue_function(BlueprintCallable)]
     def EchoState(value:MethodState):MethodState { return value }
+
     [ue_function(BlueprintCallable)]
     def EchoSettings(value:MethodSettings):MethodSettings { return <- clone(value) }
+
     [ue_function(BlueprintCallable)]
     def ChangeState(var value:MethodState&; @ue_out var previous:MethodState&):void {
         previous=value
         value=MethodState.Idle
     }
+
     [ue_function(BlueprintCallable)]
     def ChangeSettings(var value:MethodSettings&; @ue_out var previous:MethodSettings&):void {
         previous <- clone(value)
@@ -368,80 +409,103 @@ class ValueTarget {
         value.Weights["a"] += 1.0lf
         insert(value.Tags,"blue")
     }
+
     [ue_function(BlueprintCallable)]
     def FailSettings(var value:MethodSettings&):void { value.Total=999; panic("natural method failure") }
+
     [ue_function(BlueprintCallable)]
     def CopyInts(values:array<int>):array<int> { return <- clone(values) }
+
     [ue_function(BlueprintCallable)]
     def ChangeInts(var values:array<int>&; @ue_out var previous:array<int>&):void {
         previous <- clone(values)
         push(values,9)
     }
+
     [ue_function(BlueprintCallable)]
     def ChangeMap(var values:table<string; double>&; @ue_out var previous:table<string; double>&):void {
         previous <- clone(values)
         values["a"] += 1.0lf
         values["b"] = 4.5lf
     }
+
     [ue_function(BlueprintCallable)]
     def CopyMap(values:table<string; double>):table<string; double> { return <- clone(values) }
+
     [ue_function(BlueprintCallable)]
     def ChangeSet(var values:table<string>&; @ue_out var previous:table<string>&):void {
         previous <- clone(values)
         erase(values,"red")
         insert(values,"blue")
     }
+
     [ue_function(BlueprintCallable)]
     def CopySet(values:table<string>):table<string> { return <- clone(values) }
+
     [ue_function(BlueprintCallable)]
     def CopyPoints(values:array<MethodPoint>):array<MethodPoint> { return <- clone(values) }
+
     [ue_function(BlueprintCallable)]
     def ChangePoints(var values:array<MethodPoint>&; @ue_out var previous:array<MethodPoint>&):void {
         previous <- clone(values)
         if (length(values)>0) { values[0].Count += 2 }
         push_clone(values,MethodPoint())
     }
+
     [ue_function(BlueprintCallable)]
     def FailInts(var values:array<int>&):void { push(values,999); panic("container method failure") }
+
     [ue_function(BlueprintCallable)]
     def EchoActor(value:ActorRef):ActorRef { return value }
+
     [ue_function(BlueprintCallable)]
     def RefActor(var value:ActorRef&; @ue_out var previous:ActorRef&):void {
         previous=value
         value=default<ActorRef>
     }
+
     [ue_function(BlueprintCallable)]
     def EchoEvents(value:DasEventInterface):DasEventInterface { return value }
+
     [ue_function(BlueprintCallable)]
     def RefEvents(var value:DasEventInterface&; @ue_out var previous:DasEventInterface&):void {
         previous=value
         value=default<DasEventInterface>
     }
+
     [ue_function(BlueprintCallable)]
     def EchoVector(value:UEVector):UEVector { return value }
+
     [ue_function(BlueprintCallable)]
     def EchoRotator(value:UERotator):UERotator { return value }
+
     [ue_function(BlueprintCallable)]
     def EchoTransform(value:UETransform):UETransform { return value }
+
     [ue_function(BlueprintCallable)]
     def RefVector(var value:UEVector&; @ue_out var previous:UEVector&):void {
         previous=value
         value=ue_vector(5.0lf,6.0lf,7.0lf)
     }
+
     [ue_function(BlueprintCallable)]
     def RefRotator(var value:UERotator&; @ue_out var previous:UERotator&):void {
         previous=value
         value=ue_rotator(10.0lf,20.0lf,30.0lf)
     }
+
     [ue_function(BlueprintCallable)]
     def RefTransform(var value:UETransform&; @ue_out var previous:UETransform&):void {
         previous=value
         value=ue_transform_identity()
     }
+
     [ue_function(BlueprintCallable)]
     def FailVector(var value:UEVector&):void { value=ue_vector(99.0lf,0.0lf,0.0lf); panic("math method failure") }
+
     [ue_function(BlueprintCallable)]
     def EchoAuthored(value:ValueTargetRef):ValueTargetRef { return value }
+
     [ue_function(BlueprintCallable)]
     def RefAuthored(var value:ValueTargetRef&; @ue_out var previous:ValueTargetRef&):void {
         previous=value

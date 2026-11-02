@@ -1,6 +1,7 @@
 options gen2
 module ue_initialize_component_base public
 require ue_dsl public
+
 [ue_class(module_id="initcomponents",Blueprintable)]
 class InitComponentBase : ActorComponent {
     @ue_property=(EditAnywhere,BlueprintReadWrite)

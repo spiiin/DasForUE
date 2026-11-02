@@ -1,6 +1,7 @@
 options gen2
 require ue_dsl
 var remembered = ""
+
 [ue_class(module_id="text",Blueprintable)]
 class TextCounter {
     @ue_property=(EditAnywhere,BlueprintReadWrite)
@@ -16,15 +17,19 @@ class TextCounter {
         remembered = value
         return self.DSLText
     }
+
     [ue_function(BlueprintCallable)]
     def Recall():string { return remembered }
+
     [ue_function(BlueprintCallable)]
     def Precise(value:double; delta:double):double {
         self.DSLPrecise = value + delta
         return self.DSLPrecise
     }
+
     [ue_function(BlueprintCallable)]
     def Rename(value:UENameValue):UENameValue { self.DSLKey = value; return self.DSLKey }
+
     [ue_function(BlueprintCallable)]
     def NamesEqual(a:UENameValue; b:UENameValue):bool { return ue_names_equal(a,b) }
 }

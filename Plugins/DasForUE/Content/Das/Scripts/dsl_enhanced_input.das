@@ -25,14 +25,19 @@ class EnhancedInputActor {
         ue_enhanced_bind(self.ThrottleAction,"Triggered","OnThrottle")
         ue_enhanced_bind(self.MoveAction,"Triggered","OnMove")
     }
+
     [ue_function(BlueprintCallable)]
     def OnJump(value:bool):void { self.JumpHeld = value }
+
     [ue_function(BlueprintCallable)]
     def OnThrottle(value:float):void { self.Throttle = value }
+
     [ue_function(BlueprintCallable)]
     def OnMove(value:UEVector):void { self.MoveValue = value }
+
     [ue_function(BlueprintCallable)]
     def Ready():bool { return ue_enhanced_is_available() }
+
     [ue_function(BlueprintCallable)]
     def UnbindControls():int { return ue_input_unbind_all() }
 }

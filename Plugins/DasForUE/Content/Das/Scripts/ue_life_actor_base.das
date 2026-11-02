@@ -36,6 +36,7 @@ class BaseLifeActor : ProbeActor {
     def Tick(delta:float):void { self.BaseTicks+=1 }
     [ue_lifecycle]
     def EndPlay(reason:int):void { self.BaseEnds+=1 }
+
     [ue_function(BlueprintCallable)]
     def Status():int { return self.BaseBegins+self.BaseEnds }
 }

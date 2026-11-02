@@ -252,3 +252,18 @@ See also: [Classes](Classes.md) · [Defaults](Defaults.md) · [Inheritance](Inhe
 [Lifecycle](Lifecycle.md) · [Authored references](AuthoredReferences.md) ·
 [Spawn and queries](../Gameplay/SpawnAndQueries.md) ·
 [World/Actor/Component API](../../Api/WorldActorComponents.md)
+
+## Updating scene rotation
+
+Use `ue_scene_set_relative_rotation(scene, rotation, teleport=false)` from
+`ue_scene_components` to update a real scene component transform. It preserves
+relative translation and scale. For a native component field, convert its handle
+with `ue_ref(type<SceneComponentRef>, self.Mesh.handle)`.
+
+Direct writes to reflected transform fields do not necessarily invoke the engine
+scene update. Use scene operations when the change must affect the world transform.
+
+
+## Projectile movement
+
+`ue_projectile_components` declares native `ProjectileMovementComponentRef`, `NiagaraComponentRef` and `AudioComponentRef` for SCS fields. `ue_projectile_movement_launch(movement, updated:SceneComponentRef, localVelocity:UEVector, gravityScale:float)` assigns the swept component, InitialSpeed, gravity and local-space velocity, updates component velocity and activates movement. Call after component registration (normally BeginPlay). Both components must belong to the same live Actor in the script owner's game world; non-finite values and mutation during construction/bind_events/EndPlay are refused. Values and gameplay timing are chosen by the script.

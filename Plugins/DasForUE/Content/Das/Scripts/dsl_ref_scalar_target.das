@@ -1,5 +1,6 @@
 options gen2
 require ue_dsl
+
 [ue_class(module_id="refscalar", Blueprintable)]
 class ScalarTarget {
  @ue_property=(EditAnywhere, BlueprintReadWrite)

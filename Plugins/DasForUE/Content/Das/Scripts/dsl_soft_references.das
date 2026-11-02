@@ -3,6 +3,7 @@ require ue_dsl
 require ue_soft_references
 require ue_soft_record
 require native_soft_probe
+
 [ue_class(Blueprintable,type_folder="/Game/DasSoftReferences/Types")]
 class SoftReferenceActor : Actor {
     properties=ue_properties(EditAnywhere,BlueprintReadWrite) {
@@ -22,24 +23,32 @@ class SoftReferenceActor : Actor {
         var Errors:int=0
         var Rejected:int=0
     }
+
     [ue_function(BlueprintCallable)]
     def Echo(value:SoftObject):SoftObject { return value }
+
     [ue_function(BlueprintCallable)]
     def EchoClass(value:SoftActorClass):SoftActorClass { return value }
+
     [ue_function(BlueprintCallable)]
     def Change(var value:SoftObject&; @ue_out var previous:SoftObject&):SoftObject {
         previous=value;value=default<SoftObject>;return previous
     }
+
     [ue_function(BlueprintCallable)]
     def EchoAssets(value:array<SoftObject>):array<SoftObject> { return <- clone(value) }
+
     [ue_function(BlueprintCallable)]
     def ChangeAssets(var value:array<SoftObject>&; @ue_out var previous:array<SoftObject>&):array<SoftObject> {
         previous <- clone(value);clear(value);return <- clone(previous)
     }
+
     [ue_function(BlueprintCallable)]
     def EchoClasses(value:table<string;SoftActorClass>):table<string;SoftActorClass> { return <- clone(value) }
+
     [ue_function(BlueprintCallable)]
     def EchoRecord(value:SoftRecord):SoftRecord { return <- clone(value) }
+
     [ue_function(BlueprintCallable)]
     def CheckCollections():void {
         let path="/Game/NotLoaded/Asset.Asset"
@@ -102,14 +111,19 @@ class SoftReferenceActor : Actor {
         ue_soft_load_async("cancelled",self.Asset,"Cancelled")
         if(!ue_asset_cancel("cancelled")) { self.Errors+=1 }
     }
+
     [ue_function(BlueprintCallable)]
     def AssetReady(value:ObjectRef):void { if(!ue_object_valid(value.handle)) { self.Errors+=1 };self.Ready+=1 }
+
     [ue_function(BlueprintCallable)]
     def ClassReady(value:ActorClass):void { if(ue_class_path(value)!="/Script/Engine.StaticMeshActor") { self.Errors+=1 };self.Ready+=1 }
+
     [ue_function(BlueprintCallable)]
     def NullReady(value:ObjectRef):void { if(ue_object_valid(value.handle)) { self.Errors+=1 };self.Ready+=1 }
+
     [ue_function(BlueprintCallable)]
     def QueueForRelease():void { ue_soft_load_async("release",self.Asset,"Cancelled") }
+
     [ue_function(BlueprintCallable)]
     def Cancelled(value:ObjectRef):void { self.Errors+=1 }
 }

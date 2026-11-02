@@ -89,10 +89,68 @@ das::ExpressionPtr DSLComputeDefaultLeaf(const das::StructurePtr& St, das::Expre
         return new das::ExprConstDouble(E->at, 0.);
     return new das::ExprConstInt(E->at, 0);
 }
+// Expand readonly math data as syntax; CDO import never executes module globals.
+das::ExpressionPtr DSLNamedMathDefault(const das::StructurePtr& St, das::ExpressionPtr E,
+                                       TSet<const das::Variable*>& Active)
+{
+    if (!E || !E->rtti_isVar())
+        return E;
+    const auto* Reference = static_cast<das::ExprVar*>(E);
+    auto Variable = Reference->variable;
+    if (!Variable)
+    {
+        auto Name = Reference->name;
+        das::string ModuleName;
+        const auto Separator = Name.rfind("::");
+        if (Separator != das::string::npos)
+        {
+            ModuleName = Name.substr(0, Separator);
+            Name = Name.substr(Separator + 2);
+        }
+        auto Find = [&](das::Module* Module, bool Own)
+        {
+            if (!ModuleName.empty() && ModuleName != Module->name)
+                return;
+            auto Candidate = Module->findVariable(Name);
+            if (!Candidate || (!Own && Candidate->private_variable))
+                return;
+            if (Variable && Variable != Candidate)
+                DSLFail(TEXT("Ambiguous math constant in defaults"));
+            Variable = Candidate;
+        };
+        Find(St->module, true);
+        if (!Variable)
+            for (const auto& Required : St->module->requireModule)
+                Find(Required.first, false);
+    }
+    if (!Variable || !Variable->type || !Variable->type->constant || !Variable->init)
+        return E;
+    if (Active.Num() >= 32 || Active.Contains(Variable))
+        DSLFail(TEXT("Cyclic or oversized math constant in defaults"));
+    Active.Add(Variable);
+    auto Value = DSLNamedMathDefault(St, Variable->init, Active);
+    Active.Remove(Variable);
+    if (!Value || !Value->rtti_isCall())
+        return E;
+    const auto& Name = static_cast<das::ExprCall*>(Value)->name;
+    if (Name != "ue_vector" && Name != "ue_vector2d" && Name != "ue_rotator" && Name != "ue_quat" &&
+        Name != "ue_linear_color" && Name != "ue_color" && Name != "ue_transform")
+        return E;
+    auto Copy = Value->clone();
+    auto& Arguments = static_cast<das::ExprCall*>(Copy)->arguments;
+    // Imported initializers have already been inferred and carry injected context arguments.
+    // Restore literal constructor syntax before the declaration parser consumes it.
+    for (size_t Index = Arguments.size(); Index > 0; --Index)
+        if (Arguments[Index - 1]->rtti_isFakeContext() || Arguments[Index - 1]->rtti_isFakeLineInfo())
+            Arguments.erase(Arguments.begin() + Index - 1);
+    return Copy;
+}
 das::ExpressionPtr DSLComputeDefaultExpression(const das::StructurePtr& St, das::ExpressionPtr E,
                                                const das::TypeDeclPtr& Type, const FString& Key,
                                                TMap<FString, das::ExpressionPtr>& Fields)
 {
+    TSet<const das::Variable*> ActiveConstants;
+    E = DSLNamedMathDefault(St, E, ActiveConstants);
     if (!E || E->rtti_isConstant())
         return E;
     if (Type && DSLContainer(Type))

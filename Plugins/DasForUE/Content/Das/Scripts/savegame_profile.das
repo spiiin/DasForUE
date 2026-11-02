@@ -9,8 +9,10 @@ class PlayerSave : SaveGame {
         // Display name of the player.
         var PlayerName:string="Player"
     }
+
     [ue_function(BlueprintCallable)]
     def AddScore(amount:int):void { self.Score+=amount }
+
     [ue_function(BlueprintPure)]
     def GetScore():int { return self.Score }
 }

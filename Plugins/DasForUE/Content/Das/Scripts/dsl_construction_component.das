@@ -1,6 +1,7 @@
 options gen2
 module dsl_construction_component public
 require ue_dsl public
+
 [ue_class(module_id="construction",Blueprintable)]
 class StandaloneConstruction : ActorComponent {
     @ue_property=(EditAnywhere,BlueprintReadWrite)
@@ -13,6 +14,7 @@ class StandaloneConstruction : ActorComponent {
     InitializeCalls:int=0
     @ue_property=(BlueprintReadWrite)
     BeginSaw:int=0
+
     [ue_function(BlueprintCallable)]
     def Pulse():void {}
     def Initialize():void { self.InitializeCalls+=1 }

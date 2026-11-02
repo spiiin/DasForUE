@@ -1,6 +1,7 @@
 options gen2
 require ue_life_behavior_base
 require ue_probe_actor
+
 [ue_class(module_id="lifefamily",Blueprintable)]
 class ChildBehavior : BaseBehavior {
     @ue_property=(BlueprintReadWrite)
@@ -24,8 +25,10 @@ class ChildBehavior : BaseBehavior {
     def override Tick(delta:float):void { Super.Tick(delta);self.ChildTicks+=1 }
     [ue_lifecycle]
     def override EndPlay(reason:int):void { self.ChildEnds+=1;Super.EndPlay(reason) }
+
     [ue_function(BlueprintPure)]
     def const ChildStatus():int { return self.ChildBegins+self.ChildEnds }
+
     [ue_function(BlueprintPure)]
     def const Snapshot(@ue_out var value:int&):void { value=self.Bonus }
 }

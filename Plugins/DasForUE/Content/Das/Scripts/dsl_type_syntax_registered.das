@@ -13,12 +13,16 @@ struct GameSettings {
     @ue_property=(EditAnywhere, BlueprintReadWrite)
     Title : string = "Initial"
 }
+
 [ue_class(parent=Actor, module_id="authoredvalues", type_registry="/Game/DasRegisteredTypes/TypesRegistry.TypesRegistry", Blueprintable)]
 class TypedActor {
+
     [ue_function(BlueprintCallable)]
     def NamedMode():int { return ue_enum_number(ue_enum_value(ue_type(PlayState), "Active")) }
+
     [ue_function(BlueprintCallable)]
     def NamedStruct():int { return ue_struct_get_int(ue_struct_value(ue_type(GameSettings)), "Count") }
+
     [ue_function(BlueprintCallable)]
     def NativeValues():int {
         let mode = ue_enum_value("EDasCallMode", "Active")
@@ -28,6 +32,7 @@ class TypedActor {
 
     [ue_function(BlueprintCallable, arg_value_enum="direct.State", return_enum=PlayState)]
     def RawMode(value:UEEnumValue):UEEnumValue { return value }
+
     [ue_function(BlueprintCallable, arg_value_struct=GameSettings, return_struct="direct.Settings")]
     def RawConfig(value:UEStructValue):UEStructValue { return value }
 
@@ -35,27 +40,35 @@ class TypedActor {
     Mode : PlayState = PlayState.Idle
     @ue_property=(EditAnywhere, BlueprintReadWrite)
     Config : GameSettings = GameSettings()
+
     [ue_function(BlueprintCallable)]
     def SetMode(value:PlayState):void { self.Mode = value }
+
     [ue_function(BlueprintCallable)]
     def GetMode():PlayState { return self.Mode }
+
     [ue_function(BlueprintCallable)]
     def ModeNumber():int { return int(self.Mode) }
+
     [ue_function(BlueprintCallable)]
     def SetConfig(value:GameSettings):void { self.Config = value }
+
     [ue_function(BlueprintCallable)]
     def GetConfig():GameSettings { return self.Config }
+
     [ue_function(BlueprintCallable, arg_mode_enum=PlayState, arg_data_struct=GameSettings, return_struct="direct.Settings")]
     def Evaluate(mode:PlayState; data:GameSettings):GameSettings {
         var result = data
         result.Count += int(mode)
         return result
     }
+
     [ue_function(BlueprintCallable)]
     def Bump(amount:int):int {
         self.Config.Count += amount
         return self.Config.Count
     }
+
     [ue_function(BlueprintCallable)]
     def SetTitle(value:string):void { self.Config.Title = value }
 }

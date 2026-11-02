@@ -10,7 +10,9 @@
       "name": "container-transport",
       "kind": "script",
       "script": "TestContainerTransport.ps1",
-      "requires": ["build"]
+      "requires": [
+        "build"
+      ]
     },
     {
       "name": "program-cache",
@@ -24,13 +26,17 @@
       "name": "prepare-programs",
       "kind": "script",
       "script": "PreparePrograms.ps1",
-      "requires": ["build"]
+      "requires": [
+        "build"
+      ]
     },
     {
       "name": "editor-preparation",
       "kind": "script",
       "script": "TestEditorPreparation.ps1",
-      "requires": ["build"]
+      "requires": [
+        "build"
+      ]
     },
     {
       "name": "generic-parents",
@@ -645,6 +651,49 @@
       "kind": "script",
       "script": "TestEditorIsolation.ps1",
       "comment": "Build and launch a normal Editor without test extensions. Run last: it builds another Editor project."
+    },
+    {
+      "name": "rogue-chest",
+      "kind": "script",
+      "script": "TestRogueChest.ps1",
+      "comment": "Imports and executes the external daScript ActionRoguelike port; default PortRoot C:/src/ActionRoguelikeDas."
+    },
+    {
+      "name": "rogue-interaction",
+      "kind": "script",
+      "script": "TestRogueInteraction.ps1",
+      "comment": "Opt-in external ActionRoguelike port: authored controller, overlap ranking and mapped E in PIE."
+    },
+    {
+      "name": "rogue-projectile",
+      "kind": "script",
+      "script": "TestRogueProjectile.ps1"
+    },
+    {
+      "name": "gameplay-runtime",
+      "kind": "automation",
+      "test": "DasForUE.Gameplay.RuntimePIE",
+      "log": "gameplay-runtime",
+      "minimum": 1,
+      "comment": "Independent gameplay fixture: rerun runtime integration without unrelated method-values export."
+    },
+    {
+      "name": "rogue-actions",
+      "kind": "script",
+      "script": "TestRogueActions.ps1",
+      "comment": "External daScript port: factory inheritance, GC ownership, costs/cooldown and Shift sprint in real PIE."
+    },
+    {
+      "name": "rogue-projectile-attack",
+      "kind": "script",
+      "script": "TestRogueProjectileAttack.ps1",
+      "comment": "Projectile ability windup, cooldown, input and cancellation in real PIE."
+    },
+    {
+      "name": "class-archive",
+      "kind": "script",
+      "script": "TestClassArchive.ps1",
+      "comment": "Class reference retirement/restoration, saved assets, null overrides and PIE rollback."
     }
   ],
   "presets": {

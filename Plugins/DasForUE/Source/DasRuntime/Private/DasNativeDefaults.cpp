@@ -3,6 +3,7 @@
 #include "Subsystems/GameInstanceSubsystem.h"
 #include "DasNativeDefaults.h"
 #include "GameFramework/Pawn.h"
+#include "GameFramework/PlayerController.h"
 #include "GameFramework/Character.h"
 #include "DasAuthoring.h"
 #include "DasActor.h"
@@ -21,6 +22,8 @@ UClass* DasNativeDefaultBase(const FString& Parent)
     if (Parent == TEXT("/Script/DasRuntime.DasProbeActor"))
         return DasNativeScriptHost(Parent);
 #endif
+    if (Parent == TEXT("/Script/Engine.PlayerController"))
+        return APlayerController::StaticClass();
     return Parent == TEXT("/Script/Engine.Actor")
                           ? AActor::StaticClass()
                           : Parent == TEXT("/Script/Engine.Pawn")

@@ -1,5 +1,6 @@
 options gen2
 require ue_animation
+
 [ue_class(module_id="montageexample",Blueprintable)]
 class MontageActor : Actor {
     settings=ue_properties(EditAnywhere,BlueprintReadWrite) { var Montage:AnimMontageRef }
@@ -16,14 +17,19 @@ class MontageActor : Actor {
     @ue_component
     @RootComponent
     Mesh:SkeletalMeshComponentRef
+
     [ue_function(BlueprintCallable)]
     def Play():float { return ue_montage_play("action",self.Mesh,self.Montage,"OnAnimation") }
+
     [ue_function(BlueprintCallable)]
     def Stop():bool { return ue_montage_stop("action",0.05f) }
+
     [ue_function(BlueprintCallable)]
     def Cancel():bool { return ue_montage_cancel("action") }
+
     [ue_function(BlueprintCallable)]
     def Playing():bool { return ue_montage_playing("action") }
+
     [ue_function(BlueprintCallable)]
     def OnAnimation(event:MontageEvent):void {
         if(event.Kind==MontageEventKind.Completed) {

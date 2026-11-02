@@ -53,6 +53,7 @@ class HookStrike { Health:float=-1.0f }
 
 var observed:GASCueEvent
 var observedCount:int=0
+
 [ue_class]
 class CueHookObserver : Actor {
     @ue_component

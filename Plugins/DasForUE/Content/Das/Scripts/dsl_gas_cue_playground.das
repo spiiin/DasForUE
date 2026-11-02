@@ -34,15 +34,18 @@ class CuePlayground : Actor {
         self.Trigger.SetGenerateOverlapEvents(true)
         self.Trigger.SetCollisionEnabled(ECollisionEnabled.QueryOnly)
     }
+
     [ue_function(BlueprintCallable)]
     def Hit():void {
         ue_gas_apply(self.Abilities,ue_gas_make_spec(self.Abilities,self.HitEffect))
     }
+
     [ue_function(BlueprintCallable)]
     def StartAura():void {
         if(ue_gas_effect_state(self.Aura).Active) { return }
         self.Aura=ue_gas_apply(self.Abilities,ue_gas_make_spec(self.Abilities,self.AuraEffect))
     }
+
     [ue_function(BlueprintCallable)]
     def StopAura():void {
         ue_gas_remove_effect(self.Aura)

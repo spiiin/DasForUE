@@ -196,6 +196,7 @@ Use ordinary daScript inheritance from a native host marker exported by `ue_dsl`
 | `Actor` (or no base) | Actor bridge host | Default when no parent is given |
 | `Pawn` | `ADasPawn : APawn` | Real Pawn with native collision/movement |
 | `Character` | `ADasCharacter : ACharacter` | Keeps native capsule root, mesh and `CharacterMovement` |
+| `PlayerController` | `ADasPlayerController` host | Controller selected through GameMode; supports authored components and lifecycle |
 | `ActorComponent` | `UDasScriptComponent` host | Component Blueprint; add it to an Actor with `@ue_component` |
 | another `ue_class` | that class's Blueprint | See [Inheritance](Inheritance.md) |
 

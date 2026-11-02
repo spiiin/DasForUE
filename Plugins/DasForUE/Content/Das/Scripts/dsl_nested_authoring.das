@@ -22,15 +22,18 @@ struct Tree {
     @ue_property=(EditAnywhere, BlueprintReadWrite)
     Right : Branch = Branch()
 }
+
 [ue_class(module_id="nested", type_registry="REGISTRY", Blueprintable)]
 class NestedActor {
     @ue_property=(EditAnywhere, BlueprintReadWrite)
     Config : Tree = Tree()
+
     [ue_function(BlueprintCallable)]
     def Bump(amount:int):int {
         self.Config.Left.Inner.Count += amount
         return self.Config.Left.Inner.Count
     }
+
     [ue_function(BlueprintCallable)]
     def Echo(value:Tree):Tree {
         var result = value
@@ -38,8 +41,10 @@ class NestedActor {
         result.Right.Inner.Title = "Nested 世界"
         return result
     }
+
     [ue_function(BlueprintCallable)]
     def Replace(value:Tree):void { self.Config = value }
+
     [ue_function(BlueprintCallable)]
     def Get():Tree { return self.Config }
 }

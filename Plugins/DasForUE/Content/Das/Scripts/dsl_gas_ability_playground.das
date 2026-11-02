@@ -30,12 +30,15 @@ class AbilityPlayground : Actor {
         ue_gas_add_attributes(self.Abilities,self.Attributes)
         self.Grant=ue_gas_give_ability(self.Abilities,self.StrikeAbility)
     }
+
     [ue_function(BlueprintCallable)]
     def BeginAim():void { ue_gas_activate_ability(self.Grant) }
+
     [ue_function(BlueprintCallable)]
     def ConfirmAim():void {
         self.Abilities.SendAuthoredGameplayEvent(ue_name_value("GameplayEvent.Das.Sample.StrikeConfirm"),0.0f,default<ActorRef>,default<ActorRef>)
     }
+
     [ue_function(BlueprintCallable)]
     def CancelAim():void { ue_gas_cancel_ability(self.Grant) }
 }

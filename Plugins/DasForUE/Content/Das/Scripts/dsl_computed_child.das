@@ -1,5 +1,6 @@
 options gen2
 require dsl_computed_defaults public
+
 [ue_class(module_id="computeddefaults",Blueprintable)]
 class ComputedChild : ComputedDefaults {
     defaults=ue_defaults() {

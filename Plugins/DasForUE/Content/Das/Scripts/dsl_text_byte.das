@@ -12,10 +12,13 @@ class TextByteActor : Actor {
         var Title:FText = ue_text("DasTextByte", "Title", "Example title")
         var Config:TextByteData = TextByteData()
     }
+
     [ue_function(BlueprintCallable)]
     def EchoByte(value:uint8):uint8 { self.Priority=value; return self.Priority }
+
     [ue_function(BlueprintCallable)]
     def EchoText(value:FText):FText { self.Title=value; return self.Title }
+
     [ue_function(BlueprintCallable)]
     def Adjust(var priority:uint8&; @ue_out var title:FText&):FText {
         priority=uint8(int(priority)+1)
@@ -24,10 +27,13 @@ class TextByteActor : Actor {
         self.Config.Title=title
         return self.Config.Title
     }
+
     [ue_function(BlueprintCallable)]
     def DefaultByte(value:uint8=uint8(255)):uint8 { return value }
+
     [ue_function(BlueprintCallable)]
     def DefaultText(value:FText=ue_text("DasTextByte","Default","Default text")):FText { return value }
+
     [ue_function(BlueprintCallable)]
     def Reverse(var title:FText&; @ue_out var priority:uint8&):uint8 {
         self.Title=title
@@ -35,6 +41,7 @@ class TextByteActor : Actor {
         priority=uint8(255)
         return priority
     }
+
     [ue_function(BlueprintPure)]
     def Probe():int { return int(self.Priority) }
 }
