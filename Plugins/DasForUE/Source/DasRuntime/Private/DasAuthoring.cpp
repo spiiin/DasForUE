@@ -325,6 +325,8 @@ bool FDasAuthoringModule::Validate(FString& Error) const
             }
             else if (!P.DelegateWire.IsEmpty())
                 return Fail(Error, TEXT("Delegate signature is only valid on event fields"));
+            if (P.bInstanced && (P.Type.GetKind() != EDasTypeKind::Object || P.Type.WeakReference))
+                return Fail(Error, TEXT("Instanced requires a direct strong object property: ") + P.Name);
             Names.Add(P.Name.ToLower());
             if (!ValidateDasDeclarationType(P.Type, ClassIds, false, Error) ||
                 !ValidateDasAuthoredDefault(P.Type, P.Default, EDasTypeUse::PropertyDefault, Error) ||
@@ -737,20 +739,25 @@ bool FDasAuthoringModule::FromJson(const FString& Json, FDasAuthoringModule& Out
         for (const auto& V : Ps)
         {
             FDasDeclaredProperty P;
-            if (!Keys(V, {TEXT("id"),
-                               TEXT("name"),
-                                    TEXT("type"),
-                                         TEXT("default"),
-                                              TEXT("editable"), TEXT("read_only"),
-                                                                     TEXT("metadata"), TEXT("delegate_wire")}, Error) ||
-                                                   !String(V, TEXT("id"), P.Id, Error) ||
-                                                           !String(V, TEXT("name"), P.Name, Error) ||
-                                                                   !Type(V, TEXT("type"), P.Type, Error) ||
-                                                                         !Meta(V, P.Metadata, Error) ||
-                                                                         !Boolean(V, TEXT("editable"), P.bEditable,
-                                                                                          Error) ||
-                                                                                  !Boolean(V, TEXT("read_only"),
-                                                                                                   P.bReadOnly, Error))
+            if (!Keys(V, {TEXT("id"), TEXT("name"),
+                                           TEXT("type"),
+                                                TEXT("default"),
+                                                     TEXT("editable"),
+                                                          TEXT("read_only"),
+                                                               TEXT("instanced"),
+                                                                    TEXT("metadata"), TEXT("delegate_wire")}, Error) ||
+                                                               !String(V, TEXT("id"), P.Id, Error) ||
+                                                                       !String(V, TEXT("name"), P.Name, Error) ||
+                                                                               !Type(V, TEXT("type"), P.Type, Error) ||
+                                                                                     !Meta(V, P.Metadata, Error) ||
+                                                                                     !Boolean(
+                                                                                         V, TEXT("editable"),
+                                                                                                 P.bEditable, Error) ||
+                                                                                         !Boolean(V, TEXT("read_only"),
+                                                                                                          P.bReadOnly,
+                                                                                                          Error))
+                return false;
+            if (V->HasField(TEXT("instanced")) && !Boolean(V, TEXT("instanced"), P.bInstanced, Error))
                 return false;
             if (V->HasField(TEXT("delegate_wire")) && !String(V, TEXT("delegate_wire"), P.DelegateWire, Error))
                 return false;
@@ -1046,6 +1053,8 @@ bool FDasAuthoringModule::ToJson(FString& Out, FString& Error) const
             V->SetObjectField(TEXT("type"), TypeJson(P->Type));
             V->SetBoolField(TEXT("editable"), P->bEditable);
             V->SetBoolField(TEXT("read_only"), P->bReadOnly);
+            if (P->bInstanced)
+                V->SetBoolField(TEXT("instanced"), true);
             MetadataJson(P->Metadata, V);
             if (!P->DelegateWire.IsEmpty())
                 V->SetStringField(TEXT("delegate_wire"), P->DelegateWire);
@@ -1567,6 +1576,7 @@ bool FDasAuthoringModule::ToActorSchema(const FString& ClassId, FDasClassSchema&
         F.Kind = *FieldKind;
         F.bInstanceEditable = P.bEditable;
         F.bReadOnly = P.bReadOnly;
+        F.bInstanced = P.bInstanced;
         F.Metadata = P.Metadata;
         F.IntDefault = (P.Type.Kind == TEXT("int") || P.Type.Kind == TEXT("byte"))
                         ? static_cast<int32>(P.Default.Kind == TEXT("number")? P.Default.Number : 0)
@@ -1618,7 +1628,8 @@ FDasAuthoringDelta FDasAuthoringModule::Compare(const FDasDeclaredClass& Old, co
             continue;
         }
         D.bStructural |= P.Name != Prior->Name || P.Type.Identity() != Prior->Type.Identity() ||
-                         P.bEditable != Prior->bEditable || P.bReadOnly != Prior->bReadOnly;
+                         P.bEditable != Prior->bEditable || P.bReadOnly != Prior->bReadOnly ||
+                         P.bInstanced != Prior->bInstanced;
         D.bDefaults |= !SameDefault(P.Default, Prior->Default);
         D.bMetadata |= !SameMetadata(P.Metadata, Prior->Metadata);
     }

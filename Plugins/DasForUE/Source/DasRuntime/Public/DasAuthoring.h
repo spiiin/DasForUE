@@ -69,6 +69,7 @@ struct FDasDeclaredProperty
     FString DelegateWire; // Authoring-only signature contract for event fields.
     bool bEditable = true;
     bool bReadOnly = false;
+    bool bInstanced = false;
     TMap<FString, FString> Metadata;
 };
 struct FDasDeclaredParameter

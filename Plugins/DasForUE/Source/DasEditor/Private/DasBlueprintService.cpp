@@ -1549,6 +1549,13 @@ bool FDasBlueprintService::Apply(UBlueprint* BP, const FDasClassSchema& Schema, 
     {
         FBlueprintEditorUtils::SetBlueprintOnlyEditableFlag(BP, Field.Name, !Field.bInstanceEditable);
         FBlueprintEditorUtils::SetBlueprintPropertyReadOnlyFlag(BP, Field.Name, Field.bReadOnly);
+        auto* Variable = BP->NewVariables.FindByPredicate([&](const auto& V) { return V.VarName == Field.Name; });
+        const uint64 InstancedFlags = CPF_InstancedReference | CPF_ExportObject | CPF_PersistentInstance;
+        Variable->PropertyFlags = (Variable->PropertyFlags & ~InstancedFlags) | (Field.bInstanced ? InstancedFlags : 0);
+        FBlueprintEditorUtils::RemoveBlueprintVariableMetaData(BP, Field.Name, nullptr, TEXT("EditInline"));
+        if (Field.bInstanced)
+            FBlueprintEditorUtils::SetBlueprintVariableMetaData(BP, Field.Name, nullptr,
+                                                                TEXT("EditInline"), TEXT("true"));
         if (Schema.Parent == TEXT("SaveGame"))
             FBlueprintEditorUtils::SetVariableSaveGameFlag(BP, Field.Name, true);
         for (const auto* Key : {TEXT("Category"), TEXT("DisplayName"), TEXT("ToolTip"), TEXT("AssetBundles")})

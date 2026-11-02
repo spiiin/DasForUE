@@ -460,8 +460,8 @@ struct FUEObjectNewFactory : das::CallMacro
     {
         try
         {
-            if (E->arguments.size() != 3 || !E->arguments[0]->rtti_isTypeDecl())
-                DSLFail(TEXT("Expected ue_object_new(type<Ref>, classHandle, outer)"));
+            if ((E->arguments.size() != 3 && E->arguments.size() != 4) || !E->arguments[0]->rtti_isTypeDecl())
+                DSLFail(TEXT("Expected ue_object_new(type<Ref>, classHandle, outer[, template])"));
             auto Type =
                 DSLObjectNormalize(static_cast<das::ExprTypeDecl*>(E->arguments[0])->typeexpr, *P->thisModuleGroup, M);
             if (!DSLTypedReference(Type) || DSLTypedInterface(Type))
@@ -471,10 +471,15 @@ struct FUEObjectNewFactory : das::CallMacro
             if (!Class || Class->IsChildOf(AActor::StaticClass()) || Class->IsChildOf(UActorComponent::StaticClass()))
                 DSLFail(TEXT("Use actor/component creation for Actor and ActorComponent classes"));
             const FString Id = DSLAuthoredView(Type) ? DSLReferenceDeclaration(Type).Id : FString();
-            auto* Call =
-                DSLCall(E->at, "__ue_object_new",
-                        {DSLClassArgument(E->at, E->arguments[1]), new das::ExprField(E->at, E->arguments[2], "handle"),
-                         new das::ExprConstString(E->at, DSLUtf8(Base)), new das::ExprConstString(E->at, DSLUtf8(Id))});
+            das::vector<das::ExpressionPtr> Arguments = {DSLClassArgument(E->at, E->arguments[1]),
+                                                         new das::ExprField(E->at, E->arguments[2], "handle")};
+            const bool FromTemplate = E->arguments.size() == 4;
+            if (FromTemplate)
+                Arguments.push_back(new das::ExprField(E->at, E->arguments[3], "handle"));
+            Arguments.push_back(new das::ExprConstString(E->at, DSLUtf8(Base)));
+            Arguments.push_back(new das::ExprConstString(E->at, DSLUtf8(Id)));
+            auto* Call = new das::ExprCall(E->at, FromTemplate ? "__ue_object_new_from_template" : "__ue_object_new");
+            Call->arguments = std::move(Arguments);
             return DSLAuthoredView(Type) ? DSLAuthoredUnpack(E->at, Type, Call)
                                          : DSLDirectUnpack(E->at, Type, Call, Base);
         }

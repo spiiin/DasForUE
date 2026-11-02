@@ -2660,6 +2660,12 @@ bool FDasDSLService::ReimportArchivedFields(UBlueprint* BP, bool Restore, bool I
                 return Rollback(TEXT("Cannot recreate archived member"));
             auto* V = BP->NewVariables.FindByPredicate([&](const auto& X) { return X.VarName == F.Name; });
             V->VarGuid = A.Guid;
+            if (F.bInstanced)
+            {
+                V->PropertyFlags |= CPF_InstancedReference | CPF_ExportObject | CPF_PersistentInstance;
+                FBlueprintEditorUtils::SetBlueprintVariableMetaData(BP, F.Name, nullptr,
+                                                                    TEXT("EditInline"), TEXT("true"));
+            }
             FBlueprintEditorUtils::SetBlueprintOnlyEditableFlag(BP, F.Name, !F.bInstanceEditable);
             FBlueprintEditorUtils::SetBlueprintPropertyReadOnlyFlag(BP, F.Name, F.bReadOnly);
             FBlueprintEditorUtils::SetBlueprintVariableMetaData(BP, F.Name, nullptr, TEXT("DasMemberId"), F.StableId);

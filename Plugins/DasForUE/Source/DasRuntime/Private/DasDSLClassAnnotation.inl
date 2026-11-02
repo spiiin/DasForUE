@@ -235,9 +235,8 @@ struct FUEClassAnnotation : das::StructureAnnotation
             }
             else
                 C.NativeParent = NativeBase.IsEmpty()
-                    ? DSLResolveParent(DSLString(Args, "parent", TEXT("/Script/Engine.Actor")),
-                                                                    TypeScope)
-                                     : NativeBase;
+                    ? DSLResolveParent(DSLString(Args, "parent", TEXT("/Script/Engine.Actor")), TypeScope)
+                    : NativeBase;
             if (const auto* A = DSLAnnotation(St->annotations, "ue_async_physics"))
                 C.AsyncPhysics = DSLAsyncPhysics(A->arguments);
             else if (Derived)
@@ -341,6 +340,8 @@ struct FUEClassAnnotation : das::StructureAnnotation
                                 P.bEditable = true;
                                 EditAnywhere = true;
                             }
+                            else if (A.sValue == "Instanced")
+                                P.bInstanced = true;
                             else if (A.sValue == "BlueprintReadWrite")
                             {
                                 P.bReadOnly = false;

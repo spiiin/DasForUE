@@ -375,3 +375,5 @@ See also: [AuthoredReferences.md](AuthoredReferences.md) ·
 [Containers.md](Containers.md) · [SoftReferences.md](SoftReferences.md) ·
 [ModulesAndTypeIdentity.md](ModulesAndTypeIdentity.md) ·
 [TypeSupport.md](../../Reference/TypeSupport.md)
+
+See [Owned script objects](OwnedObjects.md) for Outer, explicit initialization, strong ownership and inline templates.

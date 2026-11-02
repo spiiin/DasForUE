@@ -1,4 +1,5 @@
 #include "DasPropertyTypes.h"
+#include "DasObject.h"
 #include "DasDataAssets.h"
 #include "DasTypeContracts.h"
 #include "UObject/TextProperty.h"
@@ -347,6 +348,16 @@ bool FDasClassSchema::Validate(FString& Error) const
         {
             Error = TEXT("Unsupported scalar kind or non-finite default");
             return false;
+        }
+        if (Field.bInstanced)
+        {
+            auto* Base = FindObject<UClass>(nullptr, *Field.ObjectClass);
+            if (Field.Kind != EDasScalarKind::Object || !Base || !Base->IsChildOf(UDasObject::StaticClass()) ||
+                !Base->HasAnyClassFlags(CLASS_EditInlineNew))
+            {
+                Error = TEXT("Instanced requires an EditInlineNew ScriptObject reference");
+                return false;
+            }
         }
         if (Field.Kind == EDasScalarKind::Byte && (Field.IntDefault < 0 || Field.IntDefault > 255))
         {

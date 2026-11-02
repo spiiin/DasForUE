@@ -248,6 +248,7 @@ __ue_object_key_from_ref	@ue_foundation::__ue_object_key_from_ref CIH<ue_foundat
 __ue_object_key_reference	@ue_foundation::__ue_object_key_reference Cu64 CIs CIs C_c	ue_foundation::UObjectHandle	4
 __ue_object_key_valid	@ue_foundation::__ue_object_key_valid Cu64 C_c	bool const	4
 __ue_object_new	@ue_foundation::__ue_object_new CH<ue_foundation::UEClassHandle> CIH<ue_foundation::UObjectHandle> CIs CIs C_c	ue_foundation::UObjectHandle	4
+__ue_object_new_from_template	@ue_foundation::__ue_object_new_from_template CH<ue_foundation::UEClassHandle> CIH<ue_foundation::UObjectHandle> CIH<ue_foundation::UObjectHandle> CIs CIs C_c	ue_foundation::UObjectHandle	4
 __ue_overlap_reference	@ue_foundation::__ue_overlap_reference CIH<ue_foundation::UEOverlapResult> Ci C_c	ue_foundation::UObjectHandle	4
 __ue_overlap_world	@ue_foundation::__ue_overlap_world CIH<ue_foundation::UEVector> Cd Ci CI1<H<ue_foundation::UObjectHandle>>A Cb I1<H<ue_foundation::UEOverlapResult>>A C_c C_l	void	4
 __ue_parent_lifecycle	@ue_foundation::__ue_parent_lifecycle CIs Ci Cf Ci C_c	void	4

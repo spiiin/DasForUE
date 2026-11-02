@@ -1144,6 +1144,9 @@ public:
             *this, Library, "__ue_actor_spawn_instigated", das::SideEffects::modifyExternal, "ActorSpawnInstigated");
         AddUEExtern<DAS_BIND_FUN(ScriptObjectNew), das::SimNode_ExtFuncCallAndCopyOrMove>(
             *this, Library, "__ue_object_new", das::SideEffects::modifyExternal, "ScriptObjectNew");
+        AddUEExtern<DAS_BIND_FUN(ScriptObjectNewFromTemplate), das::SimNode_ExtFuncCallAndCopyOrMove>(
+            *this, Library, "__ue_object_new_from_template", das::SideEffects::modifyExternal,
+            "ScriptObjectNewFromTemplate");
         AddUEExtern<DAS_BIND_FUN(ScriptObjectOuter), das::SimNode_ExtFuncCallAndCopyOrMove>(
             *this, Library, "ue_object_outer", das::SideEffects::accessExternal, "ScriptObjectOuter");
         AddUEExtern<DAS_BIND_FUN(WorldSeconds)>(*this, Library, "ue_world_seconds", das::SideEffects::accessExternal,
@@ -1402,8 +1405,8 @@ public:
                         *this, Library, "ue_struct_with_enum", das::SideEffects::modifyExternal, "StructWithEnum")
                         ->needCallerStackFrame = true;
         AddUEExtern<DAS_BIND_FUN(StructWithClass), das::SimNode_ExtFuncCallAndCopyOrMove>(
-            *this, Library, "__ue_struct_with_class", das::SideEffects::modifyExternal, "StructWithClass")
-            ->needCallerStackFrame = true;
+                        *this, Library, "__ue_struct_with_class", das::SideEffects::modifyExternal, "StructWithClass")
+                        ->needCallerStackFrame = true;
         AddUEExtern<DAS_BIND_FUN(StructGetClass)>(*this, Library, "__ue_struct_get_class",
                                                   das::SideEffects::modifyExternal, "StructGetClass");
         AddUEExtern<DAS_BIND_FUN(StructGetObject), das::SimNode_ExtFuncCallAndCopyOrMove>(

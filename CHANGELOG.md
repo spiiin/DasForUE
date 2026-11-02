@@ -12,6 +12,11 @@ daScript 0.6.4 (pinned), Win64 Development. Start at the
 
 ### Added
 
+- Owned ScriptObject workflow: explicit reflected initialization methods (including
+  ordinary `Initialize(owner)`), native inline `Instanced` object properties,
+  optional checked templates in `ue_object_new`, strong owner-array example and
+  focused GC/instancing validation. See [owned objects](Docs/Guide/DSL/OwnedObjects.md).
+
 - Persistent gameplay compiler cache with independent owner contexts, heaps and
   subscriptions; dependency invalidation, transactional reload and bounded idle
   retention. Configured global/map roots can be prepared during world initialization

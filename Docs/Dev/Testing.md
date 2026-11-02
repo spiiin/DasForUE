@@ -454,3 +454,12 @@ Receipt: `logs/generic-parents-validation.json`; automation report:
 `C:/src/DasForUE2-blueprint-parents`, isolated from the ongoing PlayerController
 work in main; its base snapshot contains that work. No PIE/packaged or benchmark
 was run.
+
+## Owned UObject focused check
+
+Queue `test-suite <id> owned-objects repo=<worktree>` through the shared build agent.
+It builds Editor Development and runs `DasForUE.Runtime.OwnedObjects`: inline
+template flags and descriptor round-trip, Blueprint recompilation, independent
+owner instances, template/default creation through DAS, explicit initialization,
+strong array retention and GC/context cleanup after release. No full PIE or
+packaged acceptance is implied.

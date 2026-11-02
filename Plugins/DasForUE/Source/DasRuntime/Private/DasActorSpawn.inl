@@ -126,8 +126,9 @@ bool ActorDestroySelf(das::Context* C)
 }
 
 // Non-Actor owned objects are ordinary UE objects; reflected properties keep them alive.
-FDasObjectHandle ScriptObjectNew(FDasClassHandle H, const FDasObjectHandle& OuterHandle, const char* Base,
-                                 const char* Id, das::Context* C)
+FDasObjectHandle ScriptObjectNewFromTemplate(FDasClassHandle H, const FDasObjectHandle& OuterHandle,
+                                             const FDasObjectHandle& TemplateHandle, const char* Base, const char* Id,
+                                             das::Context* C)
 {
     auto* Self = ResolveWorldContextObject(C);
     auto* World = Self->GetWorld();
@@ -146,10 +147,22 @@ FDasObjectHandle ScriptObjectNew(FDasClassHandle H, const FDasObjectHandle& Oute
     // Validate the CDO hierarchy before constructing anything; siblings still fail.
     if (Id && *Id)
         ResolveAuthoredObject(MakeObjectHandle(Class->GetDefaultObject(), UObject::StaticClass(), C), Id, C);
+    UObject* Template = TemplateHandle.Token ? ResolveObject(TemplateHandle, C) : nullptr;
+    if (Template && (!IsValid(Template) || Template->GetClass() != Class ||
+                     Template->HasAnyFlags(RF_BeginDestroyed | RF_FinishDestroyed) ||
+                     (!Template->IsTemplate() && Template->GetWorld() != World)))
+        C->throw_error(
+            "object template must have the exact requested class and be a template or live same-world object");
+    TStrongObjectPtr<UObject> KeepTemplate(Template);
     TStrongObjectPtr<UObject> KeepOuter(Outer);
     TStrongObjectPtr<UClass> KeepClass(Class);
-    TStrongObjectPtr<UObject> Created(NewObject<UObject>(Outer, Class, NAME_None, RF_Transient));
+    TStrongObjectPtr<UObject> Created(NewObject<UObject>(Outer, Class, NAME_None, RF_Transient, Template));
     return MakeObjectHandle(Created.Get(), Class, C);
+}
+FDasObjectHandle ScriptObjectNew(FDasClassHandle H, const FDasObjectHandle& OuterHandle, const char* Base,
+                                 const char* Id, das::Context* C)
+{
+    return ScriptObjectNewFromTemplate(H, OuterHandle, {}, Base, Id, C);
 }
 FDasObjectHandle ScriptObjectOuter(const FDasObjectHandle& Handle, das::Context* C)
 {

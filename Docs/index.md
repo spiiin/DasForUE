@@ -44,6 +44,7 @@ time are in the [changelog](../CHANGELOG.md).
 - [Interfaces](Guide/DSL/Interfaces.md)
 - [Delegates and events](Guide/DSL/DelegatesAndEvents.md)
 - [Object and class references](Guide/DSL/ObjectAndClassReferences.md)
+- [Owned script objects and inline templates](Guide/DSL/OwnedObjects.md)
 - [Authored references](Guide/DSL/AuthoredReferences.md)
 - [Soft references](Guide/DSL/SoftReferences.md)
 - [Function libraries](Guide/DSL/FunctionLibraries.md)

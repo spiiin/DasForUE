@@ -453,7 +453,9 @@ FDasDeclaredType DSLContainerType(const das::TypeDeclPtr& T, const FString& Fold
     if (!ValidateDasPropertyType(D, EDasPropertyUsage::Container, Error))
         DSLFail(Error);
     if (!DasContainerCarrier(D))
-        DSLFail(TEXT("Cannot construct container transport (definition changed, identity too long, or registry limit): ") + D.StorageIdentity());
+        DSLFail(
+            TEXT("Cannot construct container transport (definition changed, identity too long, or registry limit): ") +
+                 D.StorageIdentity());
     return D;
 }
 bool DSLDelegate(const das::TypeDeclPtr&);
@@ -845,11 +847,11 @@ bool DSLValidateOwner(const das::ProgramPtr& Program, const FString& Entry, UObj
                         OK = false;
                         return;
                     }
-                    const bool ActorAdapter = !DasHostIdentity(Self).IsEmpty() || DasActorHostClass(Self->GetClass()) || Self->IsA<ADasActor>() || Self->IsA<ADasPlayerController>() ||
-                                              Self->IsA<UDasScriptComponent>() ||
-                                              Self->IsA<UDasSaveGame>() || Self->IsA<UDasDataAsset>() ||
-                                              Self->IsA<UDasPrimaryDataAsset>() || Self->IsA<UDasWorldSubsystem>() ||
-                                              Self->IsA<UDasGameInstanceSubsystem>();
+                    const bool ActorAdapter = !DasHostIdentity(Self).IsEmpty() || DasActorHostClass(Self->GetClass()) ||
+                                              Self->IsA<ADasActor>() || Self->IsA<ADasPlayerController>() ||
+                                              Self->IsA<UDasScriptComponent>() || Self->IsA<UDasSaveGame>() ||
+                                              Self->IsA<UDasDataAsset>() || Self->IsA<UDasPrimaryDataAsset>() ||
+                                              Self->IsA<UDasWorldSubsystem>() || Self->IsA<UDasGameInstanceSubsystem>();
                     FDasDeclaredClass EffectiveDefaults;
                     if (!Model.ResolveClass(C.Id, EffectiveDefaults, Error))
                     {
@@ -982,7 +984,8 @@ bool DSLValidateOwner(const das::ProgramPtr& Program, const FString& Entry, UObj
                             continue;
                         }
                         if (!DSLPropertyMatches(Actual, P.Type.Kind) ||
-                            P.bReadOnly != Actual->HasAnyPropertyFlags(CPF_BlueprintReadOnly))
+                            P.bReadOnly != Actual->HasAnyPropertyFlags(CPF_BlueprintReadOnly) ||
+                            P.bInstanced != Actual->HasAnyPropertyFlags(CPF_InstancedReference))
                         {
                             Error = TEXT("DSL property differs from owner; apply/reimport Blueprint: ")+ P.Name;
                             OK = false;

@@ -6,6 +6,7 @@
       "log": "combined-editor-build",
       "name": "build"
     },
+    {"name":"owned-objects","kind":"script","script":"TestOwnedObjects.ps1","requires":["build"]},
     {
       "name": "container-transport",
       "kind": "script",

@@ -1340,8 +1340,11 @@ struct FDSLBodyVisitor : das::Visitor
             Error = TEXT("Super requires an authored parent");
             return E;
         }
-        if (Field->name == "ConstructionScript" || Field->name == "Initialize" || Field->name == "BeginPlay" ||
-            Field->name == "Tick" || Field->name == "EndPlay" || Field->name == "Deinitialize")
+        const bool ReflectedMethod =
+            Decl.Methods.ContainsByPredicate([&](const auto& Method) { return Method.Name == DSLText(Field->name); });
+        if (!ReflectedMethod &&
+            (Field->name == "ConstructionScript" || Field->name == "Initialize" || Field->name == "BeginPlay" ||
+             Field->name == "Tick" || Field->name == "EndPlay" || Field->name == "Deinitialize"))
         {
             const int Kind = Field->name == "BeginPlay"                                    ? 0
                              : Field->name == "Tick"                                       ? 1

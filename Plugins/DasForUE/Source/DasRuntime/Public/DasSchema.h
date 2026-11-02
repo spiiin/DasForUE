@@ -63,6 +63,7 @@ struct FDasFieldSchema
     FString StableId;
     FString DelegateWire;
     bool bReadOnly = false;
+    bool bInstanced = false;
     TMap<FString, FString> Metadata;
 };
 

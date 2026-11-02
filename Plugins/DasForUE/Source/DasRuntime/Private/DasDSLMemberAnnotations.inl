@@ -56,6 +56,22 @@ struct FUEFunctionAnnotation : das::FunctionAnnotation
 };
 bool DSLStandardLifecycle(const das::FunctionPtr& F)
 {
+    // Plain script objects have no implicit lifecycle. In particular Initialize
+    // may be an ordinary reflected method with application-specific parameters.
+    FString Parent;
+    for (auto Owner = F->classParent; Owner; Owner = Owner->parent)
+    {
+        const FString Marker = DSLNativeBasePath(Owner);
+        if (!Marker.IsEmpty())
+        {
+            Parent = Marker;
+            break;
+        }
+        if (const auto* Annotation = DSLAnnotation(Owner->annotations, "ue_class"))
+            Parent = DSLString(Annotation->arguments, "parent", TEXT("/Script/Engine.Actor"));
+    }
+    if (auto* Base = FindObject<UClass>(nullptr, *Parent); Base && Base->IsChildOf(UDasObject::StaticClass()))
+        return false;
     const FString Name = DSLText(DSLMethodName(F));
     return Name == TEXT("ConstructionScript") ||
                         Name == TEXT("Deinitialize") || Name == TEXT("Initialize") ||
