@@ -163,15 +163,15 @@ bool FDasRuntimeModule::ReadAuthoringScript(const FString& Path, FDasAuthoringMo
     }
     try
     {
-        das::TextWriter Output;
-        das::ModuleGroup Group;
-        auto Access = das::make_smart<FUnrealFileAccess>();
-        Access->addFileSystem(new FUnrealFileSystem(), true, false);
-        const FTCHARToUTF8 File(*Path);
-        auto Program = DSLCompile(File.Get(), Access, Output, Group);
-        if (!Program || Program->failed())
+        const auto Compiled = AcquireCompiledProgram(NormalizeScriptPath(Path), true, true);
+        const auto& Program = Compiled->Program;
+        // Cached references must contribute the same dependency graph as a fresh nested compile.
+        if (AuthoredReferenceSources && AuthoredReferenceSources != &Compiled->Sources)
+            for (const auto& Source : Compiled->Sources)
+                AuthoredReferenceSources->Add(Source.Key, Source.Value);
+        if (!Program || Program->failed() || !Compiled->CompileError.IsEmpty())
         {
-            Error = Errors(Program, Output);
+            Error = Compiled->CompileError;
             return false;
         }
         FDasAuthoringModule Candidate;
@@ -211,6 +211,7 @@ bool FDasRuntimeModule::ReadAuthoringScript(const FString& Path, FDasAuthoringMo
             return false;
         if (ImportedValues)
             *ImportedValues = MoveTemp(Discovered);
+        PinEditorProgram(NormalizeScriptPath(Path), Compiled);
         Out = MoveTemp(Candidate);
         return true;
     }
@@ -231,15 +232,14 @@ bool FDasRuntimeModule::ReadSourceCatalogImports(const FString& Path, FDasSource
     }
     try
     {
-        das::TextWriter Text;
-        das::ModuleGroup Group;
-        auto Access = das::make_smart<FUnrealFileAccess>();
-        Access->addFileSystem(new FUnrealFileSystem(), true, false);
-        const FTCHARToUTF8 File(*Path);
-        auto Program = DSLCompile(File.Get(), Access, Text, Group);
-        if (!Program || Program->failed())
+        const auto Compiled = AcquireCompiledProgram(NormalizeScriptPath(Path), true, true);
+        const auto& Program = Compiled->Program;
+        if (AuthoredReferenceSources && AuthoredReferenceSources != &Compiled->Sources)
+            for (const auto& Source : Compiled->Sources)
+                AuthoredReferenceSources->Add(Source.Key, Source.Value);
+        if (!Program || Program->failed() || !Compiled->CompileError.IsEmpty())
         {
-            Error = Errors(Program, Text);
+            Error = Compiled->CompileError;
             return false;
         }
         FDasSourceCatalog Candidate;
@@ -250,6 +250,7 @@ bool FDasRuntimeModule::ReadSourceCatalogImports(const FString& Path, FDasSource
             Error = TEXT("No authored enum/struct/interface imports found");
             return false;
         }
+        PinEditorProgram(NormalizeScriptPath(Path), Compiled);
         Out = MoveTemp(Candidate);
         return true;
     }
@@ -280,16 +281,11 @@ bool FDasRuntimeModule::ValidateFrameMethod(const FString& Path, FString& Error,
     }
     try
     {
-        das::TextWriter Output;
-        das::ModuleGroup Modules;
-        auto Access = das::make_smart<FUnrealFileAccess>();
-        Access->addFileSystem(new FUnrealFileSystem(), true, false);
-        const FTCHARToUTF8 Utf8Path(*Path);
-        das::CodeOfPolicies Policies;
-        auto Program = DSLCompile(Utf8Path.Get(), Access, Output, Modules, Policies);
-        if (!Program || Program->failed())
+        const auto Compiled = AcquireCompiledProgram(NormalizeScriptPath(Path), true, true);
+        const auto& Program = Compiled->Program;
+        if (!Program || Program->failed() || !Compiled->CompileError.IsEmpty())
         {
-            Error = Errors(Program, Output);
+            Error = Compiled->CompileError;
             return false;
         }
         if (!VerifyContract(Program, EntryPoint, Contract))
@@ -298,6 +294,7 @@ bool FDasRuntimeModule::ValidateFrameMethod(const FString& Path, FString& Error,
             return false;
         }
         // No simulate/eval: runtime global initializers and the method body are not executed during preflight.
+        PinEditorProgram(NormalizeScriptPath(Path), Compiled);
         return true;
     }
     catch (const std::exception& Exception)

@@ -8,6 +8,13 @@
 #include "UObject/WeakObjectPtr.h"
 #include "UObject/WeakObjectPtrTemplates.h"
 
+struct FDasProgramCacheStats
+{
+    uint64 Compilations = 0, Hits = 0, Simulations = 0;
+    int32 ResidentPrograms = 0;
+    uint64 PreparedLoads = 0;
+};
+
 class USaveGame;
 class UDasAuthoredGameplayAbility;
 class UDasGASCueSession;
@@ -167,6 +174,16 @@ public:
     bool IsAuthoredMethodDispatchActive() const;
     bool CanMigrateAuthoredTypes() const;
     int32 PersistentContextCount(const UWorld* World = nullptr) const;
+    FDasProgramCacheStats ProgramCacheStats() const;
+    // No owner globals, initializers or subscriptions execute during preparation.
+    bool PreparePrograms(UWorld* World, const TArray<FString>& Scripts, FString& Error);
+    bool PrepareConfiguredPrograms(UWorld* World, FString& Error);
+    bool PrepareEditorPrograms(const TArray<FString>& Scripts, FString& Error);
+    bool PrepareEditorChanges(const TArray<FString>& Files, bool bHierarchyChanged, FString& Error);
+    TArray<FString> ConfiguredProgramScripts(UWorld* World) const;
+    void SetEditorGameplayActive(bool Active);
+    bool ExportPreparedProgram(const FString& Script, FString& Error);
+    void ClearProgramCache();
     bool ExportNativeGameplayCoverage(const FString& OutputPath, const FString& ProfilePath, FString& Error);
     bool ExportNativeGameplay(const FString& OutputPath, const FString& RequestsPath, FString& Error);
     bool ExportBindings(const FString& SelectionPath, const FString& OutputPath, FString& Error);
@@ -188,6 +205,7 @@ private:
                                                  const FString& ReturnClass = FString(),
                                                  const FDasTypedCall* Typed = nullptr);
     FDelegateHandle InputRestoreTickHandle;
+    FDelegateHandle ProgramWorldLoadHandle;
     FDelegateHandle WorldCleanupHandle;
     FDelegateHandle PostGCHandle;
     FDelegateHandle ObjectsReplacedHandle;

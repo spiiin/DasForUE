@@ -84,6 +84,7 @@ time are in the [changelog](../CHANGELOG.md).
 ## Workflow
 
 - [Apply and hot reload](Guide/Workflow/ApplyAndHotReload.md)
+- [Preparing gameplay programs](Guide/Workflow/PreparedPrograms.md)
 - [Migrations](Guide/Workflow/Migrations.md)
 
 - [Authored WorldSubsystem and GameInstanceSubsystem](Guide/Gameplay/Subsystems.md)

@@ -31,11 +31,11 @@ ESourceCheck SourceCheckFor(const FPersistentSession& Session)
 }
 // Edits by other programs: each file's stat is refreshed at most once per interval for all sessions; bytes are
 // compared only where the stat differs from the snapshot (a touched file with the same bytes keeps the session).
-bool SourcesChangedOnDisk(FPersistentSession& Session)
+bool SourcesChangedOnDisk(FSourceSet& Sources)
 {
     const double Now = FPlatformTime::Seconds();
     const float Interval = CVarScriptChangePollSeconds.GetValueOnGameThread();
-    for (auto& Source : Session.AttemptedSources)
+    for (auto& Source : Sources)
     {
         FPolledStat& Polled = PolledStats.FindOrAdd(Source.Key);
         if (Now - Polled.CheckedAt >= Interval)
@@ -62,6 +62,131 @@ uint8 WidgetContractFlags()
 {
     return uint8(WidgetPaintContract) | uint8(WidgetDragContract) << 1 | uint8(FocusNotificationContract) << 2 |
            uint8(WidgetReplyContract) << 3;
+}
+namespace
+{
+// The compile environment is independent of owner and requested entry; owner/entry contracts are
+// revalidated below for each candidate. Native registration changes must not reuse an older library.
+FString PersistentCompilerKey(const FString& Path)
+{
+    EnsureDasNativeModules();
+    // These execution contracts are checked after acquisition, never baked into the AST:
+    // owner, widget/input/geometry frame, construction, library and GAS invocation.
+    FString Key = Path + FString::Printf(TEXT("|types:%d|"), CollectTypesOnly);
+    TArray<const FDasNativeModuleDesc*> Descriptors;
+    for (const auto* Desc : DasNativeModuleDescs())
+        Descriptors.Add(Desc);
+    Descriptors.Sort([](const FDasNativeModuleDesc& A, const FDasNativeModuleDesc& B) { return A.Name < B.Name; });
+    for (const auto* Desc : Descriptors)
+        Key += Desc->Name + FString::Printf(TEXT(":%d:%d:%d|"), Desc->bLoaded, Desc->bBuilt, Desc->bAttempted);
+    return Key;
+}
+void RetainCompiledProgram(const TSharedPtr<FCompiledProgram>& Program)
+{
+    ResidentCompiledPrograms.Remove(Program);
+    ResidentCompiledPrograms.Add(Program);
+    const int32 Limit = FMath::Clamp(CVarCompiledProgramCacheEntries.GetValueOnGameThread(), 0, 4096);
+    while (ResidentCompiledPrograms.Num() > Limit)
+        ResidentCompiledPrograms.RemoveAt(0);
+}
+TSharedPtr<FCompiledProgram> AcquireCompiledProgram(const FString& Path, bool bAllowSourceCompilation,
+                                                    bool bPreparation)
+{
+    DrainScriptWrites();
+    const FString Key = PersistentCompilerKey(Path);
+    if (auto* Weak = KnownCompiledPrograms.Find(Key))
+        if (auto Cached = Weak->Pin(); Cached && !Cached->bSimulating)
+        {
+            const int32 Mode = bPreparation ? 0 : CVarScriptChangeCheck.GetValueOnGameThread();
+            const bool Full = Mode != 2 && (Mode == 0 || Cached->CheckedEpoch != ScriptSourceEpoch);
+            bool Changed = false, Polled = false;
+            if (Full)
+            {
+                for (const auto& Source : Cached->Sources)
+                    if (!Source.Value.Matches(Source.Key))
+                    {
+                        Changed = true;
+                        break;
+                    }
+            }
+            else if (Mode != 2 &&
+                     FPlatformTime::Seconds() - Cached->CheckedAt >= CVarScriptChangePollSeconds.GetValueOnGameThread())
+            {
+                Changed = SourcesChangedOnDisk(Cached->Sources);
+                Polled = true;
+            }
+            if (!Changed)
+            {
+                if (Full || Polled)
+                    Cached->CheckedEpoch = ScriptSourceEpoch;
+                // A cache hit is not a disk check: keep the poll deadline for continuous spawning.
+                if (Full || Polled)
+                    Cached->CheckedAt = FPlatformTime::Seconds();
+                ++PersistentCompileCacheHits;
+                RetainCompiledProgram(Cached);
+                return Cached;
+            }
+            ResidentCompiledPrograms.Remove(Cached);
+        }
+    auto Compiled = MakeShared<FCompiledProgram>();
+    Compiled->Sources.Add(Path, FSourceSnapshot::Read(Path));
+    auto Access = das::make_smart<FUnrealFileAccess>();
+    Access->addFileSystem(new FUnrealFileSystem(&Compiled->Sources), true, false);
+    Compiled->Access = Access;
+    das::TextWriter Output;
+    try
+    {
+        const FTCHARToUTF8 Utf8Path(*Path);
+        TGuardValue<FSourceSet*> ReferenceDependencies(AuthoredReferenceSources, &Compiled->Sources);
+        FString PreparedError;
+        if (!(GIsEditor && bPreparation && !RequirePreparedPrograms()) &&
+            LoadPreparedProgram(Path, Key.RightChop(Path.Len()), *Compiled, PreparedError))
+            ++PreparedProgramLoads;
+        else if (RequirePreparedPrograms())
+            Compiled->CompileError = TEXT("Prepared daScript program required: ") + Path + TEXT("; ") + PreparedError;
+        else if (!bAllowSourceCompilation)
+        {
+            Compiled->bPreparationMissing = true;
+            Compiled->CompileError =
+                TEXT("Gameplay program is not prepared: ") + Path +
+                     TEXT(". Wait for saved scripts to finish compiling or prepare the script before use.");
+        }
+        else
+        {
+            ++PersistentCompileCount;
+            Compiled->Program = DSLCompile(Utf8Path.Get(), Access, Output, Compiled->Modules);
+        }
+        if (Compiled->CompileError.IsEmpty() && (!Compiled->Program || Compiled->Program->failed()))
+            Compiled->CompileError = Errors(Compiled->Program, Output);
+    }
+    catch (const std::exception& E)
+    {
+        Compiled->CompileError = UTF8_TO_TCHAR(E.what());
+    }
+    Compiled->CheckedEpoch = ScriptSourceEpoch;
+    Compiled->CheckedAt = FPlatformTime::Seconds();
+    if (!Compiled->bPreparationMissing)
+    {
+        for (auto It = KnownCompiledPrograms.CreateIterator(); It; ++It)
+            if (!It.Value().IsValid())
+                It.RemoveCurrent();
+        KnownCompiledPrograms.Add(Key, Compiled);
+        RetainCompiledProgram(Compiled);
+    }
+    return Compiled;
+}
+}
+FDasProgramCacheStats FDasRuntimeModule::ProgramCacheStats() const
+{
+    check(IsInGameThread());
+    return {PersistentCompileCount, PersistentCompileCacheHits, PersistentSimulationCount,
+            ResidentCompiledPrograms.Num(), PreparedProgramLoads};
+}
+void FDasRuntimeModule::ClearProgramCache()
+{
+    check(IsInGameThread());
+    ClearCompiledPrograms(); // Existing contexts keep their compiler artifact and all state.
+    EditorProgramAttempts.Empty();
 }
 void FDasRuntimeModule::NotifyScriptsChanged(const TArray<FString>& Files, bool bFilesAddedOrRemoved)
 {
@@ -486,7 +611,7 @@ FDasExecutionResult FDasRuntimeModule::RunCallback(const FString& Path, EDasCall
     }
     DasCallPhaseMark(EDasCallPhase::Session);
     bool bChanged =
-        Session->AttemptedSources.IsEmpty() ||
+        Session->AttemptedSources.IsEmpty() || (Session->bPreparationMissing && AllowGameplayCompilation(Owner)) ||
         (!Session->Live && (Session->AttemptedEntry != EntryPoint || Session->AttemptedContract != Expected));
     if (!bChanged)
     {
@@ -501,7 +626,7 @@ FDasExecutionResult FDasRuntimeModule::RunCallback(const FString& Path, EDasCall
                 }
         }
         else if (Check == ESourceCheck::Poll)
-            bChanged = SourcesChangedOnDisk(*Session);
+            bChanged = SourcesChangedOnDisk(Session->AttemptedSources);
         if (!bChanged && Check != ESourceCheck::None)
             MarkSourcesChecked(*Session);
     }
@@ -526,20 +651,18 @@ FDasExecutionResult FDasRuntimeModule::RunCallback(const FString& Path, EDasCall
         Session->AttemptedSources.Add(FullPath, FSourceSnapshot::Read(FullPath));
         MarkSourcesChecked(*Session); // The compile below snapshots every source it reads.
         FString CandidateError;
-        auto Candidate = MakeUnique<FCompiledContext>();
+        TUniquePtr<FCompiledContext> Candidate;
         try
         {
             das::TextWriter Output;
-            auto Access = das::make_smart<FUnrealFileAccess>();
-            Access->addFileSystem(new FUnrealFileSystem(&Session->AttemptedSources), true, false);
-            Candidate->Access = Access;
-            const FTCHARToUTF8 Utf8Path(*FullPath);
-            {
-                TGuardValue<FSourceSet*> ReferenceDependencies(AuthoredReferenceSources, &Session->AttemptedSources);
-                Candidate->Program = DSLCompile(Utf8Path.Get(), Access, Output, Candidate->Modules);
-            }
-            if (!Candidate->Program || Candidate->Program->failed())
-                CandidateError = Errors(Candidate->Program, Output);
+            auto Compiled = AcquireCompiledProgram(FullPath, AllowGameplayCompilation(Owner));
+            Session->bPreparationMissing = Compiled->bPreparationMissing;
+            Candidate = MakeUnique<FCompiledContext>(Compiled);
+            Session->AttemptedSources = Compiled->Sources;
+            MarkSourcesChecked(*Session);
+            if (!Candidate->Program || Candidate->Program->failed() || !Compiled->CompileError.IsEmpty())
+                CandidateError =
+                    Compiled->CompileError.IsEmpty() ? TEXT("Script compilation failed") : Compiled->CompileError;
             else if (!DSLValidateOwner(Candidate->Program, EntryPoint, Self.Get(), Candidate->DSLDeclaration,
                                        CandidateError))
             {
@@ -572,11 +695,30 @@ FDasExecutionResult FDasRuntimeModule::RunCallback(const FString& Path, EDasCall
                         SnapshotPersistentGlobals(Session->Live->Program, *Session->Live->Context);
                 FActiveContextScope Scope(*Candidate->Context);
                 // No self during initialization: rejected code cannot alter the live Actor.
-                if (!Candidate->Program->simulate(*Candidate->Context, Output))
+                // simulate builds owner-local code, globals, shared globals and heaps. Do not clone a
+                // Context: daScript's copy constructor intentionally aliases its shared memory.
+                bool Simulated = false;
+                const auto ErrorsBefore = Candidate->Program->errors.size();
+                const uint32 FlagsBefore = Candidate->Program->flags;
                 {
-                    CandidateError = Candidate->Context->getException()
-                        ? DSLDiagnosticRuntime(*Candidate->Context, Candidate->Program, TEXT("initialization"))
-                                               : Errors(Candidate->Program, Output);
+                    TGuardValue<bool> Simulating(Candidate->Compiler->bSimulating, true);
+                    ON_SCOPE_EXIT
+                    {
+                        // Program::simulate reports runtime-init errors in Program::errors. Such a
+                        // failure belongs to this context and must not poison other owners/candidates.
+                        Candidate->Program->errors.resize(ErrorsBefore);
+                        Candidate->Program->flags = FlagsBefore;
+                    };
+                    ++PersistentSimulationCount;
+                    Simulated = Candidate->Program->simulate(*Candidate->Context, Output);
+                    if (!Simulated)
+                        CandidateError = Candidate->Context->getException()
+                            ? DSLDiagnosticRuntime(*Candidate->Context, Candidate->Program, TEXT("initialization"))
+                                                   : Errors(Candidate->Program, Output);
+                }
+                Session->AttemptedSources = Candidate->Compiler->Sources;
+                if (!Simulated)
+                {
                     if (CandidateError.IsEmpty())
                         CandidateError = TEXT("Candidate initialization failed.");
                 }
@@ -683,10 +825,12 @@ FDasExecutionResult FDasRuntimeModule::RunCallback(const FString& Path, EDasCall
         {
             CandidateError = UTF8_TO_TCHAR(Exception.what());
         }
-        if (CandidateError.IsEmpty() && Candidate->Context && Candidate->Program && !Candidate->Program->failed())
+        if (CandidateError.IsEmpty() && Candidate && Candidate->Context && Candidate->Program &&
+            !Candidate->Program->failed())
             CompileDSLPhysics(*Candidate, Session->Live.Get(), FullPath, Owner, Session->AttemptedSources,
                               ParentLifecycle, Session->bBeginDelivered && DSLPhysicsOwnerReady(Owner), CandidateError);
-        if (CandidateError.IsEmpty() && Candidate->Context && Candidate->Program && !Candidate->Program->failed())
+        if (CandidateError.IsEmpty() && Candidate && Candidate->Context && Candidate->Program &&
+            !Candidate->Program->failed())
         {
             ClearSessionTimers(*Session, Candidate->Context.Get());
             Session->Bindings.Empty();
@@ -716,6 +860,11 @@ FDasExecutionResult FDasRuntimeModule::RunCallback(const FString& Path, EDasCall
             InstallSubscriptions(*Session);
             // Old physics callbacks were revoked before committing the staged replacement.
             ++Session->Revision;
+            Session->ReloadError.Empty();
+        }
+        else if (Session->bPreparationMissing && Session->Live)
+        {
+            // Saving is debounced. Waiting for the editor queue is normal, not a broken live program.
             Session->ReloadError.Empty();
         }
         else

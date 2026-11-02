@@ -48,6 +48,27 @@ public class DasRuntime : ModuleRules
         PrivateDependencyModuleNames.AddRange(new[] { "Projects", "Json", "AssetRegistry", "InputCore", "ApplicationCore", "EnhancedInput", "Slate", "SlateCore", "Niagara", "NavigationSystem", "PhysicsCore", "Chaos" });
         string Root = Path.GetFullPath(Path.Combine(ModuleDirectory, "../../../.."));
         string Das = Path.Combine(Root, "ThirdParty", "daScript");
+        // Identical in Editor/Game, tied to the production bridge and actual compiler library.
+        using (var Hash = System.Security.Cryptography.SHA256.Create())
+        using (var Identity = new MemoryStream())
+        {
+            var Inputs = new System.Collections.Generic.List<string>(
+                Directory.GetFiles(ModuleDirectory, "*", SearchOption.AllDirectories));
+            Inputs.RemoveAll(File => !(File.EndsWith(".h") || File.EndsWith(".cpp") || File.EndsWith(".inl") || File.EndsWith(".cs")));
+            Inputs.Sort(System.StringComparer.Ordinal);
+            Inputs.Add(Path.Combine(Das, "lib", "Release", "libDaScript.lib"));
+            Inputs.Add(Path.Combine(Das, "lib", "Release", "libDaScript_runtime.lib"));
+            foreach (string Input in Inputs)
+            {
+                using (var Stream = System.IO.File.OpenRead(Input))
+                {
+                    byte[] Digest = Hash.ComputeHash(Stream);
+                    Identity.Write(Digest, 0, Digest.Length);
+                }
+                ExternalDependencies.Add(Input);
+            }
+            PrivateDefinitions.Add("DAS_PREPARED_ABI=\"" + System.Convert.ToHexString(Hash.ComputeHash(Identity.ToArray())) + "\"");
+        }
         PublicSystemIncludePaths.Add(Path.Combine(Das, "include"));
         PublicSystemIncludePaths.Add(Path.Combine(Das, "3rdparty", "fmt", "include"));
         PrivateDefinitions.AddRange(new[] {
@@ -80,6 +101,10 @@ public class DasRuntime : ModuleRules
         }
         // Project-owned scripts are intentional gameplay input; data files require explicit opt-in.
         string ProjectScripts = Path.Combine(ProjectRoot, "Content", "Das", "Scripts");
+        string Prepared = Path.Combine(ProjectRoot, "Content", "Das", "Prepared");
+        if (ProjectRoot.Length != 0 && Directory.Exists(Prepared))
+            foreach (string File in Directory.GetFiles(Prepared, "*.dasp", SearchOption.TopDirectoryOnly))
+            { RuntimeDependencies.Add(File, StagedFileType.UFS); ExternalDependencies.Add(File); }
         if (ProjectRoot.Length != 0 && Directory.Exists(ProjectScripts))
             foreach (string File in Directory.GetFiles(ProjectScripts, "*.das", SearchOption.AllDirectories))
             { RuntimeDependencies.Add(File, StagedFileType.UFS); ExternalDependencies.Add(File); }

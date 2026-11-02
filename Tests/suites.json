@@ -7,6 +7,26 @@
       "name": "build"
     },
     {
+      "name": "program-cache",
+      "kind": "script",
+      "script": "TestProgramCache.ps1",
+      "requires": [
+        "build"
+      ]
+    },
+    {
+      "name": "prepare-programs",
+      "kind": "script",
+      "script": "PreparePrograms.ps1",
+      "requires": ["build"]
+    },
+    {
+      "name": "editor-preparation",
+      "kind": "script",
+      "script": "TestEditorPreparation.ps1",
+      "requires": ["build"]
+    },
+    {
       "name": "generic-parents",
       "kind": "script",
       "script": "TestGenericParents.ps1",

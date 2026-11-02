@@ -6,6 +6,9 @@
 #include "DasTypeService.h"
 #include "StructUtils/UserDefinedStruct.h"
 #include "DasRuntime.h"
+#include "Features/IModularFeatures.h"
+#include "Misc/ScopeExit.h"
+#include "Misc/ScopedSlowTask.h"
 #include "DirectoryWatcherModule.h"
 #include "Editor.h"
 #include "IDirectoryWatcher.h"
@@ -53,10 +56,18 @@ FString FullPath(const FString& Path)
 
 void FDasAutoReimport::Start()
 {
+    if (bStarted)
+        return;
+    bStarted = true;
+    IModularFeatures::Get().RegisterModularFeature(IPIEAuthorizer::GetModularFeatureName(), this);
     // The same folders the runtime resolves script names in (FDasRuntimeModule::ScriptPath).
     TArray<FString> Folders{FPaths::ProjectContentDir() / TEXT("Das/Scripts")};
+    IFileManager::Get().MakeDirectory(*Folders[0], true);
     if (auto Plugin = IPluginManager::Get().FindPlugin(TEXT("DasForUE")))
+    {
         Folders.Add(Plugin->GetContentDir() / TEXT("Das/Scripts"));
+        Folders.Add(Plugin->GetContentDir() / TEXT("Das/Runtime"));
+    }
     auto* Watcher = FModuleManager::LoadModuleChecked<FDirectoryWatcherModule>(TEXT("DirectoryWatcher")).Get();
     for (const FString& Folder : Folders)
     {
@@ -73,12 +84,24 @@ void FDasAutoReimport::Start()
         FModuleManager::LoadModuleChecked<FDasRuntimeModule>(TEXT("DasRuntime")).SetScriptWatcherActive(true);
     EndPIEHandle = FEditorDelegates::EndPIE.AddRaw(this, &FDasAutoReimport::OnEndPIE);
     PreBeginPIEHandle = FEditorDelegates::PreBeginPIE.AddRaw(this, &FDasAutoReimport::OnPreBeginPIE);
+    BeginPIEHandle = FEditorDelegates::BeginPIE.AddLambda(
+        [](bool)
+        { FModuleManager::LoadModuleChecked<FDasRuntimeModule>(TEXT("DasRuntime")).SetEditorGameplayActive(true); });
+    CancelPIEHandle = FEditorDelegates::CancelPIE.AddLambda(
+        []
+        { FModuleManager::LoadModuleChecked<FDasRuntimeModule>(TEXT("DasRuntime")).SetEditorGameplayActive(false); });
     MapOpenedHandle = FEditorDelegates::OnMapOpened.AddRaw(this, &FDasAutoReimport::OnMapOpened);
     // The startup map may already be open.
     OnMapOpened(FString(), false);
 }
 void FDasAutoReimport::Stop()
 {
+    if (!bStarted)
+        return;
+    bStarted = false;
+    IModularFeatures::Get().UnregisterModularFeature(IPIEAuthorizer::GetModularFeatureName(), this);
+    if (auto* Runtime = FModuleManager::GetModulePtr<FDasRuntimeModule>(TEXT("DasRuntime")))
+        Runtime->SetEditorGameplayActive(false);
     if (auto* Module = FModuleManager::GetModulePtr<FDirectoryWatcherModule>(TEXT("DirectoryWatcher")))
         if (auto* Watcher = Module->Get())
             for (const auto& Watch : Watches)
@@ -89,6 +112,8 @@ void FDasAutoReimport::Stop()
     Watches.Reset();
     FEditorDelegates::EndPIE.Remove(EndPIEHandle);
     FEditorDelegates::PreBeginPIE.Remove(PreBeginPIEHandle);
+    FEditorDelegates::BeginPIE.Remove(BeginPIEHandle);
+    FEditorDelegates::CancelPIE.Remove(CancelPIEHandle);
     FEditorDelegates::OnMapOpened.Remove(MapOpenedHandle);
     for (auto* Handle : {&Ticker, &RetryTicker, &StaleTicker})
     {
@@ -102,6 +127,7 @@ void FDasAutoReimport::Stop()
         CloseConfirmation(Path);
     Confirmed.Reset();
     Pending.Reset();
+    bPendingHierarchyChange = false;
     Deferred.Reset();
     DeferredGAS.Reset();
     DeferredTypes.Reset();
@@ -109,21 +135,23 @@ void FDasAutoReimport::Stop()
 }
 void FDasAutoReimport::OnScriptsChanged(const TArray<FFileChangeData>& Changes)
 {
-    // Hot reload of method bodies: the next call of an affected script compares its sources at once,
-    // without waiting for the settle delay of the declaration reimport below.
+    // Invalidate immediately, but compile once in the settled editor queue, never in a gameplay call.
     TArray<FString> Changed;
     bool bAddedOrRemoved = false;
     for (const auto& Change : Changes)
     {
+        const FString Extension = FPaths::GetExtension(Change.Filename).ToLower();
+        if (!Extension.IsEmpty() && Extension != TEXT("das") && Extension != TEXT("json"))
+            continue;
         Changed.Add(FullPath(Change.Filename));
         bAddedOrRemoved |= Change.Action != FFileChangeData::FCA_Modified;
     }
     if (!Changed.IsEmpty())
-        FModuleManager::LoadModuleChecked<FDasRuntimeModule>(TEXT("DasRuntime"))
-            .NotifyScriptsChanged(Changed, bAddedOrRemoved);
-    for (const auto& Change : Changes)
-        if (Change.Action != FFileChangeData::FCA_Removed && FPaths::GetExtension(Change.Filename) == TEXT("das"))
-            Pending.Add(FullPath(Change.Filename));
+        FModuleManager::LoadModuleChecked<FDasRuntimeModule>(
+            TEXT("DasRuntime")).NotifyScriptsChanged(Changed, bAddedOrRemoved);
+    bPendingHierarchyChange |= bAddedOrRemoved;
+    for (const auto& File : Changed)
+        Pending.Add(File);
     if (!Pending.IsEmpty() && !Ticker.IsValid())
         Ticker = FTSTicker::GetCoreTicker().AddTicker(
             FTickerDelegate::CreateRaw(this, &FDasAutoReimport::ProcessPending), SettleSeconds);
@@ -133,9 +161,17 @@ bool FDasAutoReimport::ProcessPending(float)
     Ticker.Reset();
     const TSet<FString> Saved = MoveTemp(Pending);
     Pending.Reset();
+    const bool Hierarchy = bPendingHierarchyChange;
+    bPendingHierarchyChange = false;
     // Automation tests rewrite sources and apply them themselves.
     if (CVarAutoReimport.GetValueOnGameThread() != 0 && !GIsAutomationTesting)
         ReimportFiles(Saved);
+    if (!GIsAutomationTesting)
+    {
+        FString Error;
+        if (!PrepareSavedPrograms(Saved, Hierarchy, Error))
+            DasDiagnosticEditor::Report(Error);
+    }
     return false;
 }
 TArray<UBlueprint*> FDasAutoReimport::Bound(const TSet<FString>* Files) const
@@ -334,10 +370,134 @@ void FDasAutoReimport::ReimportStale()
         Checked.Add(Key, {Stamp, FString()});
     }
 }
+bool FDasAutoReimport::PrepareSavedPrograms(const TSet<FString>& Files, bool bHierarchyChanged, FString& Error)
+{
+    return FModuleManager::LoadModuleChecked<FDasRuntimeModule>(
+        TEXT("DasRuntime")).PrepareEditorChanges(Files.Array(), bHierarchyChanged, Error);
+}
+bool FDasAutoReimport::PrepareAllPrograms(FString& Error)
+{
+    Error.Reset();
+    auto& Runtime = FModuleManager::LoadModuleChecked<FDasRuntimeModule>(TEXT("DasRuntime"));
+    TArray<FString> Scripts;
+    IFileManager::Get().FindFilesRecursive(Scripts, *(FPaths::ProjectContentDir() / TEXT("Das/Scripts")),
+                                                      TEXT("*.das"), true, false);
+    for (auto& Script : Scripts)
+        Script = FullPath(Script);
+    const auto Plugin = IPluginManager::Get().FindPlugin(TEXT("DasForUE"));
+    if (!Plugin.IsValid())
+    {
+        Error = TEXT("DasForUE plugin content is unavailable");
+        return false;
+    }
+    const FString PluginScripts = FullPath(Plugin->GetContentDir() / TEXT("Das"));
+    auto Manifest = [&](const FString& File, bool Required)
+    {
+        if (!Required && !IFileManager::Get().FileExists(*File))
+            return true;
+        TArray<FString> Lines;
+        if (!FFileHelper::LoadFileToStringArray(Lines, *File))
+        {
+            Error = TEXT("Cannot read script manifest: ") + File;
+            return false;
+        }
+        for (auto& Line : Lines)
+        {
+            Line.TrimStartAndEndInline();
+            if (Line.IsEmpty() || Line.StartsWith(TEXT("#")))
+                continue;
+            FString Full = FullPath(PluginScripts / Line);
+            if (!FPaths::IsRelative(Line) ||
+                Line.Contains(TEXT("*")) || Line.Contains(TEXT("?")) || !FPaths::CollapseRelativeDirectories(Full) ||
+                                                          !FPaths::IsUnderDirectory(Full, PluginScripts) ||
+                                                          !IFileManager::Get().FileExists(*Full))
+            {
+                Error = TEXT("Missing or invalid script manifest entry: ") + File + TEXT(": ") + Line;
+                return false;
+            }
+            if (FPaths::GetExtension(Full).Equals(TEXT("das"), ESearchCase::IgnoreCase))
+                Scripts.AddUnique(Full);
+        }
+        return true;
+    };
+    // Runtime modules and explicitly connected plugin examples, not intentional negative test fixtures.
+    if (!Manifest(PluginScripts / TEXT("RuntimeScripts.txt"), true) ||
+                  !Manifest(FPaths::ProjectConfigDir() / TEXT("DasPluginScripts.txt"), false))
+        return false;
+    UWorld* EditorWorld = GEditor ? GEditor->GetEditorWorldContext(false).World() : nullptr;
+    for (const auto& Script : Runtime.ConfiguredProgramScripts(EditorWorld))
+        Scripts.AddUnique(FullPath(FPaths::IsRelative(Script) ? Runtime.ScriptPath(Script) : Script));
+    Scripts.Sort();
+    FScopedSlowTask Progress(float(Scripts.Num()),
+                             NSLOCTEXT("DasForUE", "CompileAllScripts", "Compiling daScript scripts"));
+    if (!IsRunningCommandlet() && !GIsAutomationTesting)
+        Progress.MakeDialogDelayed(1.f);
+    const auto Before = Runtime.ProgramCacheStats();
+    int32 Failed = 0;
+    for (const auto& Script : Scripts)
+    {
+        Progress.EnterProgressFrame(1.f, FText::FromString(FPaths::GetCleanFilename(Script)));
+        FString Issue;
+        if (!Runtime.PrepareEditorPrograms({Script}, Issue))
+        {
+            if (!Error.IsEmpty())
+                Error += TEXT("\n");
+            Error += Issue;
+            ++Failed;
+        }
+    }
+    UE_LOG(LogTemp, Display,
+           TEXT("DAS_EDITOR_COMPILE_ALL scripts=%d failed=%d source_compiles=%llu"), Scripts.Num(), Failed,
+                Runtime.ProgramCacheStats().Compilations - Before.Compilations);
+    return Failed == 0;
+}
+bool FDasAutoReimport::PrepareForPlay(FString& Error)
+{
+    Error.Reset();
+    ON_SCOPE_EXIT
+    {
+        PlayPreparationError = Error;
+    };
+    auto& Runtime = FModuleManager::LoadModuleChecked<FDasRuntimeModule>(TEXT("DasRuntime"));
+    const auto Blueprints = Bound(nullptr);
+    if (!PrepareAllPrograms(Error))
+        return false;
+    // A successful compile alone is insufficient when a structural reimport was refused/deferred.
+    for (auto* Blueprint : Blueprints)
+    {
+        auto& Metadata = Blueprint->GetOutermost()->GetMetaData();
+        const FString Source = Metadata.GetValue(Blueprint, TEXT("DasDSLSource"));
+        FDasAuthoringModule Model;
+        FString Json;
+        const FString Path = FPaths::IsRelative(Source) ? Runtime.ScriptPath(Source) : Source;
+        if (!Runtime.ReadAuthoringScript(Path, Model, Error) || !Model.ToJson(Json, Error))
+            return false;
+        if (Json != Metadata.GetValue(Blueprint, TEXT("DasDSLModel")))
+        {
+            Error = TEXT("Apply/reimport the changed DSL declaration before Play: ") + Blueprint->GetPathName();
+            return false;
+        }
+    }
+    return true;
+}
+TValueOrError<bool, FText> FDasAutoReimport::IsPIEAuthorizedInternal(bool) const
+{
+    // Silent toolbar queries cannot run the compiler or keep Play disabled after a source repair.
+    return MakeValue(true);
+}
+TValueOrError<bool, FText> FDasAutoReimport::RequestPIEPermissionInternal(bool) const
+{
+    if (!PlayPreparationError.IsEmpty())
+        return MakeError(FText::FromString(PlayPreparationError));
+    return MakeValue(true);
+}
 void FDasAutoReimport::OnPreBeginPIE(bool)
 {
     if (CVarAutoReimport.GetValueOnGameThread() != 0 && !GIsAutomationTesting)
         ReimportStale();
+    FString Error;
+    if (!PrepareForPlay(Error))
+        DasDiagnosticEditor::Report(Error);
 }
 void FDasAutoReimport::OnMapOpened(const FString&, bool)
 {
@@ -348,7 +508,14 @@ void FDasAutoReimport::OnMapOpened(const FString&, bool)
 bool FDasAutoReimport::CheckStale(float)
 {
     StaleTicker.Reset();
-    OnPreBeginPIE(false);
+    if (CVarAutoReimport.GetValueOnGameThread() != 0 && !GIsAutomationTesting)
+        ReimportStale();
+    if (!IsRunningCommandlet() && !GIsAutomationTesting)
+    {
+        FString Error;
+        if (!PrepareAllPrograms(Error))
+            DasDiagnosticEditor::Report(Error);
+    }
     return false;
 }
 void FDasAutoReimport::Reimport(UBlueprint* Blueprint, bool bRetry)
@@ -416,6 +583,7 @@ void FDasAutoReimport::Reimport(UBlueprint* Blueprint, bool bRetry)
 }
 void FDasAutoReimport::OnEndPIE(bool)
 {
+    FModuleManager::LoadModuleChecked<FDasRuntimeModule>(TEXT("DasRuntime")).SetEditorGameplayActive(false);
     if ((!Deferred.IsEmpty() || !DeferredGAS.IsEmpty() || !DeferredTypes.IsEmpty()) && !RetryTicker.IsValid())
         RetryTicker = FTSTicker::GetCoreTicker().AddTicker(
             FTickerDelegate::CreateRaw(this, &FDasAutoReimport::RetryAfterPIE), SettleSeconds);

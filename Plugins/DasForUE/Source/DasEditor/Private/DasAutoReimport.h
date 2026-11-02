@@ -1,6 +1,7 @@
 #pragma once
 #include "CoreMinimal.h"
 #include "Containers/Ticker.h"
+#include "IPIEAuthorizer.h"
 
 struct FFileChangeData;
 struct FDasReimportPlan;
@@ -17,11 +18,16 @@ class SNotificationItem;
 // waits for Apply in a notification that lists the changes and the assets (Details shows all of them).
 // Struct scripts (ue_struct, imported with Das.DSL.Types.Apply) migrate their structs the same way: removals and
 // numeric retypes, and changes that reach Blueprints, maps or DataTables, ask first.
-class FDasAutoReimport
+class FDasAutoReimport : public IPIEAuthorizer
 {
 public:
     void Start();
     void Stop();
+    bool PrepareForPlay(FString& Error);
+    bool PrepareAllPrograms(FString& Error);
+    bool PrepareSavedPrograms(const TSet<FString>& Files, bool bHierarchyChanged, FString& Error);
+    // UE's non-exported RequestPIEPermission forwarder calls this virtual gate.
+    TValueOrError<bool, FText> RequestPIEPermissionInternal(bool) const override;
     // Reimports the loaded Blueprints bound to these .das files (full, normalized paths).
     void ReimportFiles(const TSet<FString>& Files);
     // Reimports the Blueprints refused during PIE; runs once PIE has ended.
@@ -44,6 +50,7 @@ public:
     void Decline(FString Key);
 
 private:
+    TValueOrError<bool, FText> IsPIEAuthorizedInternal(bool) const override;
     void OnScriptsChanged(const TArray<FFileChangeData>& Changes);
     bool ProcessPending(float);
     void OnEndPIE(bool);
@@ -65,6 +72,8 @@ private:
 
     TArray<TPair<FString, FDelegateHandle>> Watches;
     TSet<FString> Pending;
+    bool bPendingHierarchyChange = false, bStarted = false;
+    FString PlayPreparationError;
     TArray<TWeakObjectPtr<UBlueprint>> Deferred;
     TSet<TPair<FString, FString>> DeferredGAS, DeferredTypes;
     TMap<FString, TWeakPtr<SNotificationItem>> Confirmations;
@@ -74,5 +83,5 @@ private:
     // Script timestamp and declaration of each Blueprint at its last stale check.
     TMap<FString, TPair<FDateTime, FString>> Checked;
     FTSTicker::FDelegateHandle Ticker, RetryTicker, StaleTicker;
-    FDelegateHandle EndPIEHandle, PreBeginPIEHandle, MapOpenedHandle;
+    FDelegateHandle EndPIEHandle, PreBeginPIEHandle, BeginPIEHandle, CancelPIEHandle, MapOpenedHandle;
 };

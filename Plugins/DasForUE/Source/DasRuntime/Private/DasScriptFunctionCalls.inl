@@ -310,6 +310,7 @@ bool FDasRuntimeModule::CallScriptSite(FDasScriptCallSite& Site, UObject* Owner,
         return false;
     if (Session->Owner.Get() != Owner || !Session->Live || Session->Live.Get() != Site.Live ||
         Session->Revision != Site.Revision || Session->bEndDelivered || Session->bReleaseRequested ||
+        Session->AttemptedSources.IsEmpty() || Session->bPreparationMissing ||
         SourceCheckFor(*Session) != ESourceCheck::None)
         return false;
     // Only a top-level call: the full path handles nested, widget, delegate, construction and library dispatch.

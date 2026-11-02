@@ -9,15 +9,61 @@ FString Errors(const das::ProgramPtr& Program, das::TextWriter& Output)
     return UTF8_TO_TCHAR(Text.c_str());
 }
 
+// Compiler ownership is shared; every owner still gets a freshly simulated context.
+struct FCompiledProgram
+{
+    FSourceSet Sources; // Must outlive Access: its filesystem records dependencies here, never in a session.
+    das::vector<das::FileInfoPtr> SerializedFileInfos;
+    das::ModuleGroup Modules;
+    das::FileAccessPtr Access;
+    das::ProgramPtr Program;
+    FString CompileError;
+    uint64 CheckedEpoch = 0;
+    double CheckedAt = 0;
+    bool bSimulating = false;
+    bool bPreparationMissing = false;
+};
+TMap<FString, TWeakPtr<FCompiledProgram>> KnownCompiledPrograms;
+TArray<TSharedPtr<FCompiledProgram>> ResidentCompiledPrograms;
+// Keep failed attempts too; live contexts own the last working version independently.
+TMap<FString, TSharedPtr<FCompiledProgram>> EditorProgramAttempts;
+bool EditorGameplayActive = false;
+void PinEditorProgram(const FString& Path, const TSharedPtr<FCompiledProgram>& Compiled);
+TSharedPtr<FCompiledProgram> AcquireCompiledProgram(const FString& Path, bool bAllowSourceCompilation = true,
+                                                    bool bPreparation = false);
+bool AllowGameplayCompilation(UObject* Owner)
+{
+    const auto* World = Owner ? Owner->GetWorld() : nullptr;
+    return !EditorGameplayActive && (GIsEditor || IsRunningCommandlet()) && (!World || !World->IsGameWorld());
+}
+uint64 PersistentCompileCount = 0, PersistentCompileCacheHits = 0, PersistentSimulationCount = 0;
+FDelegateHandle ProgramCachePreGCHandle;
+TMap<TWeakObjectPtr<UWorld>, TArray<TSharedPtr<FCompiledProgram>>> WorldPreparedPrograms;
+uint64 PreparedProgramLoads = 0;
+bool LoadPreparedProgram(const FString& Path, const FString& Environment, FCompiledProgram& Out, FString& Error);
+bool RequirePreparedPrograms();
+TAutoConsoleVariable<int32> CVarCompiledProgramCacheEntries(TEXT("das.CompiledProgramCacheEntries"), 32,
+    TEXT("Idle compiler artifacts retained between owners. 0 retains only programs held by sessions or preparation."));
+void ClearCompiledPrograms()
+{
+    KnownCompiledPrograms.Empty();
+    ResidentCompiledPrograms.Empty();
+}
 // Declaration order keeps compiler owners alive until the context is destroyed.
 struct FCompiledContext
 {
     FString DSLDeclaration;
     TSharedPtr<FDSLAsyncPhysicsState> Physics;
     bool bPhysicsOwner = false, bPhysicsForeignSession = false;
-    das::ModuleGroup Modules;
-    das::FileAccessPtr Access;
-    das::ProgramPtr Program;
+    TSharedPtr<FCompiledProgram> Compiler;
+    das::ModuleGroup& Modules;
+    das::ProgramPtr& Program;
+    das::FileAccessPtr& Access;
+    FCompiledContext() : FCompiledContext(MakeShared<FCompiledProgram>()) {}
+    explicit FCompiledContext(const TSharedPtr<FCompiledProgram>& InCompiler)
+        : Compiler(InCompiler), Modules(Compiler->Modules), Program(Compiler->Program), Access(Compiler->Access)
+    {
+    }
     TUniquePtr<FUnrealDasContext> Context;
     das::SimFunction* Function = nullptr;
     das::SimFunction* Initializer = nullptr;
@@ -205,6 +251,7 @@ struct FPersistentSession
     FDasCallContract AttemptedContract;
     TUniquePtr<FCompiledContext> Live;
     FString ReloadError;
+    bool bPreparationMissing = false;
     uint32 Revision = 0;
     bool bBeginDelivered = false;
     bool bEndDelivered = false;
@@ -250,11 +297,10 @@ struct FCachedScriptPath
 TMap<FString, FCachedScriptPath> ScriptPathCache;
 TAutoConsoleVariable<int32> CVarScriptChangeCheck(
     TEXT("das.ScriptChangeCheck"), -1,
-    TEXT("When persistent script calls compare their sources with disk: -1 or 1 watch (after a reported change: ")
-        TEXT("writes in this process, the editor file watcher, NotifyScriptsChanged; edits by other programs ")
-        TEXT("within the poll interval), 0 every call (re-reads all sources), 2 never (no hot reload)."));
-TAutoConsoleVariable<float> CVarScriptChangePollSeconds(
-    TEXT("das.ScriptChangePollSeconds"), 1.f,
+         TEXT("When persistent script calls compare their sources with disk: -1 or 1 watch (after a reported change: ")
+             TEXT("writes in this process, the editor file watcher, NotifyScriptsChanged; edits by other programs ")
+                 TEXT("within the poll interval), 0 every call (re-reads all sources), 2 never (no hot reload)."));
+TAutoConsoleVariable<float> CVarScriptChangePollSeconds(TEXT("das.ScriptChangePollSeconds"), 1.f,
     TEXT("Watch mode: how often file size and time are compared with what scripts were compiled from, for edits ")
         TEXT("by other programs. Each file is checked once per interval for all sessions; bytes only on a change."));
 #if WITH_EDITOR
@@ -283,6 +329,12 @@ void MarkScriptsChanged(const TArray<FString>& Files, const TArray<FString>& Dir
 {
     check(IsInGameThread());
     PolledStats.Reset();
+    for (auto& Pair : KnownCompiledPrograms)
+        if (auto Program = Pair.Value.Pin())
+            Program->CheckedEpoch = 0;
+    // Added/removed modules can change require resolution even when the old source bytes are unchanged.
+    if (bAddedOrRemoved || !Directories.IsEmpty())
+        ClearCompiledPrograms();
     if (bAddedOrRemoved || !Directories.IsEmpty() || Files.IsEmpty())
         ScriptPathCache.Reset();
     if (Files.IsEmpty() && Directories.IsEmpty())

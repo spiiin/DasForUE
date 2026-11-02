@@ -198,6 +198,10 @@
 #include "HAL/IConsoleManager.h"
 #include "Misc/Guid.h"
 #include "Misc/SecureHash.h"
+#include "Misc/ConfigCacheIni.h"
+#include "Serialization/BufferArchive.h"
+#include "Serialization/MemoryReader.h"
+#include "DasScriptClassData.h"
 #include "Misc/Paths.h"
 #include "Misc/PackageName.h"
 #include "HAL/FileManager.h"
@@ -218,6 +222,7 @@ THIRD_PARTY_INCLUDES_START
 #include "daScript/ast/ast_handle.h"
 #include "daScript/ast/ast_visitor.h"
 #include "daScript/ast/ast_generate.h"
+#include "daScript/ast/ast_serializer.h"
 #include "daScript/simulate/aot_builtin_ast.h"
 #include "daScript/simulate/data_walker.h"
 THIRD_PARTY_INCLUDES_END
@@ -778,6 +783,7 @@ void FDasRuntimeModule::StartupModule()
     WorldCleanupHandle = FWorldDelegates::OnWorldCleanup.AddLambda(
         [](UWorld* World, bool, bool)
         {
+            WorldPreparedPrograms.Remove(World);
             UDasAsyncPhysicsBridge::RevokeWorld(World);
             for (auto It = InitializerDeliveries.CreateIterator(); It; ++It)
             {
@@ -895,6 +901,33 @@ void FDasRuntimeModule::StartupModule()
                     }
         });
 #endif
+    ProgramCachePreGCHandle = FCoreUObjectDelegates::GetPreGarbageCollectDelegate().AddLambda(
+        []
+        {
+            // Prepared worlds pin their artifacts through GC and between projectile instances.
+            ResidentCompiledPrograms.Empty();
+            for (auto It = KnownCompiledPrograms.CreateIterator(); It; ++It)
+                if (!It.Value().IsValid())
+                    It.RemoveCurrent();
+        });
+    ProgramWorldLoadHandle = FWorldDelegates::OnPostWorldInitialization.AddLambda(
+        [this](UWorld* World, const UWorld::InitializationValues&)
+        {
+            if (!World || !World->IsGameWorld() || IsRunningCommandlet())
+                return;
+            FString Error;
+            if (!PrepareConfiguredPrograms(World, Error))
+            {
+                if (RequirePreparedPrograms())
+                {
+                    UE_LOG(LogDasRuntime, Fatal, TEXT("DAS_PREPARE_FAILED %s"), *Error);
+                }
+                else
+                {
+                    UE_LOG(LogDasRuntime, Error, TEXT("DAS_PREPARE_FAILED %s"), *Error);
+                }
+            }
+        });
     RuntimePreExitHandle = FCoreDelegates::OnPreExit.AddRaw(this, &FDasRuntimeModule::ShutdownModule);
     bInitialized = true;
     UE_LOG(LogDasRuntime, Display, TEXT("daScript initialized; content: %s"), *Root);
@@ -908,6 +941,11 @@ static FAutoConsoleCommand GDasStructStatsCommand(TEXT("das.StructStats"),
 void FDasRuntimeModule::ShutdownModule()
 {
     UE_LOG(LogDasRuntime, Display, TEXT("%s"), *DasStructStatsLine());
+    FCoreUObjectDelegates::GetPreGarbageCollectDelegate().Remove(ProgramCachePreGCHandle);
+    ProgramCachePreGCHandle.Reset();
+    FWorldDelegates::OnPostWorldInitialization.Remove(ProgramWorldLoadHandle);
+    ProgramWorldLoadHandle.Reset();
+    WorldPreparedPrograms.Empty();
     DasRemoveScriptWriteTracker();
     // Release rooted callback signatures while UObject storage is still valid.
     FCoreDelegates::OnPreExit.Remove(RuntimePreExitHandle);
@@ -939,6 +977,9 @@ void FDasRuntimeModule::ShutdownModule()
         UDasScriptDelegateProxy::ResetReceivers();
         ResetDasCallbackFrames();
         ResetDasContainerCarriers();
+        ClearCompiledPrograms();
+        EditorProgramAttempts.Empty();
+        EditorGameplayActive = false;
         das::Module::Shutdown();
         bInitialized = false;
     }
@@ -1152,6 +1193,7 @@ FString DasFoundationExternManifest()
 
 #include "DasRuntimeModuleDispatch.inl"
 #include "DasRuntimeModuleExecution.inl"
+#include "DasPreparedPrograms.inl"
 #include "DasScriptFunctionCalls.inl"
 IMPLEMENT_MODULE(FDasRuntimeModule, DasRuntime)
 

@@ -70,6 +70,21 @@ worktree's `logs\`.
 
 ## Focused checks
 
+`test-suite <id> program-cache repo=<worktree>` builds and runs the compiler reuse
+and prepared-program automation scenarios. This includes independent owner state,
+subscriptions, failed initialization, dependency edits, LRU/GC, authored AST
+round-trip and strict execution without source compilation. See
+[Preparing gameplay programs](../Guide/Workflow/PreparedPrograms.md) for the
+release export/stage sequence. `prepare-programs` exports the project's configured
+roots; it is a build stage, not an acceptance test.
+
+`editor-preparation` exercises the eager editor policy and PIE authorization gate
+with a synthetic game world. It checks dependency saves, last-working-code
+retention, retry after preparation, unused-script errors and newly saved files.
+Startup checks all project scripts and selected plugin runtime modules, including
+unreferenced scripts. Cold-start fixtures explicitly prepare their roots; ordinary
+gameplay entries never source-compile.
+
 Each feature area has its own `Scripts/Test*.ps1` runner, for example
 `TestDSL.ps1`, `TestLifecyclePIE.ps1`, `TestMontage.ps1`, `TestAI.ps1`,
 `TestInputUI.ps1`, `TestWidgetEvents.ps1`, `TestDataTables.ps1`,

@@ -12,6 +12,19 @@ daScript 0.6.4 (pinned), Win64 Development. Start at the
 
 ### Added
 
+- Persistent gameplay compiler cache with independent owner contexts, heaps and
+  subscriptions; dependency invalidation, transactional reload and bounded idle
+  retention. Configured global/map roots can be prepared during world initialization
+  and pinned until world cleanup. `DasPreparePrograms` exports typed AST artifacts
+  for UFS staging; strict persistent execution rejects missing/stale artifacts
+  instead of compiling sources. This is a VM preparation path, not full native AOT.
+  See [preparing gameplay programs](Docs/Guide/Workflow/PreparedPrograms.md).
+- Mandatory editor startup compilation of every project script and connected
+  plugin runtime modules, including unreferenced scripts. Saves update affected
+  programs/dependencies; PIE/SIE verifies readiness and applied declarations.
+  Authoring, method preflight and gameplay share compiler artifacts. There is no
+  lazy gameplay source compilation mode; waiting owners retain working code.
+
 - Generic DSL Blueprint parents: exact eligible native classes and existing Blueprint
   generated classes, without adding a C++ host. Existing annotations and native-base
   markers are retained. Shared checked frame dispatch uses a cooked class-contract
