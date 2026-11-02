@@ -117,3 +117,22 @@ Supported: component-owned `GetConstraint` and the `ConstraintInstanceBlueprintL
 Try it: `.\Scripts\TestCollisionApiPackage.ps1 -SkipBuild -Publish` regenerates, probes and reinstalls the package.
 
 See also: [API packages](README.md) · [Async physics](../Guide/Gameplay/AsyncPhysics.md) · [Spawning and queries](../Guide/Gameplay/SpawnAndQueries.md) · [World / Actor / Components](WorldActorComponents.md)
+
+## Detached projectile hits and point damage
+
+`ue_projectile_components` exposes `CollisionHit`, a detached projection of the
+native collision callback. `ue_apply_point_damage(target, amount, direction, hit,
+source, instigator)` reconstructs FHitResult at the engine boundary and calls
+UGameplayStatics::ApplyPointDamage. The public hit fields are preserved, including
+the component, bone, physical material and trace data. Opaque actor-instance-handle
+internals are not transported. Non-finite hit/damage values are rejected without
+calling the target. This is a generic API bridge; scripts choose damage, impulse
+and effects. `ue_arg_collision_hit` writes this value into a checked call frame.
+
+`ue_report_noise(location, loudness, instigator:NativePawnRef)` calls the engine
+hearing sense using the current script owner as world context. It reports a
+stimulus; listening configuration and AI reactions belong to the game's AI.
+
+The opt-in `rogue-point-impact` suite validates actual point-damage callbacks and
+physics impacts in the external ActionRoguelike port. Hearing listener behavior
+is outside that suite.

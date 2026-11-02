@@ -10,7 +10,16 @@ daScript 0.6.4 (pinned), Win64 Development. Start at the
 
 ## Unreleased — 2026-11-02
 
+### Fixed
+
+- Runtime owner validation accounts for UE's implicit InstancedReference on
+  DefaultToInstanced object classes such as ActorComponent. Ordinary component
+  references in ScriptObjects remain valid; explicit instancing is still checked.
+
 ### Added
+
+- Detached CollisionHit-to-ApplyPointDamage bridge, checked daScript point-damage
+  and hearing-noise helpers, and an opt-in rogue-point-impact PIE suite.
 
 - Owned ScriptObject workflow: explicit reflected initialization methods (including
   ordinary `Initialize(owner)`), native inline `Instanced` object properties,
