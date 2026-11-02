@@ -245,6 +245,26 @@ FDasClassHandle StructGetClass(const FDasStructValue& H, const char* P, das::Con
     const auto Value = ReadNativePropertyValue(T, F.Memory, C);
     return {MakeObjectHandle(Value.ClassValue.Get(), UClass::StaticClass(), C).Token};
 }
+FDasStructValue StructWithClass(const FDasStructValue& H, const char* Path, FDasClassHandle X,
+                                  das::Context* C, das::LineInfoArg* At)
+{
+    FStructMutation Mutation(H, C);
+    const auto Field = StructLeaf(Mutation.Value, Path, C);
+    auto* Property = CastField<FClassProperty>(Field.Property);
+    if (!Property)
+        C->throw_error("struct field class type mismatch");
+    auto* Class = X.Token ? Cast<UClass>(ResolveObject(FDasObjectHandle{X.Token}, C)) : nullptr;
+    if (X.Token && !Class)
+        C->throw_error("expected class handle");
+    if (Class && (!IsValid(Class) || Class->HasAnyClassFlags(CLASS_Deprecated | CLASS_NewerVersionExists)))
+        C->throw_error("class value is obsolete");
+    FDasScalarValue Value;
+    Value.Kind = int32(EDasScalarKind::Class);
+    Value.ObjectClass = Property->MetaClass->GetPathName();
+    Value.ClassValue = Class;
+    WriteNativePropertyValue(Property, Field.Memory, Value, C);
+    return Mutation.Finish(C, At);
+}
 FDasObjectHandle StructGetObject(const FDasStructValue& H, const char* P, das::Context* C)
 {
     const auto& V = ResolveStructValue(H, C);
@@ -401,7 +421,7 @@ void WritePropertyEnum(FProperty* P, UObject* O, FDasEnumValue Input, das::Conte
 bool FrameClassMatches(UClass* Value, const FString& BasePath)
 {
     auto* Base = FindObject<UClass>(nullptr, *BasePath);
-    return BasePath.StartsWith(TEXT("/Script/")) && IsValid(Base) &&
+    return IsValid(Base) &&
                                !Base->HasAnyClassFlags(CLASS_Interface | CLASS_Deprecated | CLASS_NewerVersionExists) &&
                                (!Value || (IsValid(Value) && Value->IsChildOf(Base) &&
                                            !Value->HasAnyClassFlags(CLASS_Deprecated | CLASS_NewerVersionExists)));

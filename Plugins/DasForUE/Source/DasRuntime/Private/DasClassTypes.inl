@@ -1,5 +1,5 @@
 das::ExprCall* DSLCall(const das::LineInfo&, const das::string&, std::initializer_list<das::ExpressionPtr>);
-// Nominal, checked class values. Native Unreal paths live on the type, not on each function.
+// Nominal, checked class values. The native or authored base path lives on the type.
 bool DSLTypedClass(const das::TypeDeclPtr& T)
 {
     return T && T->baseType == das::Type::tStructure && T->structType &&
@@ -12,9 +12,9 @@ FString DSLTypedClassPath(const das::TypeDeclPtr& T)
     const auto* A = DSLAnnotation(T->structType->annotations, "ue_class_ref");
     const FString Path = DSLString(A->arguments, "path");
     auto* C = FindObject<UClass>(nullptr, *Path);
-    if (!Path.StartsWith(TEXT("/Script/")) || !C ||
+    if (!C ||
                          C->HasAnyClassFlags(CLASS_Interface | CLASS_Deprecated | CLASS_NewerVersionExists))
-        DSLFail(TEXT("Typed class requires a loaded native non-interface base"));
+        DSLFail(TEXT("Typed class requires a loaded non-interface base"));
     return Path;
 }
 das::ExpressionPtr DSLClassPack(const das::LineInfo& At, const das::TypeDeclPtr& T, das::ExpressionPtr V)
@@ -51,7 +51,7 @@ struct FUEClassTypeAnnotation : das::StructureAnnotation
                 !S->fields[0].type || S->fields[0].type->ref || S->fields[0].type->baseType != das::Type::tHandle ||
                 !S->fields[0].type->annotation || S->fields[0].type->annotation->name != "UEClassHandle" ||
                 S->fields[0].init || Args.size() != 1 || Args[0].name != "path" || Args[0].type != das::Type::tString)
-                DSLFail(TEXT("Typed class wrapper requires one UEClassHandle field and native path"));
+                DSLFail(TEXT("Typed class wrapper requires one UEClassHandle field and class path"));
             auto* T = new das::TypeDecl(das::Type::tStructure, S->at);
             T->structType = S;
             DSLTypedClassPath(T);
@@ -88,12 +88,12 @@ struct FUEClassTypeMacro : das::TypeMacro
         try
         {
             if (Type->typeMacroExpr.size() != 2 || !Type->typeMacroExpr[1]->rtti_isTypeDecl())
-                DSLFail(TEXT("UEClass requires one generated native object type"));
+                DSLFail(TEXT("UEClass requires one native or authored object reference type"));
             auto Base = DSLObjectNormalize(static_cast<das::ExprTypeDecl*>(Type->typeMacroExpr[1])->typeexpr,
                                            *P->thisModuleGroup, M);
-            if (!DSLTypedObject(Base))
-                DSLFail(TEXT("UEClass requires a generated native object wrapper"));
-            const FString Path = DSLTypedObjectPath(Base);
+            if (!DSLTypedObject(Base) && !DSLAuthoredView(Base))
+                DSLFail(TEXT("UEClass requires a native or authored object reference"));
+            const FString Path = DSLAuthoredView(Base) ? DSLAuthoredClassBasePath(Base) : DSLTypedObjectPath(Base);
             auto* Native = FindObject<UClass>(nullptr, *Path);
             if (Native->HasAnyClassFlags(CLASS_Deprecated | CLASS_NewerVersionExists))
                 DSLFail(TEXT("UEClass base is obsolete"));

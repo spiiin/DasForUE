@@ -573,3 +573,10 @@ directly, gameplay calls skip reflection, and scripts compile ahead of time thro
   diagnostics, UFS/Pak file access, native and AOT calls, and an editor
   structural-reload probe that creates real Blueprint classes
   ([Integration choices](Docs/Dev/Architecture/IntegrationChoices.md)) (3dbec34).
+
+### General container transports
+
+- Build missing array/map/set transports from shared type descriptors while retaining legacy wire names.
+- Support class-reference arrays and map values with native or loaded authored Blueprint base constraints.
+- Resolve `UEClass<AuthoredRef>` to its applied class, refusing missing or ambiguous source bindings.
+- Add focused `container-transport` automation for DSL read/write, subclass validation and unsupported shapes.

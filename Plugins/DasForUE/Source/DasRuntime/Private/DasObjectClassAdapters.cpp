@@ -2,6 +2,7 @@
 #include "DasSchema.h"
 #include "UObject/Interface.h"
 #include "UObject/UnrealType.h"
+#include "Misc/PackageName.h"
 
 class FDasObjectClassAdapter final : public IDasTypeAdapter
 {
@@ -26,7 +27,7 @@ public:
         }
     }
     bool UsesTypeIdentity() const override { return true; }
-    bool SupportsContainerValue() const override { return !Class; }
+    bool SupportsContainerValue() const override { return true; }
     bool CanBeContainerKey(const FDasDeclaredType& Type) const override
     {
         auto* C = FindObject<UClass>(nullptr, *Type.TypePath);
@@ -50,9 +51,16 @@ public:
             Error = TEXT("Missing or incompatible loaded class");
             return false;
         }
-        if (Usage == EDasPropertyUsage::Container && !Type.TypePath.StartsWith(TEXT("/Script/")))
+        if (Usage == EDasPropertyUsage::Container &&
+            (!FPackageName::IsValidObjectPath(Type.TypePath) || Type.TypePath.StartsWith(TEXT("/Temp/")) ||
+             Type.TypePath.StartsWith(TEXT("/Engine/Transient."))))
         {
-            Error = TEXT("Container references require native classes");
+            Error = TEXT("Container references require a persistent definition path");
+            return false;
+        }
+        if (C->HasAnyClassFlags(CLASS_Deprecated | CLASS_NewerVersionExists))
+        {
+            Error = TEXT("Reference base class is obsolete");
             return false;
         }
         return true;

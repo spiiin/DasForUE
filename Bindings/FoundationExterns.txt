@@ -161,6 +161,7 @@ __ue_map_object_token	@ue_foundation::__ue_map_object_token Cu64 C_c	ue_foundati
 __ue_map_struct_token	@ue_foundation::__ue_map_struct_token Cu64 C_c	ue_foundation::UEStructValue	4
 __ue_map_with_token_bool	@ue_foundation::__ue_map_with_token_bool CH<ue_foundation::UEStructValue> Cs * Cb	uint64 const	4
 __ue_map_with_token_byte	@ue_foundation::__ue_map_with_token_byte CH<ue_foundation::UEStructValue> Cs * Cu8	uint64 const	4
+__ue_map_with_token_class	@ue_foundation::__ue_map_with_token_class CH<ue_foundation::UEStructValue> Cs * CH<ue_foundation::UEClassHandle>	uint64 const	4
 __ue_map_with_token_double	@ue_foundation::__ue_map_with_token_double CH<ue_foundation::UEStructValue> Cs * Cd	uint64 const	4
 __ue_map_with_token_enum	@ue_foundation::__ue_map_with_token_enum CH<ue_foundation::UEStructValue> Cs * CH<ue_foundation::UEEnumValue>	uint64 const	4
 __ue_map_with_token_float	@ue_foundation::__ue_map_with_token_float CH<ue_foundation::UEStructValue> Cs * Cf	uint64 const	4
@@ -427,6 +428,7 @@ __ue_struct_set_element_enum	@ue_foundation::__ue_struct_set_element_enum CIH<ue
 __ue_struct_set_element_object_key	@ue_foundation::__ue_struct_set_element_object_key CIH<ue_foundation::UEStructValue> CIs Ci C_c	uint64 const	4
 __ue_struct_set_with_enum	@ue_foundation::__ue_struct_set_with_enum CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UEEnumValue> Cb C_c C_l	ue_foundation::UEStructValue	4
 __ue_struct_set_with_object_key	@ue_foundation::__ue_struct_set_with_object_key CIH<ue_foundation::UEStructValue> CIs Cu64 Cb C_c C_l	ue_foundation::UEStructValue	4
+__ue_struct_with_class	@ue_foundation::__ue_struct_with_class CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UEClassHandle> C_c C_l	ue_foundation::UEStructValue	4
 __ue_struct_with_enum_value	@ue_foundation::__ue_struct_with_enum_value CIH<ue_foundation::UEStructValue> CIs CH<ue_foundation::UEEnumValue> C_c C_l	ue_foundation::UEStructValue	4
 __ue_subsystem	@ue_foundation::__ue_subsystem CIs CH<ue_foundation::UEClassHandle> CIs Cb C_c	ue_foundation::UObjectHandle	4
 __ue_tag_check	@ue_foundation::__ue_tag_check CIH<ue_foundation::UEStructValue> Cb C_c	ue_foundation::UEStructValue	4
@@ -692,6 +694,7 @@ ue_struct_get_string	@ue_foundation::ue_struct_get_string CIH<ue_foundation::UES
 ue_struct_get_text	@ue_foundation::ue_struct_get_text CIH<ue_foundation::UEStructValue> CIs C_c	ue_foundation::UETextValue	4
 ue_struct_map_get_bool	@ue_foundation::ue_struct_map_get_bool CH<ue_foundation::UEStructValue> Cs *	bool const	4
 ue_struct_map_get_byte	@ue_foundation::ue_struct_map_get_byte CH<ue_foundation::UEStructValue> Cs *	uint8 const	4
+ue_struct_map_get_class	@ue_foundation::ue_struct_map_get_class CH<ue_foundation::UEStructValue> Cs *	ue_foundation::UEClassHandle	4
 ue_struct_map_get_double	@ue_foundation::ue_struct_map_get_double CH<ue_foundation::UEStructValue> Cs *	double const	4
 ue_struct_map_get_enum	@ue_foundation::ue_struct_map_get_enum CH<ue_foundation::UEStructValue> Cs *	ue_foundation::UEEnumValue	4
 ue_struct_map_get_float	@ue_foundation::ue_struct_map_get_float CH<ue_foundation::UEStructValue> Cs *	float const	4

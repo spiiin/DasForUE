@@ -1,6 +1,7 @@
 FDasDeclaredClass DSLReferenceDeclaration(const das::TypeDeclPtr&);
 bool DSLAuthoredView(const das::TypeDeclPtr&);
 FString DSLAuthoredReferencePath(const das::TypeDeclPtr&);
+FString DSLAuthoredClassBasePath(const das::TypeDeclPtr&);
 das::ExpressionPtr DSLAuthoredUnpack(const das::LineInfo&, const das::TypeDeclPtr&, das::ExpressionPtr);
 das::ExpressionPtr DSLAuthoredPack(const das::LineInfo&, const das::TypeDeclPtr&, das::ExpressionPtr);
 // UEObject reuses generated nominal wrappers; it never assumes a UObject layout.

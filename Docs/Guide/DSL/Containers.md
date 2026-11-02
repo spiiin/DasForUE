@@ -32,7 +32,22 @@ Several containers and scalars can share one method. The usual limit of 16 param
 | Typed object / interface references (`ActorRef`, generated wrappers) | Yes | Yes | Use an object key type (`ActorKey`), see below |
 | Soft object / class references | Yes | Yes | No |
 | `UEStructValue` (generic native struct) | Native self fields only | No | No |
-| Class references, delegates, other containers | No | No | No |
+| Typed class references (`UEClass`, including applied authored bases) | Yes | Yes | No |
+| Delegates, other containers | No | No | No |
+
+Class containers retain the exact `TSubclassOf` base constraint. An array of
+`ActionClass` accepts that base and its subclasses, not unrelated UObject classes.
+Native and loaded Blueprint bases are supported. Class containers start empty in
+DSL; populate them in Blueprint defaults or at runtime. Class-list initializer syntax
+is not added by this transport change. See
+[Class references](ObjectAndClassReferences.md#class-references) for authored aliases.
+
+The transport is built from the same type descriptor and adapters as the actual
+Unreal property. New combinations do not need a separate C++ carrier entry. Existing
+carrier names remain readable for compatibility. New wire names contain a versioned,
+self-contained recipe; the engine's `FName` length and registry capacity limits still
+apply. Classes remain unsupported as map keys or set elements; nested containers and
+weak-reference containers retain their existing restrictions.
 
 Nested containers (`array<array<T>>`, a map whose values are arrays, and so on) are rejected. A struct element can contain containers, though: `array<Group>` where `Group` has an `array<double>` member works.
 

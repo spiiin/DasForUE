@@ -125,7 +125,7 @@ def RefActor(var value:ActorRef&; @ue_out var previous:ActorRef&):void {
 ```
 
 With raw `UObjectHandle`, constrain classes explicitly with
-`arg_<name>_class` and `return_class` (a loaded native class path):
+`arg_<name>_class` and `return_class` (a loaded class path):
 
 ```das
 [ue_function(BlueprintCallable,
@@ -136,7 +136,7 @@ def ActorIdentity(actor:UObjectHandle):UObjectHandle { return actor }
 
 A matching explicit constraint on a typed wrapper is accepted; a conflicting one,
 an unused class annotation, a class annotation on a non-object parameter, or a
-non-native/unloaded path is a compile error.
+missing or incompatible class path is a compile error.
 
 Runtime behavior:
 
@@ -195,6 +195,37 @@ sets and object-key maps are described in [Containers.md](Containers.md).
 
 ## Class references
 
+### Authored base classes
+
+After applying/loading the base Blueprint, a reference alias can constrain class
+values to that precise authored class. Resolve these aliases in an imported module:
+
+```das
+options gen2
+module action_types public
+require ue_dsl public
+
+[ue_object_ref(script="action.das", type="Action")]
+struct ActionRef { handle:UObjectHandle }
+typedef ActionClass = $UEClass<ActionRef>
+```
+
+Use `array<ActionClass>` for available action classes and
+`table<string;ActionClass>` for named classes. `UEClass<ActionRef>` finds the loaded
+class by its authored stable ID; it does not substitute the broad native host.
+Apply/load the base first. Missing or ambiguous bindings are compile errors. If
+several assets intentionally share the same source identity, select one explicitly:
+
+```das
+[ue_class_ref(path="/Game/Actions/Action.Action_C")]
+struct ActionClass { handle:UEClassHandle }
+```
+
+This alias also accepts a native base path. The wrapper validates the class on
+conversion and the reflected `FClassProperty` enforces the same subclass constraint
+on container writes. Live carriers refuse changed dependency definitions; this step
+does not add automatic structural Blueprint migration.
+
 ### Creating and converting class values
 
 ```das
@@ -243,7 +274,7 @@ picker filtered by the base. Typed properties infer the base; `@ue_class_base` i
 needed only for raw handles. Initializers are omitted (null). Values selected on
 the Blueprint CDO or an instance survive unchanged reimport and are a hard
 dependency for save and cook. Runtime assignment accepts null and compatible
-classes and obeys `BlueprintReadOnly`. The picker filters by native inheritance;
+classes and obeys `BlueprintReadOnly`. The picker filters by the declared base class;
 exact authored identity is checked when the class is used for creation.
 
 ### Class parameters and results
@@ -266,9 +297,9 @@ def ChangeClass(var value:ActorClass&; @ue_out var previous:ActorClass&):ActorCl
 def EchoRawClass(value:UEClassHandle):UEClassHandle { return value }
 ```
 
-Blueprint sees a class pin with the native `MetaClass` (`TSubclassOf<AActor>` here).
+Blueprint sees a class pin with the declared `MetaClass` (`TSubclassOf<AActor>` here).
 Typed signatures infer `arg_<name>_class`/`return_class`; contradictory hints fail
-compilation. A constrained base must be a loaded native, non-interface class.
+compilation. A constrained base must be a loaded, non-interface class.
 `ue_class_null()` / `default<...>` is accepted everywhere. Classes are checked
 against the base before entry and when returned or published; expired or foreign
 handles, superseded classes and wrong bases fail, and failed `ref`/`out` validation
@@ -314,10 +345,8 @@ not delivered. See [DelegatesAndEvents.md](DelegatesAndEvents.md) and
 
 ## Limits
 
-- Only loaded native `/Script` classes exported in the reflection IR can be used as
-  object/class constraints. Interface types are not allowed as `$UEObject` or
-  `UEClass` bases.
-- Arrays, maps and sets of class references are not supported.
+- Native object wrappers come from the reflection IR; authored object views use their source declarations. Class constraints also accept loaded Blueprint bases (see above). Interface types are not allowed as `$UEObject` or `UEClass` bases.
+- Class references work as array elements and map values, but not as keys or set elements.
 - Arrays of authored interface wrappers are not supported. Arrays of authored
   views are covered in [AuthoredReferences.md](AuthoredReferences.md).
 - Typed wrappers add declaration/boundary typing only; calling native members still

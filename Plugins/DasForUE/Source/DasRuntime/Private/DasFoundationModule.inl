@@ -1367,6 +1367,9 @@ public:
         AddUEExtern<DAS_BIND_FUN(StructWithEnum), das::SimNode_ExtFuncCallAndCopyOrMove>(
                         *this, Library, "ue_struct_with_enum", das::SideEffects::modifyExternal, "StructWithEnum")
                         ->needCallerStackFrame = true;
+        AddUEExtern<DAS_BIND_FUN(StructWithClass), das::SimNode_ExtFuncCallAndCopyOrMove>(
+            *this, Library, "__ue_struct_with_class", das::SideEffects::modifyExternal, "StructWithClass")
+            ->needCallerStackFrame = true;
         AddUEExtern<DAS_BIND_FUN(StructGetClass)>(*this, Library, "__ue_struct_get_class",
                                                   das::SideEffects::modifyExternal, "StructGetClass");
         AddUEExtern<DAS_BIND_FUN(StructGetObject), das::SimNode_ExtFuncCallAndCopyOrMove>(

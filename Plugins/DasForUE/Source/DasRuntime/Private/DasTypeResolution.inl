@@ -28,8 +28,7 @@ FString DSLCheckTypePath(EDSLTypeKind Kind, const FString& Path)
     if (Kind == EDSLTypeKind::Class || Kind == EDSLTypeKind::Interface)
     {
         auto* C = LoadObject<UClass>(nullptr, *Path, nullptr, LOAD_NoWarn);
-        if (!C || C->HasAnyClassFlags(CLASS_Interface) != (Kind == EDSLTypeKind::Interface) ||
-            (Kind == EDSLTypeKind::Class && !Path.StartsWith(TEXT("/Script/"))))
+        if (!C || C->HasAnyClassFlags(CLASS_Interface) != (Kind == EDSLTypeKind::Interface))
             DSLFail(TEXT("Expected ")+ DSLTypeKindLabel(Kind) + TEXT(" type: ")+ Path);
         return C->GetPathName();
     }

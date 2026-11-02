@@ -1,3 +1,4 @@
+#include "DasPropertyTypes.h"
 #include "DasTypeAdapters.h"
 #include "DasValueTraversal.h"
 #include "DasInputEvents.h"
@@ -95,69 +96,24 @@ bool ValidateDasValueStruct(const FString& Path, FString& Error)
                 if (!Visit(N->Struct, Depth + 1))
                     return false;
             }
-            else if (auto* Set = CastField<FSetProperty>(P))
+            else if (CastField<FArrayProperty>(P) || CastField<FMapProperty>(P) || CastField<FSetProperty>(P))
             {
-                if (auto* Enum = CastField<FEnumProperty>(Set->ElementProp);
-                    Enum && !Enum->GetUnderlyingProperty()->IsA<FByteProperty>())
-                {
-                    Error = TEXT("Enum sets require byte-sized reflected storage");
+                FDasDeclaredType Shape;
+                // Value usage validates the shared shape/key/storage rules without
+                // restarting struct traversal; Visit owns recursion/depth accounting.
+                if (!DescribeDasProperty(P, Shape, Error) ||
+                    !ValidateDasPropertyType(Shape, EDasPropertyUsage::Value, Error))
                     return false;
-                }
-                if ((!(CastField<FByteProperty>(Set->ElementProp) && !DasEnumPropertyType(Set->ElementProp)) &&
-                     !CastField<FIntProperty>(Set->ElementProp) && !CastField<FStrProperty>(Set->ElementProp) &&
-                     !CastField<FNameProperty>(Set->ElementProp) && !DasEnumPropertyType(Set->ElementProp) &&
-                     !IsDasObjectHashProperty(Set->ElementProp)) ||
-                    ++Leaves > 1024)
-                {
-                    Error = TEXT("Snapshot sets require int/string/name/enum/object elements");
+                const auto* Adapter = FDasTypeAdapters::Get().Find(Shape);
+                if (!Adapter)
                     return false;
-                }
-            }
-            else if (auto* Map = CastField<FMapProperty>(P))
-            {
-                if ((DasEnumPropertyType(Map->KeyProp) && Map->KeyProp->GetElementSize() != 1) ||
-                    (CastField<FEnumProperty>(Map->KeyProp) &&
-                     !CastFieldChecked<FEnumProperty>(Map->KeyProp)->GetUnderlyingProperty()->IsA<FByteProperty>()))
+                for (const auto& Slot : Adapter->GetContainerSlots())
+                    if (auto* Nested = CastField<FStructProperty>(Slot.ReadProperty(P)))
+                        if (!Visit(Nested->Struct, Depth + 1))
+                            return false;
+                if (++Leaves > 1024)
                 {
-                    Error = TEXT("Enum map keys require byte-sized reflected storage");
-                    return false;
-                }
-                auto* V = CastField<FStructProperty>(Map->ValueProp);
-                if (V && !Visit(V->Struct, Depth + 1))
-                    return false;
-                if ((!(CastField<FByteProperty>(Map->KeyProp) && !DasEnumPropertyType(Map->KeyProp)) &&
-                     !CastField<FIntProperty>(Map->KeyProp) && !CastField<FStrProperty>(Map->KeyProp) &&
-                     !CastField<FNameProperty>(Map->KeyProp) && !DasEnumPropertyType(Map->KeyProp) &&
-                     !IsDasObjectHashProperty(Map->KeyProp)) ||
-                    (!CastField<FSoftObjectProperty>(Map->ValueProp) && !CastField<FTextProperty>(Map->ValueProp) &&
-                     !(CastField<FByteProperty>(Map->ValueProp) && !DasEnumPropertyType(Map->ValueProp)) &&
-                     !CastField<FIntProperty>(Map->ValueProp) && !CastField<FStrProperty>(Map->ValueProp) &&
-                     !CastField<FFloatProperty>(Map->ValueProp) && !CastField<FDoubleProperty>(Map->ValueProp) &&
-                     !CastField<FBoolProperty>(Map->ValueProp) && !CastField<FNameProperty>(Map->ValueProp) && !V &&
-                     !DasEnumPropertyType(Map->ValueProp) && !DasReferencePropertyClass(Map->ValueProp)) ||
-                    ++Leaves > 1024)
-                {
-                    Error = TEXT("Snapshot maps require int/string/name/enum/object keys and scalar/name/struct/enum/reference values");
-                    return false;
-                }
-            }
-            else if (auto* Array = CastField<FArrayProperty>(P))
-            {
-                auto* Element = CastField<FStructProperty>(Array->Inner);
-                if (Element)
-                {
-                    if (!Visit(Element->Struct, Depth + 1))
-                        return false;
-                }
-                else if (!(CastField<FSoftObjectProperty>(Array->Inner) || CastField<FTextProperty>(Array->Inner) ||
-                           (CastField<FByteProperty>(Array->Inner) && !DasEnumPropertyType(Array->Inner)) ||
-                           CastField<FIntProperty>(Array->Inner) || CastField<FFloatProperty>(Array->Inner) ||
-                           CastField<FDoubleProperty>(Array->Inner) || CastField<FBoolProperty>(Array->Inner) ||
-                           CastField<FStrProperty>(Array->Inner) || CastField<FNameProperty>(Array->Inner) ||
-                           DasEnumPropertyType(Array->Inner) || DasReferencePropertyClass(Array->Inner)) ||
-                         ++Leaves > 1024)
-                {
-                    Error = TEXT("Unsupported snapshot array element");
+                    Error = TEXT("Snapshot container layout exceeds leaf limit");
                     return false;
                 }
             }
@@ -227,6 +183,17 @@ bool ValidateDasStructSnapshot(const FInstancedStruct& Value, FString& Error)
             using ERole = DasValueTraversal::ERole;
             if (auto* Soft = CastField<FSoftObjectProperty>(P))
                 return ValidateDasSoftValue(Soft, Data, Error);
+            if (auto* Class = CastField<FClassProperty>(P))
+            {
+                auto* Object = Class->GetObjectPropertyValue(Data);
+                if (Object && (!IsValid(Object) || !Object->IsA<UClass>() ||
+                    !CastChecked<UClass>(Object)->IsChildOf(Class->MetaClass) ||
+                    CastChecked<UClass>(Object)->HasAnyClassFlags(CLASS_Deprecated | CLASS_NewerVersionExists)))
+                {
+                    Error = TEXT("Class snapshot value is incompatible or obsolete");
+                    return false;
+                }
+            }
             const bool Key = Role == ERole::MapKey, Set = Role == ERole::SetElement;
             if ((Key || Set) && IsDasObjectHashProperty(P))
             {

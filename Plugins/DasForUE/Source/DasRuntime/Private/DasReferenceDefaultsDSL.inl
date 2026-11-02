@@ -32,8 +32,8 @@ bool FDasObjectClassScriptFacet::DeclareProperty(const das::TypeDeclPtr& Type, d
             Out.Type.TypePath = Inferred;
         }
         auto* Base = FindObject<UClass>(nullptr, *Out.Type.TypePath);
-        if (!Out.Type.TypePath.StartsWith(TEXT("/Script/")) || !Base || Base->HasAnyClassFlags(CLASS_Interface))
-            DSLFail(TEXT("Class property requires ue_class_base with loaded native base"));
+        if (!Base || Base->HasAnyClassFlags(CLASS_Interface | CLASS_Deprecated | CLASS_NewerVersionExists))
+            DSLFail(TEXT("Class property requires ue_class_base with loaded non-interface base"));
         Out.Default = DSLReferencePropertyDefault(F, true);
     }
     else if (DSLTypedReference(Type))

@@ -162,6 +162,12 @@ FString DSLDirectPath(const das::TypeDeclPtr& T, const FString& Folder, const FS
                     if (!E || E->GetPathName() != DSLDirectPath(F.type->secondType, Folder, Registry))
                         DSLFail(TEXT("Direct map enum identity mismatch"));
                 }
+                if (DSLTypedClass(F.type->secondType))
+                {
+                    auto* C = CastField<FClassProperty>(Map->ValueProp);
+                    if (!C || C->MetaClass->GetPathName() != DSLTypedClassPath(F.type->secondType))
+                        DSLFail(TEXT("Direct map class base identity mismatch"));
+                }
                 if (DSLTypedReference(F.type->secondType))
                 {
                     auto* C = DasReferencePropertyClass(Map->ValueProp);
@@ -180,6 +186,12 @@ FString DSLDirectPath(const das::TypeDeclPtr& T, const FString& Folder, const FS
                     auto* C = DasReferencePropertyClass(Array->Inner);
                     if (!C || C->GetPathName() != DSLTypedReferencePath(F.type->firstType))
                         DSLFail(TEXT("Direct reference array identity mismatch"));
+                }
+                else if (DSLTypedClass(F.type->firstType))
+                {
+                    auto* C = CastField<FClassProperty>(Array->Inner);
+                    if (!C || C->MetaClass->GetPathName() != DSLTypedClassPath(F.type->firstType))
+                        DSLFail(TEXT("Direct class array base identity mismatch"));
                 }
                 else if (DSLTypedValue(F.type->firstType, EDasTypeKind::Enum))
                 {
@@ -355,7 +367,7 @@ FString DSLSourceValueKey(const das::TypeDeclPtr& Type, const FString& Path)
     if (DSLContainer(Type))
     {
         const auto Value = Type->baseType == das::Type::tTable && !DSLSet(Type) ? Type->secondType : Type->firstType;
-        if (DSLTypedReference(Value))
+        if (DSLTypedReference(Value) || DSLTypedClass(Value))
             return Path + TEXT(":reference:")+ DSLText(Value->structType->module->name) +
                                TEXT("::")+ DSLText(Value->structType->name);
     }
@@ -615,7 +627,8 @@ void DSLEnsureStructHelpers(const das::TypeDeclPtr& InputType, const FString& Pa
             const bool StructValue = V == "struct",
                        EnumValue = DSLTypedValue(Field.type->secondType, EDasTypeKind::Enum),
                        ObjectValue = DSLTypedReference(Field.type->secondType),
-                       TypedValue = StructValue || EnumValue || ObjectValue;
+                       ClassValue = DSLTypedClass(Field.type->secondType),
+                       TypedValue = StructValue || EnumValue || ObjectValue || ClassValue;
             FString ValuePath;
             if (StructValue)
             {
@@ -626,6 +639,8 @@ void DSLEnsureStructHelpers(const das::TypeDeclPtr& InputType, const FString& Pa
                 ValuePath = DSLPropertySnapshotPath(Map->ValueProp);
                 DSLEnsureStructHelpers(Field.type->secondType, ValuePath, Group, Module, Generated, Helpers);
             }
+            if (ClassValue)
+                ValuePath = DSLTypedClassPath(Field.type->secondType);
             if (EnumValue || ObjectValue)
             {
                 auto* Native = FindObject<UScriptStruct>(nullptr, *Path);
@@ -697,9 +712,10 @@ void DSLEnsureStructHelpers(const das::TypeDeclPtr& InputType, const FString& Pa
             UnpackBody->list.push_back(
                 Loop(DSLCall(At, "ue_struct_map_size", {new das::ExprVar(At, "value"), Name()}), ULoop));
         }
-        else if (Array && DSLTypedReference(Child))
+        else if (Array && (DSLTypedReference(Child) || DSLTypedClass(Child)))
         {
-            const FString ObjectPath = DSLTypedReferencePath(Child);
+            const bool ClassValue = DSLTypedClass(Child);
+            const FString ObjectPath = ClassValue ? DSLTypedClassPath(Child) : DSLTypedReferencePath(Child);
             auto IndexPath = [&]()
             {
                 return new das::ExprOp2(At, "+", new das::ExprConstString(At, Field.name + "."),
@@ -714,7 +730,7 @@ void DSLEnsureStructHelpers(const das::TypeDeclPtr& InputType, const FString& Pa
             PLoop->at = At;
             PLoop->list.push_back(new das::ExprCopy(
                 At, new das::ExprVar(At, "packed"),
-                DSLCall(At, "ue_struct_with_object",
+                DSLCall(At, ClassValue ? "__ue_struct_with_class" : "ue_struct_with_object",
                         {new das::ExprVar(At, "packed"), IndexPath(),
                          DSLDirectPack(At, Child, new das::ExprAt(At, Access(), new das::ExprVar(At, "index")),
                                        ObjectPath)})));
@@ -725,7 +741,7 @@ void DSLEnsureStructHelpers(const das::TypeDeclPtr& InputType, const FString& Pa
                 At, "push",
                 {Target(),
                  DSLDirectUnpack(At, Child,
-                                 DSLCall(At, "ue_struct_get_object", {new das::ExprVar(At, "value"), IndexPath()}),
+                                 DSLCall(At, ClassValue ? "__ue_struct_get_class" : "ue_struct_get_object", {new das::ExprVar(At, "value"), IndexPath()}),
                                  ObjectPath)}));
             UnpackBody->list.push_back(
                 Loop(DSLCall(At, "ue_struct_array_size", {new das::ExprVar(At, "value"), Name()}), ULoop));

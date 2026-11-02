@@ -7,6 +7,12 @@
       "name": "build"
     },
     {
+      "name": "container-transport",
+      "kind": "script",
+      "script": "TestContainerTransport.ps1",
+      "requires": ["build"]
+    },
+    {
       "name": "program-cache",
       "kind": "script",
       "script": "TestProgramCache.ps1",

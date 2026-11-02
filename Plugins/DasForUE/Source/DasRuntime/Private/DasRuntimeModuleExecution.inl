@@ -531,7 +531,7 @@ FDasExecutionResult FDasRuntimeModule::RunCallback(const FString& Path, EDasCall
         Expected.ReturnClass = ReturnClass;
         if (!FrameClassMatches(nullptr, ReturnClass))
         {
-            Result.Error = TEXT("Class result requires a loaded native base");
+            Result.Error = TEXT("Class result requires a loaded non-interface base");
             return Result;
         }
     }

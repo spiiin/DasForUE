@@ -298,6 +298,34 @@ FDasDeclaredClass DSLReferenceDeclaration(const das::TypeDeclPtr& T)
         DSLFail(Error);
     return CheckIdentity(Effective);
 }
+// A class constraint must name the generated authored base, never its broad native host.
+// Source-only definitions have no UClass yet: Apply the base before declaring its class values.
+FString DSLAuthoredClassBasePath(const das::TypeDeclPtr& Type)
+{
+    const auto Definition = DSLReferenceDeclaration(Type);
+    UClass* Base = nullptr;
+    for (TObjectIterator<UClass> It; It; ++It)
+    {
+        UClass* Candidate = *It;
+        if (Candidate->HasAnyClassFlags(CLASS_Deprecated | CLASS_NewerVersionExists) ||
+            Candidate->GetName().StartsWith(TEXT("SKEL_")) || Candidate->GetName().StartsWith(TEXT("REINST_")))
+            continue;
+        // Native hosts keep the ID on the CDO; generic hosts use cooked class data.
+        // Ignore ordinary BP children that only inherit the same authored identity.
+        const auto* Default = Candidate->GetDefaultObject(false);
+        if (!Default || DasHostIdentity(Default) != Definition.Id)
+            continue;
+        const auto* Super = Candidate->GetSuperClass();
+        if (Super && DasHostIdentity(Super->GetDefaultObject(false)) == Definition.Id)
+            continue;
+        if (Base && Base != Candidate)
+            DSLFail(TEXT("Ambiguous authored class base; use ue_class_ref(path=...) to select its asset: ") + Definition.Id);
+        Base = Candidate;
+    }
+    if (!Base)
+        DSLFail(TEXT("Apply/load the authored base class before using UEClass: ") + Definition.Id);
+    return Base->GetPathName();
+}
 FString DSLAuthoredReferencePath(const das::TypeDeclPtr& Type)
 {
     const auto Class = DSLReferenceDeclaration(Type);

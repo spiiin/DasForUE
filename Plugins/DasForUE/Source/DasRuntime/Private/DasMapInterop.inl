@@ -170,6 +170,34 @@ struct FMapObject
         WriteNativePropertyValue(P, M, SnapshotObjectValue(P, V, C), C);
     }
 };
+struct FMapClass
+{
+    using In = FDasClassHandle;
+    using Out = FDasClassHandle;
+    static constexpr ESnapshotKind Kind = ESnapshotKind::Class;
+    static UClass* Prepare(In V, das::Context* C)
+    {
+        auto* Class = V.Token ? Cast<UClass>(ResolveObject(FDasObjectHandle{V.Token}, C)) : nullptr;
+        if (V.Token && !Class)
+            C->throw_error("expected class handle");
+        if (Class && (!IsValid(Class) || Class->HasAnyClassFlags(CLASS_Deprecated | CLASS_NewerVersionExists)))
+            C->throw_error("class value is obsolete");
+        return Class;
+    }
+    static Out Read(FProperty* P, const void* M, das::Context* C, das::LineInfoArg*)
+    {
+        const auto Value = ReadNativePropertyValue(P, M, C);
+        return {MakeObjectHandle(Value.ClassValue.Get(), UClass::StaticClass(), C).Token};
+    }
+    static void Write(FProperty* P, void* M, UClass* Class, das::Context* C)
+    {
+        FDasScalarValue Value;
+        Value.Kind = int32(EDasScalarKind::Class);
+        Value.ObjectClass = CastFieldChecked<FClassProperty>(P)->MetaClass->GetPathName();
+        Value.ClassValue = Class;
+        WriteNativePropertyValue(P, M, Value, C);
+    }
+};
 struct FMapStruct
 {
     using In = const FDasStructValue&;
@@ -417,6 +445,7 @@ void AddMapInterops(das::Module& M, const das::ModuleLibrary& L)
     AddSnapshotMap<TMapValue<Kind>>(M, L, SnapshotKeys, #Suffix);
     DAS_SCALAR_ACCESSOR_KINDS(ADD_MAP_KIND)
 #undef ADD_MAP_KIND
+    AddSnapshotMap<FMapClass>(M, L, SnapshotKeys, "class");
     AddSnapshotMap<FMapEnum>(M, L, SnapshotKeys, "enum");
     AddSnapshotMap<FMapObject>(M, L, SnapshotKeys, "object", "__ue_map_object_token");
     AddSnapshotMap<FMapStruct>(M, L, SnapshotKeys, "struct", "__ue_map_struct_token");

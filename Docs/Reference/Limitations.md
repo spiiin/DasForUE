@@ -45,7 +45,7 @@ This page collects the limitations that still apply to DasForUE2, grouped by are
 
 - Not supported anywhere: nested containers, fixed C++ arrays, raw pointers, non-reflected C++ types.
 - Hash keys and set elements: byte, int, string, FName, supported enums and object keys only. No float, bool, FText, struct, math, class, soft or interface keys. Containers in authored `ue_struct`s are narrower (int, string, byte keys).
-- Class references cannot be stored in authored containers, authored interfaces, delegates, events or timers.
+- Class references are supported as array elements and map values, including loaded authored base classes; class keys/set elements remain unsupported. See [Containers](../Guide/DSL/Containers.md).
 - Containers of weak object references are rejected.
 - Opaque engine values (`UEHitResult`, `UETraceHit`, `UEConstraintHandle`, `UEPhysicsBodyToken`, Geometry, input events, `EventReply`) cannot be used as `ue_property` fields, authored `ue_function` signatures or JSON defaults, and are not carried across hot reload.
 - Event subscriptions accept by-value and const-ref parameters only; mutable native ref/out subscriptions are not supported. Queued callbacks and timers take 0–16 by-value arguments without ref/out or defaults.

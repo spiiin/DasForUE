@@ -1,3 +1,4 @@
+#include "DasPropertyTypes.h"
 #include "DasTypeContracts.h"
 #include "DasContainerTypes.h"
 #include "DasNativeDefaults.h"
@@ -261,20 +262,9 @@ FDasTypeUseResult QueryDasTypeUse(const FDasDeclaredType& T, EDasTypeUse Use)
                 T, {}, Use == EDasTypeUse::AuthoredReturn || Use == EDasTypeUse::InterfaceReturn, Error))
             return Decision(false, Error);
         const auto S = DasAuthoredTypeSignature(T);
-        if (K == EDasTypeKind::Object)
-        {
-            auto* C = FindObject<UClass>(nullptr, *T.TypePath);
-            if (!C || (!T.TypePath.StartsWith(TEXT("/Script/")) && !C->HasAnyClassFlags(CLASS_Interface)))
-                return Decision(false, TEXT("Object signature requires loaded native class or interface"));
-        }
-        if (K == EDasTypeKind::Class)
-        {
-            auto* C = FindObject<UClass>(nullptr, *T.TypePath);
-            if (!T.TypePath.StartsWith(
-                    TEXT("/Script/")) || !IsValid(C) ||
-                    C->HasAnyClassFlags(CLASS_Interface | CLASS_Deprecated | CLASS_NewerVersionExists))
-                return Decision(false, TEXT("Class signature requires a loaded native base class"));
-        }
+        if ((K == EDasTypeKind::Object || K == EDasTypeKind::Class) &&
+            !ValidateDasPropertyType(T, EDasPropertyUsage::Value, Error))
+            return Decision(false, Error);
         if (S == EDasMethodSignature::Struct)
         {
             const auto* Carrier = DasContainerCarrier(T);

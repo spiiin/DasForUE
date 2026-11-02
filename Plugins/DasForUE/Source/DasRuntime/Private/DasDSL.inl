@@ -428,8 +428,6 @@ FDasDeclaredType DSLContainerType(const das::TypeDeclPtr& T, const FString& Fold
             if (DSLAuthoredView(Source))
                 Child->AuthoredId = DSLReferenceDeclaration(Source).Id;
             Child->TypePath = DSLTypedReferencePath(Source);
-            if (!Child->TypePath.StartsWith(TEXT("/Script/")))
-                DSLFail(TEXT("Reference containers require native object/interface types"));
         }
         if (DSLTypedValue(Source, EDasTypeKind::Enum))
             Child->TypePath = DSLDirectPath(Source, Folder, Registry);
@@ -449,8 +447,11 @@ FDasDeclaredType DSLContainerType(const das::TypeDeclPtr& T, const FString& Fold
         }
         D.*Slot.Descriptor = Child;
     }
+    FString Error;
+    if (!ValidateDasPropertyType(D, EDasPropertyUsage::Container, Error))
+        DSLFail(Error);
     if (!DasContainerCarrier(D))
-        DSLFail(TEXT("Standalone containers require primitive/authored-struct arrays, int/string/name/enum/object-key sets or int/string/name/enum/object-key scalar/name/struct/enum/reference maps"));
+        DSLFail(TEXT("Cannot construct container transport (definition changed, identity too long, or registry limit): ") + D.StorageIdentity());
     return D;
 }
 bool DSLDelegate(const das::TypeDeclPtr&);
@@ -612,69 +613,12 @@ FDasDeclaredProperty DSLNativeSelfProperty(const FDasDeclaredClass& C, const das
         : CastField<FObjectProperty>(P)
         ? TEXT("object")
         : TEXT("");
-    auto NativeValue = [&](FProperty* Value)
+    if (CastField<FArrayProperty>(P) || CastField<FMapProperty>(P) || CastField<FSetProperty>(P))
     {
-        auto Type = MakeShared<FDasDeclaredType>();
-        if (!Value || Value->ArrayDim != 1)
-            return Type;
-        Type->Kind = CastField<FIntProperty>(Value) ? TEXT("int")
-                                                    : CastField<FFloatProperty>(Value)
-            ? TEXT("float")
-            : CastField<FDoubleProperty>(Value)
-            ? TEXT("double")
-            : CastField<FBoolProperty>(Value)
-            ? TEXT("bool")
-            : CastField<FStrProperty>(Value)
-            ? TEXT("string")
-            : CastField<FNameProperty>(Value)
-            ? TEXT("name")
-            : TEXT("");
-        if (auto* Enum = DasEnumPropertyType(Value))
-        {
-            Type->Kind = TEXT("enum");
-            Type->TypePath = Enum->GetPathName();
-        }
-        if (auto* Struct = CastField<FStructProperty>(Value))
-        {
-            FString Issue;
-            if (!ValidateDasValueStruct(Struct->Struct->GetPathName(), Issue))
-                DSLFail(Issue);
-            Type->Kind = TEXT("struct");
-            Type->TypePath = Struct->Struct->GetPathName();
-        }
-        if (!CastField<FClassProperty>(Value) && DasReferencePropertyClass(Value))
-        {
-            Type->Kind = TEXT("object");
-            Type->TypePath = DasReferencePropertyClass(Value)->GetPathName();
-        }
-        return Type;
-    };
-    if (auto* Array = CastField<FArrayProperty>(P))
-    {
-        D.Type.Kind = TEXT("array");
-        D.Type.Element = NativeValue(Array->Inner);
-        if (D.Type.Element->Kind.IsEmpty())
-            DSLFail(TEXT("Unsupported native array element"));
-    }
-    if (auto* Map = CastField<FMapProperty>(P))
-    {
-        D.Type.Kind = TEXT("map");
-        D.Type.Key = NativeValue(Map->KeyProp);
-        D.Type.Value = NativeValue(Map->ValueProp);
-        if ((D.Type.Key->GetKind() != EDasTypeKind::Int && D.Type.Key->GetKind() != EDasTypeKind::String &&
-             D.Type.Key->GetKind() != EDasTypeKind::Name && D.Type.Key->GetKind() != EDasTypeKind::Enum &&
-             D.Type.Key->GetKind() != EDasTypeKind::Object) ||
-            D.Type.Value->Kind.IsEmpty())
-            DSLFail(TEXT("Native maps require int/string/name/enum/object keys and supported values"));
-    }
-    if (auto* Set = CastField<FSetProperty>(P))
-    {
-        D.Type.Kind = TEXT("set");
-        D.Type.Element = NativeValue(Set->ElementProp);
-        if (D.Type.Element->GetKind() != EDasTypeKind::Int && D.Type.Element->GetKind() != EDasTypeKind::String &&
-            D.Type.Element->GetKind() != EDasTypeKind::Name && D.Type.Element->GetKind() != EDasTypeKind::Enum &&
-            D.Type.Element->GetKind() != EDasTypeKind::Object)
-            DSLFail(TEXT("Native sets require int/string/name/enum/object elements"));
+        FString Issue;
+        if (!DescribeDasProperty(P, D.Type, Issue) ||
+            !ValidateDasPropertyType(D.Type, EDasPropertyUsage::Container, Issue))
+            DSLFail(Issue);
     }
     if (D.Type.GetKind() == EDasTypeKind::Array || D.Type.GetKind() == EDasTypeKind::Map ||
         D.Type.GetKind() == EDasTypeKind::Set)

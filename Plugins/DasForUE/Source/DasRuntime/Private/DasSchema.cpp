@@ -1,3 +1,4 @@
+#include "DasPropertyTypes.h"
 #include "DasDataAssets.h"
 #include "DasTypeContracts.h"
 #include "UObject/TextProperty.h"
@@ -371,23 +372,13 @@ bool FDasClassSchema::Validate(FString& Error) const
             if (!E || !ValidateDasEnumNumber(Field.EnumPath, E->GetValueByNameString(Field.EnumDefault), Error))
                 return false;
         }
-        if (Field.Kind == EDasScalarKind::Object &&
-            (!FindObject<UClass>(nullptr, *Field.ObjectClass) ||
-             (!Field.ObjectClass.StartsWith(
-                 TEXT("/Script/")) &&
-                 !FindObject<UClass>(nullptr, *Field.ObjectClass)->HasAnyClassFlags(CLASS_Interface))))
+        if (Field.Kind == EDasScalarKind::Class || Field.Kind == EDasScalarKind::Object)
         {
-            Error = TEXT("Object field requires a loaded native class path");
-            return false;
-        }
-        if (Field.Kind == EDasScalarKind::Class)
-        {
-            auto* Base = FindObject<UClass>(nullptr, *Field.ObjectClass);
-            if (!Field.ObjectClass.StartsWith(TEXT("/Script/")) || !Base || Base->HasAnyClassFlags(CLASS_Interface))
-            {
-                Error = TEXT("Class field requires loaded native base class");
+            FDasDeclaredType Reference;
+            Reference.Kind = Field.Kind == EDasScalarKind::Class ? TEXT("class") : TEXT("object");
+            Reference.TypePath = Field.ObjectClass;
+            if (!ValidateDasPropertyType(Reference, EDasPropertyUsage::Value, Error))
                 return false;
-            }
         }
         if ((Field.Kind == EDasScalarKind::Class || Field.Kind == EDasScalarKind::Object) &&
             !Field.StringDefault.IsEmpty())

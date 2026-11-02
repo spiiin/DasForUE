@@ -70,6 +70,14 @@ worktree's `logs\`.
 
 ## Focused checks
 
+`test-suite <id> container-transport repo=<worktree>` builds and runs one short
+`DasForUE.Runtime.ContainerTransport` automation scenario. It checks shared descriptor
+validation and carrier construction, authored Blueprint subclass constraints,
+array/map DSL read-write through a real UFunction, unsupported shapes, GC survival
+and additive extern-manifest compatibility. It uses a synthetic game world, without
+full PIE or packaged acceptance.
+
+
 `test-suite <id> program-cache repo=<worktree>` builds and runs the compiler reuse
 and prepared-program automation scenarios. This includes independent owner state,
 subscriptions, failed initialization, dependency edits, LRU/GC, authored AST

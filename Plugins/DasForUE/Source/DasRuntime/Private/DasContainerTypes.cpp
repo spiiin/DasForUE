@@ -11,6 +11,12 @@
 #include "UObject/UnrealType.h"
 
 #include "DasSchema.h"
+#include "Dom/JsonValue.h"
+#include "Serialization/JsonReader.h"
+#include "Serialization/JsonSerializer.h"
+#include "Serialization/JsonWriter.h"
+#include "Policies/CondensedJsonPrintPolicy.h"
+#include "Misc/PackageName.h"
 #include "StructUtils/UserDefinedStruct.h"
 #include "UObject/Package.h"
 
@@ -710,6 +716,7 @@ UScriptStruct* ResolveByteMap(const FString& Path)
     return S && S->GetPathName() == Path ? S : nullptr;
 }
 
+#include "DasGenericContainerTransport.inl"
 
 }
 void ResetDasContainerCarriers()
@@ -717,7 +724,7 @@ void ResetDasContainerCarriers()
     CarrierRegistry.Reset();
     ResetDasSoftCarriers();
 }
-UScriptStruct* DasContainerCarrier(const FDasDeclaredType& Type)
+static UScriptStruct* LegacyContainerCarrier(const FDasDeclaredType& Type)
 {
     if (const auto* Adapter = FDasTypeAdapters::Get().Find(Type))
         if (Adapter->GetCarrierProperty(Type.TypePath))
@@ -778,8 +785,23 @@ UScriptStruct* DasContainerCarrier(const FDasDeclaredType& Type)
         return StructArrayCarrier(FindObject<UScriptStruct>(nullptr, *Type.Element->TypePath));
     return nullptr;
 }
+UScriptStruct* DasContainerCarrier(const FDasDeclaredType& Type)
+{
+    FString Error;
+    if (!ValidateDasPropertyType(Type, EDasPropertyUsage::Container, Error))
+        return nullptr;
+    // Preserve existing wire names; all new combinations use the descriptor builder.
+    if (auto* Legacy = LegacyContainerCarrier(Type))
+        return Legacy;
+    return GenericContainerCarrier(Type);
+}
 FProperty* DasContainerProperty(const FString& Path)
 {
+    if (Path.StartsWith(GenericContainerPrefix))
+    {
+        auto* S = ResolveGenericContainerCarrier(Path);
+        return S ? S->FindPropertyByName(TEXT("Values")) : nullptr;
+    }
     if (const auto* Adapter = FDasTypeAdapters::Get().FindStructPath(Path))
         if (auto* Property = Adapter->GetCarrierProperty(Path))
             return Property;
