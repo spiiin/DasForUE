@@ -79,6 +79,13 @@ int32 UDasReflectionMacrosCommandlet::Main(const FString& Params)
                           TEXT("NoSuchMethod"), TEXT("unbound_interface_unknown_method_rejected"));
     Reject(Source.Replace(TEXT("local.Query(5)"), TEXT("ue_call(type<LocalProbeRef>, Query, local, \"wrong\")")),
                           TEXT("no matching"), TEXT("unbound_interface_wrong_argument_rejected"));
+    Reject(Source.Replace(TEXT("ue_arg(call, next_field_name(nameReads), hit)"), TEXT("ue_arg(call, 33, hit)")),
+                          TEXT("field name must be a string"), TEXT("generic_arg_field_name_type_rejected"));
+    Reject(Source.Replace(TEXT("ue_arg(call, next_field_name(nameReads), hit)"), TEXT("ue_arg(33, \"Value\", hit)")),
+                          TEXT("UCallHandle"), TEXT("generic_arg_invalid_frame_type_rejected"));
+    Reject(Source.Replace(TEXT("ue_arg(call, next_field_name(nameReads), hit)"),
+                               TEXT("ue_arg(call, \"Value\", PlainArgRecord(Value=1))")),
+                          TEXT("supported by-value types"), TEXT("generic_arg_plain_struct_rejected"));
     const FString Descriptor = TEXT("\n[ue_reflected_call(owner=\"/Script/DasRuntime.DasFunctionLibraryFixture\",method=\"Add\",signature=\"@SIGNATURE@\")]\ndef duplicate(a:int;b:int):int{return a+b}\n");
     Reject(Source + Descriptor.Replace(TEXT("@SIGNATURE@"), TEXT("stale")),
                                        TEXT("Reflected signature changed"), TEXT("stale_binding_rejected_at_compile"));
@@ -139,6 +146,14 @@ int32 UDasReflectionMacrosCommandlet::Main(const FString& Params)
     Run(9, 3, TEXT("interface_container_without_generated_wrapper"));
     Run(10, 42, TEXT("equivalent_native_reference_view_argument"));
     Run(11, 42, TEXT("typed_class_to_native_class_argument"));
+    Run(12, 42, TEXT("generic_arg_scalars_single_evaluation"));
+    Run(15, 1, TEXT("generic_arg_runtime_property_type_rejected"));
+    Check(Actor->EchoCalls == 0, TEXT("generic_arg_rejection_has_no_native_side_effect"));
+    Run(13, 42, TEXT("generic_arg_struct_nested_math_name_byte_object"));
+    Check(Actor->EchoCalls == 1, TEXT("generic_arg_struct_invokes_once"));
+    Run(14, 3, TEXT("generic_arg_array_carrier"));
+    Run(16, 42, TEXT("generic_arg_math_value"));
+    Run(17, 42, TEXT("generic_arg_typed_class"));
     R.ReleaseObject(Actor);
     const auto NoOwner = R.RunFile(Path, 1);
     Check(!NoOwner.bSucceeded && NoOwner.Error.Contains(TEXT("self is missing")),

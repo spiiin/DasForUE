@@ -18,6 +18,10 @@ daScript 0.6.4 (pinned), Win64 Development. Start at the
 
 ### Added
 
+- `ue_arg(call, fieldName, value)` call macro selects checked argument codecs and
+  reuses generated value-struct/container packers. Projectile point damage now
+  uses it directly; the specialized ue_arg_collision_hit helper was removed.
+
 - On-demand typed member calls for native and authored Blueprint interface views,
   including ref/out and container results, checked signatures and imported native
   value structs. No generated per-interface method module is required.

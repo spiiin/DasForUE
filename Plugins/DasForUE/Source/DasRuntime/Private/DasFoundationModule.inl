@@ -34,7 +34,7 @@ public:
                          });
         }
         inferMacros.push_back(das::unique_ptr<das::PassMacro>(new FUEFunctionReferencePass()));
-        for (const auto& Pair : {std::pair<const char*, int>{"ue_static", 0}, {"ue_call", 1}, {"ue_struct_get", 2}})
+        for (const auto& Pair : {std::pair<const char*, int>{"ue_static", 0}, {"ue_call", 1}, {"ue_struct_get", 2}, {"ue_arg", 3}})
         {
             auto* Macro = new FUEReflectionMacro(Pair.first, Pair.second);
             ownedCallMacros.push_back(das::unique_ptr<das::CallMacro>(Macro));

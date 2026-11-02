@@ -33,3 +33,31 @@ let ratio = ue_struct_get(ue_struct_get(payload, Metrics), Ratio)
 `ue_struct_get` requires a typed Unreal value struct. It expands to normal checked field access without allocating a call frame or copying the whole value. Field identifiers are case-sensitive. Raw `UEStructValue` snapshots have no compile-time identity and cannot use this macro.
 
 The underlying frame API remains available unchanged for generated code and fixtures. Its implementation contract is documented in [developer reference](../Dev/Runtime/LowLevelCalls.md).
+
+## Type-directed argument packing
+
+`ue_arg(call, fieldName, value)` chooses the existing checked setter from the
+daScript value type at compilation. For example:
+
+```das
+ue_arg(call, "Damage", amount)
+ue_arg(call, "Target", target)
+ue_arg(call, "Hit", hit)
+```
+
+Supported values use the normal Unreal value codecs: scalars, typed object/class
+references, enums, names/text, math values, imported native/authored value structs
+and supported containers. Existing raw object/class/struct capabilities use their
+existing checked transport. A plain DAS struct is not an Unreal value struct and
+is rejected. Delegate binding retains its explicit API.
+
+Native value structs reuse the generated packer, including nested fields; adding
+a field to their declaration requires no handwritten argument-setter list. Field
+names may be string expressions. The macro does not invoke the function or own
+the frame: the caller still invokes/releases it, including on failure. Runtime
+checks enforce the pending-frame protocol, field existence and native property
+type, ranges, object/class constraints and struct identity. `ue_arg` does not
+coerce an int argument into a byte field; supply a byte value (`uint8`) for that
+field or use the explicit byte setter.
+
+`ue_arg_collision_hit` was removed; use `ue_arg(call, "Hit", hit)` directly.

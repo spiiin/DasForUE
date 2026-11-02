@@ -127,7 +127,7 @@ UGameplayStatics::ApplyPointDamage. The public hit fields are preserved, includi
 the component, bone, physical material and trace data. Opaque actor-instance-handle
 internals are not transported. Non-finite hit/damage values are rejected without
 calling the target. This is a generic API bridge; scripts choose damage, impulse
-and effects. `ue_arg_collision_hit` writes this value into a checked call frame.
+and effects. `ue_arg(call, "Hit", hit)` writes this value into a checked call frame.
 
 `ue_report_noise(location, loudness, instigator:NativePawnRef)` calls the engine
 hearing sense using the current script owner as world context. It reports a

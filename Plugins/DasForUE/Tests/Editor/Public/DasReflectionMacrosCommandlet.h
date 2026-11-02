@@ -2,12 +2,22 @@
 #include "Commandlets/Commandlet.h"
 #include "GameFramework/Actor.h"
 #include "DasProbeInterface.h"
+#include "DasCollisionTypes.h"
 #include "DasReflectionMacrosCommandlet.generated.h"
 UCLASS()
 class ADasReflectionMacroActor : public AActor, public IDasProbeInterface
 {
     GENERATED_BODY()
 public:
+    int32 EchoCalls = 0;
+    UFUNCTION(BlueprintCallable)
+    FDasCollisionHit EchoHit(const FDasCollisionHit& Value)
+    {
+        ++EchoCalls;
+        auto Result = Value;
+        ++Result.Item;
+        return Result;
+    }
     virtual int32 Query_Implementation(int32 Input) override { return Input + 37; }
     virtual FString Label_Implementation() override { return TEXT("reflection"); }
     virtual TArray<double> Weights_Implementation(const TArray<double>& Values) override { return Values; }

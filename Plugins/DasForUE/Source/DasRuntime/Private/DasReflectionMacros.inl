@@ -49,13 +49,58 @@ struct FUEReflectionMacro : das::CallMacro
     FUEReflectionMacro(const char* N, int Op) : CallMacro(N), Operation(Op) {}
     virtual bool canVisitArguments(das::ExprCallMacro*, int I) override
     {
-        return Operation == 2 ? I == 0 : I >= (Operation == 0 ? 1 : 2);
+        return Operation == 3 || (Operation == 2 ? I == 0 : I >= (Operation == 0 ? 1 : 2));
     }
     virtual das::ExpressionPtr visit(das::Program* P, das::Module* M, das::ExprCallMacro* E) override
     {
         try
         {
             const auto& Args = E->arguments;
+            if (Operation == 3)
+            {
+                if (Args.size() != 3)
+                    DSLFail(TEXT("Expected ue_arg(call, fieldName, value)"));
+                if (!Args[0]->type || !Args[1]->type || !Args[2]->type)
+                    return nullptr;
+                const auto CallType = DSLObjectNormalize(Args[0]->type, *P->thisModuleGroup, M);
+                if (CallType->baseType != das::Type::tHandle || !CallType->annotation ||
+                    CallType->annotation->name != "UCallHandle")
+                    DSLFail(TEXT("ue_arg requires a UCallHandle as its first argument"));
+                const auto NameType = DSLObjectNormalize(Args[1]->type, *P->thisModuleGroup, M);
+                if (NameType->baseType != das::Type::tString)
+                    DSLFail(TEXT("ue_arg field name must be a string"));
+                auto Type = DSLObjectCopyType(DSLObjectNormalize(Args[2]->type, *P->thisModuleGroup, M));
+                Type->ref = false;
+                Type->constant = false;
+                FDasDeclaredType Declared;
+                const auto* Adapter = DSLValueAdapter(Type);
+                if (DSLRawStruct(Type) || (Adapter && Adapter->Script && Adapter->Script->MatchesCallType(Type)))
+                    Declared.Kind = DSLTypeName(Type);
+                else
+                    Declared = DSLCallbackField(Type, FString(), FString());
+                const FString Path = Declared.TypePath;
+                das::vector<das::FunctionPtr> Generated;
+                TSet<FString> Helpers;
+                if (DSLContainer(Type) || DSLDirectStruct(Type))
+                    DSLEnsureStructHelpers(Type, Path, *P->thisModuleGroup, M, Generated, Helpers);
+                for (const auto& Helper : Generated)
+                    if (!M->addFunction(Helper, true))
+                        DSLFail(TEXT("ue_arg value helper collision"));
+                das::ExpressionPtr Value = Args[2];
+                das::string Bridge;
+                if (const char* Adapted = DSLAdaptedBridge(Type, EDasCallBridge::MethodBridge))
+                    Bridge = das::string(Adapted) == "input_value" ? "__ue_arg_input_value"
+                                                                   : das::string("__ue_method_arg_") + Adapted;
+                else
+                {
+                    Bridge = DSLMethodBridge(DSLMethodNativeKind(Declared.Kind), false);
+                    if (Declared.GetKind() == EDasTypeKind::Struct || Declared.GetKind() == EDasTypeKind::Enum ||
+                        Declared.GetKind() == EDasTypeKind::Object || Declared.GetKind() == EDasTypeKind::Class ||
+                        Declared.GetKind() == EDasTypeKind::Byte)
+                        Value = DSLDirectPack(E->at, Type, Value, Path);
+                }
+                return DSLCall(E->at, Bridge, {Args[0], Args[1], Value});
+            }
             if (Operation == 2)
             {
                 if (Args.size() != 2 || !Args[1]->rtti_isVar())
