@@ -801,7 +801,7 @@ void DrainEvents()
         try
         {
             const FTCHARToUTF8 Name(*Handler);
-            auto* Function = Context.findFunction(Name.Get());
+            auto* Function = FindRootScriptFunction(Session->Live->Program, Context, Name.Get());
             auto Declaration = Session->Live->Program->getThisModule()->findUniqueFunction(Name.Get());
             if (!Function)
                 continue; // Candidate validation makes this unreachable for a current binding.

@@ -8,8 +8,13 @@ typedef LocalProbeRef = UEInterfaceRef("/Script/DasRuntime.DasProbeInterface")
 typedef RepeatedProbeRef = UEInterfaceRef("/Script/DasRuntime.DasProbeInterface")
 typedef CounterRef = UEObjectRef("ue_inheritance_base.das", "BaseCounter")
 
-[ue_native_object(path="/Script/Engine.Actor")]
-struct LocalActorRef { handle:UObjectHandle }
+typedef LocalActorRef = UENativeObjectRef("/Script/Engine.Actor")
+
+typedef RepeatedActorRef = ue_foundation::UENativeObjectRef("/Script/Engine.Actor")
+
+typedef LocalMeshRef = UENativeObjectRef("/Script/Engine.SkeletalMesh")
+
+typedef LocalObjectRef = UENativeObjectRef("/Script/CoreUObject.Object")
 
 def actor_view_valid(actor:ActorRef):int { return ue_is_valid(actor) ? 42 : 0 }
 
@@ -143,6 +148,24 @@ def main(mode:int):int {
             verify(ue_is_valid(counter))
         } recover { rejected=true }
         return rejected ? 42 : -1
+    }
+    if (mode == 25) {
+        let actor = ue_ref(type<LocalActorRef>, ue_self_object())
+        let same:RepeatedActorRef = actor
+        return actor_view_valid(same)
+    }
+    if (mode == 26) { return ue_is_valid(LocalMeshRef()) ? -1 : 42 }
+    if (mode == 27) {
+        var rejected = false
+        try {
+            let mesh = ue_ref(type<LocalMeshRef>, ue_self_object())
+            verify(ue_is_valid(mesh))
+        } recover { rejected = true }
+        return rejected ? 42 : -1
+    }
+    if (mode == 28) {
+        let object = ue_ref(type<LocalObjectRef>, ue_self_object())
+        return ue_is_valid(object) ? 42 : -1
     }
     let payload = DasCallPayload(Count=17,Metrics=DasCallMetrics(Ratio=1.0f))
     if (mode == 4) { return ue_struct_get(payload, Count) }

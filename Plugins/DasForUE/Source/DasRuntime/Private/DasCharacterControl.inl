@@ -77,7 +77,7 @@ bool PlayerControlsReady(const FDasObjectHandle& H, das::Context* C)
 }
 void ControllerSetTeam(const FDasObjectHandle& H, int32 TeamId, das::Context* C)
 {
-    auto* PC = CharacterControlObject<APlayerController>(H, C, true);
+    auto* PC = CharacterControlObject<AController>(H, C, true);
     auto* Agent = Cast<IGenericTeamAgentInterface>(PC);
     if (!Agent || TeamId < 0 || TeamId > 255)
         C->throw_error("controller team requires IGenericTeamAgentInterface and a byte team id");

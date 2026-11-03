@@ -128,3 +128,24 @@ Stimuli are produced by UE itself (sight registration, `AISense_Hearing.ReportNo
 - The typed stimulus projection covers `OnTargetPerceptionUpdated`. Other perception delegates (forgotten/info updates), single-parameter forms, sight occlusion and team-affiliation policies are not specifically covered.
 
 See also: [Timers](Timers.md), [Callback arguments](CallbackArguments.md), [Gameplay services](GameplayServices.md), [Delegates and events](../DSL/DelegatesAndEvents.md), [Components](../DSL/Components.md)
+
+## Native sense setup and controller helpers
+
+`ue_perception_configure(component, sightRadius, loseSightRadius, sightAngle,
+hearingRadius, maxAge)` configures native sight/hearing sense subobjects owned
+by the component. Repeated configuration reuses the existing configs. All
+affiliations are enabled; scripts filter candidate actors. Values must be finite,
+lose-sight radius must be at least sight radius, angle must be in 0..180 and the
+remaining ranges/age must be nonnegative. Configuration requires authority and
+a live gameplay component; construction/bind_events/EndPlay writes are rejected.
+
+`ue_ai_pawn(controller)` returns its nullable controlled pawn.
+`ue_ai_set_focus(controller, actor)` uses gameplay focus, or clears it for a null
+ActorRef. `ue_ai_line_of_sight(controller, actor)` uses native controller LOS.
+Objects must belong to the script's game world; focus mutation requires
+authority. `ue_controller_set_team` also accepts AIControllerRef.
+
+The `AIController` marker in ue_ai can be used as a ue_class parent through the
+existing generic Blueprint-parent bridge; no dedicated native host is needed.
+These additions are implemented but await integration validation while the
+shared daScript dependency is being updated (2026-11-03).

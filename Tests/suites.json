@@ -722,6 +722,12 @@
       "comment": "Damage windows, stun, on-hit effects and delegate cleanup in real PIE."
     },
     {
+      "name": "rogue-ai",
+      "kind": "script",
+      "script": "TestRogueAI.ps1",
+      "comment": "Real PIE: sight/hearing, direct pursuit, action attack, stun, occlusion/memory and death cleanup."
+    },
+    {
       "name": "rogue-point-impact",
       "kind": "script",
       "script": "TestRoguePointImpact.ps1",

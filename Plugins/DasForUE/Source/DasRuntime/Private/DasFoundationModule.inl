@@ -78,8 +78,9 @@ public:
         addAnnotation(new FUEObjectTypeAnnotation());
         addAnnotation(new FUEAuthoredRefAnnotation());
         addTypeMacro(new FUEObjectTypeMacro());
-        addTypeMacro(new FUEReferenceTypeMacro(true));
-        addTypeMacro(new FUEReferenceTypeMacro(false));
+        addTypeMacro(new FUEReferenceTypeMacro("UEObjectRef"));
+        addTypeMacro(new FUEReferenceTypeMacro("UEInterfaceRef"));
+        addTypeMacro(new FUEReferenceTypeMacro("UENativeObjectRef"));
         addTypeMacro(new FUEObjectKeyTypeMacro());
         addAnnotation(new FUEClassTypeAnnotation());
         addTypeMacro(new FUEClassTypeMacro());
@@ -717,6 +718,11 @@ public:
                                                       das::SideEffects::modifyExternal, "ScriptAssetPending");
         AddUEExtern<DAS_BIND_FUN(ScriptAISelf), das::SimNode_ExtFuncCallAndCopyOrMove>(
             *this, Library, "__ue_ai_self", das::SideEffects::modifyExternal, "ScriptAISelf");
+        AddUEExtern<DAS_BIND_FUN(AIPawn), das::SimNode_ExtFuncCallAndCopyOrMove>(
+            *this, Library, "__ue_ai_pawn", das::SideEffects::modifyExternal, "AIPawn");
+        AddUEExtern<DAS_BIND_FUN(AIFocus)>(*this, Library, "__ue_ai_focus", das::SideEffects::modifyExternal, "AIFocus");
+        AddUEExtern<DAS_BIND_FUN(AILineOfSight)>(*this, Library, "__ue_ai_line_of_sight", das::SideEffects::modifyExternal, "AILineOfSight");
+        AddUEExtern<DAS_BIND_FUN(PerceptionConfigure)>(*this, Library, "__ue_perception_configure", das::SideEffects::modifyExternal, "PerceptionConfigure");
         AddUEExtern<DAS_BIND_FUN(ScriptAIMove)>(*this, Library, "__ue_ai_move", das::SideEffects::modifyExternal,
                                                 "ScriptAIMove");
         AddUEExtern<DAS_BIND_FUN(ScriptAICancel)>(*this, Library, "__ue_ai_cancel", das::SideEffects::modifyExternal,

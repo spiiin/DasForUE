@@ -1,0 +1,64 @@
+// Generic native AI operations; target selection and behavior remain in scripts.
+FDasObjectHandle AIPawn(const FDasObjectHandle& Controller, das::Context* C)
+{
+    auto* AI = CharacterControlObject<AAIController>(Controller, C);
+    return MakeObjectHandle(AI->GetPawn(), APawn::StaticClass(), C);
+}
+void AIFocus(const FDasObjectHandle& Controller, const FDasObjectHandle& Target, das::Context* C)
+{
+    auto* AI = CharacterControlObject<AAIController>(Controller, C, true);
+    if (!AI->HasAuthority())
+        C->throw_error("AI focus requires authority");
+    if (!Target.Token)
+    {
+        AI->ClearFocus(EAIFocusPriority::Gameplay);
+        return;
+    }
+    auto* Actor = Cast<AActor>(ResolveObject(Target, C));
+    if (!Actor || Actor->GetWorld() != AI->GetWorld() || Actor->IsActorBeingDestroyed())
+        C->throw_error("AI focus target must be live in the same world");
+    AI->SetFocus(Actor, EAIFocusPriority::Gameplay);
+}
+bool AILineOfSight(const FDasObjectHandle& Controller, const FDasObjectHandle& Target, das::Context* C)
+{
+    auto* AI = CharacterControlObject<AAIController>(Controller, C);
+    if (!Target.Token)
+        return false;
+    auto* Actor = Cast<AActor>(ResolveObject(Target, C));
+    if (!Actor || Actor->GetWorld() != AI->GetWorld() || Actor->IsActorBeingDestroyed())
+        return false;
+    return AI->LineOfSightTo(Actor);
+}
+void PerceptionConfigure(const FDasObjectHandle& Component, float SightRadius, float LoseSightRadius, float SightAngle,
+                         float HearingRadius, float MaxAge, das::Context* C)
+{
+    auto* P = CharacterControlObject<UAIPerceptionComponent>(Component, C, true);
+    if (!P->GetOwner() || !P->GetOwner()->HasAuthority() || !FMath::IsFinite(SightRadius) ||
+        !FMath::IsFinite(LoseSightRadius) || !FMath::IsFinite(SightAngle) || !FMath::IsFinite(HearingRadius) ||
+        !FMath::IsFinite(MaxAge) || SightRadius < 0 || LoseSightRadius < SightRadius || SightAngle < 0 ||
+        SightAngle > 180 || HearingRadius < 0 || MaxAge < 0)
+        C->throw_error(
+            "perception config requires authority, finite ranges, lose-sight >= sight, angle 0..180 and nonnegative age");
+    auto* Sight = Cast<UAISenseConfig_Sight>(P->GetSenseConfig(UAISense::GetSenseID<UAISense_Sight>()));
+    if (!Sight)
+        Sight = NewObject<UAISenseConfig_Sight>(P);
+    Sight->SightRadius = SightRadius;
+    Sight->LoseSightRadius = LoseSightRadius;
+    Sight->PeripheralVisionAngleDegrees = SightAngle;
+    Sight->DetectionByAffiliation.bDetectEnemies = true;
+    Sight->DetectionByAffiliation.bDetectFriendlies = true;
+    Sight->DetectionByAffiliation.bDetectNeutrals = true;
+    Sight->SetMaxAge(MaxAge);
+    P->ConfigureSense(*Sight);
+    auto* Hearing = Cast<UAISenseConfig_Hearing>(P->GetSenseConfig(UAISense::GetSenseID<UAISense_Hearing>()));
+    if (!Hearing)
+        Hearing = NewObject<UAISenseConfig_Hearing>(P);
+    Hearing->HearingRange = HearingRadius;
+    Hearing->DetectionByAffiliation.bDetectEnemies = true;
+    Hearing->DetectionByAffiliation.bDetectFriendlies = true;
+    Hearing->DetectionByAffiliation.bDetectNeutrals = true;
+    Hearing->SetMaxAge(MaxAge);
+    P->ConfigureSense(*Hearing);
+    P->SetDominantSense(UAISense_Sight::StaticClass());
+    P->RequestStimuliListenerUpdate();
+}

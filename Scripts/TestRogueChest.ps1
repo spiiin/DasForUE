@@ -5,9 +5,9 @@ $Das=Get-DasContext -Engine $Engine
 $Destination=Join-Path (Split-Path -Parent $Das.Project) 'Content/Das/Scripts'
 New-Item -ItemType Directory -Path $Destination -Force | Out-Null
 foreach($File in @('rogue_interaction_interface.das','rogue_interaction.das','rogue_item_chest.das')) {
-    Copy-Item -LiteralPath (Join-Path $PortRoot "Content/Das/Scripts/$File") -Destination (Join-Path $Destination $File)
+    Copy-Item -LiteralPath (Join-Path $PortRoot "Content/Das/Scripts/rogue/$File") -Destination (Join-Path $Destination $File)
 }
-Copy-Item -LiteralPath (Join-Path $PortRoot 'Tests/Das/rogue_item_chest_observer.das') -Destination (Join-Path $Destination 'rogue_item_chest_observer.das')
+Copy-Item -LiteralPath (Join-Path $PortRoot 'Tests/Das/roguetest/rogue_item_chest_observer.das') -Destination (Join-Path $Destination 'rogue_item_chest_observer.das')
 if(!$SkipBuild) { Invoke-DasBuild $Das -Name 'Rogue chest' }
 $Config=Join-Path (Split-Path -Parent $Das.Project) 'Config/DefaultEngine.ini'
 $Before=[IO.File]::ReadAllBytes($Config)

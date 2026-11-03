@@ -314,13 +314,26 @@ FDasExecutionResult FDasRuntimeModule::RunCallback(const FString& Path, EDasCall
         (Self.Get() == ActorLifecycleTarget ||
          (LifecycleComponent && LifecycleComponent->GetOwner() == ActorLifecycleTarget)) &&
         (Event == EDasCallback::BeginPlay || Event == EDasCallback::EndPlay || Event == EDasCallback::Construction);
+    // FinishSpawning a Pawn synchronously spawns its default controller before
+    // possession. Permit only that new controller's actual native startup phase,
+    // never an arbitrary existing actor or a fabricated lifecycle callback.
+    const auto* SpawnPawn = ActorSpawnDepth > 0 ? Cast<APawn>(ActorLifecycleTarget) : nullptr;
+    const auto* SpawnController = Cast<AAIController>(LifecycleComponent ? LifecycleComponent->GetOwner()
+                                                                       : Self.Get());
+    const bool DefaultControllerLifecycle =
+        SpawnPawn && SpawnController && SpawnPawn->AIControllerClass &&
+        SpawnController->GetClass() == SpawnPawn->AIControllerClass.Get() &&
+        SpawnController->GetWorld() == SpawnPawn->GetWorld() && SpawnController->HasAuthority() &&
+        (!SpawnController->GetPawn() || SpawnController->GetPawn() == SpawnPawn) &&
+        ((Event == EDasCallback::BeginPlay && SpawnController->IsActorBeginningPlay()) ||
+         (Event == EDasCallback::Construction && !SpawnController->IsActorInitialized()));
     const bool ComponentLifecycle =
         ComponentLifecycleTarget && Self.Get() == ComponentLifecycleTarget &&
         (Event == EDasCallback::BeginPlay || Event == EDasCallback::EndPlay || Event == EDasCallback::Construction);
     const bool ParentLifecycle =
         ParentLifecycleTarget && Self.Get() == ParentLifecycleTarget && Event != EDasCallback::Main;
     if (!IsInGameThread() || !bInitialized ||
-        (ActiveContext && !ActorLifecycle && !ComponentLifecycle && !ParentLifecycle &&
+        (ActiveContext && !ActorLifecycle && !DefaultControllerLifecycle && !ComponentLifecycle && !ParentLifecycle &&
          (AuthoredDispatchDepth == 0 || Event != EDasCallback::Main)))
     {
         Result.Error =
@@ -728,14 +741,14 @@ FDasExecutionResult FDasRuntimeModule::RunCallback(const FString& Path, EDasCall
                 }
                 else
                 {
-                    Candidate->Function = Candidate->Context->findFunction("main");
-                    Candidate->Initializer = Candidate->Context->findFunction("__ue_initialize");
-                    Candidate->Construction = Candidate->Context->findFunction("__ue_construct");
-                    Candidate->BeginPlay = Candidate->Context->findFunction("begin_play");
-                    Candidate->Tick = Candidate->Context->findFunction("tick");
-                    Candidate->EndPlay = Candidate->Context->findFunction("end_play");
+                    Candidate->Function = FindRootScriptFunction(Candidate->Program, *Candidate->Context, "main");
+                    Candidate->Initializer = FindRootScriptFunction(Candidate->Program, *Candidate->Context, "__ue_initialize");
+                    Candidate->Construction = FindRootScriptFunction(Candidate->Program, *Candidate->Context, "__ue_construct");
+                    Candidate->BeginPlay = FindRootScriptFunction(Candidate->Program, *Candidate->Context, "begin_play");
+                    Candidate->Tick = FindRootScriptFunction(Candidate->Program, *Candidate->Context, "tick");
+                    Candidate->EndPlay = FindRootScriptFunction(Candidate->Program, *Candidate->Context, "end_play");
                     const FTCHARToUTF8 EntryUtf8(*EntryPoint);
-                    auto* Selected = Event == EDasCallback::Main ? Candidate->Context->findFunction(EntryUtf8.Get())
+                    auto* Selected = Event == EDasCallback::Main ? FindRootScriptFunction(Candidate->Program, *Candidate->Context, EntryUtf8.Get())
                                                                  : Candidate->Function;
                     if ((Event == EDasCallback::Main && !Selected) ||
                         (Selected &&
@@ -784,7 +797,7 @@ FDasExecutionResult FDasRuntimeModule::RunCallback(const FString& Path, EDasCall
                                 FocusNotificationContract,
                                 FocusNotificationContract || Session->FocusNotificationEntries.Contains(Required.Key));
                             const FTCHARToUTF8 RequiredUtf8(*Required.Key);
-                            auto* RequiredFunction = Candidate->Context->findFunction(RequiredUtf8.Get());
+                            auto* RequiredFunction = FindRootScriptFunction(Candidate->Program, *Candidate->Context, RequiredUtf8.Get());
                             if (!RequiredFunction ||
                                 !VerifyContract(Candidate->Program, Required.Key, Required.Value,
                                                 Session->NativeInputEntries.Contains(Required.Key)))
@@ -799,7 +812,7 @@ FDasExecutionResult FDasRuntimeModule::RunCallback(const FString& Path, EDasCall
                     if (Session->Live)
                         Candidate->Context->PersistentInts = Session->Live->Context->PersistentInts;
                     Candidate->Context->Self = Self;
-                    auto* BindEvents = Candidate->Context->findFunction("bind_events");
+                    auto* BindEvents = FindRootScriptFunction(Candidate->Program, *Candidate->Context, "bind_events");
                     if (BindEvents && !ConstructingObject && !Cast<UDasGASCueSession>(Self.Get()))
                     {
                         if (!das::verifyCall<void>(BindEvents->debugInfo, Candidate->Modules))
@@ -813,7 +826,7 @@ FDasExecutionResult FDasRuntimeModule::RunCallback(const FString& Path, EDasCall
                     for (const auto& Declaration : Candidate->Context->Subscriptions)
                     {
                         const FTCHARToUTF8 Name(*Declaration.Handler);
-                        auto* Handler = Candidate->Context->findFunction(Name.Get());
+                        auto* Handler = FindRootScriptFunction(Candidate->Program, *Candidate->Context, Name.Get());
                         if (!VerifyEventHandler(Handler, Candidate->Modules, Declaration.Kind))
                             CandidateError = (Declaration.Kind == EDasMethodSignature::Int
                                               ? TEXT("Expected exported event handler(value: int): void: ")
@@ -1060,7 +1073,7 @@ FDasExecutionResult FDasRuntimeModule::RunCallback(const FString& Path, EDasCall
             else
             {
                 const FTCHARToUTF8 EntryUtf8(*EntryPoint);
-                Function = Context.findFunction(EntryUtf8.Get());
+                Function = FindRootScriptFunction(Session->Live->Program, Context, EntryUtf8.Get());
                 if (!Function || !VerifyContract(Session->Live->Program, EntryPoint, Expected))
                 {
                     Result.Error = TEXT("Expected exported ") + EntryPoint + TEXT(" with requested scalar signature.");

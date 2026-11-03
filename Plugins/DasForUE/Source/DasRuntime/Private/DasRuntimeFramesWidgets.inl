@@ -166,6 +166,13 @@ const IDasScriptTypeFacet* DasTypedCallFacet(EDasMethodSignature Kind)
                     return Entry.Script;
     return nullptr;
 }
+// Imported classes can export the same lifecycle names. Bind exactly the
+// root module function whose declaration VerifyContract validates.
+das::SimFunction* FindRootScriptFunction(const das::ProgramPtr& Program, das::Context& Context, const char* Name)
+{
+    const auto Function = Program->getThisModule()->findUniqueFunction(Name);
+    return Function && Function->exports ? Context.fnByMangledName(Function->getMangledNameHash()) : nullptr;
+}
 bool VerifyContract(const das::ProgramPtr& Program, const FString& Entry, const FDasCallContract& C,
                     bool AllowNativeInputValue = false)
 {

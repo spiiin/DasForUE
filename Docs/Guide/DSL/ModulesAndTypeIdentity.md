@@ -206,6 +206,8 @@ is checked when the source declaration resolves, so a stale entry cannot bind a
 different class. Catalog edits join compile dependency tracking and the
 last-good reload rules.
 
+The same resolution is available as `typedef CounterActorRef = UEObjectRef("game.CounterActor")`. Enable `[DasForUE.SourceCatalog] AutoGenerate=True` in DefaultEngine.ini for an automatically maintained project class/interface/struct/enum catalog before editor compilation; see [AuthoredReferences.md](AuthoredReferences.md#references-by-stable-id).
+
 ### Generating catalogs and reference modules
 
 The `DasSourceCatalog` commandlet builds the catalog and a module with reference

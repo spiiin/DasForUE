@@ -56,7 +56,10 @@ __ue_actor_spawn	@ue_foundation::__ue_actor_spawn CH<ue_foundation::UEClassHandl
 __ue_actor_spawn_instigated	@ue_foundation::__ue_actor_spawn_instigated CH<ue_foundation::UEClassHandle> CIH<ue_foundation::UETransform> CIH<ue_foundation::UObjectHandle> CIH<ue_foundation::UObjectHandle> CIs CIs CIs C_c	ue_foundation::UObjectHandle	4
 __ue_ai_active	@ue_foundation::__ue_ai_active CIs C_c	bool const	4
 __ue_ai_cancel	@ue_foundation::__ue_ai_cancel CIs C_c	bool const	4
+__ue_ai_focus	@ue_foundation::__ue_ai_focus CIH<ue_foundation::UObjectHandle> CIH<ue_foundation::UObjectHandle> C_c	void	4
+__ue_ai_line_of_sight	@ue_foundation::__ue_ai_line_of_sight CIH<ue_foundation::UObjectHandle> CIH<ue_foundation::UObjectHandle> C_c	bool const	4
 __ue_ai_move	@ue_foundation::__ue_ai_move CIs CIH<ue_foundation::UObjectHandle> CIH<ue_foundation::UObjectHandle> CIH<ue_foundation::UEVector> Cb CIs Cf Cb Cb C_c	bool const	4
+__ue_ai_pawn	@ue_foundation::__ue_ai_pawn CIH<ue_foundation::UObjectHandle> C_c	ue_foundation::UObjectHandle	4
 __ue_ai_self	@ue_foundation::__ue_ai_self C_c	ue_foundation::UObjectHandle	4
 __ue_apply_damage	@ue_foundation::__ue_apply_damage CIH<ue_foundation::UObjectHandle> Cf CIH<ue_foundation::UObjectHandle> CIH<ue_foundation::UObjectHandle> C_c	float const	4
 __ue_arg_analoginputevent	@ue_foundation::__ue_arg_analoginputevent CIH<ue_foundation::UCallHandle> CIs CIH<ue_foundation::UEAnalogInputEvent> C_c	void	4
@@ -254,6 +257,7 @@ __ue_overlap_world	@ue_foundation::__ue_overlap_world CIH<ue_foundation::UEVecto
 __ue_parent_lifecycle	@ue_foundation::__ue_parent_lifecycle CIs Ci Cf Ci C_c	void	4
 __ue_pawn_controller	@ue_foundation::__ue_pawn_controller CIH<ue_foundation::UObjectHandle> C_c	ue_foundation::UObjectHandle	4
 __ue_pawn_possess	@ue_foundation::__ue_pawn_possess CIH<ue_foundation::UObjectHandle> CIH<ue_foundation::UObjectHandle> C_c	bool const	4
+__ue_perception_configure	@ue_foundation::__ue_perception_configure CIH<ue_foundation::UObjectHandle> Cf Cf Cf Cf Cf C_c	void	4
 __ue_player_controls_ready	@ue_foundation::__ue_player_controls_ready CIH<ue_foundation::UObjectHandle> C_c	bool const	4
 __ue_primary_cancel	@ue_foundation::__ue_primary_cancel CIs C_c	bool const	4
 __ue_primary_exists	@ue_foundation::__ue_primary_exists CIs CIs C_c	bool const	4

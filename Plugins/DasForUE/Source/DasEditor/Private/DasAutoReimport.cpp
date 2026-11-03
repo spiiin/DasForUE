@@ -1,5 +1,7 @@
 #include "DasAutoReimport.h"
 #include "DasAuthoring.h"
+#include "DasSourceCatalog.h"
+#include "Misc/ConfigCacheIni.h"
 #include "DasDSLService.h"
 #include "DasGASAssetService.h"
 #include "DasTypeRegistry.h"
@@ -38,6 +40,12 @@ TAutoConsoleVariable<int32> CVarAutoReimport(TEXT("Das.DSL.AutoReimport"), 1,
 // Editors often write a file in several steps; changes are collected and handled once after this delay.
 constexpr float SettleSeconds = 0.5f;
 
+bool UpdateAutomaticCatalog(FString& Error)
+{
+    bool Enabled = false;
+    GConfig->GetBool(TEXT("DasForUE.SourceCatalog"), TEXT("AutoGenerate"), Enabled, GEngineIni);
+    return !Enabled || FDasSourceCatalog::UpdateDeclarationInventory(FPaths::ProjectContentDir() / TEXT("Das/Scripts"), Error);
+}
 void Notify(const FString& Text, bool bSuccess)
 {
     FNotificationInfo Info(FText::FromString(Text));
@@ -91,6 +99,8 @@ void FDasAutoReimport::Start()
         []
         { FModuleManager::LoadModuleChecked<FDasRuntimeModule>(TEXT("DasRuntime")).SetEditorGameplayActive(false); });
     MapOpenedHandle = FEditorDelegates::OnMapOpened.AddRaw(this, &FDasAutoReimport::OnMapOpened);
+    FString CatalogError;
+    if (!UpdateAutomaticCatalog(CatalogError)) DasDiagnosticEditor::Report(CatalogError);
     // The startup map may already be open.
     OnMapOpened(FString(), false);
 }
@@ -159,6 +169,12 @@ void FDasAutoReimport::OnScriptsChanged(const TArray<FFileChangeData>& Changes)
 bool FDasAutoReimport::ProcessPending(float)
 {
     Ticker.Reset();
+    FString CatalogError;
+    if (!UpdateAutomaticCatalog(CatalogError))
+    {
+        DasDiagnosticEditor::Report(CatalogError);
+        return false;
+    }
     const TSet<FString> Saved = MoveTemp(Pending);
     Pending.Reset();
     const bool Hierarchy = bPendingHierarchyChange;
@@ -345,6 +361,8 @@ void FDasAutoReimport::ReimportGAS(const TPair<FString, FString>& Import, bool b
 }
 void FDasAutoReimport::ReimportStale()
 {
+    FString CatalogError;
+    if (!UpdateAutomaticCatalog(CatalogError)) { DasDiagnosticEditor::Report(CatalogError); return; }
     auto& Runtime = FModuleManager::LoadModuleChecked<FDasRuntimeModule>(TEXT("DasRuntime"));
     for (UBlueprint* Blueprint : Bound(nullptr))
     {
@@ -378,6 +396,7 @@ bool FDasAutoReimport::PrepareSavedPrograms(const TSet<FString>& Files, bool bHi
 bool FDasAutoReimport::PrepareAllPrograms(FString& Error)
 {
     Error.Reset();
+    if (!UpdateAutomaticCatalog(Error)) return false;
     auto& Runtime = FModuleManager::LoadModuleChecked<FDasRuntimeModule>(TEXT("DasRuntime"));
     TArray<FString> Scripts;
     IFileManager::Get().FindFilesRecursive(Scripts, *(FPaths::ProjectContentDir() / TEXT("Das/Scripts")),

@@ -28,3 +28,9 @@ struct AIStimulus {
 
 [ue_native_object(path="/Script/AIModule.AIPerceptionComponent")]
 struct PerceptionComponentRef { handle:UObjectHandle }
+
+// Configure reusable sight/hearing subobjects owned strongly by the native component.
+def ue_perception_configure(component:PerceptionComponentRef; sight:float; loseSight:float;
+                            angle:float; hearing:float; maxAge:float):void {
+    __ue_perception_configure(component.handle,sight,loseSight,angle,hearing,maxAge)
+}

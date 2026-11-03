@@ -50,9 +50,24 @@ int32 UDasInheritedHandlersCommandlet::Main(const FString&)
                                                                              LPth = R.ScriptPath(L + TEXT(".das"));
     Middle = Middle.Replace(TEXT("@BASE@"), *B);
     Leaf = Leaf.Replace(TEXT("@MIDDLE@"), *M);
-    auto Write = [](const FString& P, const FString& S)
+    bool PrepareWrites = false;
+    auto Write = [&R, &PrepareWrites](const FString& P, const FString& S)
     {
-        return FFileHelper::SaveStringToFile(S, *P, FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM);
+        const bool Added = !IFileManager::Get().FileExists(*P);
+        const bool Saved = FFileHelper::SaveStringToFile(S, *P, FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM);
+        // These fixture edits are synchronous; do not depend on watcher polling.
+        if (Saved)
+        {
+            R.NotifyScriptsChanged({P}, Added);
+            if (PrepareWrites)
+            {
+                // Model the editor preparation queue before gameplay observes this source change.
+                // Rejected candidates remain recorded so the live VM can report ReloadError.
+                FString PreparationError;
+                R.PrepareEditorPrograms({FPaths::GetCleanFilename(P)}, PreparationError);
+            }
+        }
+        return Saved;
     };
     ON_SCOPE_EXIT
     {
@@ -182,6 +197,9 @@ int32 UDasInheritedHandlersCommandlet::Main(const FString&)
         World->DestroyWorld(false);
     };
     World->InitializeActorsForPlay(FURL());
+    Check(R.PreparePrograms(World.Get(), {B + TEXT(".das"), M + TEXT(".das"), L + TEXT(".das")}, Error),
+          TEXT("prepare_inherited_handler_world"), Error);
+    PrepareWrites = true;
     FEditorScriptExecutionGuard Allow;
     auto* A = World->SpawnActor<ADasActor>(LeafBP->GeneratedClass);
     TStrongObjectPtr<ADasActor> Keep(A);

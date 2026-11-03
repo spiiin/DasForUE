@@ -5,7 +5,7 @@ $Das=Get-DasContext -Engine $Engine
 $Destination=Join-Path (Split-Path -Parent $Das.Project) 'Content/Das/Scripts'
 New-Item -ItemType Directory -Path $Destination -Force | Out-Null
 # Stage the port dependency closure, including typed action and attribute references.
-Get-ChildItem -LiteralPath (Join-Path $PortRoot 'Content/Das/Scripts') -Filter '*.das' | ForEach-Object {
+Get-ChildItem -LiteralPath (Join-Path $PortRoot 'Content/Das/Scripts') -Filter '*.das' -Recurse -File | ForEach-Object {
     Copy-Item -LiteralPath $_.FullName -Destination (Join-Path $Destination $_.Name)
 }
 # These regressions intentionally exercise the base 30-second projectile.
@@ -17,7 +17,7 @@ $AttackSource=$AttackSource -replace '(var\s+MuzzleHeight\s*:\s*float\s*=\s*)40\
 $AttackSource=$AttackSource -replace '(var\s+AttackDelay\s*:\s*float\s*=\s*)0\.2f', '${1}0.01f'
 $AttackSource=$AttackSource -replace '(self\.CooldownTime\s*=\s*)0\.5f', '${1}0.0f'
 [IO.File]::WriteAllText($AttackFile,$AttackSource,[Text.UTF8Encoding]::new($false))
-Copy-Item -LiteralPath (Join-Path $PortRoot 'Tests/Das/rogue_item_chest_observer.das') -Destination (Join-Path $Destination 'rogue_item_chest_observer.das')
+Copy-Item -LiteralPath (Join-Path $PortRoot 'Tests/Das/roguetest/rogue_item_chest_observer.das') -Destination (Join-Path $Destination 'rogue_item_chest_observer.das')
 if(!$SkipBuild) { Invoke-DasBuild $Das -Name 'Rogue projectile' }
 $Config=Join-Path (Split-Path -Parent $Das.Project) 'Config/DefaultEngine.ini'
 $Before=[IO.File]::ReadAllBytes($Config)

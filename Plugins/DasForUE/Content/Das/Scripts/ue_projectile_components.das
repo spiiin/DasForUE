@@ -38,7 +38,7 @@ struct CollisionHit {
 }
 
 def ue_apply_point_damage(target:ActorRef; amount:float; direction:UEVector; hit:CollisionHit;
-    source:ActorRef; instigator:PlayerControllerRef):float {
+    source:ActorRef; instigator:ControllerRef):float {
     let call=ue_begin_static_call("/Script/DasRuntime.DasCollisionLibrary", "ApplyPointDamage", "")
     ue_arg_object(call, "Target", target.handle)
     ue_arg_float(call, "Damage", amount)
@@ -61,4 +61,9 @@ def ue_report_noise(location:UEVector; loudness:float; instigator:NativePawnRef)
     ue_arg_name(call, "Tag", "None")
     ue_invoke_call(call)
     ue_release_call(call)
+}
+
+def ue_apply_point_damage(target:ActorRef; amount:float; direction:UEVector; hit:CollisionHit;
+                          source:ActorRef; instigator:PlayerControllerRef):float {
+    return ue_apply_point_damage(target,amount,direction,hit,source,ue_ref(type<ControllerRef>,instigator.handle))
 }

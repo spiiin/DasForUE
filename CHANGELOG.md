@@ -620,3 +620,22 @@ directly, gameplay calls skip reflection, and scripts compile ahead of time thro
 
 - Dynamic `+=`/`-=` event subscriptions now accept reflected native/authored object-reference properties in addition to self and declared components. Signature checks use the declared source type; runtime source/delegate checks and session-owned cleanup are unchanged.
 - The ActionRoguelike example uses `BindEvents` for permanent health/status notifications and dynamic subscriptions for the running Overwhelm effect. A single base health listener invokes a virtual post-health hook for combat targets, avoiding duplicate hit/death delivery. Handwritten string-based delegate registration/removal was removed.
+
+### Authored reference macros by stable ID
+
+- Added `UEObjectRef("module.Class")` and unambiguous short-name resolution through the existing source catalog, including catalog dependency and stale-ID checks.
+- Added opt-in automatic project class/interface/struct/enum inventory before editor reimport/compilation. The index is generated from declaration headers without compiling dependent classes, is sorted and only rewritten when changed, and preserves the previous catalog on invalid/duplicate identities.
+- Migrated the ActionRoguelike authored object aliases to stable IDs and enabled automatic catalog generation for that project.
+
+- Added `UEInterfaceRef("module.Interface")` using kind-aware catalog lookup plus actual authored-interface identity validation; migrated the three ActionRoguelike interface aliases. Structs and enums share the existing schema version 3 source records.
+
+### Native object reference macro
+
+- Added `UENativeObjectRef("/Script/Module.Class")`, reusing checked native object wrapper generation and dispatch without a source catalog. Native classes are validated during compilation; interfaces, value structs and authored asset paths are rejected.
+- Migrated the ActionRoguelike skeletal mesh alias and added compile/runtime regressions for argument validation, nullable handles, derived classes, wrong object types, nominal alias reuse and catalog independence.
+
+### Project script subfolders
+
+- Added a project source filename index initialized at startup and refreshed on reported hierarchy changes; existing flat imports and saved source names resolve nested files without per-lookup directory traversal. Duplicate project module filenames are rejected.
+- Automatic declaration inventory scans nested folders and records validated relative `.das` paths. Added regression coverage for path traversal rejection, nested inventory identity, explicit/short source resolution and module imports.
+- Grouped ActionRoguelike scripts into `rogue`, `roguedemo` and `roguetest`; removed the separate presentation native-type module and updated test staging paths.

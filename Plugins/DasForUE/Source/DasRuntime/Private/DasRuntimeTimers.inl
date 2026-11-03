@@ -296,6 +296,7 @@ struct FCachedScriptPath
     double CheckedAt = 0;
 };
 TMap<FString, FCachedScriptPath> ScriptPathCache;
+#include "DasProjectScriptIndex.inl"
 TAutoConsoleVariable<int32> CVarScriptChangeCheck(
     TEXT("das.ScriptChangeCheck"), -1,
          TEXT("When persistent script calls compare their sources with disk: -1 or 1 watch (after a reported change: ")
@@ -330,6 +331,7 @@ void MarkScriptsChanged(const TArray<FString>& Files, const TArray<FString>& Dir
 {
     check(IsInGameThread());
     PolledStats.Reset();
+    if (bAddedOrRemoved || !Directories.IsEmpty()) IndexProjectScripts();
     for (auto& Pair : KnownCompiledPrograms)
         if (auto Program = Pair.Value.Pin())
             Program->CheckedEpoch = 0;

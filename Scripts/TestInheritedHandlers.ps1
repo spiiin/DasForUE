@@ -11,7 +11,7 @@ $Paths={Get-DasValidationPaths $Das -Extra @('Tests/InheritedHandlers/base.das',
     'Bindings/FoundationExterns.txt',
     'Scripts/TestInheritedHandlers.ps1')}
 Invoke-DasValidation $Das -Run DasInheritedHandlers -Name 'inherited-handlers-runtime' `
-    -Marker 'DAS_INHERITED_HANDLER_RESULT=PASS' -Checks 34 -SourcePaths $Paths `
+    -Marker 'DAS_INHERITED_HANDLER_RESULT=PASS' -Checks 35 -SourcePaths $Paths `
     -Output 'inherited-handlers-validation.json' -SuccessMarker 'DAS_INHERITED_HANDLER_VALIDATION=PASS' `
     -Mode 'headless Game World, inherited method references, virtual callbacks, Apply, imported hierarchy and reload' `
     -FailPattern 'DAS_INHERITED_HANDLER_FAIL|Ensure condition failed|Fatal error:|Log[^:]+: Error:'

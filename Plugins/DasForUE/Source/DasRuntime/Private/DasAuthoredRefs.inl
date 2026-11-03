@@ -233,7 +233,11 @@ struct FUEAuthoredRefAnnotation : das::StructureAnnotation
                 FFileHelper::BufferToString(Wire, Snapshot.Bytes.GetData(), Snapshot.Bytes.Num());
                 if (!FDasSourceCatalog::FromJson(Wire, Catalog, Issue) || !Catalog.Resolve(Name, Entry, Issue))
                     DSLFail(Issue);
-                File = Entry.Script;
+                // Declarations and their method/property descriptors use unique module filenames.
+                // Keep relative folders in the catalog, but use that same canonical key in annotations.
+                File = FPaths::GetCleanFilename(Entry.Script);
+                if (!R.ScriptPath(Entry.Script).Equals(R.ScriptPath(File), ESearchCase::IgnoreCase))
+                    DSLFail(TEXT("Catalog source does not match the indexed module filename: ") + Entry.Script);
                 Name = Entry.Name;
                 const FString Key = File + TEXT("::")+ Name;
                 if (const auto* Prior = DSLSourceCatalogExpectedIds.Find(Key))
@@ -264,6 +268,15 @@ struct FUEAuthoredRefAnnotation : das::StructureAnnotation
             }
             if (!FDasSourceCatalog::LocalFile(File, TEXT("das")))
                 DSLFail(TEXT("Expected local authored source filename"));
+            if (File.Contains(TEXT("/")))
+            {
+                auto& Runtime = FModuleManager::LoadModuleChecked<FDasRuntimeModule>(TEXT("DasRuntime"));
+                const FString Short = FPaths::GetCleanFilename(File);
+                if (!Runtime.ScriptPath(File).Equals(Runtime.ScriptPath(Short), ESearchCase::IgnoreCase))
+                    DSLFail(TEXT("Reference source does not match the indexed module filename: ") + File);
+                for (auto& A : Args)
+                    if (A.name == "script") A.sValue = DSLUtf8(Short);
+            }
             return true;
         }
         catch (const std::exception& X)
@@ -668,11 +681,15 @@ bool DSLEmitProperty(das::Program* P, das::Module* M, const das::TypeDeclPtr& T,
     P->library.foreach (
         [&](das::Module* Mod)
         {
+            // A sibling's generated accessor cannot satisfy this module's lookup.
+            if (!M->isVisibleDirectly(Mod))
+                return true;
             Mod->functions.foreach (
                 [&](const das::FunctionPtr& F)
                 {
                     if (F->name == Getter && !F->arguments.empty() &&
-                        F->arguments[0]->type->structType == T->structType)
+                        F->arguments[0]->type->structType == T->structType &&
+                        (Mod == M || (!F->generated && !F->privateFunction)))
                         Exists = true;
                 });
             return true;
@@ -817,7 +834,7 @@ bool DSLEmitProperty(das::Program* P, das::Module* M, const das::TypeDeclPtr& T,
         F->at = At;
         F->name = Getter + Suffix;
         F->generated = true;
-        F->privateFunction = false;
+        F->privateFunction = true;
         F->isCustomProperty = true;
         F->result = Setter ? new das::TypeDecl(das::Type::tVoid, At) : DSLObjectCopyType(ValueType);
         auto* Receiver = new das::Variable();
@@ -1122,7 +1139,7 @@ bool DSLEmitRoutedMethod(das::Program* Program, das::Module* Module, const das::
     Fn->at = At;
     Fn->name = Name;
     Fn->generated = true;
-    Fn->privateFunction = false;
+    Fn->privateFunction = true;
     Fn->result = DSLObjectCopyType(Types[0]);
     auto AddArgument = [&](const das::string& ArgName, const das::TypeDeclPtr& Type, bool bMutable)
     {
@@ -1225,11 +1242,15 @@ bool DSLEmitReferenceMethod(das::Program* Program, das::Module* Module, const da
     Program->library.foreach (
         [&](das::Module* Mod)
         {
+            // A sibling's generated accessor cannot satisfy this module's lookup.
+            if (!Module->isVisibleDirectly(Mod))
+                return true;
             Mod->functions.foreach (
                 [&](const das::FunctionPtr& Fn)
                 {
                     if (Fn->name == Name && !Fn->arguments.empty() &&
-                        Fn->arguments[0]->type->structType == ReceiverType->structType)
+                        Fn->arguments[0]->type->structType == ReceiverType->structType &&
+                        (Mod == Module || (!Fn->generated && !Fn->privateFunction)))
                         Exists = true;
                 });
             return true;
@@ -1276,14 +1297,14 @@ bool DSLEmitReferenceMethod(das::Program* Program, das::Module* Module, const da
                                                                      TEXT("::")+ Method->Name : FString();
     const auto* Descriptor = Native ? &NativeDescriptor : DSLMethodSourceSignatures.Find(SourceKey);
     if (!Descriptor || Descriptor->Parameters.size() != size_t(Method->Parameters.Num()))
-        DSLFail(TEXT("Missing authored method source signature"));
+        DSLFail(TEXT("Missing authored method source signature: ") + SourceKey);
     if (Native && !Interface && DSLEmitRoutedMethod(Program, Module, ReceiverType, Name, At, Declaration.Id, *Method, *Descriptor))
         return true;
     auto* Fn = new das::Function();
     Fn->at = At;
     Fn->name = Name;
     Fn->generated = true;
-    Fn->privateFunction = false;
+    Fn->privateFunction = true;
     Fn->result = DSLMethodValueType(Program, Module, Method->ReturnType, Descriptor->Result, Descriptor->Scope, At);
     das::vector<das::FunctionPtr> Helpers;
     TSet<FString> HelperPaths;
@@ -1749,8 +1770,52 @@ struct FUEPropertyPass : das::PassMacro
                 das::LineInfo At;
             };
             das::vector<FMethod> Methods;
+            das::vector<FMethod> PropertyCalls;
+            das::vector<das::ExprCall*> RebindCalls;
             das::vector<das::ExprField*> Fields;
             TSet<das::ExprField*> MethodFields;
+            das::Program* Program;
+            das::Module* Current;
+            FScan(das::Program* P, das::Module* M) : Program(P), Current(M) {}
+            virtual void preVisit(das::ExprCall* E) override
+            {
+                // Failed imported calls have already lost their function pointer.
+                // Recover the exact generated receiver overload, not an unrelated
+                // extension with the same name, so it too can be rebound locally.
+                if (!E->func && !E->arguments.empty() && DSLTypedReference(E->arguments[0]->type))
+                {
+                    const auto Split = E->name.rfind("::");
+                    const auto Name = Split == das::string::npos ? E->name : E->name.substr(Split + 2);
+                    Program->library.foreach ([&](das::Module* Mod)
+                    {
+                        if (Mod != Current)
+                            Mod->functions.foreach ([&](const das::FunctionPtr& F)
+                            {
+                                if (F->generated && F->privateFunction && F->name == Name &&
+                                    !F->arguments.empty() && F->arguments[0]->name == "receiver" &&
+                                    F->arguments[0]->type->structType == E->arguments[0]->type->structType)
+                                    E->func = F;
+                            });
+                        return true;
+                    }, "*");
+                }
+                // Inherited helpers may already call a generated private member
+                // wrapper in their parent's module. Recreate it locally before
+                // rebinding the inferred call; no dependency on a sibling leaks.
+                auto* F = E->func;
+                if (!F || F->module == Current || !F->generated || !F->privateFunction ||
+                    F->arguments.empty() || F->arguments[0]->name != "receiver" ||
+                    !DSLTypedReference(F->arguments[0]->type) || F->name.find("__") == 0)
+                    return;
+                RebindCalls.push_back(E);
+                if (F->isCustomProperty && F->name.find(".`") == 0)
+                {
+                    const auto End = F->name.find('`', 2);
+                    PropertyCalls.push_back({F->arguments[0]->type, F->name.substr(2, End - 2), E->at});
+                }
+                else
+                    Methods.push_back({F->arguments[0]->type, F->name, E->at});
+            }
             virtual void preVisit(das::ExprInvoke* E) override
             {
                 if (!E->isInvokeMethod || E->arguments.empty() || !E->arguments[0]->rtti_isField())
@@ -1770,7 +1835,7 @@ struct FUEPropertyPass : das::PassMacro
                     Fields.push_back(E);
                 return E;
             }
-        } Scan;
+        } Scan(P, M);
         das::vector<das::FunctionPtr> Functions;
         M->functions.foreach (
             [&](const das::FunctionPtr& F)
@@ -1796,6 +1861,16 @@ struct FUEPropertyPass : das::PassMacro
                 P->error("Authored property generation failed", X.what(), "", E->at,
                          das::CompilationError::invalid_type);
             }
+        for (const auto& Property : Scan.PropertyCalls)
+            try
+            {
+                Changed |= DSLEmitProperty(P, M, Property.Type, Property.Name, Property.At);
+            }
+            catch (const std::exception& X)
+            {
+                P->error("Authored property generation failed", X.what(), "", Property.At,
+                         das::CompilationError::invalid_type);
+            }
         for (const auto& Method : Scan.Methods)
             try
             {
@@ -1806,6 +1881,12 @@ struct FUEPropertyPass : das::PassMacro
                 P->error("Authored method generation failed", X.what(), "", Method.At,
                          das::CompilationError::invalid_type);
             }
+        for (auto* Call : Scan.RebindCalls)
+        {
+            Call->name = Call->func->name;
+            Call->func = nullptr;
+            Changed = true;
+        }
         FUEReferenceMutationVisitor Mutations(P, M);
         for (const auto& F : Functions)
             if (F->body && F->name.find("__ue_reference_mutation_") != 0)

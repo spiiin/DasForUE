@@ -36,6 +36,11 @@
 #include "DasSaveGameProxy.h"
 #include "DasAIMoveProxy.h"
 #include "AIController.h"
+#include "Perception/AIPerceptionComponent.h"
+#include "Perception/AISenseConfig_Sight.h"
+#include "Perception/AISenseConfig_Hearing.h"
+#include "Perception/AISense_Sight.h"
+#include "Perception/AISense_Hearing.h"
 #include "Navigation/PathFollowingComponent.h"
 #include "AISystem.h"
 #include "GameFramework/Pawn.h"
@@ -768,6 +773,7 @@ void FDasRuntimeModule::StartupModule()
     FModuleManager::LoadModuleChecked<IModuleInterface>(TEXT("EnhancedInput"));
     Root = FPaths::ConvertRelativePathToFull(IPluginManager::Get().FindPlugin(TEXT("DasForUE"))->GetContentDir() /
                                                                               TEXT("Das"));
+    IndexProjectScripts();
     const FTCHARToUTF8 Utf8Root(*Root);
     das::setDasRoot(das::string(Utf8Root.Get(), Utf8Root.Length()));
     NEED_ALL_DEFAULT_MODULES;
@@ -1011,7 +1017,11 @@ FString FDasRuntimeModule::ScriptPath(const FString& Name) const
 {
     int32 Slash;
     if (Name.FindChar(TEXT('/'), Slash) || Name.FindChar(TEXT('\\'), Slash))
-        return Root / TEXT("Scripts") / Name;
+    {
+        if (!FDasSourceCatalog::LocalFile(Name, TEXT("das"))) return {};
+        const FString Project = FPaths::ConvertRelativePathToFull(FPaths::ProjectContentDir() / TEXT("Das/Scripts") / Name);
+        return IFileManager::Get().FileExists(*Project) ? Project : Root / TEXT("Scripts") / Name;
+    }
     // A project script shadows the plugin script of the same name. The file check costs tens of microseconds,
     // so the answer is cached until a reported folder change or the poll interval (NotifyScriptsChanged).
     const bool bCache = IsInGameThread();
@@ -1021,6 +1031,8 @@ FString FDasRuntimeModule::ScriptPath(const FString& Name) const
     if (const auto* Cached = bCache ? ScriptPathCache.Find(Name) : nullptr;
         Cached && Now - Cached->CheckedAt < CVarScriptChangePollSeconds.GetValueOnGameThread())
         return Cached->Path;
+    if (AmbiguousProjectScripts.Contains(Name)) return {};
+    if (const auto* Indexed = ProjectScriptPaths.Find(Name)) return *Indexed;
     const FString Project = FPaths::ConvertRelativePathToFull(FPaths::ProjectContentDir() / TEXT("Das/Scripts") / Name);
     FString Plugin = Root / TEXT("Scripts") / Name;
 #if !DAS_WITH_TEST_PROBES

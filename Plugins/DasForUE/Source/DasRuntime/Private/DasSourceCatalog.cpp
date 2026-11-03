@@ -1,4 +1,7 @@
 #include "DasSourceCatalog.h"
+#include "HAL/FileManager.h"
+#include "Misc/FileHelper.h"
+#include "Misc/SecureHash.h"
 #include "Dom/JsonObject.h"
 #include "Misc/Paths.h"
 #include "Serialization/JsonSerializer.h"
@@ -37,9 +40,14 @@ bool CatalogKeys(const TSharedPtr<FJsonObject>& J, std::initializer_list<const T
 }
 bool FDasSourceCatalog::LocalFile(const FString& File, const FString& Extension)
 {
-    return !File.IsEmpty() && File.Len() < NAME_SIZE && FPaths::GetCleanFilename(File) == File &&
-           !File.Contains(TEXT(":")) && CatalogIdentifier(FPaths::GetBaseFilename(File)) &&
-                          FPaths::GetExtension(File) == Extension;
+    if (File.IsEmpty() || File.Len() >= 512 || File.Contains(TEXT("\\")) || File.Contains(TEXT(":")) ||
+        !FPaths::IsRelative(File) || FPaths::GetExtension(File) != Extension) return false;
+    TArray<FString> Parts;
+    File.ParseIntoArray(Parts, TEXT("/"), false);
+    if (Parts.IsEmpty() || (Extension != TEXT("das") && Parts.Num() != 1)) return false;
+    for (int32 I = 0; I < Parts.Num(); ++I)
+        if (!CatalogIdentifier(I + 1 == Parts.Num() ? FPaths::GetBaseFilename(Parts[I]) : Parts[I])) return false;
+    return true;
 }
 bool FDasSourceCatalog::Validate(FString& Error) const
 {
@@ -122,6 +130,29 @@ bool FDasSourceCatalog::Resolve(const FString& Identity, FDasSourceCatalogEntry&
     Out = *Matches[0];
     return true;
 }
+bool FDasSourceCatalog::ResolveType(const FString& Kind, const FString& Identity, FDasCatalogValueModule& Module,
+                                   FDasCatalogValueType& Type, FString& Error) const
+{
+    if (!Validate(Error)) return false;
+    struct FMatch { const FDasCatalogValueModule* Module; const FDasCatalogValueType* Type; };
+    TMap<FString,FMatch> Matches;
+    for (const auto& M : ValueModules)
+        for (const auto& T : M.Types)
+        {
+            const FString Logical = T.Kind == TEXT("interface_ref") ? TEXT("interface") : T.Kind;
+            if (Logical != Kind || (T.Id != Identity && T.Name != Identity)) continue;
+            auto* Existing = Matches.Find(T.Id);
+            if (!Existing || T.Kind == TEXT("interface")) Matches.Add(T.Id,{&M,&T});
+        }
+    if (Matches.Num() != 1)
+    {
+        Error = (Matches.IsEmpty() ? TEXT("Unknown catalog type: ") : TEXT("Ambiguous catalog type name; use stable ID: ")) + Kind + TEXT(":") + Identity;
+        return false;
+    }
+    const auto& Match = Matches.CreateConstIterator().Value();
+    Module = *Match.Module; Type = *Match.Type; return true;
+}
+
 bool FDasSourceCatalog::ToJson(FString& Out, FString& Error) const
 {
     if (!Validate(Error))
@@ -313,3 +344,5 @@ bool FDasSourceCatalog::ReferenceModule(const FString& Module, const FString& Ca
     Out = MoveTemp(Source);
     return true;
 }
+
+#include "DasSourceCatalogInventory.inl"

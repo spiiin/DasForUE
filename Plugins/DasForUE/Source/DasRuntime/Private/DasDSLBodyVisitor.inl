@@ -1314,6 +1314,32 @@ struct FDSLBodyVisitor : das::Visitor
     }
     virtual void preVisit(das::ExprInvoke* E) override
     {
+        // Inferred imported bodies use type<Parent>.Method plus cast<auto> self
+        // instead of self.Method plus type<auto>. Restore that syntax before
+        // the normal self/virtual lowering removes the script instance argument.
+        if (!NativeOnly && E->isInvokeMethod && E->arguments.size() >= 2)
+        {
+            das::Expression* Selector = E->arguments[0];
+            if (Selector->rtti_isR2V())
+                Selector = static_cast<das::ExprRef2Value*>(Selector)->subexpr;
+            das::Expression* Receiver = E->arguments[1];
+            if (Receiver->rtti_isCast())
+                Receiver = static_cast<das::ExprCast*>(Receiver)->subexpr;
+            if (Receiver->rtti_isPtr2Ref() && static_cast<das::ExprPtr2Ref*>(Receiver)->alwaysSafe)
+                Receiver = static_cast<das::ExprPtr2Ref*>(Receiver)->subexpr;
+            if (Receiver->rtti_isR2V())
+                Receiver = static_cast<das::ExprRef2Value*>(Receiver)->subexpr;
+            if (Selector->rtti_isField() && Receiver->rtti_isVar() &&
+                static_cast<das::ExprVar*>(Receiver)->name == Self)
+            {
+                auto* Field = static_cast<das::ExprField*>(Selector);
+                if (Field->value->rtti_isTypeDecl())
+                {
+                    E->arguments[0] = new das::ExprField(E->at, new das::ExprVar(E->at, Self), Field->name);
+                    E->arguments[1] = new das::ExprTypeDecl(E->at, new das::TypeDecl(das::Type::autoinfer, E->at));
+                }
+            }
+        }
         if (E->isInvokeMethod && !E->arguments.empty())
             if (auto* F = NativeSelfMethod(E->arguments[0]))
                 LeftFields.Add(F);

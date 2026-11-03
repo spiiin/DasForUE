@@ -33,6 +33,8 @@ class CallbackBase {
  def PublicCallback():void {self.PublicHits+=5}
  [ue_function(BlueprintEvent)]
  def InheritedVisible():void {self.PublicHits+=7}
+ // Imported script-only helper must dispatch the leaf override without retaining self.
+ def ForwardPublicCallback():void {self.PublicCallback()}
  [ue_function(BlueprintCallable)]
  def PublicPulse():void {self.Bumps+=7}
  def Clicked():void {self.Bumps+=100}

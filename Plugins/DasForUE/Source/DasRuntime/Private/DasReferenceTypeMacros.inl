@@ -5,16 +5,20 @@ bool DSLReferenceTypeMacro(const das::TypeDeclPtr& Type)
         return false;
     const auto Name = Type->typeMacroName();
     return Name == "UEObjectRef" || Name == "ue_foundation::UEObjectRef" || Name == "UEInterfaceRef" ||
-           Name == "ue_foundation::UEInterfaceRef";
+           Name == "ue_foundation::UEInterfaceRef" || Name == "UENativeObjectRef" ||
+           Name == "ue_foundation::UENativeObjectRef";
 }
 
 das::TypeDeclPtr DSLExpandReferenceType(const das::TypeDeclPtr& Type, das::ModuleGroup& Group, das::Module* Module)
 {
     const auto Macro = Type->typeMacroName();
     const bool Object = Macro == "UEObjectRef" || Macro == "ue_foundation::UEObjectRef";
+    const bool Native = Macro == "UENativeObjectRef" || Macro == "ue_foundation::UENativeObjectRef";
     const size_t Count = Type->typeMacroExpr.size();
-    if ((Object && Count != 3) || (!Object && Count != 2 && Count != 3))
-        DSLFail(TEXT("Expected UEObjectRef(script, className) or UEInterfaceRef(path, optional authoredId)"));
+    if (Native && Count != 2)
+        DSLFail(TEXT("Expected UENativeObjectRef(nativeClassPath)"));
+    if (Count != 2 && Count != 3)
+        DSLFail(TEXT("Expected UEObjectRef(classIdOrName), UEObjectRef(script, className) or UEInterfaceRef(path, optional authoredId)"));
     das::vector<das::string> Values;
     for (size_t I = 1; I < Count; ++I)
     {
@@ -23,8 +27,34 @@ das::TypeDeclPtr DSLExpandReferenceType(const das::TypeDeclPtr& Type, das::Modul
             DSLFail(TEXT("Reference type macro arguments must be string literals"));
         Values.push_back(static_cast<const das::ExprConstString*>(Value)->text);
     }
-    const bool AuthoredInterface = !Object && Count == 3;
-    const char* Tag = Object ? "ue_object_ref" : AuthoredInterface ? "ue_interface_ref" : "ue_native_interface";
+    const bool CatalogInterface = !Object && !Native && Count == 2 && !Values[0].empty() && Values[0][0] != '/';
+    if (CatalogInterface)
+    {
+        auto& Runtime = FModuleManager::LoadModuleChecked<FDasRuntimeModule>(TEXT("DasRuntime"));
+        const FString Path = Runtime.ScriptPath(TEXT("ue_type_catalog.json"));
+        const auto Snapshot = FSourceSnapshot::Read(Path);
+        if (AuthoredReferenceSources)
+            AuthoredReferenceSources->Add(Path, Snapshot);
+        if (!Snapshot.bExists || Snapshot.Bytes.Num() > 1024 * 1024)
+            DSLFail(TEXT("Missing/oversized source catalog: ") + Path);
+        FString Json, Issue;
+        FFileHelper::BufferToString(Json, Snapshot.Bytes.GetData(), Snapshot.Bytes.Num());
+        FDasSourceCatalog Catalog;
+        FDasCatalogValueModule ValueModule;
+        FDasCatalogValueType ValueType;
+        if (!FDasSourceCatalog::FromJson(Json, Catalog, Issue) ||
+            !Catalog.ResolveType(TEXT("interface"), DSLText(Values[0]), ValueModule, ValueType, Issue))
+            DSLFail(Issue);
+        const FString InterfacePath = DSLResolveType(EDSLTypeKind::Interface, ValueType.Id,
+                                                     FDSLTypeScope{FString(), FString(), FString(), &Group, Module});
+        Values[0] = DSLUtf8(InterfacePath);
+        Values.push_back(DSLUtf8(ValueType.Id));
+    }
+    const bool AuthoredInterface = !Object && !Native && (Count == 3 || CatalogInterface);
+    const char* Tag = Native              ? "ue_native_object"
+                      : Object            ? "ue_object_ref"
+                      : AuthoredInterface ? "ue_interface_ref"
+                                          : "ue_native_interface";
     auto Marks = Group.findAnnotation(Tag, Module);
     auto Handles = Group.findAnnotation("UObjectHandle", Module);
     if (Marks.size() != 1 || Handles.size() != 1)
@@ -33,9 +63,14 @@ das::TypeDeclPtr DSLExpandReferenceType(const das::TypeDeclPtr& Type, das::Modul
     Annotation->flags = 0;
     Annotation->annotation = Marks[0];
     Annotation->at = Type->at;
-    Annotation->arguments.push_back(das::AnnotationArgument(Object ? "script" : "path", Values[0]));
-    if (Count == 3)
-        Annotation->arguments.push_back(das::AnnotationArgument(Object ? "type" : "id", Values[1]));
+    if (Object && Count == 2)
+        Annotation->arguments.push_back(das::AnnotationArgument("type", Values[0]));
+    else
+    {
+        Annotation->arguments.push_back(das::AnnotationArgument(Object ? "script" : "path", Values[0]));
+        if (Count == 3 || CatalogInterface)
+            Annotation->arguments.push_back(das::AnnotationArgument(Object ? "type" : "id", Values[1]));
+    }
     das::StructurePtr Candidate = new das::Structure();
     Candidate->at = Type->at;
     Candidate->module = Module;
@@ -79,7 +114,7 @@ das::TypeDeclPtr DSLExpandReferenceType(const das::TypeDeclPtr& Type, das::Modul
 
 struct FUEReferenceTypeMacro : das::TypeMacro
 {
-    FUEReferenceTypeMacro(bool Object) : TypeMacro(Object ? "UEObjectRef" : "UEInterfaceRef") {}
+    FUEReferenceTypeMacro(const char* Name) : TypeMacro(Name) {}
     virtual das::TypeDeclPtr visit(das::Program* Program, das::Module* Module, const das::TypeDeclPtr& Type,
                                    const das::TypeDeclPtr& Pass) override
     {

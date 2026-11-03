@@ -42,3 +42,6 @@ def ue_controller_set_team(player:PlayerControllerRef; team:int):void { __ue_con
 [ue_native_object(path="/Script/Engine.SpringArmComponent")]
 struct SpringArmComponentRef { handle:UObjectHandle }
 def SpringArmComponentRef_from(value:UObjectHandle):SpringArmComponentRef { return SpringArmComponentRef(handle=ue_cast_nullable_object(value,"/Script/Engine.SpringArmComponent")) }
+
+[ue_native_object(path="/Script/Engine.Controller")]
+struct ControllerRef { handle:UObjectHandle }

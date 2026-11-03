@@ -353,7 +353,7 @@ FDasExecutionResult FDasRuntimeModule::RunFile(const FString& Path, int32 Input,
                                                                          : Errors(Program, Output);
             return Result;
         }
-        auto Function = Context.findFunction("main");
+        auto Function = FindRootScriptFunction(Program, Context, "main");
         if (!Function || !das::verifyCall<int32, int32>(Function->debugInfo, Modules))
         {
             Result.Error = TEXT("Expected exported main(input: int): int.");

@@ -19,8 +19,13 @@ struct DASRUNTIME_API FDasSourceCatalog
 {
     TArray<FDasSourceCatalogEntry> Entries;
     TArray<FDasCatalogValueModule> ValueModules;
+    // Header inventory only; the compiler remains authoritative for declarations, bodies and identities.
+    static bool DeclarationInventory(const TMap<FString, FString>& Sources, FDasSourceCatalog& Out, FString& Error);
+    static bool UpdateDeclarationInventory(const FString& ScriptsFolder, FString& Error);
     bool Validate(FString& Error) const;
     bool Resolve(const FString& Identity, FDasSourceCatalogEntry& Out, FString& Error) const;
+    bool ResolveType(const FString& Kind, const FString& Identity, FDasCatalogValueModule& Module,
+                     FDasCatalogValueType& Type, FString& Error) const;
     bool ToJson(FString& Out, FString& Error) const;
     static bool FromJson(const FString& Wire, FDasSourceCatalog& Out, FString& Error);
     bool ReferenceModule(const FString& Module, const FString& Catalog, FString& Out, FString& Error) const;

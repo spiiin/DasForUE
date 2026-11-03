@@ -30,3 +30,23 @@ def ue_ai_move_cancel(name:string):bool { return __ue_ai_cancel(name) }
 def ue_ai_move_active(name:string):bool { return __ue_ai_active(name) }
 // Same damage adapter, including an AI controller as the instigator.
 def ue_apply_damage(target:ActorRef; amount:float; source:ActorRef; instigator:AIControllerRef):float { return __ue_apply_damage(target.handle,amount,source.handle,instigator.handle) }
+
+// Generic native controller host; lifecycle uses the common Blueprint-parent bridge.
+[ue_native_base(path="/Script/AIModule.AIController")]
+class AIController {}
+
+def ue_ai_pawn(controller:AIControllerRef):NativePawnRef {
+    return NativePawnRef_from(__ue_ai_pawn(controller.handle))
+}
+
+def ue_ai_set_focus(controller:AIControllerRef; target:ActorRef):void {
+    __ue_ai_focus(controller.handle,target.handle)
+}
+
+def ue_ai_line_of_sight(controller:AIControllerRef; target:ActorRef):bool {
+    return __ue_ai_line_of_sight(controller.handle,target.handle)
+}
+
+def ue_controller_set_team(controller:AIControllerRef; team:int):void {
+    __ue_controller_set_team(controller.handle,team)
+}

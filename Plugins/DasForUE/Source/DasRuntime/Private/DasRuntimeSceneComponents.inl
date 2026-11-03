@@ -336,6 +336,7 @@ FDasObjectHandle PathComponentOperation(const FDasObjectHandle& H, const char* P
 #include "DasActorSpawn.inl"
 #include "DasObjectQueries.inl"
 #include "DasCharacterControl.inl"
+#include "DasAISetup.inl"
 #include "DasNativeGameplayRuntime.inl"
 #include "DasScalarAccessors.inl"
 FDasObjectHandle AuthoredComponentGet(const FDasObjectHandle& H, const char* Id, const char* Name, das::Context* C)
