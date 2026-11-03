@@ -732,6 +732,12 @@
       "kind": "script",
       "script": "TestRoguePointImpact.ps1",
       "comment": "Real projectile collisions: point damage payload, single-hit delivery, physics impulse and zero-damage impacts."
+    },
+    {
+      "name": "rogue-ai-presentation",
+      "kind": "script",
+      "script": "TestRogueAIPresentation.ps1",
+      "comment": "Opt-in local Paragon Minion mesh, locomotion, telegraph, reactions, stun/death poses and missing-profile fallback in real PIE."
     }
   ],
   "presets": {
