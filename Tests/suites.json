@@ -748,6 +748,36 @@
       ]
     },
     {
+      "name": "navigation-bindings-prepare",
+      "kind": "script",
+      "script": "PrepareNavigationBindings.ps1",
+      "comment": "Discover typed native navigation references, publish native registry artifacts and rebuild before focused checks."
+    },
+    {
+      "name": "rogue-patrol",
+      "kind": "script",
+      "script": "TestRoguePatrol.ps1",
+      "comment": "Real Recast NavMesh: point graph, nonbacktracking patrol, obstacle detour, combat/stun interruptions and cleanup."
+    },
+    {
+      "name": "navigation-queries",
+      "kind": "script",
+      "script": "TestNavigationQueries.ps1",
+      "comment": "Transient real Recast mesh: generated and compact typed queries, corridor lengths and partial paths.",
+      "requires": [
+        "navigation-bindings-prepare"
+      ]
+    },
+    {
+      "name": "rogue-patrol-points",
+      "kind": "script",
+      "script": "TestRoguePatrolPoints.ps1",
+      "comment": "Compile PatrolPoint and its authored self reference independently of combat. Disk AST serialization is not covered.",
+      "requires": [
+        "navigation-bindings-prepare"
+      ]
+    },
+    {
       "name": "rogue-input",
       "kind": "script",
       "script": "TestRogueInput.ps1",

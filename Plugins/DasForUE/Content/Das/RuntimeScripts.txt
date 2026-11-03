@@ -44,4 +44,5 @@ Scripts/ue_subsystems.das
 Scripts/ue_vector_math.das
 
 Scripts/ue_asset_optional.das
+Scripts/ue_navigation.das
 Scripts/ue_result.das

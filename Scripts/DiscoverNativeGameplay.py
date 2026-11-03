@@ -43,6 +43,18 @@ def declarations(source):
         if ts[i] in ('require','module') and i+1<len(ts) and IDENT.fullmatch(ts[i+1]):
             if ts[i]=='require':requires.append(ts[i+1])
             elif module is None:module=ts[i+1]
+        if ts[i]=='typedef' and i+3<len(ts) and IDENT.fullmatch(ts[i+1]) and ts[i+2]=='=':
+            macro=i+3
+            if ts[macro]=='$':macro+=1
+            if macro<len(ts) and ts[macro]=='UENativeObjectRef':
+                if macro+3>=len(ts) or ts[macro+1]!='(' or not ts[macro+2].startswith('"') or ts[macro+3]!=')':
+                    raise ValueError('UENativeObjectRef requires one literal path')
+                try:native=json.loads(ts[macro+2])
+                except json.JSONDecodeError as exc:raise ValueError('Invalid native path literal') from exc
+                if not NATIVE_PATH.fullmatch(native):raise ValueError('Invalid native path '+native)
+                objects.append((native,ts[i+1]))
+                i=macro+4
+                continue
         if ts[i]!='[':i+=1;continue
         start=i;i+=1;depth=1
         while i<len(ts) and depth:

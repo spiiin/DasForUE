@@ -6,3 +6,4 @@ require ue_character_control public
 require ue_text public
 require ue_pickup_components public
 require ue_soft_references public
+require ue_navigation public

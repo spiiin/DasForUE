@@ -9,6 +9,7 @@ require ue_gas_authored_types public
 require ue_gas_types public
 require ue_generated public
 require ue_native_self_refs public
+require ue_navigation public
 require ue_pickup_components public
 require ue_scene_components public
 require ue_soft_references public
@@ -42,10 +43,6 @@ def Native_CheatManagerRef_d4008399_from(value:UObjectHandle):Native_CheatManage
 [ue_native_object(path="/Script/Engine.ChildActorComponent")]
 struct Native_ChildActorComponentRef_405d4379 { handle:UObjectHandle }
 def Native_ChildActorComponentRef_405d4379_from(value:UObjectHandle):Native_ChildActorComponentRef_405d4379 { return Native_ChildActorComponentRef_405d4379(handle=ue_cast_nullable_object(value,"/Script/Engine.ChildActorComponent")) }
-
-[ue_native_object(path="/Script/Engine.Controller")]
-struct Native_ControllerRef_78a9db5e { handle:UObjectHandle }
-def Native_ControllerRef_78a9db5e_from(value:UObjectHandle):Native_ControllerRef_78a9db5e { return Native_ControllerRef_78a9db5e(handle=ue_cast_nullable_object(value,"/Script/Engine.Controller")) }
 
 [ue_native_object(path="/Script/Engine.CurveTable")]
 struct Native_CurveTableRef_4055f623 { handle:UObjectHandle }
@@ -495,6 +492,14 @@ enum EMovementMode {
     MOVE_Swimming=4
     MOVE_Flying=5
     MOVE_Custom=6
+}
+
+[ue_native_enum(path="/Script/Engine.ENavigationOptionFlag")]
+enum ENavigationOptionFlag {
+    Default=0
+    Enable=1
+    Disable=2
+    MAX=3
 }
 
 [ue_native_enum(path="/Script/Engine.ENetDormancy")]

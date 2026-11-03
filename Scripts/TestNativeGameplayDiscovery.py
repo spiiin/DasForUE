@@ -75,4 +75,17 @@ class DiscoveryTests(unittest.TestCase):
  def test_native_enum_discovered(self):
   self.write('main',self.wrapper()+'[ue_native_enum(path="/Script/Engine.ECollisionChannel")] enum Channel { A }')
   self.assertEqual(self.run_discovery()['enums'][0]['name'],'Channel')
+ def test_native_reference_macro_is_discovered_transitively(self):
+  self.write('main','require refs')
+  self.write('refs','module refs public\ntypedef PathRef = UENativeObjectRef(\"/Script/NavigationSystem.NavigationPath\")')
+  result=self.run_discovery()
+  self.assertEqual(result['classes'],[{'path':'/Script/NavigationSystem.NavigationPath','module':'refs','name':'PathRef'}])
+ def test_native_reference_macro_dollar_spelling(self):
+  self.assertEqual(declarations('typedef PathRef = $UENativeObjectRef(\"/Script/NavigationSystem.NavigationPath\")')[2],[('/Script/NavigationSystem.NavigationPath','PathRef')])
+ def test_native_reference_macro_rejects_invalid_arguments(self):
+  for args in ['SomeConstant','\"/Game/BP.BP_C\"','\"/Script/Engine.Actor\",true']:
+   with self.assertRaises(ValueError):declarations('typedef Ref = UENativeObjectRef('+args+')')
+ def test_native_reference_macro_ignores_comments_and_strings(self):
+  source='// typedef Fake = UENativeObjectRef(\"/Script/Engine.Actor\")\nlet text=\"UENativeObjectRef(\\\"/Script/Engine.Actor\\\")\"'
+  self.assertEqual(declarations(source)[2],[])
 if __name__=='__main__':unittest.main()

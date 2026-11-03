@@ -368,7 +368,10 @@ bool ApplyDeclaration(const FString& Script, const FString& Package, const FStri
                     const auto* Before = Old->Methods.FindByPredicate([&](const auto& P) { return P.Id == M.Id; });
                     if (Before && Before->bBlueprintEvent != M.bBlueprintEvent)
                     {
-                        Error = TEXT("Changing callable/BlueprintEvent role requires a later dependency migration; create a new Blueprint for this declaration");
+                        Error = FString::Printf(
+                            TEXT("Changing callable/BlueprintEvent role for %s.%s (%s -> %s) requires a later dependency migration; create a new Blueprint for this declaration"),
+                            *Declaration.Name, *M.Name, Before->bBlueprintEvent ? TEXT("event") : TEXT("callable"),
+                            M.bBlueprintEvent ? TEXT("event") : TEXT("callable"));
                         return false;
                     }
                 }
