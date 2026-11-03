@@ -63,6 +63,18 @@ void UDasIntDelegateProxy::ReceiveVoid()
     }
 }
 
+void UDasIntDelegateProxy::ReceiveInt64(int64 Value)
+{
+    if (!IsInGameThread())
+        return;
+    if (auto* R = FModuleManager::GetModulePtr<FDasRuntimeModule>(TEXT("DasRuntime")))
+    {
+        FDasScalarValue V;
+        V.Kind = int32(EDasMethodSignature::Int64);
+        V.Int64Value = Value;
+        R->DispatchScalarEvent(SubscriptionId, V);
+    }
+}
 void UDasIntDelegateProxy::ReceiveDouble(double Value)
 {
     if (!IsInGameThread())

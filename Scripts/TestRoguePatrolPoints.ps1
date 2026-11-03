@@ -17,7 +17,7 @@ try {
     $Arguments=@((Join-Path $PortRoot 'ActionRoguelikeDas.uproject'),'-run=DasExport',('-Probe='+$Probe),'-Multiprocess','-unattended','-NullRHI','-nosplash','-NoZenAutoLaunch','-ddc=NoZenLocalFallback',('-abslog='+$Log))
     & (Join-Path $Engine 'Engine/Binaries/Win64/UnrealEditor-Cmd.exe') @Arguments *> ($Log+'.stdout')
     if($LASTEXITCODE) { throw ('Patrol point compilation failed; see '+$Log) }
-    if(!(Select-String -LiteralPath $Log -SimpleMatch 'DAS_PACKAGE_PREFLIGHT=PASS value=42' -Quiet)) { throw 'Missing patrol point compilation marker' }
+    if(!(Test-DasResult -LiteralPath $Log -SimpleMatch 'DAS_PACKAGE_PREFLIGHT=PASS value=42' -Quiet)) { throw 'Missing patrol point compilation marker' }
 } finally {
     Remove-Item -LiteralPath $Probe -Force -ErrorAction SilentlyContinue
 }

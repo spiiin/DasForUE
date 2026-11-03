@@ -75,7 +75,7 @@ int32 UDasReflectionMacrosCommandlet::Main(const FString& Params)
     };
     Reject(Source.Replace(TEXT("GameplayStatics.GetTimeSeconds"), TEXT("GameplayStatics.NoSuchFunction")),
                           TEXT("Unknown callable static"), TEXT("unknown_static_rejected"));
-    Reject(Source.Replace(TEXT("KismetMathLibrary.Abs"), TEXT("DasFunctionLibraryFixture.UnsupportedInt64")),
+    Reject(Source.Replace(TEXT("KismetMathLibrary.Abs"), TEXT("DasFunctionLibraryFixture.UnsupportedSnapshot")),
                           TEXT("No generated binding"), TEXT("unsupported_transport_rejected"));
     Reject(Source.Replace(TEXT("ue_call(type<DasProbeInterface>, Query,"),
                                TEXT("ue_call(type<DasProbeInterface>, Missing,")),

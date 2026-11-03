@@ -1,0 +1,11 @@
+#include "DasRandomLibrary.h"
+
+int32 UDasRandomLibrary::RandomIntegerInRange(int32& Seed, int32 Minimum, int32 Maximum)
+{
+    if (Maximum < Minimum || int64(Maximum) - Minimum + 1 > MAX_int32)
+        return Minimum;
+    FRandomStream Stream(Seed);
+    const int32 Value = Stream.RandRange(Minimum, Maximum);
+    Seed = Stream.GetCurrentSeed();
+    return Value;
+}

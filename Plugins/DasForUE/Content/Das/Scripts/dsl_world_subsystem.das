@@ -6,10 +6,13 @@ class MissionService : WorldSubsystem {
     @ue_property=(BlueprintReadWrite)
     Starts:int = 0
     @ue_property=(BlueprintReadWrite)
+    Ticks:int = 0
+    @ue_property=(BlueprintReadWrite)
     Stops:int = 0
     @ue_property=(BlueprintReadWrite)
     Score:int = 0
     def Initialize() { self.Starts += 1 }
+    def Tick(delta:float) { self.Ticks += 1 }
     def Deinitialize() { self.Stops += 1 }
 
     [ue_function(BlueprintCallable)]

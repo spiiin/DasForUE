@@ -65,6 +65,11 @@ bool DasBlueprintFieldDefault(const FDasFieldSchema& Field, FString& Out, FDasDe
         Error = TEXT("Delegate defaults require the signature service");
         return false;
     }
+    if (Field.Kind == EDasScalarKind::Int64)
+    {
+        Out = FString::Printf(TEXT("%lld"), Field.Int64Default);
+        return true;
+    }
     Out = Field.Kind == EDasScalarKind::Text   ? Field.StringDefault
           : Field.Kind == EDasScalarKind::Byte ? FString::FromInt(Field.IntDefault)
           : Field.Kind == EDasScalarKind::Enum

@@ -17,6 +17,9 @@ TMap<FString, FDasPersistentGlobalValue> SnapshotPersistentGlobals(const das::Pr
                     Value.Kind = V->type->baseType;
                     switch (Value.Kind)
                     {
+                    case das::Type::tInt64:
+                        Value.Int64 = *static_cast<int64*>(Address);
+                        break;
                     case das::Type::tInt:
                         Value.Int = *static_cast<int32*>(Address);
                         break;
@@ -58,6 +61,8 @@ template <class T, das::Type Kind> T InitializePersistentGlobal(const char* Key,
         Value.Kind = Kind;
         if constexpr (Kind == das::Type::tInt)
             Value.Int = Default;
+        else if constexpr (Kind == das::Type::tInt64)
+            Value.Int64 = Default;
         else if constexpr (Kind == das::Type::tBool)
             Value.Bool = Default;
         else
@@ -67,6 +72,8 @@ template <class T, das::Type Kind> T InitializePersistentGlobal(const char* Key,
     }
     if constexpr (Kind == das::Type::tInt)
         return Existing->Int;
+    else if constexpr (Kind == das::Type::tInt64)
+        return Existing->Int64;
     else if constexpr (Kind == das::Type::tBool)
         return Existing->Bool;
     else

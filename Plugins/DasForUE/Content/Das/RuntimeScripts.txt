@@ -46,3 +46,5 @@ Scripts/ue_vector_math.das
 Scripts/ue_asset_optional.das
 Scripts/ue_navigation.das
 Scripts/ue_result.das
+Scripts/ue_instanced_mesh.das
+Scripts/ue_random.das

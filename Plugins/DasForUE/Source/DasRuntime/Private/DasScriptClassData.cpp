@@ -49,7 +49,7 @@ FDasScalarValue Execute(UObject* Owner, UDasScriptClassData* Data, const FString
     FDasScalarValue Result;
     Result.Kind = -1;
     if (!ValidOwner(Owner, Data) || Data->MethodScripts.FindRef(Entry) != File || Kind < 0 || Kind == 4 ||
-        (Kind > 13 && Kind != 15 && Kind != 16 && Kind != 17 && Kind != 18))
+        (Kind > 13 && Kind != 15 && Kind != 16 && Kind != 17 && Kind != 18 && Kind != 19))
     {
         Report(Owner, TEXT("Invalid authored object owner, entry contract or result kind"));
         return Result;
@@ -66,6 +66,7 @@ FDasScalarValue Execute(UObject* Owner, UDasScriptClassData* Data, const FString
     Outputs = V.OutputValues;
     Result.Kind = Kind;
     Result.IntValue = V.Value;
+    Result.Int64Value = V.Int64Value;
     Result.FloatValue = V.FloatValue;
     Result.DoubleValue = V.DoubleValue;
     Result.BoolValue = V.BoolValue;

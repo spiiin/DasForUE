@@ -65,10 +65,10 @@ bool RunDasFoundationTests(FString& Report)
              {EDasScalarKind::Int32, EDasScalarKind::Float32, EDasScalarKind::Bool, EDasScalarKind::String,
               EDasScalarKind::Double, EDasScalarKind::Name, EDasScalarKind::Object, EDasScalarKind::Struct,
               EDasScalarKind::Enum, EDasScalarKind::Event, EDasScalarKind::Class, EDasScalarKind::Delegate,
-              EDasScalarKind::Byte, EDasScalarKind::Text})
+              EDasScalarKind::Byte, EDasScalarKind::Text, EDasScalarKind::Int64})
             if (DasFieldKind(DasTypeKindOf(Field)) != Field)
                 Bad += FString::Printf(TEXT("field%d "), int32(Field));
-        for (int32 Signature = 0; Signature <= int32(EDasMethodSignature::Text); ++Signature)
+        for (int32 Signature = 0; Signature <= int32(EDasMethodSignature::Int64); ++Signature)
             if (Signature != 14 && Signature != int32(EDasMethodSignature::Frame) &&
                 DasTypeKindOf(EDasMethodSignature(Signature)) == EDasTypeKind::Invalid)
                 Bad += FString::Printf(TEXT("signature%d "), Signature);

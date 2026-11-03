@@ -45,6 +45,7 @@ struct FDasExecutionResult
     bool bSucceeded = false;
     bool bUsedAot = false;
     int32 Value = 0;
+    int64 Int64Value = 0;
     float FloatValue = 0;
     bool BoolValue = false;
     FString StringValue;

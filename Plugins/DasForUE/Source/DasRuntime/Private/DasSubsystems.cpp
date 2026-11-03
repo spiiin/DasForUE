@@ -57,6 +57,25 @@ void UDasWorldSubsystem::Initialize(FSubsystemCollectionBase& Collection)
     // Reuse the owned-session ABI: Initialize is once per object, never once per reload.
     RecordLifecycleResult(Runtime.RunLifecycle(Runtime.ScriptPath(LifecycleScript), EDasCallback::BeginPlay, this));
 }
+bool UDasWorldSubsystem::IsTickable() const
+{
+    if (!bDasActive || IsTemplate())
+        return false;
+    const UWorld* World = GetWorld();
+    return World && World->HasBegunPlay() && !World->bIsTearingDown;
+}
+TStatId UDasWorldSubsystem::GetStatId() const
+{
+    RETURN_QUICK_DECLARE_CYCLE_STAT(DasWorldSubsystem, STATGROUP_Tickables);
+}
+void UDasWorldSubsystem::Tick(float DeltaTime)
+{
+    Super::Tick(DeltaTime);
+    if (!IsTickable())
+        return;
+    if (auto* Runtime = FModuleManager::GetModulePtr<FDasRuntimeModule>(TEXT("DasRuntime")))
+        RecordLifecycleResult(Runtime->RunLifecycle(Runtime->ScriptPath(LifecycleScript), EDasCallback::Tick, this, DeltaTime));
+}
 void UDasWorldSubsystem::Deinitialize()
 {
     if (auto* Runtime = FModuleManager::GetModulePtr<FDasRuntimeModule>(TEXT("DasRuntime")))

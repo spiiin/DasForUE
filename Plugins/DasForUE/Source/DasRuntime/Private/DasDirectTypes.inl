@@ -319,7 +319,7 @@ FString DSLDirectPath(const das::TypeDeclPtr& T, const FString& Folder, const FS
                 continue;
             }
             const bool Matches =
-                K ==
+                K == TEXT("int64") ? CastFieldChecked<FInt64Property>(P)->GetPropertyValue_InContainer(Memory) == FCString::Atoi64(*F.Default.String) : K ==
                 TEXT("int")
                      ? CastFieldChecked<FIntProperty>(P)->GetPropertyValue_InContainer(Memory) ==
                            static_cast<int32>(F.Default.Number)
@@ -585,12 +585,10 @@ void DSLEnsureStructHelpers(const das::TypeDeclPtr& InputType, const FString& Pa
         }
         else if (DSLSet(Field.type))
         {
-            const das::string Suffix =
-                DSLTypeName(Field.type->firstType) ==
-                TEXT("byte")? "byte"
-                            : DSLTypeName(Field.type->firstType) == TEXT("name")? "name"
-                                                                                : DSLTypeName(Field.type->firstType) ==
-                                                                                      TEXT("string")? "string" : "int";
+            const char* KeySuffix = DasContainerKeyKindSuffix(DSLTypeName(Field.type->firstType));
+            if (!KeySuffix)
+                DSLFail(TEXT("Unsupported scalar set key bridge"));
+            const das::string Suffix = KeySuffix;
             auto* PLoop = new das::ExprBlock();
             PLoop->at = At;
             PLoop->list.push_back(
@@ -612,18 +610,13 @@ void DSLEnsureStructHelpers(const das::TypeDeclPtr& InputType, const FString& Pa
         }
         else if (Field.type->baseType == das::Type::tTable)
         {
-            const das::string K = DSLTypedValue(Field.type->firstType, EDasTypeKind::Enum) ? "enum"
-                                  : DSLObjectKey(Field.type->firstType)
-                                      ? "object"
-                                      : DSLTypeName(Field.type->firstType) ==
-                                            TEXT("byte")
-                                                 ? "byte"
-                                                 : DSLTypeName(Field.type->firstType) ==
-                                                       TEXT("name")
-                                                            ? "name"
-                                                                                : DSLTypeName(Field.type->firstType) ==
-                                                                  TEXT("string")? "string" : "int",
-                                                                       V = DSLUtf8(DSLTypeName(Field.type->secondType));
+            const bool EnumKey = DSLTypedValue(Field.type->firstType, EDasTypeKind::Enum);
+            const bool ObjectKey = DSLObjectKey(Field.type->firstType);
+            const char* KeySuffix = DasContainerKeyKindSuffix(DSLTypeName(Field.type->firstType));
+            if (!EnumKey && !ObjectKey && !KeySuffix)
+                DSLFail(TEXT("Unsupported scalar map key bridge"));
+            const das::string K = EnumKey ? "enum" : ObjectKey ? "object" : KeySuffix;
+            const das::string V = DSLUtf8(DSLTypeName(Field.type->secondType));
             const bool StructValue = V == "struct",
                        EnumValue = DSLTypedValue(Field.type->secondType, EDasTypeKind::Enum),
                        ObjectValue = DSLTypedReference(Field.type->secondType),
@@ -685,14 +678,10 @@ void DSLEnsureStructHelpers(const das::TypeDeclPtr& InputType, const FString& Pa
             PackBody->list.push_back(KeysLoop);
             auto* ULoop = new das::ExprBlock();
             ULoop->at = At;
-            das::ExpressionPtr Key = DSLCall(At,
-                                             K == "enum"     ? "__ue_struct_map_key_enum"
-                                             : K == "object" ? "__ue_struct_map_key_object"
-                                             : K == "byte"   ? "ue_struct_map_key_byte"
-                                             : K == "name"   ? "ue_struct_map_key_name"
-                                             : K == "string" ? "ue_struct_map_key_string"
-                                                             : "ue_struct_map_key",
-                                             {new das::ExprVar(At, "value"), Name(), new das::ExprVar(At, "index")});
+            const das::string KeyBridge = K == "enum" || K == "object" ? "__ue_struct_map_key_" + K
+                                          : K == "int" ? "ue_struct_map_key" : "ue_struct_map_key_" + K;
+            das::ExpressionPtr Key = DSLCall(At, KeyBridge,
+                {new das::ExprVar(At, "value"), Name(), new das::ExprVar(At, "index")});
             das::ExpressionPtr Result = DSLCall(At, Get, {new das::ExprVar(At, "value"), Name(), Key->clone()});
             if (ObjectValue || StructValue)
                 Result = DSLCall(At, ObjectValue ? "__ue_map_object_token" : "__ue_map_struct_token", {Result});

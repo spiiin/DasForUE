@@ -27,6 +27,7 @@ FDasScalarValue ExecuteLibrary(const FString& Contract, const FString& File, con
     FDasScalarValue R;
     R.Kind = V.bSucceeded ? Kind : -1;
     R.IntValue = V.Value;
+    R.Int64Value = V.Int64Value;
     R.FloatValue = V.FloatValue;
     R.BoolValue = V.BoolValue;
     R.StringValue = V.StringValue;

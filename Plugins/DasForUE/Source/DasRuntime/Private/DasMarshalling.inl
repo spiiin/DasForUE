@@ -61,6 +61,8 @@ EMarshallingKind FieldKind(FProperty* Property, das::Context* Context)
         return EMarshallingKind::Text;
     case EDasTypeKind::Name:
         return EMarshallingKind::Name;
+    case EDasTypeKind::Int64:
+        return EMarshallingKind::Int64;
     case EDasTypeKind::Int:
         return EMarshallingKind::Int;
     case EDasTypeKind::Float:
@@ -86,7 +88,7 @@ EMarshallingKind FieldKind(FProperty* Property, das::Context* Context)
 bool IsHashScalar(FProperty* Property, das::Context* Context)
 {
     const auto Kind = FieldKind(Property, Context);
-    return Kind == EMarshallingKind::Byte || Kind == EMarshallingKind::Int || Kind == EMarshallingKind::Float ||
+    return Kind == EMarshallingKind::Int64 || Kind == EMarshallingKind::Byte || Kind == EMarshallingKind::Int || Kind == EMarshallingKind::Float ||
            Kind == EMarshallingKind::Double || Kind == EMarshallingKind::Bool || Kind == EMarshallingKind::String ||
            Kind == EMarshallingKind::Name || Kind == EMarshallingKind::Enum;
 }
@@ -195,6 +197,8 @@ const TCHAR* CallKindName(EMarshallingKind Kind)
 {
     switch (Kind)
     {
+    case EMarshallingKind::Int64:
+        return TEXT("int64");
     case EMarshallingKind::Byte:
         return TEXT("byte");
     case EMarshallingKind::Text:

@@ -5,6 +5,7 @@ namespace
 using F = EDasScalarKind;
 using S = EDasMethodSignature;
 const FDasValueKindRow Rows[] = {
+    {EDasTypeKind::Int64, TEXT("int64"), F::Int64, S::Int64},
     {EDasTypeKind::Void, TEXT("void"), {}, S::Void},
      {EDasTypeKind::Byte, TEXT("byte"), F::Byte, S::Byte},
       {EDasTypeKind::Text, TEXT("text"), F::Text, S::Text},

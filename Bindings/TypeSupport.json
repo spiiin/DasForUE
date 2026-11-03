@@ -1626,6 +1626,195 @@
 			]
 		},
 		{
+			"id": "int64",
+			"kind": "int64",
+			"struct_path": "",
+			"family": false,
+			"leaf": false,
+			"reference_value": false,
+			"native_policy": null,
+			"container_value_policy": true,
+			"default_policy": "explicit",
+			"default_kind": "",
+			"container_slots": [],
+			"script":
+			{
+				"registered": false,
+				"module": "",
+				"handle": "",
+				"native_property": false,
+				"self_property": false,
+				"authored_reference": false,
+				"frame_bridge": "",
+				"method_bridge": ""
+			},
+			"samples": [
+				{
+					"id": "int64[0]:0:",
+					"type":
+					{
+						"kind": "int64",
+						"type_path": "",
+						"weak": false,
+						"enum_storage": 0,
+						"authored_id": "",
+						"delegate_wire": ""
+					},
+					"capabilities":
+					{
+						"value_property":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"snapshot_member":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_parameter":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"array_element":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_value":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"map_key":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"set_element":
+						{
+							"state": "supported",
+							"reason": ""
+						}
+					},
+					"uses":
+					{
+						"authored_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"authored_out":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"authored_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"authored_return":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_out":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"interface_return":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_out":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"delegate_return":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"multicast_in":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"multicast_ref":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"queued_event":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"timer":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"property_default":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"struct_member_default":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"parameter_default":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"computed_default_leaf":
+						{
+							"state": "supported",
+							"reason": ""
+						},
+						"synchronous_callback":
+						{
+							"state": "unsupported",
+							"reason": "No specialized synchronous callback transport; ordinary signatures are separate"
+						},
+						"native_call":
+						{
+							"state": "unsupported",
+							"reason": "No registered native transport gate; generic API validation is separate"
+						}
+					}
+				}
+			]
+		},
+		{
 			"id": "map",
 			"kind": "map",
 			"struct_path": "",

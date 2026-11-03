@@ -1,5 +1,6 @@
 {
   "kinds": [
+    {"name": "int64", "property": "Int64Property", "self": "int64", "reference": "int64", "struct_leaf": true},
     {"name": "int", "property": "IntProperty", "self": "int", "reference": "int", "struct_leaf": true},
     {"name": "float", "property": "FloatProperty", "self": "float", "reference": "float", "struct_leaf": true},
     {"name": "double", "property": "DoubleProperty", "self": "double", "reference": "double", "struct_leaf": true},

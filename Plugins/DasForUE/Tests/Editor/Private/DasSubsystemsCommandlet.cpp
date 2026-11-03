@@ -37,8 +37,12 @@ int32 UDasSubsystemsCommandlet::Main(const FString&)
     FFileHelper::LoadFileToString(GISource, *R.ScriptPath(TEXT("dsl_gameinstance_subsystem.das")));
     auto Write = [&](const FString& File, const FString& Source)
     {
-        return FFileHelper::SaveStringToFile(Source, *R.ScriptPath(File),
-                                             FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM);
+        if (!FFileHelper::SaveStringToFile(Source, *R.ScriptPath(File),
+                                          FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM))
+            return false;
+        // Prepare outside execution, including body reloads. Gameplay never compiles on demand.
+        FString PreparationError;
+        return R.PrepareEditorPrograms({File}, PreparationError);
     };
     ON_SCOPE_EXIT
     {
@@ -102,6 +106,7 @@ int32 UDasSubsystemsCommandlet::Main(const FString&)
           Read(M1, TEXT("Starts")) == 1 && Read(M2, TEXT("Starts")) == 1,
                                                 TEXT("world_collection_auto_creation_isolated"));
     Check(M1 && Advance(M1) == 1 && Read(M2, TEXT("Score")) == 0, TEXT("world_state_isolated"));
+    Check(M1 && !M1->IsTickable(), TEXT("world_tick_waits_for_begin_play"));
     FString Lookup = FString::Printf(
         TEXT("options gen2\nrequire ue_subsystems\n[export]\n")
             TEXT("def world_ref():UObjectHandle { return ue_subsystem(type<WorldSubsystemRef>,")
@@ -124,7 +129,7 @@ int32 UDasSubsystemsCommandlet::Main(const FString&)
     Check(M1 && Advance(M1) == 21 && !M1->LastDasError.IsEmpty(), TEXT("failed_reload_retains_last_good_VM"));
     Write(WorldFile, WorldSource);
     W1->DestroyWorld(false);
-    Check(M1 && Read(M1, TEXT("Stops")) == 1 && !M1->IsDasActive(), TEXT("world_deinitialize_once"));
+    Check(M1 && Read(M1, TEXT("Stops")) == 1 && !M1->IsDasActive() && !M1->IsTickable(), TEXT("world_deinitialize_once"));
     auto Stopped = R.RunNamedVoidPersistent(R.ScriptPath(WorldFile), TEXT("__ue_initialize"), M1);
     Check(!Stopped.bSucceeded && Stopped.Error.Contains(TEXT("deinitialized")),
                                                         TEXT("retained_reference_cannot_resurrect_stopped_VM"),

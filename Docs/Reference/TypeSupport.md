@@ -16,11 +16,12 @@ Generated from the live registry export in [Bindings/TypeSupport.json](../../Bin
 | <code>array&lt;int&gt;</code> | Yes | Yes | Yes | No | No | No | No |
 | <code>bool</code> | Yes | Yes | Yes | Yes | Yes | No | No |
 | <code>byte</code> | Yes | Yes | Yes | Yes | Yes | Yes | Yes |
-| <code>class:/Script/CoreUObject.Object</code> | Yes | Yes | Yes | No | No | No | No |
+| <code>class:/Script/CoreUObject.Object</code> | Yes | Yes | Yes | Yes | Yes | No | No |
 | <code>double</code> | Yes | Yes | Yes | Yes | Yes | No | No |
 | <code>enum:/Script/Engine.ECollisionChannel</code> | Yes | Yes | Yes | Yes | Yes | Yes | Yes |
 | <code>float</code> | Yes | Yes | Yes | Yes | Yes | No | No |
 | <code>int</code> | Yes | Yes | Yes | Yes | Yes | Yes | Yes |
+| <code>int64</code> | Yes | Yes | Yes | Yes | Yes | Yes | Yes |
 | <code>map&lt;int, int&gt;</code> | Yes | Yes | Yes | No | No | No | No |
 | <code>name</code> | Yes | Yes | Yes | Yes | Yes | Yes | Yes |
 | <code>object:/Script/CoreUObject.Object</code> | Yes | Yes | Yes | Yes | Yes | Yes | Yes |
@@ -71,6 +72,7 @@ These columns query `QueryDasTypeUse` at the boundaries listed below. They are n
 | <code>enum:/Script/Engine.ECollisionChannel</code> | Yes | Yes | Yes | Yes | Yes |
 | <code>float</code> | Yes | Yes | Yes | Yes | Yes |
 | <code>int</code> | Yes | Yes | Yes | Yes | Yes |
+| <code>int64</code> | Yes | Yes | Yes | Yes | Yes |
 | <code>map&lt;int, int&gt;</code> | Yes | Yes | Yes | Yes | Yes |
 | <code>name</code> | Yes | Yes | Yes | Yes | Yes |
 | <code>object:/Script/CoreUObject.Object</code> | Yes | Yes | Yes | Yes | Yes |
@@ -117,6 +119,7 @@ These columns query `QueryDasTypeUse` at the boundaries listed below. They are n
 | <code>enum:/Script/Engine.ECollisionChannel</code> | Yes | Yes | Yes | Yes | Yes |
 | <code>float</code> | Yes | Yes | Yes | Yes | Yes |
 | <code>int</code> | Yes | Yes | Yes | Yes | Yes |
+| <code>int64</code> | Yes | Yes | Yes | Yes | Yes |
 | <code>map&lt;int, int&gt;</code> | Yes | Yes | Yes | Yes | Yes |
 | <code>name</code> | Yes | Yes | Yes | Yes | Yes |
 | <code>object:/Script/CoreUObject.Object</code> | Yes | Yes | Yes | Yes | Yes |
@@ -163,6 +166,7 @@ These columns query `QueryDasTypeUse` at the boundaries listed below. They are n
 | <code>enum:/Script/Engine.ECollisionChannel</code> | Yes | Yes | Yes | Yes | Yes |
 | <code>float</code> | Yes | Yes | Yes | Yes | Yes |
 | <code>int</code> | Yes | Yes | Yes | Yes | Yes |
+| <code>int64</code> | Yes | Yes | Yes | Yes | Yes |
 | <code>map&lt;int, int&gt;</code> | Yes | Yes | Yes | Yes | Yes |
 | <code>name</code> | Yes | Yes | Yes | Yes | Yes |
 | <code>object:/Script/CoreUObject.Object</code> | Yes | Yes | Yes | Yes | Yes |
@@ -209,6 +213,7 @@ These columns query `QueryDasTypeUse` at the boundaries listed below. They are n
 | <code>enum:/Script/Engine.ECollisionChannel</code> | Yes | Yes | Yes | No | No |
 | <code>float</code> | Yes | Yes | Yes | Yes | Yes |
 | <code>int</code> | Yes | Yes | Yes | Yes | Yes |
+| <code>int64</code> | Yes | Yes | Yes | Yes | Yes |
 | <code>map&lt;int, int&gt;</code> | Yes | Yes | Yes | No | No |
 | <code>name</code> | Yes | Yes | Yes | No | No |
 | <code>object:/Script/CoreUObject.Object</code> | Yes | Yes | Yes | No | No |
@@ -255,6 +260,7 @@ These columns query `QueryDasTypeUse` at the boundaries listed below. They are n
 | <code>enum:/Script/Engine.ECollisionChannel</code> | No | No |
 | <code>float</code> | No | No |
 | <code>int</code> | No | No |
+| <code>int64</code> | No | No |
 | <code>map&lt;int, int&gt;</code> | No | No |
 | <code>name</code> | No | No |
 | <code>object:/Script/CoreUObject.Object</code> | No | No |
@@ -330,6 +336,7 @@ These are adapter/facet declarations, not an independent support table. `—` me
 | <code>enum</code> | <code>ue_native_gameplay</code> | native_property | — / — | <code>explicit</code> | — |
 | <code>float</code> | — | — | — / — | <code>explicit</code> | — |
 | <code>int</code> | — | — | — / — | <code>explicit</code> | — |
+| <code>int64</code> | — | — | — / — | <code>explicit</code> | — |
 | <code>map</code> | — | — | — / — | <code>explicit</code> | — |
 | <code>name</code> | <code>ue_foundation</code> | native_property, self_property, authored_reference | — / — | <code>explicit</code> | — |
 | <code>object</code> | <code>ue_native_gameplay</code> | native_property, self_property, authored_reference | — / — | <code>explicit</code> | — |
@@ -386,7 +393,7 @@ Transport identifiers and native-call constraints come from the owning adapter. 
 | <code>struct:/Script/UMG.PaintContext</code> | <code>scoped_paint_context_v1</code> / <code>UEPaintContext</code> | <code>synchronous_paint_scope</code> | PaintContext requires exact scalar synchronous OnPaint adapter | PaintContext requires synchronous OnPaint, not reflected storage/defaults |
 | <code>struct:/Script/UMG.WidgetAnimationHandle</code> | <code>weak_widget_animation_v1</code> / <code>UEWidgetAnimationHandle</code> | <code>weak_widget_context_capability</code> | WidgetAnimation requires exact scalar producer result | WidgetAnimation requires a weak context capability, not reflected storage/defaults |
 
-Coverage: **40 registered adapters, 43 representative descriptors**.
+Coverage: **41 registered adapters, 44 representative descriptors**.
 
 **AOT:** per binding; not inferred from a type adapter. A scalar-compatible binding can be AOT eligible while an opaque overload of the same operation is closed. A type-level `Yes` would be misleading.
 

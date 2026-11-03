@@ -131,6 +131,8 @@ FString TypeFieldDefault(const FDasDeclaredProperty& P)
         return P.Default.String;
     if (P.Type.Kind == TEXT("bool"))
         return P.Default.Boolean ? TEXT("true"): TEXT("false");
+    if (P.Type.Kind == TEXT("int64"))
+        return P.Default.Kind.IsEmpty() ? TEXT("0") : P.Default.String;
     return P.Type.Kind == TEXT("int")? FString::FromInt(int32(P.Default.Number))
                                      : FString::Printf(TEXT("%.17g"), P.Default.Number);
 }

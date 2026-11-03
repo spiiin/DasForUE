@@ -1,4 +1,5 @@
 #include "DasInterfaceMigration.h"
+#include "DasInterfaceContracts.h"
 #include "DasBlueprintRollback.h"
 #include "DasDSLService.h"
 #include "DasTypePins.h"
@@ -33,7 +34,7 @@ bool SameInterfaceSignature(const FDasDeclaredMethod& A, const FDasDeclaredMetho
 }
 bool Implements(const UBlueprint* BP, const FDasInterfaceChange& Change)
 {
-    return BP->GeneratedClass && BP->GeneratedClass->ImplementsInterface(Change.Blueprint->GeneratedClass);
+    return DasImplementsInterface(BP->GeneratedClass, Change.Blueprint->GeneratedClass);
 }
 const FDasDeclaredMethod* ReferencedMethod(UK2Node* Node, UBlueprint* BP, const FDasInterfaceChange& Change)
 {
@@ -59,7 +60,7 @@ const FDasDeclaredMethod* ReferencedMethod(UK2Node* Node, UBlueprint* BP, const 
         const auto* OwnerBlueprint = Cast<UBlueprint>(Owner->ClassGeneratedBy);
         if (Owner != Change.Blueprint->GeneratedClass && OwnerBlueprint != Change.Blueprint &&
             !(OwnerBlueprint && Implements(OwnerBlueprint, Change)) &&
-            !Owner->ImplementsInterface(Change.Blueprint->GeneratedClass))
+            !DasImplementsInterface(Owner, Change.Blueprint->GeneratedClass))
             return nullptr;
     }
     else if (!Implements(BP, Change))

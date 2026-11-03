@@ -132,7 +132,7 @@ FDasScalarValue UDasScriptComponent::ExecuteDasFrame(const FString& File, const 
                                                      const TArray<FDasScalarValue>& Args, int32 Kind,
                                                      const FString& ResultClass)
 {
-    if (Kind < 0 || (Kind > 13 && Kind != 15 && Kind != 16 && Kind != 17 && Kind != 18) || Kind == 4)
+    if (Kind < 0 || (Kind > 13 && Kind != 15 && Kind != 16 && Kind != 17 && Kind != 18 && Kind != 19) || Kind == 4)
     {
         FDasExecutionResult Error;
         Error.Error = TEXT("Invalid scalar result kind");
@@ -148,6 +148,7 @@ FDasScalarValue UDasScriptComponent::ExecuteDasFrame(const FString& File, const 
     FDasScalarValue Result;
     Result.Kind = V.bSucceeded ? Kind : -1;
     Result.IntValue = V.Value;
+    Result.Int64Value = V.Int64Value;
     Result.FloatValue = V.FloatValue;
     Result.BoolValue = V.BoolValue;
     Result.StringValue = V.StringValue;
@@ -171,7 +172,7 @@ FDasScalarValue UDasScriptComponent::ExecuteDasFrameOutputs(const FString& File,
                                                             TArray<FDasScalarValue>& Outputs)
 {
     Outputs = Args;
-    if (Kind < 0 || (Kind > 13 && Kind != 15 && Kind != 16 && Kind != 17 && Kind != 18) || Kind == 4)
+    if (Kind < 0 || (Kind > 13 && Kind != 15 && Kind != 16 && Kind != 17 && Kind != 18 && Kind != 19) || Kind == 4)
     {
         FDasScalarValue Failed;
         Failed.Kind = -1;
@@ -192,6 +193,7 @@ FDasScalarValue UDasScriptComponent::ExecuteDasFrameOutputs(const FString& File,
     FDasScalarValue Result;
     Result.Kind = V.bSucceeded ? Kind : -1;
     Result.IntValue = V.Value;
+    Result.Int64Value = V.Int64Value;
     Result.FloatValue = V.FloatValue;
     Result.BoolValue = V.BoolValue;
     Result.StringValue = V.StringValue;

@@ -19,6 +19,17 @@ struct FDasKindInt
     static int32 FromDas(int32 V, das::Context*) { return V; }
     static void Check(Property*, das::Context*) {}
 };
+struct FDasKindInt64
+{
+    static constexpr ESnapshotKind SnapshotKind = ESnapshotKind::Int64;
+    using Property = FInt64Property;
+    using In = int64;
+    using Out = int64;
+    static constexpr const TCHAR* Name = TEXT("int64");
+    static int64 ToDas(int64 V, das::Context*) { return V; }
+    static int64 FromDas(int64 V, das::Context*) { return V; }
+    static void Check(Property*, das::Context*) {}
+};
 struct FDasKindFloat
 {
     using Property = FFloatProperty;
@@ -579,6 +590,7 @@ struct FDasKindCallByte : FDasKindByteInt
 
 // (argument extern, result extern, kind)
 #define DAS_CALL_SCALAR_KINDS(X)                                                                                       \
+    X("ue_arg_int64", "ue_result_int64", FDasKindInt64) \
     X("ue_arg_int", "ue_result_int", FDasKindInt)                                                                      \
     X("ue_arg_float", "ue_result_float", FDasKindFloat)                                                                \
     X("ue_arg_double", "ue_result_double", FDasKindDouble)                                                             \
@@ -595,6 +607,7 @@ struct FDasKindCallByte : FDasKindByteInt
 
 // (daScript suffix, self and struct kind, reference kind)
 #define DAS_SCALAR_ACCESSOR_KINDS(X)                                                                                   \
+    X(int64, FDasKindInt64, FDasKindInt64) \
     X(int, FDasKindInt, FDasKindInt)                                                                                   \
     X(float, FDasKindFloat, FDasKindFloat)                                                                             \
     X(double, FDasKindDouble, FDasKindDouble)                                                                          \
@@ -606,6 +619,7 @@ struct FDasKindCallByte : FDasKindByteInt
 
 // (daScript suffix, kind): scalar map keys and set elements with in-place self container access.
 #define DAS_CONTAINER_KEY_KINDS(X)                                                                                     \
+    X(int64, FDasKindInt64) \
     X(int, FDasKindInt)                                                                                                \
     X(string, FDasKindString)                                                                                          \
     X(name, FDasKindName)                                                                                              \

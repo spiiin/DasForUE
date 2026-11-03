@@ -130,8 +130,8 @@ return rejected)"));
     const auto Inventory = ObjectRun(TEXT("return __ue_probe_map_binding_count()"));
     const int32 MapBindings = Inventory.Value;
     const bool Legacy = !Inventory.bSucceeded;
-    // Class-valued snapshots add one get/with pair to the original linear inventory.
-    constexpr int32 ExpectedMapBindings = 56 + 2;
+    // Class snapshots add two bindings; int64 values/keys add six linear bindings.
+    constexpr int32 ExpectedMapBindings = 56 + 2 + 6;
     Expect(MapBindings == ExpectedMapBindings && !Legacy, TEXT("map_interop_linear_binding_inventory"));
     UE_LOG(LogTemp, Display, TEXT("DAS_MAP_INTEROP_BINDINGS legacy=196 current=%d"), MapBindings);
 }

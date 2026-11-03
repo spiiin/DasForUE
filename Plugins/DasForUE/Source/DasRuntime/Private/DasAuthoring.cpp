@@ -1394,14 +1394,15 @@ bool FDasAuthoringModule::ToActorSchema(const FString& ClassId, FDasClassSchema&
         return Fail(Error, TEXT("SaveGame/DataAsset supports data and methods, without world lifecycle/components"));
     if (Subsystem && (C->AsyncPhysics || !C->Components.IsEmpty() ||
                       C->Callbacks.ContainsByPredicate(
-                          [](const auto& Hook)
+                          [&](const auto& Hook)
                           {
-                              return Hook.Kind !=
-                                     TEXT("Initialize") &&
-                                          (Hook.Kind != TEXT("EndPlay") || Hook.Name != TEXT("Deinitialize"));
+                              const bool WorldTick = C->NativeParent == TEXT("/Script/Engine.WorldSubsystem") &&
+                                                     Hook.Kind == TEXT("Tick");
+                              return !WorldTick && Hook.Kind != TEXT("Initialize") &&
+                                     (Hook.Kind != TEXT("EndPlay") || Hook.Name != TEXT("Deinitialize"));
                           })))
         return Fail(Error,
-                    TEXT("Subsystem supports Initialize and Deinitialize only, without Actor components/physics"));
+                    TEXT("Subsystem supports Initialize and Deinitialize, plus Tick on WorldSubsystem, without Actor components/physics"));
     if (!Library && !SaveGame && !DataAsset && !Subsystem &&
         (!DasActorNativeParent(C->NativeParent) && C->NativeParent != TEXT("/Script/Engine.ActorComponent") &&
                                                                            !DasGenericScriptParent(C->NativeParent)))
@@ -1578,6 +1579,8 @@ bool FDasAuthoringModule::ToActorSchema(const FString& ClassId, FDasClassSchema&
         F.bReadOnly = P.bReadOnly;
         F.bInstanced = P.bInstanced;
         F.Metadata = P.Metadata;
+        if (P.Type.Kind == TEXT("int64") && !P.Default.Kind.IsEmpty() && !ParseDasInt64Literal(P.Default.String, F.Int64Default))
+            return Fail(Error, TEXT("Invalid int64 default: ") + P.Name);
         F.IntDefault = (P.Type.Kind == TEXT("int") || P.Type.Kind == TEXT("byte"))
                         ? static_cast<int32>(P.Default.Kind == TEXT("number")? P.Default.Number : 0)
                         : 0;

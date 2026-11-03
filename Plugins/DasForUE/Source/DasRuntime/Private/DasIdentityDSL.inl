@@ -266,7 +266,7 @@ struct FUEStatePass : das::PassMacro
                     if (Kind == das::Type::autoinfer || Kind == das::Type::alias)
                         return;
                     if (!DSLDefaultScalar(Kind))
-                        DSLFail(TEXT("ue_state supports int, bool, float, double and string; object/VM references cannot persist"));
+                        DSLFail(TEXT("ue_state supports int, int64, bool, float, double and string; object/VM references cannot persist"));
                     V->do_not_delete = true;
                     V->marked_used = true;
                     if (const auto* Done = V->annotation.find("_ue_state_lowered", das::Type::tBool))
@@ -281,6 +281,11 @@ struct FUEStatePass : das::PassMacro
                     das::string Suffix;
                     switch (Kind)
                     {
+                    case das::Type::tInt64:
+                        Suffix = "int64";
+                        if (!Default)
+                            Default = new das::ExprConstInt64(V->at, 0);
+                        break;
                     case das::Type::tInt:
                         Suffix = "int";
                         if (!Default)

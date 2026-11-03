@@ -45,6 +45,7 @@ struct FMapKey
 {
     ESnapshotKind Kind = ESnapshotKind::Invalid;
     int32 Int = 0;
+    int64 Int64 = 0;
     uint8 Byte = 0;
     FString String;
     FName Name;
@@ -53,6 +54,8 @@ struct FMapKey
     {
         switch (Kind)
         {
+        case ESnapshotKind::Int64:
+            return &Int64;
         case ESnapshotKind::Int:
             return &Int;
         case ESnapshotKind::Byte:
@@ -76,6 +79,11 @@ FMapKey ReadMapKey(vec4f V, const das::TypeInfo* T, FProperty* Expected, das::Co
     {
         K.Kind = ESnapshotKind::Int;
         K.Int = MapArg<int32>(V, T, C);
+    }
+    else if (T->type == das::Type::tInt64)
+    {
+        K.Kind = ESnapshotKind::Int64;
+        K.Int64 = MapArg<int64>(V, T, C);
     }
     else if (T->type == das::Type::tUInt8)
     {
@@ -338,7 +346,7 @@ struct FMapKeyAnnotation : das::FunctionAnnotation
     {
         const auto T = Call->arguments[Index]->type;
         if (T &&
-            (T->baseType == das::Type::tInt || T->baseType == das::Type::tUInt8 || T->baseType == das::Type::tString ||
+            (T->baseType == das::Type::tInt64 || T->baseType == das::Type::tInt || T->baseType == das::Type::tUInt8 || T->baseType == das::Type::tString ||
              (T->baseType == das::Type::tHandle &&
               (T->annotation == MapNameType || (Index == 2 && T->annotation == MapEnumType))) ||
              (Index == 2 && T->baseType == das::Type::tUInt64)))

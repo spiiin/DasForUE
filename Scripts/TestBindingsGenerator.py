@@ -116,7 +116,7 @@ class GeneratorTests(unittest.TestCase):
         self.assertEqual(sorted(native_type_names([NATIVE_BINDS_SOURCE])),
                          ['AActor', 'APawn', 'UActorComponent', 'UGameInstance', 'USceneComponent', 'UWorld'])
         self.assertEqual(dsl_base_names(PLUGIN_SCRIPTS),
-                         dict(ProbeActor='ue_probe_actor', **{name: 'ue_dsl' for name in ('Actor', 'Pawn', 'Character', 'ActorComponent', 'SaveGame',
+                         dict(ProbeActor='ue_probe_actor', AIController='ue_ai', **{name: 'ue_dsl' for name in ('Actor', 'Pawn', 'Character', 'ActorComponent', 'SaveGame', 'PlayerController', 'ScriptObject',
                                                       'DataAsset', 'PrimaryDataAsset', 'WorldSubsystem',
                                                       'GameInstanceSubsystem')}))
         text = generate(self.ir)

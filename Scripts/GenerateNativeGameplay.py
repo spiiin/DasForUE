@@ -18,7 +18,7 @@ def generate(ir,script_dirs=None,*,scripts_root=None):
  methods=[];defaults=[];used=[];soft_types={}
  def visit(value,depth=0):
   if depth>16:raise ValueError('Recursive native type')
-  if value['kind'] not in ('int','float','double','bool','string','name','object','class','struct','enum','byte','text','array','map','set'):raise ValueError('Unsupported type')
+  if value['kind'] not in ('int64','int','float','double','bool','string','name','object','class','struct','enum','byte','text','array','map','set'):raise ValueError('Unsupported type')
   if 'weak_reference' in value and (type(value['weak_reference'])!=bool or value['kind']!='object'):raise ValueError('Invalid weak reference marker')
   used.append(value)
   soft=value.get('soft_reference')
@@ -36,7 +36,7 @@ def generate(ir,script_dirs=None,*,scripts_root=None):
    visit(value['element'],depth+1)
   if value['kind'] in ('map','set'):
    key=value.get('key' if value['kind']=='map' else 'element')
-   if value.get('type_path') or not key or key['kind'] not in ('int','string','name','enum','object'):raise ValueError('Unsupported native hash key')
+   if value.get('type_path') or not key or key['kind'] not in ('int64','int','string','name','enum','object'):raise ValueError('Unsupported native hash key')
    visit(key,depth+1)
    if value['kind']=='map':
     item=value.get('value')

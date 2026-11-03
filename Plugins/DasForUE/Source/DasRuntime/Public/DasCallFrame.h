@@ -21,6 +21,8 @@ struct DASRUNTIME_API FDasScalarValue
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "daScript")
     int32 IntValue = 0;
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "daScript")
+    int64 Int64Value = 0;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "daScript")
     float FloatValue = 0;
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "daScript")
     bool BoolValue = false;

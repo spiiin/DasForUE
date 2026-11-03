@@ -80,6 +80,10 @@ void SubscribeObjectInt(const FDasObjectHandle& H, const char* Event, const char
 {
     SubscribeObjectScalar(H, Event, Handler, C, EDasMethodSignature::Int);
 }
+void SubscribeObjectInt64(const FDasObjectHandle& H, const char* Event, const char* Handler, das::Context* C)
+{
+    SubscribeObjectScalar(H, Event, Handler, C, EDasMethodSignature::Int64);
+}
 void SubscribeObjectFloat(const FDasObjectHandle& H, const char* Event, const char* Handler, das::Context* C)
 {
     SubscribeObjectScalar(H, Event, Handler, C, EDasMethodSignature::Float);
@@ -187,6 +191,8 @@ bool VerifyEventHandler(das::SimFunction* F, das::ModuleGroup& G, EDasMethodSign
         return das::verifyCall<void, FDasNameValue>(F->debugInfo, G);
     case EDasMethodSignature::Struct:
         return das::verifyCall<void, FDasStructValue>(F->debugInfo, G);
+    case EDasMethodSignature::Int64:
+        return das::verifyCall<void, int64>(F->debugInfo, G);
     case EDasMethodSignature::Double:
         return das::verifyCall<void, double>(F->debugInfo, G);
     case EDasMethodSignature::Object:

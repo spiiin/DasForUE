@@ -78,6 +78,7 @@ bool UDasScriptDelegateProxy::Invoke(UFunction* Signature, const void* Input, vo
     Ret.Kind = int32(Schema.ReturnKind);
     Ret.ObjectClass = Schema.ReturnClass;
     Ret.IntValue = Result.Value;
+    Ret.Int64Value = Result.Int64Value;
     Ret.FloatValue = Result.FloatValue;
     Ret.DoubleValue = Result.DoubleValue;
     Ret.BoolValue = Result.BoolValue;

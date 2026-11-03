@@ -70,6 +70,15 @@ FDasDeclaredLiteral DSLParameterDefault(das::ExpressionPtr Init)
         Negative = true;
         E = Unary->subexpr;
     }
+    if (E->__rtti == das::string("ExprConstInt64"))
+    {
+        const int64 Value = static_cast<das::ExprConstInt64*>(E)->getValue();
+        if (Negative && Value == MIN_int64)
+            DSLFail(TEXT("Negated int64 default overflows"));
+        Result.Kind = TEXT("string");
+        Result.String = FString::Printf(TEXT("%lld"), Negative ? -Value : Value);
+        return Result;
+    }
     if (E->__rtti == das::string("ExprConstInt"))
     {
         Result.Kind = TEXT("number");
@@ -106,6 +115,18 @@ FDasDeclaredLiteral DSLParameterDefault(das::ExpressionPtr Init)
 
     return Result;
 }
+FDasDeclaredLiteral DSLInt64Default(das::ExpressionPtr Init)
+{
+    auto Default = DSLParameterDefault(Init);
+    if (Default.Kind == TEXT("number") && FMath::IsFinite(Default.Number) &&
+        Default.Number >= MIN_int32 && Default.Number <= MAX_int32 && FMath::FloorToDouble(Default.Number) == Default.Number)
+    {
+        Default.Kind = TEXT("string");
+        Default.String = FString::Printf(TEXT("%lld"), int64(Default.Number));
+        Default.Number = 0;
+    }
+    return Default;
+}
 das::ExpressionPtr DSLParameterDefaultExpression(const FDasDeclaredParameter& P, const das::LineInfo& At)
 {
     if (P.Default.Kind.IsEmpty())
@@ -113,6 +134,13 @@ das::ExpressionPtr DSLParameterDefaultExpression(const FDasDeclaredParameter& P,
     if (const auto* Facet = DSLKindFacet(P.Type.GetKind()))
         if (auto Expression = Facet->DefaultExpression(P.Default, At))
             return Expression;
+    if (P.Type.GetKind() == EDasTypeKind::Int64)
+    {
+        int64 Value = 0;
+        if (!ParseDasInt64Literal(P.Default.String, Value))
+            DSLFail(TEXT("Invalid int64 parameter default"));
+        return new das::ExprConstInt64(At, Value);
+    }
     if (P.Type.GetKind() == EDasTypeKind::Byte)
         return new das::ExprConstUInt8(At, uint8(P.Default.Number));
     if (P.Type.GetKind() == EDasTypeKind::Int)
@@ -358,6 +386,8 @@ FString DSLTypeName(const das::TypeDeclPtr& T)
         return TEXT("array");
     case das::Type::tTable:
         return T->secondType && T->secondType->baseType == das::Type::tVoid ? TEXT("set"): TEXT("map");
+    case das::Type::tInt64:
+        return TEXT("int64");
     case das::Type::tInt:
         return TEXT("int");
     case das::Type::tFloat:
@@ -601,7 +631,7 @@ FDasDeclaredProperty DSLNativeSelfProperty(const FDasDeclaredClass& C, const das
     FDasDeclaredProperty D;
     D.Name = N;
     D.bReadOnly = OwnerFacade || P->HasAnyPropertyFlags(CPF_BlueprintReadOnly);
-    D.Type.Kind = CastField<FIntProperty>(P) ? TEXT("int")
+    D.Type.Kind = CastField<FInt64Property>(P) ? TEXT("int64") : CastField<FIntProperty>(P) ? TEXT("int")
                                              : CastField<FFloatProperty>(P)
         ? TEXT("float")
         : CastField<FDoubleProperty>(P)
@@ -1095,7 +1125,9 @@ bool DSLValidateOwner(const das::ProgramPtr& Program, const FString& Entry, UObj
                         {
                             UObject* CDO = DeclaringCDO;
                             const bool DefaultMatches =
-                                P.Type.GetKind() == EDasTypeKind::Int
+                                P.Type.GetKind() == EDasTypeKind::Int64
+                                    ? CastField<FInt64Property>(Actual)->GetPropertyValue_InContainer(CDO) == FCString::Atoi64(*P.Default.String)
+                                : P.Type.GetKind() == EDasTypeKind::Int
                                     ? CastField<FIntProperty>(Actual)->GetPropertyValue_InContainer(CDO) ==
                                           static_cast<int32>(P.Default.Number)
                                 : P.Type.GetKind() == EDasTypeKind::Float

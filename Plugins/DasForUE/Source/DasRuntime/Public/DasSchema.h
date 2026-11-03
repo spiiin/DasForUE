@@ -6,6 +6,8 @@ struct FInstancedStruct;
 class UScriptStruct;
 class FProperty;
 class UEnum;
+// Strict signed decimal parsing, including both int64 endpoints, without floating point.
+DASRUNTIME_API bool ParseDasInt64Literal(const FString& Text, int64& Out);
 DASRUNTIME_API UEnum* ResolveDasEnum(const FString& Path, FString& Error);
 DASRUNTIME_API bool ValidateDasEnumNumber(const FString& Path, int64 Value, FString& Error);
 DASRUNTIME_API FProperty* FindDasStructField(const UScriptStruct* Type, const FString& Name);
@@ -41,7 +43,8 @@ enum class EDasScalarKind : uint8
     Class = 15,
     Delegate = 16,
     Byte = 17,
-    Text = 18
+    Text = 18,
+    Int64 = 19
 };
 
 struct FDasFieldSchema
@@ -49,6 +52,7 @@ struct FDasFieldSchema
     FName Name;
     EDasScalarKind Kind = EDasScalarKind::Int32;
     int32 IntDefault = 0;
+    int64 Int64Default = 0;
     float FloatDefault = 0;
     bool BoolDefault = false;
     double DoubleDefault = 0;
@@ -87,7 +91,7 @@ enum class EDasMethodSignature : uint8
     Delegate = 16,
     Byte = 17,
     Text = 18,
-    // Typed calls from C++ only (DasScript.h, TDasFunction): never in call frames, schemas or components.
+    // Int64 also participates in reflected authoring and call frames. The remaining kinds below are typed calls only.
     Int64 = 19,
     Vector2D = 20,
     Quat = 21,

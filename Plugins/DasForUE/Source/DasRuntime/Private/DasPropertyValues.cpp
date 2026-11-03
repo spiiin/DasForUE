@@ -120,6 +120,9 @@ bool ReadDasPropertyValue(FProperty* P, const void* Memory, FDasScalarValue& Out
     case EDasTypeKind::Text:
         Value.TextValue = CastFieldChecked<FTextProperty>(P)->GetPropertyValue(Memory);
         break;
+    case EDasTypeKind::Int64:
+        Value.Int64Value = CastFieldChecked<FInt64Property>(P)->GetPropertyValue(Memory);
+        break;
     case EDasTypeKind::Int:
         Value.IntValue = CastFieldChecked<FIntProperty>(P)->GetPropertyValue(Memory);
         break;
@@ -224,6 +227,9 @@ bool WriteDasPropertyValue(FProperty* P, void* Memory, const FDasScalarValue& Va
         break;
     case EDasTypeKind::Text:
         CastFieldChecked<FTextProperty>(P)->SetPropertyValue(Memory, Value.TextValue);
+        break;
+    case EDasTypeKind::Int64:
+        CastFieldChecked<FInt64Property>(P)->SetPropertyValue(Memory, Value.Int64Value);
         break;
     case EDasTypeKind::Int:
         CastFieldChecked<FIntProperty>(P)->SetPropertyValue(Memory, Value.IntValue);

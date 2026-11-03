@@ -652,7 +652,7 @@ das::TypeDeclPtr DSLPropertyType(const FString& Kind, das::ModuleGroup& G, das::
     if (Kind == TEXT("struct"))
         return DSLHandleType(G, M, "UEStructValue");
     return new das::TypeDecl(
-        (Kind == TEXT("int") || Kind == TEXT("byte"))
+        Kind == TEXT("int64") ? das::Type::tInt64 : (Kind == TEXT("int") || Kind == TEXT("byte"))
          ? das::Type::tInt
          : Kind == TEXT("float")
                         ? das::Type::tFloat
@@ -872,7 +872,7 @@ bool DSLEmitProperty(das::Program* P, das::Module* M, const das::TypeDeclPtr& T,
     if (!Prop->bReadOnly && Prop->Type.Kind != TEXT("event"))
     {
         Add("`clone", Write(new das::ExprVar(At, "value")), true);
-        if (Prop->Type.Kind == TEXT("int") || Prop->Type.Kind == TEXT("float") || Prop->Type.Kind == TEXT("double"))
+        if (Prop->Type.Kind == TEXT("int64") || Prop->Type.Kind == TEXT("int") || Prop->Type.Kind == TEXT("float") || Prop->Type.Kind == TEXT("double"))
             for (const auto* Op : {"+", "-", "*", "/"})
                 Add(das::string("`") + Op + "=", Write(new das::ExprOp2(At, Op, Read(), new das::ExprVar(At, "value"))),
                     true);

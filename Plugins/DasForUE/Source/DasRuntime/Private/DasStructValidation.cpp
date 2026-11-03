@@ -120,7 +120,7 @@ bool ValidateDasValueStruct(const FString& Path, FString& Error)
             else
             {
                 if (!((CastField<FByteProperty>(P) && !CastField<FByteProperty>(P)->Enum) ||
-                      CastField<FTextProperty>(P) || CastField<FIntProperty>(P) || CastField<FFloatProperty>(P) ||
+                      CastField<FTextProperty>(P) || CastField<FInt64Property>(P) || CastField<FIntProperty>(P) || CastField<FFloatProperty>(P) ||
                       CastField<FDoubleProperty>(P) || CastField<FBoolProperty>(P) || CastField<FStrProperty>(P) ||
                       CastField<FNameProperty>(P) || CastField<FSoftObjectProperty>(P) ||
                       CastField<FClassProperty>(P) || DasReferencePropertyClass(P) || CastField<FEnumProperty>(P) ||

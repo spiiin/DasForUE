@@ -1,6 +1,7 @@
 #pragma once
 #include "CoreMinimal.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
+#include "StructUtils/InstancedStruct.h"
 #include "DasFunctionLibraryFixture.generated.h"
 UCLASS()
 class DASRUNTIME_API UDasFunctionLibraryFixture : public UBlueprintFunctionLibrary
@@ -31,4 +32,6 @@ public:
     static TArray<TSubclassOf<AActor>> EchoClassArray(const TArray<TSubclassOf<AActor>>& Values);
     UFUNCTION(BlueprintPure, Category = "daScript Test")
     static int64 UnsupportedInt64(int64 Value);
+    UFUNCTION(BlueprintCallable, Category = "daScript Test")
+    static FInstancedStruct UnsupportedSnapshot(const FInstancedStruct& Value);
 };

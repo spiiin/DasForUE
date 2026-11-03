@@ -1,7 +1,7 @@
 bool DSLDefaultScalar(das::Type T)
 {
     FDasDeclaredType Type;
-    Type.Kind = T == das::Type::tInt ? TEXT("int")
+    Type.Kind = T == das::Type::tInt64 ? TEXT("int64") : T == das::Type::tInt ? TEXT("int")
                                      : T == das::Type::tFloat
         ? TEXT("float")
         : T == das::Type::tDouble
@@ -79,6 +79,8 @@ das::ExpressionPtr DSLComputeDefaultLeaf(const das::StructurePtr& St, das::Expre
         DSLFail(TEXT("Duplicate computed default evaluator: ")+ Key);
     DSLComputedDefaults->Pending.Add({Key, Fn});
     const auto T = Type ? Type->baseType : das::Type::tInt;
+    if (T == das::Type::tInt64)
+        return new das::ExprConstInt64(E->at, 0);
     if (T == das::Type::tString)
         return new das::ExprConstString(E->at, "");
     if (T == das::Type::tBool)
@@ -248,6 +250,8 @@ void DSLPrepareComputedDefaults(const das::StructurePtr& St)
             das::ExpressionPtr E = nullptr;
             if (auto* Int = CastField<FIntProperty>(P))
                 E = new das::ExprConstInt(St->at, Int->GetPropertyValue(Data));
+            else if (auto* Int64 = CastField<FInt64Property>(P))
+                E = new das::ExprConstInt64(St->at, Int64->GetPropertyValue(Data));
             else if (auto* Float = CastField<FFloatProperty>(P))
                 E = new das::ExprConstFloat(St->at, Float->GetPropertyValue(Data));
             else if (auto* Double = CastField<FDoubleProperty>(P))
@@ -291,6 +295,8 @@ void DSLPrepareComputedDefaults(const das::StructurePtr& St)
                     E = new das::ExprConstBool(F.at, false);
                 else if (F.type->baseType == das::Type::tFloat)
                     E = new das::ExprConstFloat(F.at, 0.f);
+                else if (F.type->baseType == das::Type::tInt64)
+                    E = new das::ExprConstInt64(F.at, 0);
                 else if (F.type->baseType == das::Type::tDouble)
                     E = new das::ExprConstDouble(F.at, 0.);
                 else
@@ -486,6 +492,9 @@ void DSLEvaluateComputedDefaults(const das::ProgramPtr& Program, das::TextWriter
         das::ExpressionPtr Literal = nullptr;
         switch (P.Function->result->baseType)
         {
+        case das::Type::tInt64:
+            Literal = new das::ExprConstInt64(At, das::cast<int64>::to(Value));
+            break;
         case das::Type::tInt:
             Literal = new das::ExprConstInt(At, das::cast<int32>::to(Value));
             break;

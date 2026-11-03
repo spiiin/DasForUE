@@ -484,3 +484,12 @@ void SubscribeObjectScalar(const FDasObjectHandle& Handle, const char* Event, co
         Context->throw_error("subscription declaration limit exceeded");
     ActiveContext->Subscriptions.Add({Source, Name, UTF8_TO_TCHAR(Handler), Kind, PayloadPath});
 }
+
+// Audio's native-only parameter interface has no BlueprintEvent implementation to ProcessEvent.
+void AudioTriggerParameter(const FDasObjectHandle& Handle, FDasNameValue Name, das::Context* C)
+{
+    auto* Audio = Cast<UAudioComponent>(ResolveObject(Handle, C));
+    if (!Audio || !Audio->IsRegistered())
+        C->throw_error("audio trigger requires a registered AudioComponent");
+    Audio->SetTriggerParameter(ResolveDSLName(Name, C));
+}

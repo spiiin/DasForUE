@@ -9,7 +9,7 @@ public:
     virtual EDasTypeKind GetKind() const override { return Kind; }
     bool CanBeContainerKey(const FDasDeclaredType&) const override
     {
-        return Kind == EDasTypeKind::Int || Kind == EDasTypeKind::Byte || Kind == EDasTypeKind::String ||
+        return Kind == EDasTypeKind::Int64 || Kind == EDasTypeKind::Int || Kind == EDasTypeKind::Byte || Kind == EDasTypeKind::String ||
                Kind == EDasTypeKind::Name;
     }
     virtual bool MatchesProperty(const FProperty* Property) const override

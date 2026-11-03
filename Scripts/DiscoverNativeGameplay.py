@@ -6,7 +6,7 @@ NATIVE_PATH=re.compile(r'/Script/[A-Za-z_]\w*\.[A-Za-z_]\w*\Z')
 IDENT=re.compile(r'[A-Za-z_]\w*\Z')
 GENERATED='ue_native_gameplay'
 BOOTSTRAP='ue_native_gameplay_sources'
-BUILTINS={'ue_foundation'}
+BUILTINS={'ue_foundation','math'}
 
 def tokens(source):
     """Small declaration lexer: strings/comments cannot create phantom declarations."""

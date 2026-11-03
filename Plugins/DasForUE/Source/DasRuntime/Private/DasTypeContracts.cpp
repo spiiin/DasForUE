@@ -66,7 +66,7 @@ bool DeclarationType(const FDasDeclaredType& Type, const TSet<FString>& Classes,
             return Fail(Error, TEXT("Invalid map type shape"));
         if (Type.Key->Kind !=
             TEXT("byte") && Type.Key->Kind !=
-                                TEXT("int") && Type.Key->Kind !=
+                                TEXT("int64") && Type.Key->Kind != TEXT("int") && Type.Key->Kind !=
                                                    TEXT("float") &&
                                                         Type.Key->Kind !=
                                                             TEXT("double") &&
@@ -99,7 +99,7 @@ bool DeclarationType(const FDasDeclaredType& Type, const TSet<FString>& Classes,
         return Fail(Error, TEXT("Primitive type has a type_path"));
     if (K == TEXT("byte") ||
                   K == TEXT("text") ||
-                            K == TEXT("int") ||
+                            K == TEXT("int64") || K == TEXT("int") ||
                                       K == TEXT("float") ||
                                                 K == TEXT("double") ||
                                                           K == TEXT("bool") ||
@@ -122,6 +122,11 @@ bool PropertyDefault(const FDasDeclaredType& Type, const FDasDeclaredLiteral& D,
     if (D.Kind.IsEmpty())
         return true;
     const auto& K = Type.Kind;
+    if (K == TEXT("int64"))
+    {
+        int64 Value = 0;
+        return D.Kind == TEXT("string") && ParseDasInt64Literal(D.String, Value);
+    }
     if (K == TEXT("text"))
     {
         FText Value;
@@ -173,7 +178,7 @@ FDasTypeUseResult Decision(bool Good, const FString& Why)
 }
 bool ScalarDefault(EDasTypeKind K, bool Parameter)
 {
-    return K == EDasTypeKind::Int || K == EDasTypeKind::Float || K == EDasTypeKind::Double || K == EDasTypeKind::Bool ||
+    return K == EDasTypeKind::Int64 || K == EDasTypeKind::Int || K == EDasTypeKind::Float || K == EDasTypeKind::Double || K == EDasTypeKind::Bool ||
            K == EDasTypeKind::String || (Parameter && (K == EDasTypeKind::Byte || K == EDasTypeKind::Text));
 }
 }
@@ -337,11 +342,11 @@ FDasTypeUseResult QueryDasTypeUse(const FDasDeclaredType& T, EDasTypeUse Use)
                 return Decision(false, TEXT("Unsupported authored map value"));
             if (K == EDasTypeKind::Set &&
                 (!T.Element || (T.Element->Kind !=
-                                TEXT("byte") && T.Element->Kind != TEXT("int") && T.Element->Kind != TEXT("string"))))
+                                TEXT("byte") && T.Element->Kind != TEXT("int64") && T.Element->Kind != TEXT("int") && T.Element->Kind != TEXT("string"))))
                 return Decision(false, TEXT("Authored sets require int/string elements and empty defaults"));
             if (K == EDasTypeKind::Map &&
                 (!T.Key || !T.Value ||
-                 (T.Key->Kind != TEXT("byte") && T.Key->Kind != TEXT("int") && T.Key->Kind != TEXT("string"))))
+                 (T.Key->Kind != TEXT("byte") && T.Key->Kind != TEXT("int64") && T.Key->Kind != TEXT("int") && T.Key->Kind != TEXT("string"))))
                 return Decision(false, TEXT("Authored maps require int/string keys and empty defaults"));
         }
         return Decision(true, {});

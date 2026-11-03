@@ -610,7 +610,9 @@ struct FUEClassAnnotation : das::StructureAnnotation
                 if (F.init)
                 {
                     P.Default.Kind = TEXT("number");
-                    if (F.init->__rtti == das::string("ExprConstInt"))
+                    if (P.Type.GetKind() == EDasTypeKind::Int64)
+                        P.Default = DSLInt64Default(F.init);
+                    else if (F.init->__rtti == das::string("ExprConstInt"))
                         P.Default.Number = static_cast<das::ExprConstInt*>(F.init)->getValue();
                     else if (F.init->__rtti == das::string("ExprConstFloat"))
                         P.Default.Number = static_cast<das::ExprConstFloat*>(F.init)->getValue();
@@ -834,7 +836,7 @@ struct FUEClassAnnotation : das::StructureAnnotation
                     if (!DefaultAdapter ||
                         !DefaultAdapter->Script->ParseDefault(EDasScriptDefaultUse::Parameter, V->type, V->init, Group,
                                                               St->module, P.Default))
-                        P.Default = K == TEXT("byte") ? DSLByteDefault(V->init) : DSLParameterDefault(V->init);
+                        P.Default = K == TEXT("byte") ? DSLByteDefault(V->init) : K == TEXT("int64") ? DSLInt64Default(V->init) : DSLParameterDefault(V->init);
                     P.Direction = Direction;
                     Directions.Remove(DSLText(V->name));
                     P.Name = LegacySingle ? TEXT("Input"): DSLText(V->name);

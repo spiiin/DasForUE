@@ -88,4 +88,7 @@ class DiscoveryTests(unittest.TestCase):
  def test_native_reference_macro_ignores_comments_and_strings(self):
   source='// typedef Fake = UENativeObjectRef(\"/Script/Engine.Actor\")\nlet text=\"UENativeObjectRef(\\\"/Script/Engine.Actor\\\")\"'
   self.assertEqual(declarations(source)[2],[])
+ def test_builtin_math_has_no_source_file(self):
+  self.write('main','require math\n'+self.wrapper())
+  self.assertEqual(len(self.run_discovery()['classes']),1)
 if __name__=='__main__':unittest.main()

@@ -1,4 +1,5 @@
 #pragma once
+#include "StructUtils/InstancedStruct.h"
 #include "CoreMinimal.h"
 #include "UObject/Object.h"
 #include "DasProbeActor.h"
@@ -248,9 +249,12 @@ public:
     int32 PolicyInternal(int32 Value) { return Value; }
     UFUNCTION(BlueprintPure, Category = "Policy", meta = (DisplayName = "Policy default", ToolTip = "Metadata fixture"))
     int32 PolicyDefault(int32 Value = 7) const { return Value; }
-    // Keep int64 unsupported here so exporter refusal tests do not depend on engine API coverage.
+    // Historical name: int64 now has a supported reflected transport.
     UFUNCTION(BlueprintCallable, Category = "Unsupported")
     int64 UnsupportedInt64(int64 Value) { return Value; }
+    // A native snapshot owns type-erased references and remains unsupported as a generic leaf.
+    UFUNCTION(BlueprintCallable, Category = "Unsupported")
+    FInstancedStruct UnsupportedSnapshot(const FInstancedStruct& Value) { return Value; }
     UFUNCTION(BlueprintCallable, Category = "Defaults")
     FString DefaultScalars(int32 Count = 7, bool bEnabled = true, float Ratio = 1.5f, double Weight = 1.25,
                            FString Label = TEXT("Hello {world}"), FName Key = NAME_None,

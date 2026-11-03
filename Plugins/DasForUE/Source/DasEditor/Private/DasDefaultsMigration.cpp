@@ -120,6 +120,8 @@ bool DefaultFieldMatches(FProperty* P, const FDasFieldSchema& F)
         return false;
     switch (F.Kind)
     {
+    case EDasScalarKind::Int64:
+        return CastField<FInt64Property>(P) != nullptr;
     case EDasScalarKind::Int32:
         return CastField<FIntProperty>(P) != nullptr;
     case EDasScalarKind::Float32:
@@ -166,6 +168,9 @@ bool OwnValue(FProperty* P, const FDasFieldSchema& F, void* Data, FString& Error
 {
     switch (F.Kind)
     {
+    case EDasScalarKind::Int64:
+        CastFieldChecked<FInt64Property>(P)->SetPropertyValue(Data, F.Int64Default);
+        break;
     case EDasScalarKind::Int32:
         CastFieldChecked<FIntProperty>(P)->SetPropertyValue(Data, F.IntDefault);
         break;

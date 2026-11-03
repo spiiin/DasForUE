@@ -105,6 +105,11 @@ def default_expr(field, enums):
     if not isinstance(text, str): raise ValueError('default_text must be a string')
     if not field['input'] or field['output']: raise ValueError('defaults require input-only parameters')
     kind = field['kind']
+    if kind == 'int64':
+        if not re.fullmatch(r'-?[0-9]+', text): raise ValueError('expected decimal int64')
+        value = int(text)
+        if not -(2**63) <= value < 2**63: raise ValueError('int64 default out of range')
+        return str(value)+'l' if value != -(2**63) else '(-9223372036854775807l - 1l)'
     if kind == 'int':
         if not re.fullmatch(r'[+-]?[0-9]+', text): raise ValueError('expected decimal int32')
         value = int(text)
@@ -264,7 +269,7 @@ def generate(ir, module="ue_generated", source_types=None, canonical_math=False,
                 raise ValueError('Missing object class')
     aliases = set()
     enums = {}
-    kinds = {'soft_object', 'delegate', 'byte', 'text', 'int', 'float', 'double', 'bool', 'string', 'object', 'class', 'name', 'enum', 'array', 'map', 'set', 'struct'}
+    kinds = {'soft_object', 'delegate', 'byte', 'text', 'int64', 'int', 'float', 'double', 'bool', 'string', 'object', 'class', 'name', 'enum', 'array', 'map', 'set', 'struct'}
     for fn in ir['functions']:
         alias = fn['alias']
         if not re.fullmatch(r'[A-Za-z_][A-Za-z0-9_]*', alias) or alias in aliases or not alias.startswith(('actor_', 'fixture_', 'ue_')):
@@ -454,7 +459,7 @@ def generate(ir, module="ue_generated", source_types=None, canonical_math=False,
     def check_source_field(field, depth=0):
         if depth > 16: raise ValueError('Source mapping nesting limit exceeded')
         kind = field['kind']
-        if kind in ('byte', 'text', 'int', 'float', 'double', 'bool', 'string', 'name', 'object', 'class'): return
+        if kind in ('byte', 'text', 'int64', 'int', 'float', 'double', 'bool', 'string', 'name', 'object', 'class'): return
         if is_opaque_native(field) or (kind == 'struct' and field['type_path'] in math_types): return
         if kind in ('struct', 'enum'):
             mapped = source_mappings.get(field['type_path'])
@@ -464,8 +469,8 @@ def generate(ir, module="ue_generated", source_types=None, canonical_math=False,
             return
         if kind in ('map','set'):
             key=field['key'] if kind=='map' else field['element']
-            if key['kind'] not in ('byte','int','string'): raise ValueError('Source hash keys/elements require int/string')
-            if kind=='map' and field['value']['kind'] not in ('byte','text','int','float','double','bool','string','name'): raise ValueError('Unsupported source hash value')
+            if key['kind'] not in ('byte','int64','int','string'): raise ValueError('Source hash keys/elements require int/string')
+            if kind=='map' and field['value']['kind'] not in ('byte','text','int64','int','float','double','bool','string','name'): raise ValueError('Unsupported source hash value')
             return
         if kind == 'array': check_source_field(field['element'], depth + 1); return
         raise ValueError('Unsupported source mapping field kind: ' + kind)

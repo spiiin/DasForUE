@@ -52,6 +52,8 @@ public:
     UFUNCTION()
     void ReceiveDouble(double Value);
     UFUNCTION()
+    void ReceiveInt64(int64 Value);
+    UFUNCTION()
     void ReceiveObject(UObject* Value);
     UFUNCTION()
     void ReceiveVector(FVector Value);

@@ -98,6 +98,8 @@ FName FrameField(EDasMethodSignature K)
         ? TEXT("TextValue")
         : K == EDasMethodSignature::Class
         ? TEXT("ClassValue")
+        : K == EDasMethodSignature::Int64
+        ? TEXT("Int64Value")
         : K == EDasMethodSignature::Int
         ? TEXT("IntValue")
         : K == EDasMethodSignature::Float
@@ -1356,8 +1358,11 @@ bool FDasBlueprintService::Apply(UBlueprint* BP, const FDasClassSchema& Schema, 
         const auto* NameProperty = FindFProperty<FNameProperty>(BP->GeneratedClass, Old.VarName);
         const auto* ByteProperty = FindFProperty<FByteProperty>(BP->GeneratedClass, Old.VarName);
         const auto* TextProperty = FindFProperty<FTextProperty>(BP->GeneratedClass, Old.VarName);
+        const auto* Int64Property = FindFProperty<FInt64Property>(BP->GeneratedClass, Old.VarName);
         const bool bSameDefault =
-            Field->Kind == EDasScalarKind::Byte
+            Field->Kind == EDasScalarKind::Int64
+                ? Int64Property && Int64Property->GetPropertyValue_InContainer(DefaultsObject) == Field->Int64Default
+            : Field->Kind == EDasScalarKind::Byte
                 ? ByteProperty && !ByteProperty->Enum &&
                       ByteProperty->GetPropertyValue_InContainer(DefaultsObject) == Field->IntDefault
             : Field->Kind == EDasScalarKind::Text
@@ -1478,6 +1483,9 @@ bool FDasBlueprintService::Apply(UBlueprint* BP, const FDasClassSchema& Schema, 
             auto* P = BP->GeneratedClass->FindPropertyByName(F.Name);
             switch (F.Kind)
             {
+            case EDasScalarKind::Int64:
+                CastFieldChecked<FInt64Property>(P)->SetPropertyValue_InContainer(CDO, F.Int64Default);
+                break;
             case EDasScalarKind::Int32:
                 CastFieldChecked<FIntProperty>(P)->SetPropertyValue_InContainer(CDO, F.IntDefault);
                 break;

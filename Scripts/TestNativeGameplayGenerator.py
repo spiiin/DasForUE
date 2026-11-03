@@ -10,6 +10,16 @@ class NativeGameplayGeneratorTests(unittest.TestCase):
         self.assertIn('ue_character_control::CharacterRef',header)
         self.assertNotIn('[ue_native_object(path="/Script/Engine.Character")]',module)
         self.assertIn('_from(value:UObjectHandle)',module)
+    def test_int64_struct_and_hash_types(self):
+        item=copy.deepcopy(self.ir['structs'][0])
+        item['path']='/Script/DasRuntime.Int64GeneratorFixture'
+        item['fields']=[{'name':'Amount','kind':'int64','type_path':''},
+                        {'name':'Balances','kind':'map','type_path':'',
+                         'key':{'kind':'int64','type_path':''},'value':{'kind':'int64','type_path':''}}]
+        self.ir['structs'].append(item)
+        header,module=generate(self.ir)
+        self.assertIn('Amount:int64',module)
+        self.assertIn('Balances:table<int64;int64>',module)
     def test_reject_schema(self):
         self.ir['schema_version']=99
         with self.assertRaises(ValueError): generate(self.ir)

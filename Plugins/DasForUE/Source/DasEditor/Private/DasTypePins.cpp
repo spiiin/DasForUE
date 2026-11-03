@@ -50,7 +50,7 @@ bool ResolveType(const FDasDeclaredType& Input, FDasDeclaredType& Output, const 
 bool ValueCategory(FName C)
 {
     return C == UEdGraphSchema_K2::PC_SoftObject || C == UEdGraphSchema_K2::PC_SoftClass ||
-           C == UEdGraphSchema_K2::PC_Int || C == UEdGraphSchema_K2::PC_Byte || C == UEdGraphSchema_K2::PC_Text ||
+           C == UEdGraphSchema_K2::PC_Int64 || C == UEdGraphSchema_K2::PC_Int || C == UEdGraphSchema_K2::PC_Byte || C == UEdGraphSchema_K2::PC_Text ||
            C == UEdGraphSchema_K2::PC_Real || C == UEdGraphSchema_K2::PC_Boolean || C == UEdGraphSchema_K2::PC_String ||
            C == UEdGraphSchema_K2::PC_Name || C == UEdGraphSchema_K2::PC_Object ||
            C == UEdGraphSchema_K2::PC_Interface || C == UEdGraphSchema_K2::PC_Class ||

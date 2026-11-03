@@ -288,7 +288,7 @@ typedef PhysicsVolume = C_PhysicsVolume_d3600a0c
 
 typedef PlayerCameraManager = C_PlayerCameraManager_7d85a11d
 
-typedef PlayerController = C_PlayerController_fb3d8846
+// PlayerController: no short alias, the name belongs to the DSL base class ue_dsl::PlayerController; use C_PlayerController_fb3d8846
 
 typedef PlayerState = C_PlayerState_bd340396
 

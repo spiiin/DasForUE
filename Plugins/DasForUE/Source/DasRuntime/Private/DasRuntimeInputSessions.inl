@@ -858,6 +858,8 @@ void DrainEvents()
                 Args[0] = das::cast<void*>::from(&RotatorArg);
             else if (Payload.Kind == 11)
                 Args[0] = das::cast<void*>::from(&TransformArg);
+            else if (Payload.Kind == 19)
+                Args[0] = das::cast<int64>::from(Payload.Int64Value);
             else if (Payload.Kind == 0)
                 Args[0] = das::cast<int32>::from(Payload.IntValue);
             else if (Payload.Kind == 1)

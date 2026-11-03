@@ -252,6 +252,8 @@ TArray<FDSLComponentDefault> DSLCollectComponentDefaults(const das::StructurePtr
                 D.Value.Kind = TEXT("bool");
                 D.Value.Boolean = static_cast<das::ExprConstBool*>(V)->getValue();
             }
+            else if (V->__rtti == das::string("ExprConstInt64"))
+                D.Value = DSLInt64Default(V);
             else if (V->__rtti == das::string("ExprConstString"))
             {
                 D.Value.Kind = TEXT("string");

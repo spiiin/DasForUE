@@ -151,7 +151,7 @@ struct FUEStructAnnotation : das::StructureAnnotation
                 if (DSLSet(F.type))
                 {
                     const FString K = DSLTypeName(F.type->firstType);
-                    if (F.init || (K != TEXT("byte") && K != TEXT("int") && K != TEXT("string")))
+                    if (F.init || (K != TEXT("byte") && K != TEXT("int64") && K != TEXT("int") && K != TEXT("string")))
                         DSLFail(TEXT("Authored sets require int/string elements and empty defaults"));
                     P.Type.Kind = TEXT("set");
                     auto E = MakeShared<FDasDeclaredType>();
@@ -164,12 +164,12 @@ struct FUEStructAnnotation : das::StructureAnnotation
                     if (F.init ||
                         (Key !=
                          TEXT("byte") &&
-                             Key != TEXT("int") && Key != TEXT("string")) ||
+                             Key != TEXT("int64") && Key != TEXT("int") && Key != TEXT("string")) ||
                                  (Value !=
                                   TEXT("byte") &&
                                       Value !=
                                           TEXT("text") &&
-                                              Value !=
+                                              Value != TEXT("int64") && Value !=
                                                   TEXT("int") &&
                                                       Value !=
                                                           TEXT("string") &&
@@ -245,7 +245,7 @@ struct FUEStructAnnotation : das::StructureAnnotation
                          !DSLTypedReference(F.type->firstType) && DSLMathPath(F.type->firstType).IsEmpty() &&
                          K != TEXT("byte") &&
                                    K != TEXT("text") &&
-                                             K != TEXT("int") &&
+                                             K != TEXT("int64") && K != TEXT("int") &&
                                                        K != TEXT("float") &&
                                                                  K != TEXT("double") &&
                                                                            K != TEXT("bool") &&
@@ -358,7 +358,9 @@ struct FUEStructAnnotation : das::StructureAnnotation
                     P.Default = DSLByteDefault(F.init);
                 else if (F.init && P.Type.GetKind() != EDasTypeKind::Struct && P.Type.GetKind() != EDasTypeKind::Enum)
                 {
-                    if (F.init->__rtti == das::string("ExprConstInt"))
+                    if (P.Type.GetKind() == EDasTypeKind::Int64)
+                        P.Default = DSLInt64Default(F.init);
+                    else if (F.init->__rtti == das::string("ExprConstInt"))
                     {
                         P.Default.Kind = TEXT("number");
                         P.Default.Number = static_cast<das::ExprConstInt*>(F.init)->getValue();

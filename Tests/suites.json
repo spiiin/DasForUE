@@ -7,6 +7,14 @@
       "name": "build"
     },
     {
+      "name": "authored-int64",
+      "kind": "script",
+      "script": "TestInt64.ps1",
+      "requires": [
+        "build"
+      ]
+    },
+    {
       "name": "owned-objects",
       "kind": "script",
       "script": "TestOwnedObjects.ps1",
@@ -758,6 +766,27 @@
       "kind": "script",
       "script": "TestRoguePatrol.ps1",
       "comment": "Real Recast NavMesh: point graph, nonbacktracking patrol, obstacle detour, combat/stun interruptions and cleanup."
+    },
+    {
+      "name": "rogue-pickup",
+      "kind": "script",
+      "script": "TestRoguePickup.ps1",
+      "comment": "Real PIE E input, pawn overlap, clamped healing, reentrant collection guard, respawn and owner teardown."
+    },
+    {
+      "name": "coin-bindings-prepare",
+      "kind": "script",
+      "script": "PrepareCoinBindings.ps1",
+      "comment": "Publish world component and stable ISM views after building the generic bridge."
+    },
+    {
+      "name": "rogue-coins",
+      "kind": "script",
+      "script": "TestRogueCoins.ps1",
+      "requires": [
+        "coin-bindings-prepare"
+      ],
+      "comment": "Real world subsystem tick, native stable ISM batches, currency grants, GC and single AI death loot."
     },
     {
       "name": "navigation-queries",

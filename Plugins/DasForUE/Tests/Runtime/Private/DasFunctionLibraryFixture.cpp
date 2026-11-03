@@ -45,3 +45,8 @@ bool UDasFunctionLibraryFixture::ChangeInterfaceIdentityForProbe(const FString& 
     Interface->StableId += TEXT(".ChangedByProbe");
     return true;
 }
+
+FInstancedStruct UDasFunctionLibraryFixture::UnsupportedSnapshot(const FInstancedStruct& Value)
+{
+    return Value;
+}

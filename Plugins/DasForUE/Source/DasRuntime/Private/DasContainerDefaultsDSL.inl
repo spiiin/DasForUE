@@ -91,6 +91,8 @@ TSharedPtr<FJsonValue> DSLDefaultJsonValue(const das::TypeDeclPtr& T, das::Expre
         return Struct(Value.GetScriptStruct(), Value.GetMemory());
     }
     const auto K = DSLTypeName(T);
+    if (K == TEXT("int64"))
+        return MakeShared<FJsonValueString>(DSLInt64Default(E).String);
     if (K == TEXT("byte"))
     {
         const auto D = DSLByteDefault(E);

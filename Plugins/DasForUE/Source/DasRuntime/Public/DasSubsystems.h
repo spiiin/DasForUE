@@ -9,7 +9,7 @@ DASRUNTIME_API void LoadDasSubsystemClasses();
 DASRUNTIME_API void ResetDasSubsystemClasses();
 
 UCLASS(BlueprintType, Blueprintable)
-class DASRUNTIME_API UDasWorldSubsystem : public UWorldSubsystem
+class DASRUNTIME_API UDasWorldSubsystem : public UTickableWorldSubsystem
 {
     GENERATED_BODY()
 public:
@@ -29,6 +29,10 @@ public:
     virtual void Initialize(FSubsystemCollectionBase& Collection) override;
     virtual void Deinitialize() override;
     virtual void BeginDestroy() override;
+    virtual void Tick(float DeltaTime) override;
+    virtual bool IsTickable() const override;
+    virtual TStatId GetStatId() const override;
+
     bool IsDasActive() const { return bDasActive; }
 
 private:

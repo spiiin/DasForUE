@@ -145,7 +145,7 @@ struct FDasActorHostRuntime
     static FDasScalarValue ExecuteDasFrame(T& A, const FString& File, const FString& Entry,
                                            const TArray<FDasScalarValue>& Args, int32 Kind, const FString& ResultClass)
     {
-        if (Kind < 0 || (Kind > 13 && Kind != 15 && Kind != 16 && Kind != 17 && Kind != 18) || Kind == 4)
+        if (Kind < 0 || (Kind > 13 && Kind != 15 && Kind != 16 && Kind != 17 && Kind != 18 && Kind != 19) || Kind == 4)
         {
             FDasExecutionResult Error;
             Error.Error = TEXT("Invalid scalar result kind");
@@ -166,6 +166,7 @@ struct FDasActorHostRuntime
         FDasScalarValue Result;
         Result.Kind = V.bSucceeded ? Kind : -1;
         Result.IntValue = V.Value;
+    Result.Int64Value = V.Int64Value;
         Result.FloatValue = V.FloatValue;
         Result.BoolValue = V.BoolValue;
         Result.StringValue = V.StringValue;
@@ -190,7 +191,7 @@ struct FDasActorHostRuntime
                                                   const FString& ResultClass, TArray<FDasScalarValue>& Outputs)
     {
         Outputs = Args;
-        if (Kind < 0 || (Kind > 13 && Kind != 15 && Kind != 16 && Kind != 17 && Kind != 18) || Kind == 4)
+        if (Kind < 0 || (Kind > 13 && Kind != 15 && Kind != 16 && Kind != 17 && Kind != 18 && Kind != 19) || Kind == 4)
         {
             FDasScalarValue Failed;
             Failed.Kind = -1;
@@ -211,6 +212,7 @@ struct FDasActorHostRuntime
         FDasScalarValue Result;
         Result.Kind = V.bSucceeded ? Kind : -1;
         Result.IntValue = V.Value;
+    Result.Int64Value = V.Int64Value;
         Result.FloatValue = V.FloatValue;
         Result.BoolValue = V.BoolValue;
         Result.StringValue = V.StringValue;

@@ -702,6 +702,11 @@ int32 UDasMethodValuesCommandlet::Main(const FString& Params)
         return 1;
     if (!Target || !Driver)
         return 1;
+    if (!Runtime.PrepareEditorPrograms({TargetFile, DriverFile}, Error))
+    {
+        UE_LOG(LogTemp, Error, TEXT("%s"), *Error);
+        return 1;
+    }
     FString Report;
     const bool Good = RunDasMethodValuesProbe(Driver->GeneratedClass, Target->GeneratedClass, Report);
     UE_LOG(LogTemp, Display, TEXT("%s"), *Report);

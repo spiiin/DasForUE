@@ -81,6 +81,7 @@ uint64 NextObjectHandle = 1;
 
 enum class EMarshallingKind
 {
+    Int64,
     Int,
     Float,
     Double,
@@ -201,6 +202,7 @@ struct FDasPersistentGlobalValue
 {
     das::Type Kind = das::Type::tVoid;
     int32 Int = 0;
+    int64 Int64 = 0;
     double Number = 0;
     bool Bool = false;
     FString String;

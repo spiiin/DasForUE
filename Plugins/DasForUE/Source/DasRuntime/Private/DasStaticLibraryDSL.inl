@@ -155,7 +155,7 @@ struct FUELibraryAnnotation : das::StructureAnnotation
                     P.Direction = DSLParameterDirection(Arg, FString());
                     if (P.Type.GetKind() == EDasTypeKind::Void)
                         DSLFail(TEXT("Void static parameter"));
-                    P.Default = DSLParameterDefault(Arg->init);
+                    P.Default = P.Type.Kind == TEXT("int64") ? DSLInt64Default(Arg->init) : DSLParameterDefault(Arg->init);
                     if (DSLDelegate(Arg->type) && P.Direction != TEXT("in"))
                         DSLFail(TEXT("Delegate ref/out is unsupported"));
                     M.Parameters.Add(P);

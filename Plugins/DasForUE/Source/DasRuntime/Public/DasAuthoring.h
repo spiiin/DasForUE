@@ -23,7 +23,8 @@ enum class EDasTypeKind : uint8
     Set,
     Map,
     Delegate,
-    Event
+    Event,
+    Int64
 };
 enum class EDasEnumStorage : uint8
 {

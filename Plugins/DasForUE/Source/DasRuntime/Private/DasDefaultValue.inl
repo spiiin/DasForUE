@@ -4,6 +4,7 @@ namespace
 {
 enum class EDasDefaultNode : uint8
 {
+    Int64,
     Boolean,
     Number,
     String,
@@ -24,6 +25,7 @@ struct FDasDefaultValue
     FProperty* Property = nullptr;
     FString Text, Location;
     double Number = 0;
+    int64 Integer = 0;
     bool Boolean = false;
     TArray<FDasDefaultValue> Children;
 };
@@ -226,6 +228,19 @@ bool ReadDefault(FProperty* P, const TSharedPtr<FJsonValue>& Json, FDasDefaultVa
         Out.Kind = EDasDefaultNode::Boolean;
         return Json->Type == EJson::Boolean && Json->TryGetBool(Out.Boolean) ? true : Fail();
     }
+    else if (CastField<FInt64Property>(P))
+    {
+        Out.Kind = EDasDefaultNode::Int64;
+        if (Json->Type == EJson::String)
+            return Json->TryGetString(Out.Text) && ParseDasInt64Literal(Out.Text, Out.Integer) ? true : Fail();
+        // Ordinary int32 literals widen exactly; large persisted integers require decimal strings.
+        double Number = 0;
+        if (Json->Type != EJson::Number || !Json->TryGetNumber(Number) || !FMath::IsFinite(Number) ||
+            Number < MIN_int32 || Number > MAX_int32 || FMath::FloorToDouble(Number) != Number)
+            return Fail();
+        Out.Integer = int64(Number);
+        return true;
+    }
     else if (auto* Numeric = CastField<FNumericProperty>(P))
     {
         Out.Kind = EDasDefaultNode::Number;
@@ -284,6 +299,9 @@ bool WriteDefault(const FDasDefaultValue& Value, void* Data, FDasDefaultRoots& R
         SoftProperty->SetPropertyValue(Data, Ref);
         return true;
     }
+    case EDasDefaultNode::Int64:
+        CastFieldChecked<FInt64Property>(P)->SetPropertyValue(Data, Value.Integer);
+        return true;
     case EDasDefaultNode::Boolean:
         CastFieldChecked<FBoolProperty>(P)->SetPropertyValue(Data, Value.Boolean);
         return true;
@@ -573,6 +591,8 @@ TSharedPtr<FJsonValue> ExportDasPropertyDefault(FProperty* P, const void* Data)
     }
     if (auto* B = CastField<FBoolProperty>(P))
         return MakeShared<FJsonValueBoolean>(B->GetPropertyValue(Data));
+    if (auto* I = CastField<FInt64Property>(P))
+        return MakeShared<FJsonValueString>(FString::Printf(TEXT("%lld"), I->GetPropertyValue(Data)));
     if (auto* N = CastField<FNumericProperty>(P))
         return MakeShared<FJsonValueNumber>(N->IsInteger() ? double(N->GetSignedIntPropertyValue(Data))
                                                            : N->GetFloatingPointPropertyValue(Data));

@@ -138,6 +138,15 @@ FDasDeclaredLiteral DSLNativeDefault(const FString& Class, const FString& Method
                     D.String = E->GetNameStringByIndex(E->GetIndexByValue(Value));
                 }
             }
+            else if (Kind == EDasTypeKind::Int64)
+            {
+                int64 Value = 0;
+                if (ParseDasInt64Literal(Text, Value))
+                {
+                    D.Kind = TEXT("string");
+                    D.String = Text;
+                }
+            }
             else if (Kind == EDasTypeKind::Int || Kind == EDasTypeKind::Byte)
             {
                 int32 Value = 0;

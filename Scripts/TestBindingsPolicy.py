@@ -36,22 +36,24 @@ def main():
         return ir
 
     rule = dict(class_rules=[{'class': FIXTURE, 'prefix': 'fixture_', 'include': ['Policy*', 'Transform*'], 'exclude': ['Transform*']}],
-        functions=[{'class': FIXTURE, 'function': 'UnsupportedInt64', 'alias': 'fixture_Unsupported', 'required': False}])
+        functions=[{'class': FIXTURE, 'function': 'UnsupportedInt64', 'alias': 'fixture_Int64', 'required': False}, {'class': FIXTURE, 'function': 'UnsupportedSnapshot', 'alias': 'fixture_Unsupported', 'required': False}])
     ir = export('filtered', rule)
-    assert [f['function'] for f in ir['functions']] == ['PolicyDefault']
+    assert [f['function'] for f in ir['functions']] == ['PolicyDefault', 'UnsupportedInt64']
     reasons = {d['function']: d['reason'] for d in ir['diagnostics']}
     assert reasons['TransformPayload'] == 'excluded_by_rule'
     assert reasons['PolicyDeprecated'] == 'deprecated_function'
     assert reasons['PolicyInternal'] == 'internal_function'
-    assert 'unsupported UFunction or struct field type' in reasons['UnsupportedInt64']
-    fn = ir['functions'][0]
+    assert 'unsupported' in reasons['UnsupportedSnapshot'].lower()
+    wide=next(f for f in ir['functions'] if f['function']=='UnsupportedInt64')
+    assert all(p['kind']=='int64' for p in wide['parameters'])
+    fn = next(f for f in ir['functions'] if f['function']=='PolicyDefault')
     assert fn['pure'] and fn['const'] and fn['declaring_class'] == FIXTURE
     assert fn['metadata']['Category'] == 'Policy' and fn['metadata']['DisplayName'] == 'Policy default'
     assert next(p for p in fn['parameters'] if p['path'] == 'value')['default_text'] == '7'
     assert ir == export('deterministic', rule)
     rule['policy'] = dict(allow_deprecated=True, allow_internal=True)
     allowed = export('opt_in', rule)
-    assert {f['function'] for f in allowed['functions']} == {'PolicyDefault', 'PolicyDeprecated', 'PolicyInternal'}
+    assert {f['function'] for f in allowed['functions']} == {'PolicyDefault', 'PolicyDeprecated', 'PolicyInternal', 'UnsupportedInt64'}
     inherited = {'class_rules': [{'class': '/Script/DasRuntime.DasProbeActor', 'prefix': 'ue_', 'include': ['GetOwner'], 'include_inherited': True}]}
     inherited_ir = export('inherited', inherited)
     assert inherited_ir['functions'][0]['declaring_class'] == '/Script/Engine.Actor'

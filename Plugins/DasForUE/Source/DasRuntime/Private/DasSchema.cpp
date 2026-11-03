@@ -7,6 +7,28 @@
 #include "DasScriptHosts.h"
 #include "DasGenericParents.h"
 #include "DasSchema.h"
+
+bool ParseDasInt64Literal(const FString& Text, int64& Out)
+{
+    if (Text.IsEmpty() || Text.Len() > 20)
+        return false;
+    const bool Negative = Text[0] == '-';
+    const int32 Start = Negative ? 1 : 0;
+    if (Start == Text.Len())
+        return false;
+    const uint64 Limit = Negative ? uint64(MAX_int64) + 1 : uint64(MAX_int64);
+    uint64 Value = 0;
+    for (int32 I = Start; I < Text.Len(); ++I)
+    {
+        const TCHAR Digit = Text[I];
+        if (Digit < '0' || Digit > '9' || Value > (Limit - uint64(Digit - '0')) / 10)
+            return false;
+        Value = Value * 10 + uint64(Digit - '0');
+    }
+    Out = Negative ? (Value == uint64(MAX_int64) + 1 ? MIN_int64 : -int64(Value)) : int64(Value);
+    return true;
+}
+
 #include "DasAuthoring.h"
 #include "DasDelegateSignatures.h"
 #include "UObject/StrongObjectPtr.h"
@@ -285,7 +307,7 @@ bool FDasClassSchema::Validate(FString& Error) const
         if (Contract.Inputs.Num() > 16 ||
             ((static_cast<uint8>(Contract.ReturnKind) > 13 && Contract.ReturnKind != EDasMethodSignature::Class &&
               Contract.ReturnKind != EDasMethodSignature::Delegate &&
-              Contract.ReturnKind != EDasMethodSignature::Byte && Contract.ReturnKind != EDasMethodSignature::Text) ||
+              Contract.ReturnKind != EDasMethodSignature::Byte && Contract.ReturnKind != EDasMethodSignature::Text && Contract.ReturnKind != EDasMethodSignature::Int64) ||
              Contract.ReturnKind == EDasMethodSignature::Frame))
         {
             Error = TEXT("Invalid scalar frame contract");
@@ -307,7 +329,7 @@ bool FDasClassSchema::Validate(FString& Error) const
                               TEXT("ReturnValue") || ParameterNames.Contains(P.Name) ||
                                    ((static_cast<uint8>(P.Kind) > 13 && P.Kind != EDasMethodSignature::Class &&
                                      P.Kind != EDasMethodSignature::Delegate && P.Kind != EDasMethodSignature::Byte &&
-                                     P.Kind != EDasMethodSignature::Text) ||
+                                     P.Kind != EDasMethodSignature::Text && P.Kind != EDasMethodSignature::Int64) ||
                                     P.Kind == EDasMethodSignature::Void || P.Kind == EDasMethodSignature::Frame))
             {
                 Error = TEXT("Invalid scalar frame parameter");
@@ -337,7 +359,7 @@ bool FDasClassSchema::Validate(FString& Error) const
             return false;
         }
         if ((Field.Kind != EDasScalarKind::Byte && Field.Kind != EDasScalarKind::Text &&
-             Field.Kind != EDasScalarKind::Int32 && Field.Kind != EDasScalarKind::Float32 &&
+             Field.Kind != EDasScalarKind::Int64 && Field.Kind != EDasScalarKind::Int32 && Field.Kind != EDasScalarKind::Float32 &&
              Field.Kind != EDasScalarKind::Bool && Field.Kind != EDasScalarKind::String &&
              Field.Kind != EDasScalarKind::Double && Field.Kind != EDasScalarKind::Name &&
              Field.Kind != EDasScalarKind::Struct && Field.Kind != EDasScalarKind::Object &&
@@ -443,6 +465,8 @@ bool FDasClassSchema::FromDeclaration(const FDasTypeDeclaration& Declaration, co
         Field.Name = *Name;
         if (Kind == TEXT("int"))
             Field.Kind = EDasScalarKind::Int32;
+        else if (Kind == TEXT("int64"))
+            Field.Kind = EDasScalarKind::Int64;
         else if (Kind == TEXT("float"))
             Field.Kind = EDasScalarKind::Float32;
         else

@@ -8,6 +8,7 @@ require ue_gameplay_tags public
 require ue_gas_authored_types public
 require ue_gas_types public
 require ue_generated public
+require ue_instanced_mesh public
 require ue_native_self_refs public
 require ue_navigation public
 require ue_pickup_components public
@@ -16,6 +17,10 @@ require ue_soft_references public
 require ue_text public
 
 // Generated dependency views; methods/fields are synthesized from the compiled manifest.
+[ue_native_object(path="/Script/AudioExtensions.SoundModulatorBase")]
+struct Native_SoundModulatorBaseRef_f2ab0642 { handle:UObjectHandle }
+def Native_SoundModulatorBaseRef_f2ab0642_from(value:UObjectHandle):Native_SoundModulatorBaseRef_f2ab0642 { return Native_SoundModulatorBaseRef_f2ab0642(handle=ue_cast_nullable_object(value,"/Script/AudioExtensions.SoundModulatorBase")) }
+
 [ue_native_object(path="/Script/ClothingSystemRuntimeInterface.ClothingSimulationInteractor")]
 struct Native_ClothingSimulationInteractorRef_75d9e2c1 { handle:UObjectHandle }
 def Native_ClothingSimulationInteractorRef_75d9e2c1_from(value:UObjectHandle):Native_ClothingSimulationInteractorRef_75d9e2c1 { return Native_ClothingSimulationInteractorRef_75d9e2c1(handle=ue_cast_nullable_object(value,"/Script/ClothingSystemRuntimeInterface.ClothingSimulationInteractor")) }
@@ -31,6 +36,10 @@ def Native_AnimMontageRef_e25467ee_from(value:UObjectHandle):Native_AnimMontageR
 [ue_native_object(path="/Script/Engine.AnimationAsset")]
 struct Native_AnimationAssetRef_c8dec86d { handle:UObjectHandle }
 def Native_AnimationAssetRef_c8dec86d_from(value:UObjectHandle):Native_AnimationAssetRef_c8dec86d { return Native_AnimationAssetRef_c8dec86d(handle=ue_cast_nullable_object(value,"/Script/Engine.AnimationAsset")) }
+
+[ue_native_object(path="/Script/Engine.AudioBus")]
+struct Native_AudioBusRef_328a1f39 { handle:UObjectHandle }
+def Native_AudioBusRef_328a1f39_from(value:UObjectHandle):Native_AudioBusRef_328a1f39 { return Native_AudioBusRef_328a1f39(handle=ue_cast_nullable_object(value,"/Script/Engine.AudioBus")) }
 
 [ue_native_object(path="/Script/Engine.CameraShakeSourceComponent")]
 struct Native_CameraShakeSourceComponentRef_cf819c92 { handle:UObjectHandle }
@@ -140,6 +149,10 @@ def Native_SkinnedAssetRef_4bc30438_from(value:UObjectHandle):Native_SkinnedAsse
 struct Native_SkinnedMeshComponentRef_86806378 { handle:UObjectHandle }
 def Native_SkinnedMeshComponentRef_86806378_from(value:UObjectHandle):Native_SkinnedMeshComponentRef_86806378 { return Native_SkinnedMeshComponentRef_86806378(handle=ue_cast_nullable_object(value,"/Script/Engine.SkinnedMeshComponent")) }
 
+[ue_native_object(path="/Script/Engine.SoundAttenuation")]
+struct Native_SoundAttenuationRef_d1991af4 { handle:UObjectHandle }
+def Native_SoundAttenuationRef_d1991af4_from(value:UObjectHandle):Native_SoundAttenuationRef_d1991af4 { return Native_SoundAttenuationRef_d1991af4(handle=ue_cast_nullable_object(value,"/Script/Engine.SoundAttenuation")) }
+
 [ue_native_object(path="/Script/Engine.SoundClass")]
 struct Native_SoundClassRef_dbf04ee6 { handle:UObjectHandle }
 def Native_SoundClassRef_dbf04ee6_from(value:UObjectHandle):Native_SoundClassRef_dbf04ee6 { return Native_SoundClassRef_dbf04ee6(handle=ue_cast_nullable_object(value,"/Script/Engine.SoundClass")) }
@@ -152,9 +165,17 @@ def Native_SoundConcurrencyRef_36fc67f9_from(value:UObjectHandle):Native_SoundCo
 struct Native_SoundEffectSourcePresetChainRef_1f5469bc { handle:UObjectHandle }
 def Native_SoundEffectSourcePresetChainRef_1f5469bc_from(value:UObjectHandle):Native_SoundEffectSourcePresetChainRef_1f5469bc { return Native_SoundEffectSourcePresetChainRef_1f5469bc(handle=ue_cast_nullable_object(value,"/Script/Engine.SoundEffectSourcePresetChain")) }
 
+[ue_native_object(path="/Script/Engine.SoundSourceBus")]
+struct Native_SoundSourceBusRef_31427c81 { handle:UObjectHandle }
+def Native_SoundSourceBusRef_31427c81_from(value:UObjectHandle):Native_SoundSourceBusRef_31427c81 { return Native_SoundSourceBusRef_31427c81(handle=ue_cast_nullable_object(value,"/Script/Engine.SoundSourceBus")) }
+
 [ue_native_object(path="/Script/Engine.SoundSubmixBase")]
 struct Native_SoundSubmixBaseRef_9443b147 { handle:UObjectHandle }
 def Native_SoundSubmixBaseRef_9443b147_from(value:UObjectHandle):Native_SoundSubmixBaseRef_9443b147 { return Native_SoundSubmixBaseRef_9443b147(handle=ue_cast_nullable_object(value,"/Script/Engine.SoundSubmixBase")) }
+
+[ue_native_object(path="/Script/Engine.SoundWave")]
+struct Native_SoundWaveRef_c7e51b41 { handle:UObjectHandle }
+def Native_SoundWaveRef_c7e51b41_from(value:UObjectHandle):Native_SoundWaveRef_c7e51b41 { return Native_SoundWaveRef_c7e51b41(handle=ue_cast_nullable_object(value,"/Script/Engine.SoundWave")) }
 
 [ue_native_object(path="/Script/Engine.SpectatorPawn")]
 struct Native_SpectatorPawnRef_c2962b49 { handle:UObjectHandle }
@@ -230,6 +251,24 @@ def Native_WidgetNavigationRef_8de38c28_from(value:UObjectHandle):Native_WidgetN
 
 typedef NativeSoftClass_GameplayEffect_06e0d8b0 = $UESoftClass<Native_GameplayEffectRef_77c7fc7b>
 
+[ue_native_enum(path="/Script/AudioExtensions.EAudioParameterType")]
+enum EAudioParameterType {
+    None=0
+    Boolean=1
+    Integer=2
+    Float=3
+    String=4
+    Object=5
+    NoneArray=6
+    BooleanArray=7
+    IntegerArray=8
+    FloatArray=9
+    StringArray=10
+    ObjectArray=11
+    Trigger=12
+    COUNT=13
+}
+
 [ue_native_enum(path="/Script/ClothingSystemRuntimeInterface.EClothingTeleportMode")]
 enum EClothingTeleportMode {
     None=0
@@ -284,6 +323,25 @@ enum EAttachmentRule {
     KeepRelative=0
     KeepWorld=1
     SnapToTarget=2
+}
+
+[ue_native_enum(path="/Script/Engine.EAudioComponentPlayState")]
+enum EAudioComponentPlayState {
+    Playing=0
+    Stopped=1
+    Paused=2
+    FadingIn=3
+    FadingOut=4
+    Count=5
+}
+
+[ue_native_enum(path="/Script/Engine.EAudioFaderCurve")]
+enum EAudioFaderCurve {
+    Linear=0
+    Logarithmic=1
+    SCurve=2
+    Sin=3
+    Count=4
 }
 
 [ue_native_enum(path="/Script/Engine.ECameraProjectionMode")]
@@ -481,6 +539,23 @@ enum ELightmapType {
     Default=0
     ForceSurface=1
     ForceVolumetric=2
+}
+
+[ue_native_enum(path="/Script/Engine.EModulationDestination")]
+enum EModulationDestination {
+    Volume=0
+    Pitch=1
+    Lowpass=2
+    Highpass=3
+    Count=4
+}
+
+[ue_native_enum(path="/Script/Engine.EModulationRouting")]
+enum EModulationRouting {
+    Disable=0
+    Inherit=1
+    Override=2
+    Union=3
 }
 
 [ue_native_enum(path="/Script/Engine.EMovementMode")]
@@ -1024,6 +1099,23 @@ enum EWidgetTickFrequency {
     Auto=1
 }
 
+[ue_native_struct(path="/Script/AudioExtensions.AudioParameter")]
+struct AudioParameter {
+    ParamName:UENameValue
+    FloatParam:float
+    BoolParam:bool
+    IntParam:int
+    ObjectParam:C_Object_55c3753a
+    StringParam:string
+    ArrayFloatParam:array<float>
+    ArrayBoolParam:array<bool>
+    ArrayIntParam:array<int>
+    ArrayObjectParam:array<C_Object_55c3753a>
+    ArrayStringParam:array<string>
+    ParamType:EAudioParameterType
+    TypeName:UENameValue
+}
+
 [ue_native_struct(path="/Script/CoreUObject.Box")]
 struct Box {
     Min:UEVector
@@ -1358,6 +1450,27 @@ struct SingleAnimationPlayData {
     bSavedPlaying:bool
     SavedPosition:float
     SavedPlayRate:float
+}
+
+[ue_native_struct(path="/Script/Engine.SoundWaveEnvelopeDataPerSound")]
+struct SoundWaveEnvelopeDataPerSound {
+    Envelope:float
+    PlaybackTime:float
+    SoundWave:Native_SoundWaveRef_c7e51b41
+}
+
+[ue_native_struct(path="/Script/Engine.SoundWaveSpectralData")]
+struct SoundWaveSpectralData {
+    FrequencyHz:float
+    Magnitude:float
+    NormalizedMagnitude:float
+}
+
+[ue_native_struct(path="/Script/Engine.SoundWaveSpectralDataPerSound")]
+struct SoundWaveSpectralDataPerSound {
+    SpectralData:array<SoundWaveSpectralData>
+    PlaybackTime:float
+    SoundWave:Native_SoundWaveRef_c7e51b41
 }
 
 [ue_native_struct(path="/Script/Engine.StreamingSourceShape")]

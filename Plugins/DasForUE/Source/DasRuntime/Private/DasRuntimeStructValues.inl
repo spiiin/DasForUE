@@ -62,6 +62,8 @@ template <class Property> constexpr ESnapshotKind SnapshotValueKind()
 {
     if constexpr (std::is_same_v<Property, FIntProperty>)
         return ESnapshotKind::Int;
+    else if constexpr (std::is_same_v<Property, FInt64Property>)
+        return ESnapshotKind::Int64;
     else if constexpr (std::is_same_v<Property, FByteProperty>)
         return ESnapshotKind::Byte;
     else if constexpr (std::is_same_v<Property, FTextProperty>)
@@ -129,6 +131,33 @@ FDasScalarValue SnapshotObjectValue(FProperty* P, UObject* Object, das::Context*
 int32 StructSetSize(const FDasStructValue& H, const char* Path, das::Context* C)
 {
     return SnapshotSet(StructLeaf(ResolveStructValue(H, C), Path, C), ESnapshotKind::Invalid, C).Num();
+}
+// Scalar snapshot keys share the same kind traits as self/native property access.
+template <class K>
+typename K::Out StructSetElementKind(const FDasStructValue& H, const char* Path, int32 Index, das::Context* C)
+{
+    auto F = SnapshotKeyAt(H, Path, SnapshotSet(StructLeaf(ResolveStructValue(H, C), Path, C), K::SnapshotKind, C), Index, C);
+    return K::ToDas(ReadPropertyScalarValue(CastFieldChecked<typename K::Property>(F.Property), F.Memory, C), C);
+}
+template <class K>
+bool StructSetContainsKind(const FDasStructValue& H, const char* Path, typename K::In Element, das::Context* C)
+{
+    const auto Key = K::FromDas(Element, C);
+    return SnapshotSet(StructLeaf(ResolveStructValue(H, C), Path, C), K::SnapshotKind, C).Contains(&Key);
+}
+template <class K>
+FDasStructValue StructSetWithKind(const FDasStructValue& H, const char* Path, typename K::In Element, bool Present,
+                                das::Context* C, das::LineInfoArg* At)
+{
+    const auto Key = K::FromDas(Element, C);
+    return SetSnapshotValue(H, Path, &Key, K::SnapshotKind, Present, C, At);
+}
+template <class K>
+typename K::Out StructMapKeyKind(const FDasStructValue& H, const char* Path, int32 Index, das::Context* C)
+{
+    auto F = SnapshotKeyAt(H, Path,
+        SnapshotMap(StructLeaf(ResolveStructValue(H, C), Path, C), K::SnapshotKind, ESnapshotKind::Invalid, C), Index, C);
+    return K::ToDas(ReadPropertyScalarValue(CastFieldChecked<typename K::Property>(F.Property), F.Memory, C), C);
 }
 int32 StructSetElementInt(const FDasStructValue& H, const char* Path, int32 Index, das::Context* C)
 {
@@ -477,6 +506,13 @@ void PublishFrameValue(int32 Index, FDasScalarValue Value, das::Context* C)
         (Value.Kind == 6 && !FMath::IsFinite(Value.DoubleValue)))
         C->throw_error("non-finite frame output");
     ActiveOutputFrame->Values.Add(Index, MoveTemp(Value));
+}
+void PublishFrameInt64(int32 I, int64 X, das::Context* C)
+{
+    FDasScalarValue V;
+    V.Kind = int32(EDasMethodSignature::Int64);
+    V.Int64Value = X;
+    PublishFrameValue(I, MoveTemp(V), C);
 }
 void PublishFrameInt(int32 I, int32 X, das::Context* C)
 {

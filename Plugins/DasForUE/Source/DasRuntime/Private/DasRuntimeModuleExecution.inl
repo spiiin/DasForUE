@@ -398,7 +398,7 @@ FDasExecutionResult FDasRuntimeModule::RunCallback(const FString& Path, EDasCall
         Expected.Inputs.Reset();
         if (Frame->Num() > 16 || ((static_cast<uint8>(Signature) > 13 && Signature != EDasMethodSignature::Class &&
                                    Signature != EDasMethodSignature::Delegate &&
-                                   Signature != EDasMethodSignature::Byte && Signature != EDasMethodSignature::Text) ||
+                                   Signature != EDasMethodSignature::Byte && Signature != EDasMethodSignature::Text && Signature != EDasMethodSignature::Int64) ||
                                   Signature == EDasMethodSignature::Frame))
         {
             Result.Error = TEXT("Invalid scalar frame");
@@ -406,7 +406,7 @@ FDasExecutionResult FDasRuntimeModule::RunCallback(const FString& Path, EDasCall
         }
         for (const auto& V : *Frame)
         {
-            if (V.Kind < 0 || (V.Kind > 13 && V.Kind != 15 && V.Kind != 16 && V.Kind != 17 && V.Kind != 18) ||
+            if (V.Kind < 0 || (V.Kind > 13 && V.Kind != 15 && V.Kind != 16 && V.Kind != 17 && V.Kind != 18 && V.Kind != 19) ||
                 V.Kind == 3 || V.Kind == 4)
             {
                 Result.Error = TEXT("Invalid scalar argument kind");
@@ -1160,6 +1160,8 @@ FDasExecutionResult FDasRuntimeModule::RunCallback(const FString& Path, EDasCall
                         D.Single = V.DelegateValue;
                         Packed.push_back(das::cast<uint64>::from(StoreDelegateValue(MoveTemp(D), &Context)));
                     }
+                    else if (V.Kind == int32(EDasMethodSignature::Int64))
+                        Packed.push_back(das::cast<int64>::from(V.Int64Value));
                     else if (V.Kind == 0)
                         Packed.push_back(das::cast<int32>::from(V.IntValue));
                     else if (V.Kind == 1)
@@ -1338,6 +1340,8 @@ FDasExecutionResult FDasRuntimeModule::RunCallback(const FString& Path, EDasCall
                     Result.RotatorValue = ReturnedRotator;
                 else if (Signature == EDasMethodSignature::Transform)
                     Result.TransformValue = ReturnedTransform;
+                else if (Signature == EDasMethodSignature::Int64)
+                    Result.Int64Value = das::cast<int64>::to(Value);
                 else if (Signature == EDasMethodSignature::Int)
                     Result.Value = das::cast<int32>::to(Value);
                 else if (Signature == EDasMethodSignature::Float)

@@ -776,12 +776,14 @@ public:
                                                         das::SideEffects::modifyExternal, "ScriptTimerStartEnum");
         AddUEExtern<DAS_BIND_FUN(ScriptTimerNextTickEnum)>(*this, Library, "ue_timer_next_tick",
                                                            das::SideEffects::modifyExternal, "ScriptTimerNextTickEnum");
+        AddUEExtern<DAS_BIND_FUN(AudioTriggerParameter)>(*this, Library, "__ue_audio_trigger", das::SideEffects::modifyExternal, "AudioTriggerParameter");
         // Scalar timer payloads (DasScalarAccessors.inl).
 #define DAS_REGISTER_TIMER_SCALARS(Kind)                                                                               \
     AddUEExtern<DAS_BIND_FUN(ScriptTimerStartKind<Kind>)>(*this, Library, "ue_timer_start",                            \
                                                           das::SideEffects::modifyExternal, "ScriptTimerStartKind");   \
     AddUEExtern<DAS_BIND_FUN(ScriptTimerNextTickKind<Kind>)>(                                                          \
         *this, Library, "ue_timer_next_tick", das::SideEffects::modifyExternal, "ScriptTimerNextTickKind");
+        DAS_REGISTER_TIMER_SCALARS(FDasKindInt64)
         DAS_REGISTER_TIMER_SCALARS(FDasKindInt)
         DAS_REGISTER_TIMER_SCALARS(FDasKindFloat)
         DAS_REGISTER_TIMER_SCALARS(FDasKindBool)
@@ -1231,6 +1233,8 @@ public:
         AddUEExtern<DAS_BIND_FUN(SubscribeObjectArrayText)>(*this, Library, "ue_subscribe_object_array_text",
                                                             das::SideEffects::modifyExternal,
                                                             "SubscribeObjectArrayText");
+        AddUEExtern<DAS_BIND_FUN(SubscribeObjectInt64)>(*this, Library, "ue_subscribe_object_int64",
+                                                        das::SideEffects::modifyExternal, "SubscribeObjectInt64");
         AddUEExtern<DAS_BIND_FUN(SubscribeObjectInt)>(*this, Library, "ue_subscribe_object_int",
                                                       das::SideEffects::modifyExternal, "SubscribeObjectInt");
 
@@ -1244,6 +1248,7 @@ public:
             *this, Library, "__ue_subsystem", das::SideEffects::modifyExternal);
         AddUEExtern<DAS_BIND_FUN(ClassDefaultObject), das::SimNode_ExtFuncCallAndCopyOrMove>(
             *this, Library, "__ue_class_default_object", das::SideEffects::modifyExternal);
+        AddUEExtern<DAS_BIND_FUN((InitializePersistentGlobal<int64,das::Type::tInt64>))>(*this, Library, "__ue_state_init_int64", das::SideEffects::modifyExternal);
         AddUEExtern<DAS_BIND_FUN((InitializePersistentGlobal<int32,das::Type::tInt>))>(
             *this, Library, "__ue_state_init_int", das::SideEffects::modifyExternal);
         AddUEExtern<DAS_BIND_FUN((InitializePersistentGlobal<bool,das::Type::tBool>))>(
@@ -1296,6 +1301,14 @@ public:
                         ->needCallerStackFrame = true;
         AddUEExtern<DAS_BIND_FUN(StructSetSize)>(*this, Library, "ue_struct_set_size", das::SideEffects::modifyExternal,
                                                  "StructSetSize");
+        AddUEExtern<DAS_BIND_FUN(StructSetElementKind<FDasKindInt64>)>(*this, Library,
+            "ue_struct_set_element_int64", das::SideEffects::modifyExternal);
+        AddUEExtern<DAS_BIND_FUN(StructSetContainsKind<FDasKindInt64>)>(*this, Library,
+            "ue_struct_set_contains_int64", das::SideEffects::modifyExternal);
+        AddUEExtern<DAS_BIND_FUN(StructMapKeyKind<FDasKindInt64>)>(*this, Library,
+            "ue_struct_map_key_int64", das::SideEffects::modifyExternal);
+        AddUEExtern<DAS_BIND_FUN(StructSetWithKind<FDasKindInt64>), das::SimNode_ExtFuncCallAndCopyOrMove>(
+            *this, Library, "ue_struct_set_with_int64", das::SideEffects::modifyExternal)->needCallerStackFrame = true;
         AddUEExtern<DAS_BIND_FUN(StructSetElementInt)>(*this, Library, "ue_struct_set_element_int",
                                                        das::SideEffects::modifyExternal, "StructSetElementInt");
         AddUEExtern<DAS_BIND_FUN(StructSetElementString)>(*this, Library, "ue_struct_set_element_string",
@@ -1312,6 +1325,7 @@ public:
                         "StructSetWithString")
                         ->needCallerStackFrame = true;
 
+        AddUEExtern<DAS_BIND_FUN(PublishFrameInt64)>(*this, Library, "ue_frame_out_int64", das::SideEffects::modifyExternal, "PublishFrameInt64");
         AddUEExtern<DAS_BIND_FUN(PublishFrameInt)>(*this, Library, "ue_frame_out_int", das::SideEffects::modifyExternal,
                                                    "PublishFrameInt");
         AddUEExtern<DAS_BIND_FUN(PublishFrameFloat)>(*this, Library, "ue_frame_out_float",

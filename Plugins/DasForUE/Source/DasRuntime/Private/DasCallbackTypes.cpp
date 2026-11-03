@@ -216,6 +216,7 @@ TConstArrayView<FDasCallbackType> DasCallbackTypes()
            {TEXT("void"), K::Void, nullptr, true, PROXY(ReceiveVoid), NAME_None},
             {TEXT("byte"), K::Byte, nullptr, true, PROXY(ReceiveByte), NAME_None},
              {TEXT("text"), K::Text, nullptr, true, PROXY(ReceiveText), PROXY(ReceiveTextRef)},
+              {TEXT("int64"), K::Int64, nullptr, true, PROXY(ReceiveInt64), NAME_None},
               {TEXT("int"), K::Int, nullptr, true, PROXY(Receive), NAME_None},
                {TEXT("float"), K::Float, nullptr, true, PROXY(ReceiveFloat), NAME_None},
                 {TEXT("double"), K::Double, nullptr, true, PROXY(ReceiveDouble), NAME_None},

@@ -1,6 +1,7 @@
 options gen2
 module ue_navigation public
 require ue_gameplay_services public
+require math
 
 typedef NavigationPathRef = UENativeObjectRef("/Script/NavigationSystem.NavigationPath")
 
@@ -46,6 +47,28 @@ def ue_navigation_distance(start : UEVector; finish : UEVector) : NavigationDist
     if (symbol == "Success") { result.Status = NavigationQueryStatus.Success }
     elif (symbol == "Fail") { result.Status = NavigationQueryStatus.Fail }
     elif (symbol == "Error") { result.Status = NavigationQueryStatus.Error }
+    ue_release_call(call)
+    return result
+}
+
+
+struct NavigationPoint {
+    Found : bool = false
+    Location : UEVector
+}
+
+def ue_navigation_random_point(origin : UEVector; radius : float) : NavigationPoint {
+    var result = NavigationPoint(Location=origin)
+    if (!is_finite(radius) || radius < 0.0f) { return result }
+    let call = ue_begin_static_call("/Script/NavigationSystem.NavigationSystemV1",
+        "K2_GetRandomLocationInNavigableRadius", "WorldContextObject")
+    ue_arg(call, "Origin", origin)
+    ue_arg(call, "Radius", radius)
+    ue_arg(call, "NavData", default<ObjectRef>)
+    ue_arg_class(call, "FilterClass", ue_class_null())
+    ue_invoke_call(call)
+    result.Found = ue_result_bool(call, "ReturnValue")
+    if (result.Found) { result.Location = __ue_method_result_vector(call, "RandomLocation") }
     ue_release_call(call)
     return result
 }

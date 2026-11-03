@@ -6,6 +6,7 @@ template <class P> struct TPropertyScalarSlot;
         static constexpr EDasMethodSignature Kind = EDasMethodSignature::Signature;                                    \
         static constexpr auto Member = &FDasScalarValue::Field;                                                        \
     };
+DAS_PROPERTY_SCALAR_SLOT(FInt64Property, Int64, Int64Value)
 DAS_PROPERTY_SCALAR_SLOT(FIntProperty, Int, IntValue)
 DAS_PROPERTY_SCALAR_SLOT(FFloatProperty, Float, FloatValue)
 DAS_PROPERTY_SCALAR_SLOT(FDoubleProperty, Double, DoubleValue)
