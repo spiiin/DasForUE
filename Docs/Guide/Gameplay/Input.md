@@ -80,6 +80,49 @@ The handler signature selects the transport:
 
 Class handlers return `void`. Pass `self.Method` to generate a hidden entry point automatically; methods declared later in the class are resolved. String handler names require explicitly reflected methods. Add `[ue_function(BlueprintCallable)]` when a handler should also appear in the Blueprint palette. Plain `[export] def handler(value:InputActionValue):void` functions remain accepted. With a scalar/vector handler, a runtime value of the wrong kind is dropped. The native proxy checks SourceAction and finite values and delivers an owned copy; you may store it in an array.
 
+### Native input setup and possession
+
+The default `ADasPlayerController`, `ADasPawn` and `ADasCharacter` hosts forward
+the engine's native setup hooks to optional zero-argument reflected script events:
+
+```das
+// Character/Pawn; a PlayerController instead defines SetupInputComponent().
+[ue_function(BlueprintEvent)]
+def SetupPlayerInputComponent():void {
+    ue_enhanced_add_context(ue_pawn_controller(ue_character_self()), self.Controls, 0)
+    ue_bind_inputs()
+}
+
+[ue_function(BlueprintEvent)]
+def TeardownPlayerInputComponent():void {
+    ue_unbind_inputs()
+    ue_enhanced_remove_context(ue_pawn_controller(ue_character_self()), self.Controls)
+}
+```
+
+Native `Super` setup runs first. If input is prepared before the script session's
+BeginPlay, the host remembers it and delivers the event after BeginPlay. A later
+PawnClientRestart/recreated input component invokes setup again; no Tick polling,
+timer or separate retry state is required. These script events take no parameters:
+the existing input APIs resolve the host's current native input component.
+Validate configured assets in setup rather than retrying missing assets forever.
+
+Pawn/Character `UnPossessed` calls teardown while the old controller/input component
+still exist, then performs native cleanup. Remove pawn-owned mapping contexts and
+cancel held input actions there. Controller-owned mappings can remain across pawn
+changes. Session EndPlay/release retains its existing automatic cleanup.
+
+`ue_unbind_inputs()` expands the same annotations/inheritance rules as
+`ue_bind_inputs()`, calling checked `ue_enhanced_unbind` for each declared action
+and trigger. It removes only those bindings of this session; unrelated native,
+Blueprint and script bindings are preserved. Neither macro creates assets or
+acquires/releases a mapping context automatically. Rebinding replaces existing
+action/trigger entries and works with a new native input component.
+
+These hooks are implemented by the three default native hosts, not by an arbitrary
+foreign Blueprint parent that does not derive from them. Existing manually called
+binding methods and normal Unreal project/input configuration remain supported.
+
 ### InputActionValue
 
 `require ue_input_value` (re-exported by `ue_enhanced_input`). Example: `Plugins/DasForUE/Content/Das/Scripts/input_action_values.das`.

@@ -14,10 +14,17 @@ void ADasPlayerController::ApplyDasSceneRoot()
 {
     FDasActorHostRuntime::ApplyDasSceneRoot(*this);
 }
+void ADasPlayerController::SetupInputComponent()
+{
+    Super::SetupInputComponent();
+    bDasInputSetupPending = true;
+    FDasActorHostRuntime::InputSetup(*this, TEXT("SetupInputComponent"));
+}
 void ADasPlayerController::BeginPlay()
 {
     Super::BeginPlay();
     FDasActorHostRuntime::BeginPlay(*this);
+    FDasActorHostRuntime::InputSetup(*this, TEXT("SetupInputComponent"));
 }
 void ADasPlayerController::Tick(float DeltaSeconds)
 {
@@ -26,6 +33,7 @@ void ADasPlayerController::Tick(float DeltaSeconds)
 }
 void ADasPlayerController::EndPlay(const EEndPlayReason::Type Reason)
 {
+    bDasInputSetupPending = false;
     FDasActorHostRuntime::EndPlay(*this, Reason);
     Super::EndPlay(Reason);
 }

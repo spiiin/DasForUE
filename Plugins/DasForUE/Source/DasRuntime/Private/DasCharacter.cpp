@@ -14,10 +14,23 @@ void ADasCharacter::ApplyDasSceneRoot()
 {
     FDasActorHostRuntime::ApplyDasSceneRoot(*this);
 }
+void ADasCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+{
+    Super::SetupPlayerInputComponent(PlayerInputComponent);
+    bDasInputSetupPending = true;
+    FDasActorHostRuntime::InputSetup(*this, TEXT("SetupPlayerInputComponent"));
+}
+void ADasCharacter::UnPossessed()
+{
+    // The old controller/input component still exist during script cleanup.
+    FDasActorHostRuntime::InputTeardown(*this, TEXT("TeardownPlayerInputComponent"));
+    Super::UnPossessed();
+}
 void ADasCharacter::BeginPlay()
 {
     Super::BeginPlay();
     FDasActorHostRuntime::BeginPlay(*this);
+    FDasActorHostRuntime::InputSetup(*this, TEXT("SetupPlayerInputComponent"));
 }
 void ADasCharacter::Tick(float DeltaSeconds)
 {
@@ -26,6 +39,7 @@ void ADasCharacter::Tick(float DeltaSeconds)
 }
 void ADasCharacter::EndPlay(const EEndPlayReason::Type Reason)
 {
+    bDasInputSetupPending = false;
     FDasActorHostRuntime::EndPlay(*this, Reason);
     Super::EndPlay(Reason);
 }

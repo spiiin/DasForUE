@@ -1,6 +1,7 @@
 options gen2
 require ue_enhanced_input
 require ue_gameplay_services
+require ue_result
 [ue_delegate]
 struct InheritQuery {signature:function<(value:int):int>}
 [ue_delegate]
@@ -23,6 +24,8 @@ class CallbackBase {
  HitTotal:int=0
  @ue_property=(BlueprintReadWrite)
  Action:InputActionRef
+ @ue_property=(BlueprintReadWrite)
+ QueryOffsets:table<string;int>
  @ue_property=(BlueprintAssignable)
  Changed:InheritEvent
  def Pulse():void {self.Pulses+=1}
@@ -39,7 +42,13 @@ class CallbackBase {
  def PublicPulse():void {self.Bumps+=7}
  def Clicked():void {self.Bumps+=100}
  def Input(value:float):void {self.InputTotal+=int(value)}
- def Query(value:int):int {return value+10}
+ def CheckedQuery(value:int):Result<int;string> {
+  ue_require(value>=0,"negative query") |> ue_try
+  var offsets := self.QueryOffsets
+  let extra=key_exists(offsets,"extra") ? offsets["extra"] : 0
+  return ok(value+10+extra,type<string>)
+ }
+ def Query(value:int):int {return unwrap(self.CheckedQuery(value))}
  def Mutate(var value:int&;@ue_out var accepted:bool&):int {value+=3;accepted=true;return value*2}
  [ue_function(BlueprintCallable)]
  def BaseMutation():int {

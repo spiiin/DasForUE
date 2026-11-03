@@ -118,20 +118,25 @@ void DSLNormalizeInputBindings(const das::StructurePtr& St, das::ModuleGroup& Gr
         FExpand(const das::vector<FBinding>& B, das::EnumerationPtr Enum) : Bindings(B), TriggerEnum(Enum) {}
         virtual das::ExpressionPtr visit(das::ExprCall* E) override
         {
-            if (E->name != "ue_bind_inputs" && E->name != "ue_enhanced_input::ue_bind_inputs")
+            const bool Unbind = E->name == "ue_unbind_inputs" || E->name == "ue_enhanced_input::ue_unbind_inputs";
+            if (!Unbind && E->name != "ue_bind_inputs" && E->name != "ue_enhanced_input::ue_bind_inputs")
                 return E;
             if (!E->arguments.empty() || Static || Bindings.empty())
-                DSLFail(TEXT("ue_bind_inputs() requires an instance method and at least one ue_input handler"));
+                DSLFail(TEXT("ue_bind_inputs()/ue_unbind_inputs() requires an instance method and at least one ue_input handler"));
             auto* Block = new das::ExprBlock();
             Block->at = E->at;
             for (const auto& B : Bindings)
             {
                 auto* Enum = new das::TypeDecl(das::Type::tEnumeration, E->at);
                 Enum->enumType = TriggerEnum;
-                Block->list.push_back(DSLCall(E->at, "ue_enhanced_input::ue_enhanced_bind",
-                                              {new das::ExprField(E->at, new das::ExprVar(E->at, Self), B.Action),
-                                               new das::ExprConstEnumeration(E->at, B.Trigger, Enum),
-                                               new das::ExprField(E->at, new das::ExprVar(E->at, Self), B.Method)}));
+                auto* Action = new das::ExprField(E->at, new das::ExprVar(E->at, Self), B.Action);
+                auto* Trigger = new das::ExprConstEnumeration(E->at, B.Trigger, Enum);
+                if (Unbind)
+                    Block->list.push_back(DSLCall(E->at, "ue_enhanced_input::ue_enhanced_unbind", {Action, Trigger}));
+                else
+                    Block->list.push_back(DSLCall(E->at, "ue_enhanced_input::ue_enhanced_bind",
+                                                  {Action, Trigger,
+                                                   new das::ExprField(E->at, new das::ExprVar(E->at, Self), B.Method)}));
             }
             return Block;
         }

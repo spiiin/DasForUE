@@ -31,6 +31,7 @@ public:
     FName DasSceneRootProperty;
     virtual void OnConstruction(const FTransform& Transform) override;
     virtual void PostInitializeComponents() override;
+    virtual void SetupInputComponent() override;
     virtual void BeginPlay() override;
     virtual void Tick(float DeltaSeconds) override;
     virtual void EndPlay(const EEndPlayReason::Type Reason) override;
@@ -61,6 +62,7 @@ private:
     friend class FDasRuntimeModule;
     FString ActiveLifecyclePath;
     bool bLifecycleActive = false;
+    bool bDasInputSetupPending = false;
     void ApplyDasSceneRoot();
     void RecordLifecycleResult(const struct FDasExecutionResult& Result);
 };

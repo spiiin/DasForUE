@@ -1,4 +1,4 @@
-param([string]$Engine='C:\src\unreal\UnrealEngine', [string]$PortRoot='C:\src\ActionRoguelikeDas', [switch]$SkipBuild, [switch]$Attack, [switch]$Presentation, [switch]$Effects, [switch]$Overwhelm, [switch]$PointImpact, [switch]$AI, [switch]$AIPresentation)
+param([string]$Engine='C:\src\unreal\UnrealEngine', [string]$PortRoot='C:\src\ActionRoguelikeDas', [switch]$SkipBuild, [switch]$InputLifecycle, [switch]$Attack, [switch]$Presentation, [switch]$Effects, [switch]$Overwhelm, [switch]$PointImpact, [switch]$AI, [switch]$AIPresentation)
 $ErrorActionPreference='Stop'
 Import-Module (Join-Path $PSScriptRoot 'DasTest.psm1') -Force
 $Das=Get-DasContext -Engine $Engine
@@ -10,7 +10,7 @@ $EngineModules=Get-Content -LiteralPath (Join-Path $Engine 'Engine/Binaries/Win6
 if($Modules.BuildId -ne $EngineModules.BuildId) { throw 'Tested modules and actual engine have different BuildIds' }
 Copy-Item -LiteralPath (Join-Path $Source 'UnrealEditor-DasRuntime.dll'),(Join-Path $Source 'UnrealEditor-DasEditor.dll') -Destination $Target -Force
 @{BuildId=$Modules.BuildId;Modules=@{DasRuntime='UnrealEditor-DasRuntime.dll';DasEditor='UnrealEditor-DasEditor.dll'}} | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $Target 'UnrealEditor.modules') -Encoding utf8
-$Case=if($AIPresentation){'ai_presentation'}elseif($AI){'ai'}elseif($PointImpact){'point_impact'}elseif($Overwhelm){'overwhelm'}elseif($Effects){'effects'}elseif($Presentation){'presentation'}elseif($Attack){'projectile_attack'}else{'actions'}
+$Case=if($InputLifecycle){'input'}elseif($AIPresentation){'ai_presentation'}elseif($AI){'ai'}elseif($PointImpact){'point_impact'}elseif($Overwhelm){'overwhelm'}elseif($Effects){'effects'}elseif($Presentation){'presentation'}elseif($Attack){'projectile_attack'}else{'actions'}
 $Result=Join-Path $PortRoot ('Saved/Tests/rogue_'+$Case+'_pie.json')
 if(Test-Path -LiteralPath $Result) { Remove-Item -LiteralPath $Result }
 $Bootstrap=(Join-Path $PortRoot ('Scripts/run_'+$Case+'_test.py')).Replace('\','/')
@@ -18,11 +18,11 @@ if($Bootstrap.Contains("'") -or $Bootstrap.Contains('"')) { throw 'Bootstrap pat
 $Command="py __import__('runpy').run_path(r'$Bootstrap')"
 $Log=Join-Path $Das.Logs ('rogue-'+$Case+'.log')
 $Arguments=@(('"'+(Join-Path $PortRoot 'ActionRoguelikeDas.uproject')+'"'),'/Game/DasRogue/Maps/ChestTest','-Multiprocess','-NoZenAutoLaunch','-ddc=NoZenLocalFallback','-nosplash','-NoSound','-benchmark','-fps=60',('-abslog="'+$Log+'"'),('-ExecCmds="'+$Command+'"'))
-$StrictSetup=$AIPresentation -or $AI -or $Presentation -or $Effects -or $Overwhelm -or $PointImpact
+$StrictSetup=$InputLifecycle -or $AIPresentation -or $AI -or $Presentation -or $Effects -or $Overwhelm -or $PointImpact
 # Do not interpret the previous run's errors while the new editor is starting.
 if($StrictSetup -and (Test-Path -LiteralPath $Log)) { Move-Item -LiteralPath $Log -Destination ($Log+'.previous') -Force }
 $Process=Start-Process -FilePath (Join-Path $Engine 'Engine/Binaries/Win64/UnrealEditor.exe') -ArgumentList $Arguments -WindowStyle Hidden -PassThru
-$Deadline=[DateTime]::UtcNow.AddSeconds($(if($Presentation -or $AIPresentation){600}else{240}))
+$Deadline=[DateTime]::UtcNow.AddSeconds($(if($Presentation -or $AIPresentation){600}else{360}))
 while(!$Process.WaitForExit(1000)) {
     if($StrictSetup -and (Test-Path -LiteralPath $Log)) {
         $Failure=Select-String -LiteralPath $Log -Pattern 'Incompatible or missing module:|DAS_DSL_APPLY rejected:|DAS_DSL_AUTO_REIMPORT rejected|Play-In-Editor canceled by plugin:|appError called:' | Select-Object -First 1

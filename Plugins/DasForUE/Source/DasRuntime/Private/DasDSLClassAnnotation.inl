@@ -1,5 +1,67 @@
 // Part of DasDSL.inl: The [ue_class] structure annotation: validation, lowering and authoring model emission.
 // Included in place; declaration order matters.
+// Inherited script-only methods may already contain inferred private helpers
+// (container converters and concrete generic instantiations) from their module.
+// Keep that dependency closure private in the consuming module; never expose
+// implementation functions globally or re-infer a specialization without its
+// compile-time arguments, which have already been erased from the call.
+struct FDSLInheritedPrivateCalls : das::Visitor
+{
+    das::Module* SourceModule;
+    das::Module* TargetModule;
+    das::string Prefix;
+    das::vector<das::FunctionPtr>& Generated;
+    TMap<das::Function*, das::FunctionPtr>& Copies;
+    FDSLInheritedPrivateCalls(das::Module* Source, das::Module* Target, const das::string& Context,
+                              das::vector<das::FunctionPtr>& Output,
+                              TMap<das::Function*, das::FunctionPtr>& InCopies)
+        : SourceModule(Source), TargetModule(Target), Prefix(Context), Generated(Output), Copies(InCopies) {}
+    virtual das::ExpressionPtr visit(das::ExprCall* Call) override
+    {
+        if (SourceModule == TargetModule)
+            return Call;
+        auto* Function = Call->func;
+        if (!Function)
+        {
+            // Function::clone can leave a concrete name without its old binding.
+            // Only resolve an unambiguous private name in the lexical source.
+            int32 Matches = 0;
+            SourceModule->functions.foreach([&](const das::FunctionPtr& F)
+            {
+                if (F->privateFunction && F->arguments.size() == Call->arguments.size() &&
+                    (F->name == Call->name || SourceModule->name + "::" + F->name == Call->name))
+                {
+                    Function = F;
+                    ++Matches;
+                }
+            });
+            if (Matches != 1)
+                return Call;
+        }
+        if (!Function->privateFunction || Function->module != SourceModule || Function->builtIn || !Function->body)
+            return Call;
+        auto* Existing = Copies.Find(Function);
+        das::FunctionPtr Copy = Existing ? *Existing : nullptr;
+        if (!Copy)
+        {
+            Copy = Function->clone();
+            Copy->name = Prefix + "_private_" + DSLUtf8(FMD5::HashAnsiString(*DSLText(Function->getMangledName())));
+            Copy->classParent = nullptr;
+            Copy->isClassMethod = false;
+            Copy->exports = false;
+            Copy->privateFunction = true;
+            Copy->generated = true;
+            Copy->annotations.clear();
+            Copy->fromGeneric = nullptr; // this is a concrete instance, with template witnesses already erased
+            Copies.Add(Function, Copy); // before recursion, including mutually recursive helpers
+            Copy->body = Copy->body->visit(*this);
+            Generated.push_back(Copy);
+        }
+        Call->name = Copy->name;
+        Call->func = nullptr;
+        return Call;
+    }
+};
 struct FUEClassAnnotation : das::StructureAnnotation
 {
     FUEClassAnnotation() : StructureAnnotation("ue_class") {}
@@ -1002,6 +1064,7 @@ struct FUEClassAnnotation : das::StructureAnnotation
                 QualifiedLocals.Add(DSLText(V.Function->name), DynamicLocals[V.Name]);
                 QualifiedLocals.Add(DSLText(V.Owner->module->name + "::" + V.Function->name), DynamicLocals[V.Name]);
             }
+            TMap<das::Function*, das::FunctionPtr> PrivateCopies;
             for (const auto& Variant : LocalVariants)
             {
                 const auto& F = Variant.Function;
@@ -1040,6 +1103,9 @@ struct FUEClassAnnotation : das::StructureAnnotation
                 Rewrite.LocalRenames = LocalRenames;
                 Rewrite.QualifiedLocals = QualifiedLocals;
                 Clone->body = Clone->body->visit(Rewrite);
+                FDSLInheritedPrivateCalls PrivateCalls(Variant.Owner->module, St->module, Variant.Target,
+                                                       Generated, PrivateCopies);
+                Clone->body = Clone->body->visit(PrivateCalls);
                 if (Variant.Owner == St && Derived)
                 {
                     struct FHelperSuperSource : das::Visitor

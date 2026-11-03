@@ -4,6 +4,7 @@
 #include "DasScriptComponent.h"
 #include "DasCallPhases.h"
 #include "Components/SceneComponent.h"
+#include "Components/InputComponent.h"
 #include "Modules/ModuleManager.h"
 #include "Misc/Paths.h"
 #include "Blueprint/BlueprintExceptionInfo.h"
@@ -76,6 +77,36 @@ struct FDasActorHostRuntime
         A.bLifecycleActive = true;
         A.SetActorTickEnabled(true);
         A.RecordLifecycleResult(Runtime.RunLifecycle(A.ActiveLifecyclePath, EDasCallback::BeginPlay, &A));
+    }
+    // Input can be prepared before the script's BeginPlay, or recreated later
+    // by PawnClientRestart. Deliver only after the script session is initialized.
+    template <class T> static void InputSetup(T& A, FName Event)
+    {
+        if (!A.bDasInputSetupPending || !A.bLifecycleActive || !IsValid(A.InputComponent) ||
+            A.IsActorBeingDestroyed())
+            return;
+        A.bDasInputSetupPending = false;
+        InvokeInputEvent(A, Event);
+    }
+    template <class T> static void InputTeardown(T& A, FName Event)
+    {
+        A.bDasInputSetupPending = false;
+        if (A.bLifecycleActive && IsValid(A.InputComponent) && !A.IsActorBeingDestroyed())
+            InvokeInputEvent(A, Event);
+    }
+    template <class T> static void InvokeInputEvent(T& A, FName Event)
+    {
+        auto* Function = A.FindFunction(Event);
+        if (!Function)
+            return;
+        if (Function->NumParms != 0 || Function->GetReturnProperty())
+        {
+            FDasExecutionResult Error;
+            Error.Error = Event.ToString() + TEXT(" must have no parameters and return void");
+            A.RecordLifecycleResult(Error);
+            return;
+        }
+        A.ProcessEvent(Function, nullptr);
     }
     template <class T> static void Tick(T& A, float DeltaSeconds)
     {
