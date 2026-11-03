@@ -12,6 +12,13 @@ daScript 0.6.4 (pinned), Win64 Development. Start at the
 
 ### Fixed
 
+- Additive class migration accepts new callback adapters and metadata updates with
+  independent DSL consumers, while changed/removed callbacks retain strict checks.
+- Generated authored-reference field setters include their defining module in the
+  helper identity, avoiding ambiguous overloads across imported modules.
+- ScriptObject CDOs retain their own cooked class contract even when a derived
+  class declares no methods. GC/reimport no longer borrows and overwrites a parent
+  contract in that case.
 - Runtime owner validation accounts for UE's implicit InstancedReference on
   DefaultToInstanced object classes such as ActorComponent. Ordinary component
   references in ScriptObjects remain valid; explicit instancing is still checked.

@@ -568,7 +568,8 @@ bool ApplyDeclaration(const FString& Script, const FString& Package, const FStri
         TArray<TStrongObjectPtr<UObject>> Assets;
         // Adding members without changing existing declarations leaves contracts of independent
         // referencing DSL classes unchanged. Snapshot/recompile those assets too;
-        // removals, signature changes and default changes retain the stricter guard.
+        // Tooltip/category metadata does not alter consumer contracts. Removals, signature changes
+        // and default changes retain the stricter guard.
         bool AdditiveMembers = false;
         if (PriorClass)
         {
@@ -581,8 +582,16 @@ bool ApplyDeclaration(const FString& Script, const FString& Package, const FStri
             Common.Methods.RemoveAll(
                 [&](const auto& M)
                 { return !PriorClass->Methods.ContainsByPredicate([&](const auto& Old) { return Old.Id == M.Id; }); });
+            // New callback adapters do not alter existing consumers. Retain callbacks with an
+            // existing name in the comparison so removals and signature/source changes still refuse.
+            Common.Callbacks.RemoveAll(
+                [&](const auto& Callback)
+                {
+                    return !PriorClass->Callbacks.ContainsByPredicate(
+                        [&](const auto& Old) { return Old.Name == Callback.Name; });
+                });
             const auto Difference = FDasAuthoringModule::Compare(*PriorClass, Common);
-            AdditiveMembers = !Difference.bStructural && !Difference.bDefaults && !Difference.bMetadata &&
+            AdditiveMembers = !Difference.bStructural && !Difference.bDefaults &&
                               !Difference.bImplementation;
         }
         if (!FDasBlueprintRollback::GatherScope(BP, Scope, Assets, Error, false, AdditiveMembers))

@@ -57,6 +57,9 @@ bool DasPrepareGenericBlueprint(UBlueprint* BP, const FDasDeclaredClass& Class, 
     if (!DasGenericScriptParent(Class.NativeParent))
         return true;
     auto* Data = DasGenericClassData(BP);
+    if (Data && Data->OwnerClass == BP->GeneratedClass && Data->AuthoredTypeId == Class.Id)
+        if (auto* Object = Cast<UDasObject>(BP->GeneratedClass->GetDefaultObject()))
+            Object->DasClassData = Data;
     if (BodyOnly)
     {
         if (!Data)
@@ -102,6 +105,8 @@ bool DasPrepareGenericBlueprint(UBlueprint* BP, const FDasDeclaredClass& Class, 
         }
     Data = NewObject<UDasScriptClassData>(BP->GetOutermost(), TEXT("DasScriptClassData"), RF_Public | RF_Transactional);
     Data->OwnerClass = BP->GeneratedClass;
+    if (auto* Object = Cast<UDasObject>(BP->GeneratedClass->GetDefaultObject()))
+        Object->DasClassData = Data;
     Data->AuthoredTypeId = Class.Id;
     Data->LifecycleScript = Script;
     for (const auto& M : Schema.EffectiveMethods())
@@ -196,6 +201,12 @@ void DasFinishGenericBlueprint(UBlueprint* BP)
         if (Candidate != BP &&
             Candidate->GetOutermost()->GetMetaData().GetValue(Candidate, TEXT("DasDSLClassId")) != Data->AuthoredTypeId)
             continue;
+        if (auto* Object = Cast<UDasObject>(Candidate->GeneratedClass->GetDefaultObject()))
+            if (Object->DasClassData != Data)
+            {
+                Object->DasClassData = Data;
+                Object->MarkPackageDirty();
+            }
         if (Data->OwnerClass != Candidate->GeneratedClass)
         {
             Data->OwnerClass = Candidate->GeneratedClass;

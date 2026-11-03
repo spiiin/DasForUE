@@ -609,7 +609,7 @@ struct FDSLBodyVisitor : das::Visitor
                 return E;
             }
             const das::string Name = DSLUtf8(TEXT("__ue_set_authored_field_")+
-                FMD5::HashAnsiString(*(P->Type.AuthoredId + TEXT(":")+ DSLText(Field->type->structType->module->name) +
+                FMD5::HashAnsiString(*(DSLText(Source->module->name) + TEXT(":") + P->Type.AuthoredId + TEXT(":")+ DSLText(Field->type->structType->module->name) +
                                                                  TEXT("::")+ DSLText(Field->type->structType->name))));
             if (!Source->module->functionsByName.find(das::hash64z(Name.c_str())))
             {

@@ -259,6 +259,30 @@ bool FDasGenericParentsTest::RunTest(const FString&)
                   FDasDSLService::Reimport(DescriptorChild, Error, EDasDefaultMigrationPolicy::Refuse));
     TestTrue(TEXT("Child contract is canonical after reimport"),
                   ChildContract->OwnerClass == DescriptorChild->GeneratedClass);
+    // A child with no own methods has no bytecode graph to retain its contract.
+    UBlueprint* ContractOnlyChild = nullptr;
+    if (!Apply(TEXT("ContractOnlyChild"),
+            Prefix + TEXT("require ") + FPaths::GetBaseFilename(MutableScript) +
+                TEXT("\n[ue_class(module_id=\"genericparents\")]\nclass ContractOnlyChild : Mutable {}\n"),
+                    ContractOnlyChild))
+        return false;
+    TStrongObjectPtr<UBlueprint> KeepContractChild(ContractOnlyChild);
+    TWeakObjectPtr<UDasScriptClassData> EmptyContract = DasGenericClassData(ContractOnlyChild);
+    TestNotNull(TEXT("Contract-only child has its own contract"), EmptyContract.Get());
+    CollectGarbage(RF_NoFlags);
+    if (!TestTrue(TEXT("CDO retains contract without method graphs across GC"), EmptyContract.IsValid()))
+        return false;
+    TestTrue(TEXT("Contract-only child lookup uses its own contract"),
+                  UDasScriptClassData::Find(ContractOnlyChild->GeneratedClass) == EmptyContract.Get());
+    TestEqual(TEXT("Parent identity is not overwritten by empty child"),
+                   DasGenericClassData(Mutable)->AuthoredTypeId, FString(TEXT("genericparents.Mutable")));
+    Error.Reset();
+    if (!TestTrue(TEXT("Contract-only child reimports after GC"),
+                       FDasDSLService::Reimport(ContractOnlyChild, Error, EDasDefaultMigrationPolicy::Refuse)))
+    {
+        AddError(Error);
+        return false;
+    }
     // A generic-object consumer has a public cooked-contract export beside its
     // Blueprint. Adding an Actor member must preserve that referring package.
     UBlueprint *MigrationActor = nullptr, *Consumer = nullptr;
@@ -315,6 +339,34 @@ bool FDasGenericParentsTest::RunTest(const FString&)
                       MigrationActor->GeneratedClass);
     TestTrue(TEXT("Consumer cooked contract remains canonical"),
                   ConsumerContract->OwnerClass == Consumer->GeneratedClass);
+    // A new callback and comment-derived tooltips are additive even with independent consumers.
+    FString CallbackActor = ExtendedActor;
+    CallbackActor.ReplaceInline(TEXT("require ue_dsl\n"), TEXT("require ue_dsl\nrequire ue_native_gameplay\n"));
+    CallbackActor.ReplaceInline(TEXT("class MigrationActor {\n"),
+        TEXT("class MigrationActor {\n [ue_event(source=self, source_type=ActorRef, name=OnDestroyed)]\n def HandleDestroyed(actor:ActorRef):void {}\n"));
+    CallbackActor.ReplaceInline(TEXT(" Score:int=7"), TEXT(" // Updated score tooltip\n Score:int=7"));
+    FFileHelper::SaveStringToFile(CallbackActor, *Runtime.ScriptPath(ActorScript),
+                                  FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM);
+    Error.Reset();
+    if (!TestTrue(TEXT("Additive callback and tooltip migration includes independent consumer"),
+                       FDasDSLService::Reimport(MigrationActor, Error, EDasDefaultMigrationPolicy::Refuse)))
+    {
+        AddError(Error);
+        return false;
+    }
+    const FString CallbackModel = MigrationActor->GetOutermost()->GetMetaData().GetValue(MigrationActor, TEXT("DasDSLModel"));
+    UClass* CallbackClass = MigrationActor->GeneratedClass.Get();
+    FFileHelper::SaveStringToFile(ExtendedActor, *Runtime.ScriptPath(ActorScript),
+                                  FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM);
+    Error.Reset();
+    TestFalse(TEXT("Removing an existing callback still refuses independent consumers"),
+                   FDasDSLService::Reimport(MigrationActor, Error, EDasDefaultMigrationPolicy::Refuse));
+    TestTrue(TEXT("Rejected callback removal retains generated class"), MigrationActor->GeneratedClass.Get() == CallbackClass);
+    TestEqual(TEXT("Rejected callback removal retains model"),
+        FString(MigrationActor->GetOutermost()->GetMetaData().GetValue(MigrationActor, TEXT("DasDSLModel"))), CallbackModel);
+    TestTrue(TEXT("Consumer contract survives callback migration"), ConsumerContract->OwnerClass == Consumer->GeneratedClass);
+    FFileHelper::SaveStringToFile(CallbackActor, *Runtime.ScriptPath(ActorScript),
+                                  FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM);
     Runtime.ReleaseObject(LiveMutable.Get());
     Runtime.ReleaseObject(MutableObject.Get());
     Runtime.ReleaseObject(First);

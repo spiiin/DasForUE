@@ -706,6 +706,12 @@
       "comment": "Projectile ability windup, cooldown, input and cancellation in real PIE."
     },
     {
+      "name": "rogue-character-combat",
+      "kind": "script",
+      "script": "TestRogueCharacterCombat.ps1",
+      "comment": "Real PIE: camera aim, socket/fallback muzzle, near-cover collision, incoming damage and terminal death."
+    },
+    {
       "name": "class-archive",
       "kind": "script",
       "script": "TestClassArchive.ps1",
@@ -813,6 +819,12 @@
       "requires": [
         "build"
       ]
+    },
+    {
+      "name": "rogue-attributes",
+      "kind": "script",
+      "script": "TestRogueAttributes.ps1",
+      "comment": "Real PIE: Base/Modifier/OverrideBase, typed sets, HealthMax clamp, movement, damage Rage, reentry and ownership."
     }
   ],
   "presets": {

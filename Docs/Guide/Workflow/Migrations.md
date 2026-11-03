@@ -56,10 +56,14 @@ and the parent compiles before children. Supported dependents are ordinary Bluep
 (non-partitioned, non-streaming) maps with their placed actors. Package names are logged as
 `DAS_RENAME_SCOPE`.
 
+Additive reimport can include independent DSL consumers when existing declarations stay compatible:
+new properties, methods and callback adapters may accompany tooltip/category metadata updates. Existing
+callbacks are compared by name and full contract; removing one or changing its signature/source retains
+the stricter dependency guard.
+
 Refused before mutation: World Partition / external actors, streaming levels, non-`/Game` or
-unsupported asset types, dependent Blueprints with their own separate DSL import source, Blueprints
-that are not successfully compiled (compile pending edits first), and replicated/RepNotify
-properties.
+unsupported asset types, independent DSL consumers of non-additive changes, Blueprints that are not
+successfully compiled (compile pending edits first), and replicated/RepNotify properties.
 
 ## Defaults
 
