@@ -10,7 +10,8 @@ enum class EDasAISense : uint8
     Invalid,
     Sight,
     Hearing,
-    Other
+    Other,
+    Damage
 };
 // Owned, read-only projection of a native stimulus at callback delivery time.
 // FAISenseID stays native; its process-local number is never exported to DAS.

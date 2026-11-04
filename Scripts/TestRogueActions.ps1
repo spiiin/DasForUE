@@ -30,7 +30,7 @@ $Process=Start-Process -FilePath (Join-Path $Engine 'Engine/Binaries/Win64/Unrea
 $Deadline=[DateTime]::UtcNow.AddSeconds($(if($Scenario -or $Presentation -or $AIPresentation -or $Patrol -or $Pickup -or $Coins){600}else{360}))
 while(!$Process.WaitForExit(1000)) {
     if($StrictSetup -and (Test-Path -LiteralPath $Log)) {
-        $Failure=Test-DasResult -LiteralPath $Log -Pattern 'Incompatible or missing module:|DAS_DSL_APPLY rejected:|DAS_DSL_AUTO_REIMPORT rejected|Play-In-Editor canceled by plugin:|appError called:' | Select-Object -First 1
+        $Failure=Test-DasResult -LiteralPath $Log -Pattern 'Incompatible or missing module:|DAS_DSL_APPLY rejected:|DAS_DSL_REIMPORT rejected:|DAS_DSL_AUTO_REIMPORT rejected|Play-In-Editor canceled by plugin:|appError called:' | Select-Object -First 1
         if($Failure) {
             Stop-Process -Id $Process.Id -Force
             throw ('Rogue setup failed before PIE: '+$Failure.Line)
@@ -55,7 +55,7 @@ if($Scenario -or $Patrol -or $Pickup -or $Coins) {
 }
 
 if($AIPresentation) {
-    $MaterialFailure=Test-DasResult -LiteralPath $Log -Pattern 'Failed to compile Material|LoadErrors:.*(/Game/ParagonMinions/|/Game/ExampleContent/Textures/T_White)' | Select-Object -First 1
+    $MaterialFailure=Test-DasResult -LiteralPath $Log -Pattern 'Failed to compile Material|missing usage flag|LoadErrors:.*(/Game/ParagonMinions/|/Game/ExampleContent/Textures/T_White)' | Select-Object -First 1
     if($MaterialFailure) { throw ('Minion resource load/compile failed: '+$MaterialFailure.Line) }
 }
 

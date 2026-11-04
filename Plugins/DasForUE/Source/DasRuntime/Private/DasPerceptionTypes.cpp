@@ -2,6 +2,7 @@
 #include "DasRuntime.h"
 #include "Perception/AISense_Sight.h"
 #include "Perception/AISense_Hearing.h"
+#include "Perception/AISense_Damage.h"
 #include "UObject/UnrealType.h"
 bool CanProjectDasAIStimulus(const FProperty* Source, const UScriptStruct* Expected)
 {
@@ -24,6 +25,7 @@ bool ProjectDasAIStimulus(const FAIStimulus& S, FDasAIStimulus& Out, FString& Er
     {
         V.Sense = S.Type == UAISense::GetSenseID<UAISense_Sight>()     ? EDasAISense::Sight
                   : S.Type == UAISense::GetSenseID<UAISense_Hearing>() ? EDasAISense::Hearing
+                  : S.Type == UAISense::GetSenseID<UAISense_Damage>()  ? EDasAISense::Damage
                                                                        : EDasAISense::Other;
     }
     V.SuccessfullySensed = S.WasSuccessfullySensed();

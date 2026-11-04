@@ -149,3 +149,31 @@ The `AIController` marker in ue_ai can be used as a ue_class parent through the
 existing generic Blueprint-parent bridge; no dedicated native host is needed.
 These additions are implemented but await integration validation while the
 shared daScript dependency is being updated (2026-11-03).
+
+
+## Damage perception
+
+`ue_perception_configure_damage(component, maxAge)` adds a native `UAISenseConfig_Damage`
+to a live perception component. Sight/hearing configuration stays independent.
+`AIStimulus.Sense == AISense.Damage` identifies native damage notifications; the
+existing Invalid/Sight/Hearing/Other enum values remain unchanged.
+
+`ue_perception_report_damage(damaged, instigator, amount, eventLocation, hitLocation)`
+forwards to `UAISense_Damage::ReportDamageEvent`. Both actors must be live in the
+script owner's game world. Reporting requires authority, positive finite damage
+and finite locations. Team filtering and target selection belong to gameplay:
+`ue_controller_is_friendly(controller, otherActor)` queries UE's generic team attitude.
+
+```das
+ue_perception_configure_damage(self.Perception, 3.0f)
+// In an actor's native damage handler, after resolving the instigating controller/pawn:
+if (!ue_controller_is_friendly(observer, instigatingController)) {
+    ue_perception_report_damage(ue_self_actor(), attacker, amount,
+        attacker.K2_GetActorLocation(), self.K2_GetActorLocation())
+}
+```
+
+`ue_character_control` also exposes `ue_pawn_move_ignore_actor(pawn, actor, ignore=true)`.
+It calls native `APawn::MoveIgnoreActorAdd/Remove` for a live Pawn and Actor in the
+same game world. A projectile ignoring its instigator does not automatically make
+that Pawn's movement ignore the projectile; configure both sides after spawning.

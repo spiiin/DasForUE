@@ -62,3 +62,42 @@ void PerceptionConfigure(const FDasObjectHandle& Component, float SightRadius, f
     P->SetDominantSense(UAISense_Sight::StaticClass());
     P->RequestStimuliListenerUpdate();
 }
+
+void PerceptionConfigureDamage(const FDasObjectHandle& Component, float MaxAge, das::Context* C)
+{
+    auto* P = CharacterControlObject<UAIPerceptionComponent>(Component, C, true);
+    if (!P->GetOwner() || !P->GetOwner()->HasAuthority() || !FMath::IsFinite(MaxAge) || MaxAge < 0)
+        C->throw_error("damage perception config requires authority and finite nonnegative age");
+    auto* Damage = Cast<UAISenseConfig_Damage>(P->GetSenseConfig(UAISense::GetSenseID<UAISense_Damage>()));
+    if (!Damage)
+        Damage = NewObject<UAISenseConfig_Damage>(P);
+    Damage->SetMaxAge(MaxAge);
+    P->ConfigureSense(*Damage);
+    P->RequestStimuliListenerUpdate();
+}
+void PerceptionReportDamage(const FDasObjectHandle& Damaged, const FDasObjectHandle& Instigator, float Amount,
+                            const FVector& EventLocation, const FVector& HitLocation, das::Context* C)
+{
+    auto* Victim = CharacterControlObject<AActor>(Damaged, C, true);
+    auto* Source = CharacterControlObject<AActor>(Instigator, C);
+    if (!Victim->HasAuthority() || !FMath::IsFinite(Amount) || Amount <= 0 || EventLocation.ContainsNaN() ||
+        HitLocation.ContainsNaN())
+        C->throw_error("damage perception requires authority, positive finite damage and finite locations");
+    UAISense_Damage::ReportDamageEvent(Victim, Victim, Source, Amount, EventLocation, HitLocation);
+}
+bool ControllerIsFriendly(const FDasObjectHandle& Controller, const FDasObjectHandle& Other, das::Context* C)
+{
+    auto* Observer = CharacterControlObject<AController>(Controller, C);
+    auto* Target = CharacterControlObject<AActor>(Other, C);
+    auto* Agent = Cast<IGenericTeamAgentInterface>(Observer);
+    return Agent && Agent->GetTeamAttitudeTowards(*Target) == ETeamAttitude::Friendly;
+}
+void PawnMoveIgnoreActor(const FDasObjectHandle& Pawn, const FDasObjectHandle& Other, bool Ignore, das::Context* C)
+{
+    auto* P = CharacterControlObject<APawn>(Pawn, C, true);
+    auto* Actor = CharacterControlObject<AActor>(Other, C);
+    if (Ignore)
+        P->MoveIgnoreActorAdd(Actor);
+    else
+        P->MoveIgnoreActorRemove(Actor);
+}

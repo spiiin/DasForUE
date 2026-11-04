@@ -842,6 +842,15 @@
         "rogue-movement-reference"
       ],
       "comment": "Actual WASD-equivalent input at two camera yaws, facing, speed and braking versus original Blueprint defaults."
+    },
+    {
+      "name": "rogue-combat-parity",
+      "kind": "script",
+      "script": "TestRogueCombatParity.ps1",
+      "requires": [
+        "rogue-movement-reference"
+      ],
+      "comment": "Native damage sense, reciprocal movement ignore, flash timers, original spread/balance and ten-second ragdoll."
     }
   ],
   "presets": {

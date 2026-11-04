@@ -722,7 +722,17 @@ public:
             *this, Library, "__ue_ai_pawn", das::SideEffects::modifyExternal, "AIPawn");
         AddUEExtern<DAS_BIND_FUN(AIFocus)>(*this, Library, "__ue_ai_focus", das::SideEffects::modifyExternal, "AIFocus");
         AddUEExtern<DAS_BIND_FUN(AILineOfSight)>(*this, Library, "__ue_ai_line_of_sight", das::SideEffects::modifyExternal, "AILineOfSight");
-        AddUEExtern<DAS_BIND_FUN(PerceptionConfigure)>(*this, Library, "__ue_perception_configure", das::SideEffects::modifyExternal, "PerceptionConfigure");
+        AddUEExtern<DAS_BIND_FUN(PerceptionConfigure)>(*this, Library, "__ue_perception_configure",
+                                                       das::SideEffects::modifyExternal, "PerceptionConfigure");
+        AddUEExtern<DAS_BIND_FUN(PerceptionConfigureDamage)>(*this, Library, "__ue_perception_configure_damage",
+                                                             das::SideEffects::modifyExternal,
+                                                             "PerceptionConfigureDamage");
+        AddUEExtern<DAS_BIND_FUN(PerceptionReportDamage)>(*this, Library, "__ue_perception_report_damage",
+                                                          das::SideEffects::modifyExternal, "PerceptionReportDamage");
+        AddUEExtern<DAS_BIND_FUN(ControllerIsFriendly)>(*this, Library, "__ue_controller_is_friendly",
+                                                        das::SideEffects::modifyExternal, "ControllerIsFriendly");
+        AddUEExtern<DAS_BIND_FUN(PawnMoveIgnoreActor)>(*this, Library, "__ue_pawn_move_ignore_actor",
+                                                       das::SideEffects::modifyExternal, "PawnMoveIgnoreActor");
         AddUEExtern<DAS_BIND_FUN(ScriptAIMove)>(*this, Library, "__ue_ai_move", das::SideEffects::modifyExternal,
                                                 "ScriptAIMove");
         AddUEExtern<DAS_BIND_FUN(ScriptAICancel)>(*this, Library, "__ue_ai_cancel", das::SideEffects::modifyExternal,

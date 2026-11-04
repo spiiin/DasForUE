@@ -41,6 +41,8 @@
 #include "Perception/AISenseConfig_Hearing.h"
 #include "Perception/AISense_Sight.h"
 #include "Perception/AISense_Hearing.h"
+#include "Perception/AISense_Damage.h"
+#include "Perception/AISenseConfig_Damage.h"
 #include "Navigation/PathFollowingComponent.h"
 #include "AISystem.h"
 #include "GameFramework/Pawn.h"

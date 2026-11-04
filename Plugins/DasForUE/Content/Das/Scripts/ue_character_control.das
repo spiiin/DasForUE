@@ -45,3 +45,8 @@ def SpringArmComponentRef_from(value:UObjectHandle):SpringArmComponentRef { retu
 
 [ue_native_object(path="/Script/Engine.Controller")]
 struct ControllerRef { handle:UObjectHandle }
+
+// Mirrors APawn::MoveIgnoreActorAdd/Remove for reciprocal movement collision ignores.
+def ue_pawn_move_ignore_actor(pawn:NativePawnRef; actor:ActorRef; ignore:bool=true):void {
+    __ue_pawn_move_ignore_actor(pawn.handle,actor.handle,ignore)
+}
