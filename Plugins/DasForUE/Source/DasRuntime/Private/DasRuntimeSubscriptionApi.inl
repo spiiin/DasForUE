@@ -332,3 +332,4 @@ bool ScriptEffectBurst(const FDasObjectHandle&, const FDasObjectHandle&, const F
                        das::Context*);
 
 bool AIBrainPause(const FDasObjectHandle&, bool, const char*, das::Context*);
+bool EnvironmentQueryAbort(const FDasObjectHandle&, das::Context*);

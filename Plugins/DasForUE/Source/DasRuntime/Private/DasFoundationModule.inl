@@ -720,6 +720,7 @@ public:
             *this, Library, "__ue_ai_self", das::SideEffects::modifyExternal, "ScriptAISelf");
         AddUEExtern<DAS_BIND_FUN(AIPawn), das::SimNode_ExtFuncCallAndCopyOrMove>(
             *this, Library, "__ue_ai_pawn", das::SideEffects::modifyExternal, "AIPawn");
+        AddUEExtern<DAS_BIND_FUN(EnvironmentQueryAbort)>(*this, Library, "__ue_environment_query_abort", das::SideEffects::modifyExternal, "EnvironmentQueryAbort");
         AddUEExtern<DAS_BIND_FUN(AIBrainPause)>(*this, Library, "__ue_ai_brain_pause", das::SideEffects::modifyExternal, "AIBrainPause");
         AddUEExtern<DAS_BIND_FUN(AIFocus)>(*this, Library, "__ue_ai_focus", das::SideEffects::modifyExternal, "AIFocus");
         AddUEExtern<DAS_BIND_FUN(AILineOfSight)>(*this, Library, "__ue_ai_line_of_sight", das::SideEffects::modifyExternal, "AILineOfSight");

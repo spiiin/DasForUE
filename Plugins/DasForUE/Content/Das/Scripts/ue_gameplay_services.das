@@ -108,3 +108,12 @@ def ue_sphere_overlap(position:UEVector; radius:double; channel:TraceChannel=Tra
 def ue_overlap_actor(hit:UEOverlapResult):ActorRef { return ue_ref(type<ActorRef>,__ue_overlap_reference(hit,0)) }
 def ue_overlap_component(hit:UEOverlapResult):TraceComponentRef { return TraceComponentRef_from(__ue_overlap_reference(hit,1)) }
 def ue_overlap_physics_owner(hit:UEOverlapResult):Object { return ue_ref(type<Object>,__ue_overlap_reference(hit,2)) }
+
+
+def ue_actor_has_authority(actor : ActorRef) : bool {
+    let call = ue_begin_call(actor.handle, "HasAuthority")
+    ue_invoke_call(call)
+    let authority = ue_result_bool(call, "ReturnValue")
+    ue_release_call(call)
+    return authority
+}

@@ -343,13 +343,20 @@ FDasExecutionResult FDasRuntimeModule::RunCallback(const FString& Path, EDasCall
         (!SpawnController->GetPawn() || SpawnController->GetPawn() == SpawnPawn) &&
         ((Event == EDasCallback::BeginPlay && SpawnController->IsActorBeginningPlay()) ||
          (Event == EDasCallback::Construction && !SpawnController->IsActorInitialized()));
+    // APawn destruction synchronously destroys its actual non-player controller.
+    // Capture its identity before Destroy(), since UnPossess clears GetPawn().
+    const bool DestroyedControllerLifecycle =
+        DestroyedPawnControllerTarget && Event == EDasCallback::EndPlay &&
+        DestroyedPawnControllerTarget->IsActorBeingDestroyed() &&
+        (Self.Get() == DestroyedPawnControllerTarget ||
+         (LifecycleComponent && LifecycleComponent->GetOwner() == DestroyedPawnControllerTarget));
     const bool ComponentLifecycle =
         ComponentLifecycleTarget && Self.Get() == ComponentLifecycleTarget &&
         (Event == EDasCallback::BeginPlay || Event == EDasCallback::EndPlay || Event == EDasCallback::Construction);
     const bool ParentLifecycle =
         ParentLifecycleTarget && Self.Get() == ParentLifecycleTarget && Event != EDasCallback::Main;
     if (!IsInGameThread() || !bInitialized ||
-        (ActiveContext && !ActorLifecycle && !DefaultControllerLifecycle && !ComponentLifecycle && !ParentLifecycle &&
+        (ActiveContext && !ActorLifecycle && !DefaultControllerLifecycle && !DestroyedControllerLifecycle && !ComponentLifecycle && !ParentLifecycle &&
          (AuthoredDispatchDepth == 0 || Event != EDasCallback::Main)))
     {
         Result.Error =

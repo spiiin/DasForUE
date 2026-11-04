@@ -11,4 +11,7 @@ public:
     // Keep FRandomStream's engine algorithm while exposing its mutable seed by ref.
     UFUNCTION(BlueprintCallable, Category="daScript|Math")
     static int32 RandomIntegerInRange(UPARAM(ref) int32& Seed, int32 Minimum, int32 Maximum);
+
+    UFUNCTION(BlueprintCallable, Category="daScript|Math")
+    static float RandomFloatInRange(UPARAM(ref) int32& Seed, float Minimum, float Maximum);
 };

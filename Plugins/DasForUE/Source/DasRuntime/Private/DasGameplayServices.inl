@@ -232,7 +232,14 @@ bool ShowGameplayWidget(const FDasObjectHandle& H, int32 Z, das::Context* C)
 }
 void RemoveGameplayWidget(const FDasObjectHandle& H, das::Context* C)
 {
-    auto* W = OwnedWidget(H, C);
+    RequireObjectContext(C);
+    if (ConstructingObject || ActiveContext->bCollectingSubscriptions)
+        C->throw_error("widget removal is forbidden in construction/bind_events");
+    auto* W = Cast<UUserWidget>(TryObject(H, C));
+    if (!W || !ActiveContext->WidgetLifetime.Owns(W))
+        C->throw_error("widget is not owned by this script context");
+    // Removing owned UI is cleanup and remains valid during EndPlay/world teardown.
+    // Creation, showing, text updates and input continue to require GameplayWorld.
     ActiveContext->WidgetLifetime.Remove(W);
 }
 void GameplayWidgetText(const FDasObjectHandle& H, const char* Name, FDasTextValue Text, das::Context* C)

@@ -83,6 +83,8 @@ bool ActorDestroy(const FDasObjectHandle& H, das::Context* C)
     if (!Creator || Creator->Get() != Self)
         C->throw_error("only actors spawned by this script owner may be destroyed");
     TGuardValue<AActor*> LifecycleTarget(ActorLifecycleTarget, Actor);
+    TGuardValue<AController*> ControllerTarget(
+        DestroyedPawnControllerTarget, Cast<APawn>(Actor) ? Cast<APawn>(Actor)->GetController() : nullptr);
     const bool Destroyed = Actor->Destroy();
     if (Destroyed)
         CreatedScriptActors.Remove(TWeakObjectPtr<AActor>(Actor));
@@ -106,6 +108,8 @@ bool ActorDestroySelfNextTick(das::Context* C)
                                                  !Actor->GetWorld() || Actor->GetWorld()->bIsTearingDown)
                                                  return;
                                              TGuardValue<AActor*> LifecycleTarget(ActorLifecycleTarget, Actor);
+    TGuardValue<AController*> ControllerTarget(
+        DestroyedPawnControllerTarget, Cast<APawn>(Actor) ? Cast<APawn>(Actor)->GetController() : nullptr);
                                              if (Actor->Destroy())
                                                  CreatedScriptActors.Remove(TWeakObjectPtr<AActor>(Actor));
                                          }));
@@ -119,6 +123,8 @@ bool ActorDestroySelf(das::Context* C)
         ActiveContext->bCollectingSubscriptions || ActiveContext->bEnding)
         C->throw_error("self destruction requires the script owner's live Actor in an active game world");
     TGuardValue<AActor*> LifecycleTarget(ActorLifecycleTarget, Actor);
+    TGuardValue<AController*> ControllerTarget(
+        DestroyedPawnControllerTarget, Cast<APawn>(Actor) ? Cast<APawn>(Actor)->GetController() : nullptr);
     const bool Destroyed = Actor->Destroy();
     if (Destroyed)
         CreatedScriptActors.Remove(TWeakObjectPtr<AActor>(Actor));

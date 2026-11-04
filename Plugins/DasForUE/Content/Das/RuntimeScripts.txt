@@ -50,3 +50,6 @@ Scripts/ue_instanced_mesh.das
 Scripts/ue_random.das
 Scripts/ue_radial_force.das
 Scripts/ue_projectile_movement_types.das
+
+Scripts/ue_environment_queries.das
+Scripts/ue_float_curves.das

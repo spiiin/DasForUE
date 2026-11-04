@@ -399,6 +399,7 @@ thread_local FOutputFrame* ActiveOutputFrame = nullptr;
 
 
 thread_local AActor* ActorLifecycleTarget = nullptr;
+thread_local AController* DestroyedPawnControllerTarget = nullptr;
 thread_local int32 ActorSpawnDepth = 0;
 thread_local UDasScriptComponent* ComponentLifecycleTarget = nullptr;
 thread_local int32 ComponentLifecycleDepth = 0;

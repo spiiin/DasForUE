@@ -118,3 +118,12 @@ bool AIBrainPause(const FDasObjectHandle& Controller, bool Paused, const char* R
         Brain->ResumeLogic(Why);
     return Brain->IsPaused() == Paused;
 }
+
+// Blueprint wrappers expose completion and results, but not cancellation.
+bool EnvironmentQueryAbort(const FDasObjectHandle& Query, das::Context* C)
+{
+    auto* Wrapper = CharacterControlObject<UEnvQueryInstanceBlueprintWrapper>(Query, C);
+    auto* Manager = UEnvQueryManager::GetCurrent(Wrapper->GetWorld());
+    const auto* Instance = Wrapper->GetQueryInstance();
+    return Manager && Instance && Manager->AbortQuery(Instance->QueryID);
+}

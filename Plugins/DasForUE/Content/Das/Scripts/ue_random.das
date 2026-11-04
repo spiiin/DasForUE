@@ -17,3 +17,17 @@ def ue_random_int(var seed : int&; minimum : int; maximum : int) : int {
     ue_release_call(call)
     return value
 }
+
+
+def ue_random_float(var seed : int&; minimum : float; maximum : float) : float {
+    verify(minimum <= maximum, "Invalid random float range")
+    let call = ue_begin_static_call("/Script/DasRuntime.DasRandomLibrary", "RandomFloatInRange", "")
+    ue_arg_int(call, "Seed", seed)
+    ue_arg_float(call, "Minimum", minimum)
+    ue_arg_float(call, "Maximum", maximum)
+    ue_invoke_call(call)
+    let value = ue_result_float(call, "ReturnValue")
+    seed = ue_result_int(call, "Seed")
+    ue_release_call(call)
+    return value
+}

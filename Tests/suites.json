@@ -936,6 +936,12 @@
       "kind": "script",
       "script": "TestRogueHUD.ps1",
       "comment": "DAS HUD vitals, int64 coins, effect rows, MonsterData health widgets, subscriptions and teardown in real PIE."
+    },
+    {
+      "name": "rogue-director",
+      "kind": "script",
+      "script": "TestRogueDirector.ps1",
+      "comment": "DAS credit/weighted directors, native async EQS, shared capacity, failure refunds and lifetime cleanup in PIE."
     }
   ],
   "presets": {

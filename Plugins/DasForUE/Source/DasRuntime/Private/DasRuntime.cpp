@@ -26,6 +26,8 @@
 #include "DasMathAdapters.h"
 #include "DasDiagnostics.h"
 #include "Engine/CurveTable.h"
+#include "EnvironmentQuery/EnvQueryManager.h"
+#include "EnvironmentQuery/EnvQueryInstanceBlueprintWrapper.h"
 #include "Engine/DataTable.h"
 #include "DasDataAssets.h"
 #include "DasPrimaryAssets.h"

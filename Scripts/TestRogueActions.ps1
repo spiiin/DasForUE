@@ -21,7 +21,7 @@ $Bootstrap=(Join-Path $PortRoot ('Scripts/run_'+$Case+'_test.py')).Replace('\','
 if($Bootstrap.Contains("'") -or $Bootstrap.Contains('"')) { throw 'Bootstrap path contains unsupported quotes' }
 $Command="py __import__('runpy').run_path(r'$Bootstrap')"
 $Log=Join-Path $Das.Logs ('rogue-'+$Case+'.log')
-$Map=if(($Patrol -or $Coins) -and (Test-Path -LiteralPath (Join-Path $PortRoot 'Content/DasRogue/Maps/PatrolTest.umap'))){'/Game/DasRogue/Maps/PatrolTest'}else{'/Game/DasRogue/Maps/ChestTest'}
+$Map=if($Case -eq 'director'){'/Game/DasRogue/Maps/DirectorTest'}elseif(($Patrol -or $Coins) -and (Test-Path -LiteralPath (Join-Path $PortRoot 'Content/DasRogue/Maps/PatrolTest.umap'))){'/Game/DasRogue/Maps/PatrolTest'}else{'/Game/DasRogue/Maps/ChestTest'}
 $Arguments=@(('"'+(Join-Path $PortRoot 'ActionRoguelikeDas.uproject')+'"'),$Map,'-Multiprocess','-NoZenAutoLaunch','-ddc=NoZenLocalFallback','-nosplash','-NoSound','-benchmark','-fps=60',('-abslog="'+$Log+'"'),('-ExecCmds="'+$Command+'"'))
 if($Unattended){$Arguments+='-unattended'}
 $StrictSetup=$Scenario -or $Attributes -or $Attack -or $Combat -or $InputLifecycle -or $Coins -or $Pickup -or $Patrol -or $AIPresentation -or $AI -or $Presentation -or $Effects -or $Overwhelm -or $PointImpact

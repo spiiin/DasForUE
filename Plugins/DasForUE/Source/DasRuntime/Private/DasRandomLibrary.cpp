@@ -9,3 +9,13 @@ int32 UDasRandomLibrary::RandomIntegerInRange(int32& Seed, int32 Minimum, int32 
     Seed = Stream.GetCurrentSeed();
     return Value;
 }
+
+float UDasRandomLibrary::RandomFloatInRange(int32& Seed, float Minimum, float Maximum)
+{
+    if (!FMath::IsFinite(Minimum) || !FMath::IsFinite(Maximum) || Maximum < Minimum)
+        return Minimum;
+    FRandomStream Stream(Seed);
+    const float Value = Stream.FRandRange(Minimum, Maximum);
+    Seed = Stream.GetCurrentSeed();
+    return Value;
+}

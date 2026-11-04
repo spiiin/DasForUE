@@ -275,9 +275,19 @@ UClass* CheckedClass(UClass* Class, const char* Base, const char* Id, das::Conte
         C->throw_error("class reference is missing, abstract, obsolete or has incompatible base");
     if (Id && *Id)
     {
-        const auto* Defaults = Class->GetDefaultObject();
-        const FString Actual = DasHostIdentity(Defaults);
-        if (Actual != UTF8_TO_TCHAR(Id))
+        const FString Expected = UTF8_TO_TCHAR(Id);
+        bool Matches = false;
+        for (UClass* Candidate = Class; Candidate && Candidate->IsChildOf(Parent);
+             Candidate = Candidate->GetSuperClass())
+        {
+            if (!Candidate->HasAnyClassFlags(CLASS_Deprecated | CLASS_NewerVersionExists) &&
+                DasHostIdentity(Candidate->GetDefaultObject()) == Expected)
+            {
+                Matches = true;
+                break;
+            }
+        }
+        if (!Matches)
             C->throw_error("class reference authored identity mismatch");
     }
     return Class;
