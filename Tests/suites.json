@@ -826,6 +826,21 @@
       "kind": "script",
       "script": "TestRogueAttributes.ps1",
       "comment": "Real PIE: Base/Modifier/OverrideBase, typed sets, HealthMax clamp, movement, damage Rage, reentry and ownership."
+    },
+    {
+      "name": "rogue-movement-reference",
+      "kind": "script",
+      "script": "TestRogueMovementReference.ps1",
+      "comment": "Read actual movement, rotation and camera defaults from the pinned original Blueprint."
+    },
+    {
+      "name": "rogue-movement",
+      "kind": "script",
+      "script": "TestRogueMovement.ps1",
+      "requires": [
+        "rogue-movement-reference"
+      ],
+      "comment": "Actual WASD-equivalent input at two camera yaws, facing, speed and braking versus original Blueprint defaults."
     }
   ],
   "presets": {
