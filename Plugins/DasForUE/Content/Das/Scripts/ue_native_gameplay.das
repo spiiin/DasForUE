@@ -13,6 +13,8 @@ require ue_native_hash_probe public
 require ue_native_self_refs public
 require ue_navigation public
 require ue_pickup_components public
+require ue_projectile_movement_types public
+require ue_radial_force public
 require ue_scene_components public
 require ue_soft_references public
 require ue_text public
@@ -623,6 +625,74 @@ enum ENetworkSmoothingMode {
     Disabled=0
     Linear=1
     Exponential=2
+}
+
+[ue_native_enum(path="/Script/Engine.EObjectTypeQuery")]
+enum EObjectTypeQuery {
+    ObjectTypeQuery1=0
+    ObjectTypeQuery2=1
+    ObjectTypeQuery3=2
+    ObjectTypeQuery4=3
+    ObjectTypeQuery5=4
+    ObjectTypeQuery6=5
+    ObjectTypeQuery7=6
+    ObjectTypeQuery8=7
+    ObjectTypeQuery9=8
+    ObjectTypeQuery10=9
+    ObjectTypeQuery11=10
+    ObjectTypeQuery12=11
+    ObjectTypeQuery13=12
+    ObjectTypeQuery14=13
+    ObjectTypeQuery15=14
+    ObjectTypeQuery16=15
+    ObjectTypeQuery17=16
+    ObjectTypeQuery18=17
+    ObjectTypeQuery19=18
+    ObjectTypeQuery20=19
+    ObjectTypeQuery21=20
+    ObjectTypeQuery22=21
+    ObjectTypeQuery23=22
+    ObjectTypeQuery24=23
+    ObjectTypeQuery25=24
+    ObjectTypeQuery26=25
+    ObjectTypeQuery27=26
+    ObjectTypeQuery28=27
+    ObjectTypeQuery29=28
+    ObjectTypeQuery30=29
+    ObjectTypeQuery31=30
+    ObjectTypeQuery32=31
+    ObjectTypeQuery33=32
+    ObjectTypeQuery34=33
+    ObjectTypeQuery35=34
+    ObjectTypeQuery36=35
+    ObjectTypeQuery37=36
+    ObjectTypeQuery38=37
+    ObjectTypeQuery39=38
+    ObjectTypeQuery40=39
+    ObjectTypeQuery41=40
+    ObjectTypeQuery42=41
+    ObjectTypeQuery43=42
+    ObjectTypeQuery44=43
+    ObjectTypeQuery45=44
+    ObjectTypeQuery46=45
+    ObjectTypeQuery47=46
+    ObjectTypeQuery48=47
+    ObjectTypeQuery49=48
+    ObjectTypeQuery50=49
+    ObjectTypeQuery51=50
+    ObjectTypeQuery52=51
+    ObjectTypeQuery53=52
+    ObjectTypeQuery54=53
+    ObjectTypeQuery55=54
+    ObjectTypeQuery56=55
+    ObjectTypeQuery57=56
+    ObjectTypeQuery58=57
+    ObjectTypeQuery59=58
+    ObjectTypeQuery60=59
+    ObjectTypeQuery61=60
+    ObjectTypeQuery62=61
+    ObjectTypeQuery63=62
+    ObjectTypeQuery64=63
 }
 
 [ue_native_enum(path="/Script/Engine.EPerQualityLevels")]

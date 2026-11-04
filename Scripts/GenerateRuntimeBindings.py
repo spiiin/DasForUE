@@ -87,7 +87,8 @@ def main():
                 raise SystemExit('Stale runtime binding: '+str(file))
         else:
             file.parent.mkdir(parents=True, exist_ok=True)
-            file.write_text(text, encoding='utf-8', newline='\n')
+            if not file.exists() or file.read_text(encoding='utf-8') != text:
+                file.write_text(text, encoding='utf-8', newline='\n')
     print('DAS_RUNTIME_BINDINGS=PASS')
 
 if __name__ == '__main__': main()

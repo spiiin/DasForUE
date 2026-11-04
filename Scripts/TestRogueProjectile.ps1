@@ -34,7 +34,7 @@ try {
     Add-Content -LiteralPath $InputConfig -Value ("`n"+(Get-Content -LiteralPath (Join-Path $PortRoot 'Config/DefaultInput.ini') -Raw)) -Encoding utf8
     Invoke-DasAutomation $Das -Test 'DasForUE.Ports.RogueProjectilePIE' -Name 'rogue-projectile' -Rendering -Extra @('-DasRoguePort','-ddc=NoZenLocalFallback','-NoZenAutoLaunch','-ini:Engine:[ConsoleVariables]:HomeScreen.EnableHomeScreen=0')
     $RunLog=Join-Path $Das.Logs 'rogue-projectile.log'
-    if(Select-String -LiteralPath $RunLog -Pattern 'daScript lifecycle .*:|daScript did not run') { throw 'Projectile emitted a runtime lifecycle error' }
+    if(Test-DasResult -LiteralPath $RunLog -Pattern 'daScript lifecycle .*:|daScript did not run') { throw 'Projectile emitted a runtime lifecycle error' }
 } finally {
     if($null -ne $TagsBefore){[IO.File]::WriteAllBytes($TagsConfig,$TagsBefore)}else{Remove-Item -LiteralPath $TagsConfig -ErrorAction SilentlyContinue}
     [IO.File]::WriteAllBytes($Config,$Before)

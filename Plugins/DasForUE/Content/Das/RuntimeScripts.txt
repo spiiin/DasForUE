@@ -48,3 +48,5 @@ Scripts/ue_navigation.das
 Scripts/ue_result.das
 Scripts/ue_instanced_mesh.das
 Scripts/ue_random.das
+Scripts/ue_radial_force.das
+Scripts/ue_projectile_movement_types.das

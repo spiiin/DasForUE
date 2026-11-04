@@ -29,6 +29,10 @@
       "Enabled": true
     },
     {
+      "Name": "PropertyAccessNode",
+      "Enabled": true
+    },
+    {
       "Name": "ContentBrowserAssetDataSource",
       "Enabled": true
     },

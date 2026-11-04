@@ -11,7 +11,7 @@ $ReferenceProject='C:\src\ActionRoguelike\ActionRoguelikeMovementReference.uproj
 if(Test-Path -LiteralPath $ReferenceProject){throw 'Reference project file already exists'}
 $Descriptor=Get-Content -LiteralPath 'C:\src\ActionRoguelike\ActionRoguelike.uproject' -Raw|ConvertFrom-Json
 $Descriptor|Add-Member -NotePropertyName DisableEnginePluginsByDefault -NotePropertyValue $true -Force
-$Descriptor.Plugins=@('EnhancedInput','Niagara','PythonScriptPlugin','PropertyAccessEditor','AnimationData','ControlRig'|ForEach-Object {@{Name=$_;Enabled=$true}})
+$Descriptor.Plugins=@('EnhancedInput','Niagara','PythonScriptPlugin','PropertyAccessEditor','AnimationData','ControlRig','Metasound'|ForEach-Object {@{Name=$_;Enabled=$true}})
 $Descriptor|ConvertTo-Json -Depth 20|Set-Content -LiteralPath $ReferenceProject -Encoding utf8
 try {
     & (Join-Path $Engine 'Engine/Build/BatchFiles/Build.bat') ActionRoguelikeEditor Win64 Development ("-Project="+$ReferenceProject) -WaitMutex -NoXGE -MaxParallelActions=12

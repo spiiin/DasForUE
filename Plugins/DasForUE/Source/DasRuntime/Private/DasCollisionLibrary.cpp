@@ -1,4 +1,5 @@
 #include "DasCollisionLibrary.h"
+#include "PhysicsEngine/RadialForceComponent.h"
 #include "Components/PrimitiveComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "PhysicalMaterials/PhysicalMaterial.h"
@@ -31,4 +32,16 @@ float UDasCollisionLibrary::ApplyPointDamage(AActor* Target, float Damage, FVect
     Native.MyBoneName = Hit.MyBoneName;
     Native.PhysMaterial = Cast<UPhysicalMaterial>(Hit.PhysMaterial);
     return UGameplayStatics::ApplyPointDamage(Target, Damage, Direction, Native, Instigator, Source, nullptr);
+}
+
+bool UDasCollisionLibrary::RemoveRadialForceCollisionChannel(URadialForceComponent* Force,
+                                                             TEnumAsByte<ECollisionChannel> Channel)
+{
+    if (!IsInGameThread() || !IsValid(Force) || Channel >= ECC_MAX)
+        return false;
+    const auto ObjectType = UEngineTypes::ConvertToObjectType(Channel);
+    if (ObjectType == ObjectTypeQuery_MAX)
+        return false;
+    Force->RemoveObjectTypeToAffect(ObjectType);
+    return true;
 }

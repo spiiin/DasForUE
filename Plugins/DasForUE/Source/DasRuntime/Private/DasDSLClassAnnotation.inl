@@ -368,6 +368,16 @@ struct FUEClassAnnotation : das::StructureAnnotation
                     F.inherited &&
                     ComponentDefaults.ContainsByPredicate(
                         [&](const auto& D) { return D.Component.IsEmpty() && D.Property == DSLText(F.name); });
+                // Helpers are module-private. A derived class reading an inherited
+                // container/struct needs its own adapters even without a new default.
+                if (F.inherited && !F.classMethod && !F.generated && (DSLContainer(F.type) || DSLDirectStruct(F.type)))
+                    if (const auto* Property = BaseEffective.Properties.FindByPredicate(
+                            [&](const auto& P) { return P.Name == DSLText(F.name); }))
+                    {
+                        const FString Path = DSLContainer(F.type) ? DasContainerCarrier(Property->Type)->GetPathName()
+                                                                  : Property->Type.TypePath;
+                        DSLEnsureStructHelpers(F.type, Path, Group, St->module, HelpersGenerated, Helpers);
+                    }
                 if (F.classMethod || F.generated || (F.inherited && !InheritedDefault) || F.name == "__rtti")
                     continue;
                 const auto* InheritedProperty =

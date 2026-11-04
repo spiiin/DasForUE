@@ -8,3 +8,5 @@ require ue_pickup_components public
 require ue_soft_references public
 require ue_navigation public
 require ue_instanced_mesh public
+require ue_radial_force public
+require ue_projectile_movement_types public

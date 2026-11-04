@@ -6,8 +6,22 @@
       "log": "combined-editor-build",
       "name": "build"
     },
-    {"name":"editor-source-batch","kind":"script","script":"TestEditorSourceBatch.ps1","requires":["build"]},
-    {"name":"editor-module-cache","kind":"script","script":"TestEditorModuleCache.ps1","requires":["build"]},
+    {
+      "name": "editor-source-batch",
+      "kind": "script",
+      "script": "TestEditorSourceBatch.ps1",
+      "requires": [
+        "build"
+      ]
+    },
+    {
+      "name": "editor-module-cache",
+      "kind": "script",
+      "script": "TestEditorModuleCache.ps1",
+      "requires": [
+        "build"
+      ]
+    },
     {
       "name": "authored-int64",
       "kind": "script",
@@ -829,6 +843,35 @@
       "comment": "Real PIE: Base/Modifier/OverrideBase, typed sets, HealthMax clamp, movement, damage Rage, reentry and ownership."
     },
     {
+      "name": "barrel-bindings-prepare",
+      "kind": "script",
+      "script": "PrepareBarrelBindings.ps1"
+    },
+    {
+      "name": "rogue-barrels",
+      "kind": "script",
+      "script": "TestRogueBarrels.ps1",
+      "requires": [
+        "barrel-bindings-prepare"
+      ]
+    },
+    {
+      "name": "rogue-additional-attacks",
+      "kind": "script",
+      "script": "TestRogueAdditionalAttacks.ps1",
+      "requires": [
+        "barrel-bindings-prepare"
+      ]
+    },
+    {
+      "name": "rogue-blackhole",
+      "kind": "script",
+      "script": "TestRogueBlackhole.ps1",
+      "requires": [
+        "barrel-bindings-prepare"
+      ]
+    },
+    {
       "name": "rogue-movement-reference",
       "kind": "script",
       "script": "TestRogueMovementReference.ps1",
@@ -851,6 +894,18 @@
         "rogue-movement-reference"
       ],
       "comment": "Native damage sense, reciprocal movement ignore, flash timers, original spread/balance and ten-second ragdoll."
+    },
+    {
+      "name": "rogue-course-animation",
+      "kind": "script",
+      "script": "TestRogueCourseAnimation.ps1",
+      "comment": "Export a local adapted copy of the original course Anim Blueprint, then verify its DAS gameplay-state bridge in PIE."
+    },
+    {
+      "name": "rogue-course-animation-pie",
+      "kind": "script",
+      "script": "TestRogueCourseAnimationPIE.ps1",
+      "comment": "Verify an already exported local course Anim Blueprint without reopening the source project."
     }
   ],
   "presets": {
