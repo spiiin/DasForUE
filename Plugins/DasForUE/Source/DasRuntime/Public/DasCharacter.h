@@ -2,14 +2,16 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "DasCallFrame.h"
+#include "GenericTeamAgentInterface.h"
 #include "DasCharacter.generated.h"
 class UDasTypeRegistry;
 UCLASS(Blueprintable)
-class DASRUNTIME_API ADasCharacter : public ACharacter
+class DASRUNTIME_API ADasCharacter : public ACharacter, public IGenericTeamAgentInterface
 {
     GENERATED_BODY()
 public:
     ADasCharacter();
+    virtual FGenericTeamId GetGenericTeamId() const override;
     UPROPERTY()
     FString AuthoredTypeId;
     UPROPERTY()

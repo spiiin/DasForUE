@@ -1,6 +1,7 @@
 #include "DasCharacter.h"
 #include "DasTypeRegistry.h"
 #include "DasActorHostRuntime.h"
+#include "GameFramework/Controller.h"
 ADasCharacter::ADasCharacter()
 {
     PrimaryActorTick.bCanEverTick = true;
@@ -82,4 +83,11 @@ FDasScalarValue ADasCharacter::ExecuteDasConstFrameOutputs(const FString& File, 
                                                            TArray<FDasScalarValue>& Outputs) const
 {
     return const_cast<ADasCharacter*>(this)->ExecuteDasFrameOutputs(File, Entry, Args, Kind, ResultClass, Outputs);
+}
+
+// Pawns expose the team configured on their controller to native perception/EQS.
+FGenericTeamId ADasCharacter::GetGenericTeamId() const
+{
+    const auto* Team = Cast<IGenericTeamAgentInterface>(GetController());
+    return Team ? Team->GetGenericTeamId() : FGenericTeamId::NoTeam;
 }

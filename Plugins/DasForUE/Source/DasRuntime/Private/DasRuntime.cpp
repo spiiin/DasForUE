@@ -36,6 +36,7 @@
 #include "DasSaveGameProxy.h"
 #include "DasAIMoveProxy.h"
 #include "AIController.h"
+#include "BrainComponent.h"
 #include "Perception/AIPerceptionComponent.h"
 #include "Perception/AISenseConfig_Sight.h"
 #include "Perception/AISenseConfig_Hearing.h"

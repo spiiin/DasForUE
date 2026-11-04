@@ -1137,10 +1137,14 @@ bool FDasBlueprintService::Apply(UBlueprint* BP, const FDasClassSchema& Schema, 
     {
         if (auto* ParentMethod = BP->ParentClass->FindFunctionByName(M.Name))
         {
-            if (Schema.ParentStableId.IsEmpty() || !M.bBlueprintEvent ||
-                ParentMethod->HasAnyFunctionFlags(FUNC_Final) || !MethodShape(ParentMethod, M))
+            // Authored descendants and native Blueprint events share the same checked adapter.
+            // A native callable alone is not an override point (even if it is non-final).
+            const bool NativeEvent = ParentMethod->HasAllFunctionFlags(FUNC_Event | FUNC_BlueprintEvent) &&
+                                     ParentMethod->GetOuterUClass()->HasAnyClassFlags(CLASS_Native);
+            if ((Schema.ParentStableId.IsEmpty() && !NativeEvent) || !M.bBlueprintEvent ||
+                ParentMethod->HasAnyFunctionFlags(FUNC_Final | FUNC_Static) || !MethodShape(ParentMethod, M))
             {
-                Error = TEXT("Override requires a compatible non-final authored BlueprintEvent");
+                Error = TEXT("Override requires a compatible non-final authored or native BlueprintEvent");
                 return false;
             }
         }

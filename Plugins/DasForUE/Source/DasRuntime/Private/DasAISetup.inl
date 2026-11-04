@@ -30,7 +30,8 @@ bool AILineOfSight(const FDasObjectHandle& Controller, const FDasObjectHandle& T
     return AI->LineOfSightTo(Actor);
 }
 void PerceptionConfigure(const FDasObjectHandle& Component, float SightRadius, float LoseSightRadius, float SightAngle,
-                         float HearingRadius, float MaxAge, das::Context* C)
+                         float HearingRadius, float MaxAge, bool DetectEnemies, bool DetectFriendlies,
+                         bool DetectNeutrals, das::Context* C)
 {
     auto* P = CharacterControlObject<UAIPerceptionComponent>(Component, C, true);
     if (!P->GetOwner() || !P->GetOwner()->HasAuthority() || !FMath::IsFinite(SightRadius) ||
@@ -45,18 +46,18 @@ void PerceptionConfigure(const FDasObjectHandle& Component, float SightRadius, f
     Sight->SightRadius = SightRadius;
     Sight->LoseSightRadius = LoseSightRadius;
     Sight->PeripheralVisionAngleDegrees = SightAngle;
-    Sight->DetectionByAffiliation.bDetectEnemies = true;
-    Sight->DetectionByAffiliation.bDetectFriendlies = true;
-    Sight->DetectionByAffiliation.bDetectNeutrals = true;
+    Sight->DetectionByAffiliation.bDetectEnemies = DetectEnemies;
+    Sight->DetectionByAffiliation.bDetectFriendlies = DetectFriendlies;
+    Sight->DetectionByAffiliation.bDetectNeutrals = DetectNeutrals;
     Sight->SetMaxAge(MaxAge);
     P->ConfigureSense(*Sight);
     auto* Hearing = Cast<UAISenseConfig_Hearing>(P->GetSenseConfig(UAISense::GetSenseID<UAISense_Hearing>()));
     if (!Hearing)
         Hearing = NewObject<UAISenseConfig_Hearing>(P);
     Hearing->HearingRange = HearingRadius;
-    Hearing->DetectionByAffiliation.bDetectEnemies = true;
-    Hearing->DetectionByAffiliation.bDetectFriendlies = true;
-    Hearing->DetectionByAffiliation.bDetectNeutrals = true;
+    Hearing->DetectionByAffiliation.bDetectEnemies = DetectEnemies;
+    Hearing->DetectionByAffiliation.bDetectFriendlies = DetectFriendlies;
+    Hearing->DetectionByAffiliation.bDetectNeutrals = DetectNeutrals;
     Hearing->SetMaxAge(MaxAge);
     P->ConfigureSense(*Hearing);
     P->SetDominantSense(UAISense_Sight::StaticClass());
@@ -100,4 +101,20 @@ void PawnMoveIgnoreActor(const FDasObjectHandle& Pawn, const FDasObjectHandle& O
         P->MoveIgnoreActorAdd(Actor);
     else
         P->MoveIgnoreActorRemove(Actor);
+}
+
+bool AIBrainPause(const FDasObjectHandle& Controller, bool Paused, const char* Reason, das::Context* C)
+{
+    auto* AI = CharacterControlObject<AAIController>(Controller, C, true);
+    if (!AI->HasAuthority())
+        C->throw_error("AI brain pause requires authority");
+    auto* Brain = AI->GetBrainComponent();
+    if (!Brain)
+        return false;
+    const FString Why = UTF8_TO_TCHAR(Reason ? Reason : "");
+    if (Paused)
+        Brain->PauseLogic(Why);
+    else
+        Brain->ResumeLogic(Why);
+    return Brain->IsPaused() == Paused;
 }

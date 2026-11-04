@@ -7,6 +7,9 @@
 #include "UObject/Package.h"
 #include "GameFramework/Actor.h"
 #include "Components/ActorComponent.h"
+#include "EnvironmentQuery/Contexts/EnvQueryContext_BlueprintBase.h"
+#include "EnvironmentQuery/EnvQueryManager.h"
+#include "Engine/World.h"
 
 UDasScriptClassData* UDasScriptClassData::Find(const UClass* Class)
 {
@@ -45,6 +48,17 @@ FDasScalarValue Execute(UObject* Owner, UDasScriptClassData* Data, const FString
                         const TArray<FDasScalarValue>& Args, int32 Kind, const FString& ResultClass,
                         TArray<FDasScalarValue>& Outputs)
 {
+    // EQS duplicates its context CDO into the per-world manager. UE strips the
+    // CDO flag but preserves RF_ArchetypeObject; this is a live query instance,
+    // not an editable template. Normalize only that engine-owned game-world copy.
+    if (IsInGameThread() && IsValid(Owner) && Owner->HasAnyFlags(RF_ArchetypeObject) &&
+        !Owner->HasAnyFlags(RF_ClassDefaultObject) && Owner->IsA<UEnvQueryContext_BlueprintBase>())
+    {
+        auto* Manager = Cast<UEnvQueryManager>(Owner->GetOuter());
+        auto* World = Manager ? Manager->GetWorld() : nullptr;
+        if (World && World->IsGameWorld() && !World->bIsTearingDown && Owner->GetWorld() == World)
+            Owner->ClearFlags(RF_ArchetypeObject);
+    }
     Outputs = Args;
     FDasScalarValue Result;
     Result.Kind = -1;

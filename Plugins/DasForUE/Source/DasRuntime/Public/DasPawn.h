@@ -2,14 +2,16 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
 #include "DasCallFrame.h"
+#include "GenericTeamAgentInterface.h"
 #include "DasPawn.generated.h"
 class UDasTypeRegistry;
 UCLASS(Blueprintable)
-class DASRUNTIME_API ADasPawn : public APawn
+class DASRUNTIME_API ADasPawn : public APawn, public IGenericTeamAgentInterface
 {
     GENERATED_BODY()
 public:
     ADasPawn();
+    virtual FGenericTeamId GetGenericTeamId() const override;
     UPROPERTY()
     FString AuthoredTypeId;
     UPROPERTY()

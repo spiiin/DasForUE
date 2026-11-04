@@ -906,6 +906,30 @@
       "kind": "script",
       "script": "TestRogueCourseAnimationPIE.ps1",
       "comment": "Verify an already exported local course Anim Blueprint without reopening the source project."
+    },
+    {
+      "name": "rogue-burning",
+      "kind": "script",
+      "script": "TestRogueBurning.ps1",
+      "comment": "Original Burning defaults, native damage/Rage, stacking cadence, expiry, native damage semantics, hit application and lifecycle in real PIE."
+    },
+    {
+      "name": "rogue-ai-reference",
+      "kind": "script",
+      "script": "TestRogueAIReference.ps1",
+      "comment": "Read the pinned Behavior Tree and EQS settings without saving original assets."
+    },
+    {
+      "name": "rogue-behavior-tree",
+      "kind": "script",
+      "script": "TestRogueBehaviorTree.ps1",
+      "comment": "Native BT/EQS with DAS tasks/decorators/context and real NavMesh, healing and interruption in PIE."
+    },
+    {
+      "name": "rogue-monster-data",
+      "kind": "script",
+      "script": "TestRogueMonsterData.ps1",
+      "comment": "MonsterData class/actions/DropLoot spawning, idempotency and owned actor cleanup in PIE."
     }
   ],
   "presets": {

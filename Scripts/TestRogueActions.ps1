@@ -1,4 +1,4 @@
-param([string]$Engine='C:\src\unreal\UnrealEngine', [string]$PortRoot='C:\src\ActionRoguelikeDas', [switch]$SkipBuild, [switch]$InputLifecycle, [switch]$Attack, [switch]$Attributes, [switch]$Combat, [switch]$Presentation, [switch]$Effects, [switch]$Overwhelm, [switch]$PointImpact, [switch]$AI, [switch]$AIPresentation, [switch]$Patrol, [switch]$Pickup, [switch]$Coins, [string]$Scenario)
+param([string]$Engine='C:\src\unreal\UnrealEngine', [string]$PortRoot='C:\src\ActionRoguelikeDas', [switch]$SkipBuild, [switch]$InputLifecycle, [switch]$Attack, [switch]$Attributes, [switch]$Combat, [switch]$Presentation, [switch]$Effects, [switch]$Overwhelm, [switch]$PointImpact, [switch]$AI, [switch]$AIPresentation, [switch]$Patrol, [switch]$Pickup, [switch]$Coins, [string]$Scenario, [switch]$Unattended)
 $ErrorActionPreference='Stop'
 Import-Module (Join-Path $PSScriptRoot 'DasTest.psm1') -Force
 $Das=Get-DasContext -Engine $Engine
@@ -23,6 +23,7 @@ $Command="py __import__('runpy').run_path(r'$Bootstrap')"
 $Log=Join-Path $Das.Logs ('rogue-'+$Case+'.log')
 $Map=if(($Patrol -or $Coins) -and (Test-Path -LiteralPath (Join-Path $PortRoot 'Content/DasRogue/Maps/PatrolTest.umap'))){'/Game/DasRogue/Maps/PatrolTest'}else{'/Game/DasRogue/Maps/ChestTest'}
 $Arguments=@(('"'+(Join-Path $PortRoot 'ActionRoguelikeDas.uproject')+'"'),$Map,'-Multiprocess','-NoZenAutoLaunch','-ddc=NoZenLocalFallback','-nosplash','-NoSound','-benchmark','-fps=60',('-abslog="'+$Log+'"'),('-ExecCmds="'+$Command+'"'))
+if($Unattended){$Arguments+='-unattended'}
 $StrictSetup=$Scenario -or $Attributes -or $Attack -or $Combat -or $InputLifecycle -or $Coins -or $Pickup -or $Patrol -or $AIPresentation -or $AI -or $Presentation -or $Effects -or $Overwhelm -or $PointImpact
 # Do not interpret the previous run's errors while the new editor is starting.
 if($StrictSetup -and (Test-Path -LiteralPath $Log)) { Move-Item -LiteralPath $Log -Destination ($Log+'.previous') -Force }
@@ -46,7 +47,7 @@ if($Process.ExitCode) { throw "Rogue actions editor failed (exit $($Process.Exit
 if(!(Test-Path -LiteralPath $Result)) { throw "Rogue actions produced no result; see $Log" }
 $Receipt=Get-Content -LiteralPath $Result -Raw | ConvertFrom-Json
 if(!$Receipt.passed) { throw "Rogue actions failed: $($Receipt.error)" }
-$RuntimePattern=if($Scenario -or $AI -or $AIPresentation -or $Patrol -or $Pickup -or $Coins){'daScript runtime:|Script timer .* failed:|DAS object call rejected:|Blueprint Runtime Error:'}else{'PIE: Error: daScript runtime:|Script timer .* failed:|DAS object call rejected:'}
+$RuntimePattern=if($Scenario -or $AI -or $AIPresentation -or $Patrol -or $Pickup -or $Coins){'daScript runtime:|Script timer .* failed:|DAS object call rejected:|Blueprint Runtime Error:|Invalid authored object owner|Invalid authored lifecycle owner'}else{'PIE: Error: daScript runtime:|Script timer .* failed:|DAS object call rejected:'}
 $RuntimeFailure=Test-DasResult -LiteralPath $Log -Pattern $RuntimePattern | Select-Object -First 1
 if($RuntimeFailure) { throw ('Rogue runtime/teardown failed: '+$RuntimeFailure.Line) }
 if($Scenario -or $Patrol -or $Pickup -or $Coins) {

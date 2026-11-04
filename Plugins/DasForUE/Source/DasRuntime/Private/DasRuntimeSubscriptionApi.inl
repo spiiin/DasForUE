@@ -330,3 +330,5 @@ uint64 DelegateBindScript(uint64, const char*, bool, const FDasObjectHandle&, co
 
 bool ScriptEffectBurst(const FDasObjectHandle&, const FDasObjectHandle&, const FTransform&, float, float,
                        das::Context*);
+
+bool AIBrainPause(const FDasObjectHandle&, bool, const char*, das::Context*);
