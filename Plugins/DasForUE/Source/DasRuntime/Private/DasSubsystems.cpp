@@ -52,8 +52,22 @@ void UDasWorldSubsystem::Initialize(FSubsystemCollectionBase& Collection)
         InitializeConfiguredSubsystems(Collection, StaticClass());
     if (bDasActive || IsTemplate() || LifecycleScript.IsEmpty())
         return;
-    bDasActive = true;
     auto& Runtime = FModuleManager::LoadModuleChecked<FDasRuntimeModule>(TEXT("DasRuntime"));
+    // Native world subsystems initialize before OnPostWorldInitialization prepares
+    // the other world programs. Pin this root before its Initialize callback.
+    // A late-created subsystem still cannot compile source after BeginPlay.
+    if (auto* World = GetWorld(); World && !World->HasBegunPlay())
+    {
+        FString Error;
+        if (!Runtime.PreparePrograms(World, {LifecycleScript}, Error))
+        {
+            FDasExecutionResult Failure;
+            Failure.Error = Error;
+            RecordLifecycleResult(Failure);
+            return;
+        }
+    }
+    bDasActive = true;
     // Reuse the owned-session ABI: Initialize is once per object, never once per reload.
     RecordLifecycleResult(Runtime.RunLifecycle(Runtime.ScriptPath(LifecycleScript), EDasCallback::BeginPlay, this));
 }

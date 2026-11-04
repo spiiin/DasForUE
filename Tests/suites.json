@@ -930,6 +930,12 @@
       "kind": "script",
       "script": "TestRogueMonsterData.ps1",
       "comment": "MonsterData class/actions/DropLoot spawning, idempotency and owned actor cleanup in PIE."
+    },
+    {
+      "name": "rogue-hud",
+      "kind": "script",
+      "script": "TestRogueHUD.ps1",
+      "comment": "DAS HUD vitals, int64 coins, effect rows, MonsterData health widgets, subscriptions and teardown in real PIE."
     }
   ],
   "presets": {

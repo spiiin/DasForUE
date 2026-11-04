@@ -166,7 +166,7 @@ FDasBlueprintRollback::~FDasBlueprintRollback() = default;
 bool FDasBlueprintRollback::InstanceAsset(const FAssetData& Data, const UClass* Root)
 {
     const UClass* Class = FindObject<UClass>(Data.AssetClassPath);
-    return Root && Class && Class->IsChildOf(Root) && Class->IsChildOf(UDataAsset::StaticClass());
+    return Class && (!Root || Class->IsChildOf(Root)) && Class->IsChildOf(UDataAsset::StaticClass());
 }
 bool FDasBlueprintRollback::GatherScope(UBlueprint* Root, TArray<UBlueprint*>& BPs,
                                         TArray<TStrongObjectPtr<UObject>>& Assets, FString& Error, bool DefaultsOnly,
@@ -252,7 +252,8 @@ bool FDasBlueprintRollback::GatherScope(UBlueprint* Root, TArray<UBlueprint*>& B
                     });
                 if (Data.Num() != 1 || (Data[0].AssetClassPath != UBlueprint::StaticClass()->GetClassPathName() &&
                                         Data[0].AssetClassPath != UWorld::StaticClass()->GetClassPathName() &&
-                                        !InstanceAsset(Data[0], Root->GeneratedClass)))
+                                        // A DataAsset may refer to a migrated class without deriving from it.
+                                        !InstanceAsset(Data[0], nullptr)))
                 {
                     FString Kinds;
                     for (const auto& Item : Data)
