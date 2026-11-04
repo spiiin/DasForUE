@@ -168,3 +168,28 @@ does not discard the ordinary memory cache.
 The cache currently has a per-stream read limit of 256 MiB. Its project Saved
 folder can be removed while the editor is closed. Total-size eviction is a
 follow-up; old ABI-specific streams can accumulate.
+
+## Shared source reads during editor preparation
+
+`das.EditorSourceBatchCache=1` (default) shares source snapshots for one synchronous
+editor preparation pass. Startup/map-open reimport, bulk compilation and declaration
+checks nest into the same scope; saved-change processing and pre-PIE preparation
+use the same rule. Each compiled program keeps its own dependency snapshot and AST.
+
+A file is read and hashed on first use in the pass. Other roots reuse those bytes;
+validation compares the content hash against each root's own previous revision,
+so roots with different baselines are still invalidated correctly. File size and
+mtime alone never establish equality during preparation. Cached file reads include
+catalog JSON accessed through the source-snapshot layer.
+
+The outermost scope releases all temporary snapshots. Every later pass reads fresh
+bytes. Source-write notifications clear active snapshots too, including missing-file
+entries, so a save or a newly created module can be observed within the same pass.
+This is a short-lived view of source reads, not a persistent filesystem cache or an
+atomic multi-file revision.
+
+`DAS_EDITOR_SOURCE_READS` reports content-read requests, bytes, snapshot hits,
+dependency checks and invalidations for the startup loop. Filesystem path/stat
+lookups outside the source-snapshot layer are not included. Set
+`das.EditorSourceBatchCache=0` to compare repeated preparation without this cache.
+Compiled-program reuse and the disk module cache have their own independent settings.

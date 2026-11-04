@@ -473,3 +473,13 @@ metadata and executable output. The warm phase also checks repeat preparation,
 saved dependency updates, an unreferenced invalid script, failed-save retention,
 source repair and damaged-stream fallback. The final fresh process checks that
 saving did not discard the cached standard-library prefix. It is not a full PIE/packaged gate.
+
+## Editor source batch
+
+Queue `test-suite <id> editor-source-batch repo=<worktree>` through the build agent.
+One `DasForUE.Runtime.EditorSourceBatch` automation scenario compares uncached and
+batched content reads for three roots with one common module. It checks equal
+validation coverage, nested startup scopes, release of transient snapshots,
+same-size/same-mtime dependency edits, saves within an active pass, negative-cache
+invalidation on file creation and retention/repair after an invalid save.
+No full PIE or packaged checks are included.

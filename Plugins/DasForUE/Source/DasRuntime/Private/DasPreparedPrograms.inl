@@ -326,6 +326,7 @@ void FDasRuntimeModule::SetEditorGameplayActive(bool Active)
 bool FDasRuntimeModule::PrepareEditorPrograms(const TArray<FString>& Scripts, FString& Error)
 {
     check(IsInGameThread());
+    FDasEditorSourceReadScope SourcePass;
     Error.Reset();
     for (const auto& Script : Scripts)
     {

@@ -170,6 +170,7 @@ void FDasAutoReimport::OnScriptsChanged(const TArray<FFileChangeData>& Changes)
 }
 bool FDasAutoReimport::ProcessPending(float)
 {
+    FDasEditorSourceReadScope SourcePass;
     Ticker.Reset();
     FString CatalogError;
     if (!UpdateAutomaticCatalog(CatalogError))
@@ -402,6 +403,7 @@ bool FDasAutoReimport::PrepareSavedPrograms(const TSet<FString>& Files, bool bHi
 bool FDasAutoReimport::PrepareAllPrograms(FString& Error)
 {
     const double BatchStarted = FPlatformTime::Seconds();
+    FDasEditorSourceReadScope SourcePass;
     Error.Reset();
     if (!UpdateAutomaticCatalog(Error))
         return false;
@@ -490,6 +492,13 @@ bool FDasAutoReimport::PrepareAllPrograms(FString& Error)
             After.Hits - Before.Hits, After.DiskModuleHits - Before.DiskModuleHits,
             After.DiskModuleReparses - Before.DiskModuleReparses,
             After.DiskModuleCacheWrites - Before.DiskModuleCacheWrites);
+    UE_LOG(
+        LogTemp, Display,
+        TEXT("DAS_EDITOR_SOURCE_READS reads=%llu bytes=%llu snapshot_hits=%llu dependency_checks=%llu invalidations=%llu"),
+            After.SourcePhysicalReads - Before.SourcePhysicalReads, After.SourceBytesRead - Before.SourceBytesRead,
+            After.SourceSnapshotHits - Before.SourceSnapshotHits,
+            After.SourceContentChecks - Before.SourceContentChecks,
+            After.SourceBatchInvalidations - Before.SourceBatchInvalidations);
     Timings.Sort([](const auto& A, const auto& B) { return A.Milliseconds > B.Milliseconds; });
     for (int32 I = 0; I < FMath::Min(5, Timings.Num()); ++I)
         UE_LOG(LogTemp, Display,
@@ -498,6 +507,7 @@ bool FDasAutoReimport::PrepareAllPrograms(FString& Error)
 }
 bool FDasAutoReimport::PrepareForPlay(FString& Error)
 {
+    FDasEditorSourceReadScope SourcePass;
     Error.Reset();
     ON_SCOPE_EXIT
     {
@@ -538,6 +548,7 @@ TValueOrError<bool, FText> FDasAutoReimport::RequestPIEPermissionInternal(bool) 
 }
 void FDasAutoReimport::OnPreBeginPIE(bool)
 {
+    FDasEditorSourceReadScope SourcePass;
     if (CVarAutoReimport.GetValueOnGameThread() != 0 && !GIsAutomationTesting)
         ReimportStale();
     FString Error;
@@ -552,6 +563,7 @@ void FDasAutoReimport::OnMapOpened(const FString&, bool)
 }
 bool FDasAutoReimport::CheckStale(float)
 {
+    FDasEditorSourceReadScope SourcePass;
     StaleTicker.Reset();
     if (CVarAutoReimport.GetValueOnGameThread() != 0 && !GIsAutomationTesting)
         ReimportStale();

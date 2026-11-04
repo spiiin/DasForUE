@@ -186,11 +186,21 @@ TSharedPtr<FCompiledProgram> AcquireCompiledProgram(const FString& Path, bool bA
 FDasProgramCacheStats FDasRuntimeModule::ProgramCacheStats() const
 {
     check(IsInGameThread());
-    return {PersistentCompileCount,    PersistentCompileCacheHits,
-            PersistentSimulationCount, ResidentCompiledPrograms.Num(),
-            PreparedProgramLoads,      DiskModuleHits,
-            DiskModuleReparses,        DiskModuleCacheWrites,
-            CompilerPassSeconds};
+    return {PersistentCompileCount,
+            PersistentCompileCacheHits,
+            PersistentSimulationCount,
+            ResidentCompiledPrograms.Num(),
+            PreparedProgramLoads,
+            DiskModuleHits,
+            DiskModuleReparses,
+            DiskModuleCacheWrites,
+            CompilerPassSeconds,
+            SourcePhysicalReads,
+            SourceBytesRead,
+            SourceSnapshotHits,
+            SourceContentChecks,
+            SourceBatchInvalidations,
+            EditorSourceReadBatch ? EditorSourceReadBatch->Snapshots.Num() : 0};
 }
 void FDasRuntimeModule::ClearProgramCache()
 {

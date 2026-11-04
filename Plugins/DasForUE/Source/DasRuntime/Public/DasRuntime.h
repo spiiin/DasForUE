@@ -15,6 +15,23 @@ struct FDasProgramCacheStats
     uint64 PreparedLoads = 0;
     uint64 DiskModuleHits = 0, DiskModuleReparses = 0, DiskModuleCacheWrites = 0;
     double CompilerPassSeconds = 0; // Inclusive of nested compiler passes. Use batch wall time for startup totals.
+    uint64 SourcePhysicalReads = 0, SourceBytesRead = 0, SourceSnapshotHits = 0, SourceContentChecks = 0,
+           SourceBatchInvalidations = 0;
+    int32 SourceSnapshotsInBatch = 0;
+};
+
+// Nestable game-thread scope. Snapshot storage is released by the outermost scope.
+// A write notification invalidates active snapshots; the next pass always reads fresh bytes.
+class DASRUNTIME_API FDasEditorSourceReadScope
+{
+public:
+    FDasEditorSourceReadScope();
+    ~FDasEditorSourceReadScope();
+    FDasEditorSourceReadScope(const FDasEditorSourceReadScope&) = delete;
+    FDasEditorSourceReadScope& operator=(const FDasEditorSourceReadScope&) = delete;
+
+private:
+    bool bActive = false;
 };
 
 class USaveGame;

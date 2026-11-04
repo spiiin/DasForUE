@@ -12,6 +12,11 @@ daScript 0.6.4 (pinned), Win64 Development. Start at the
 
 ### Added
 
+- Editor preparation shares byte snapshots and content hashes for one startup,
+  save or pre-PIE pass. Common dependencies are read once while every root is
+  checked against its own previous source revision; source writes invalidate the
+  active batch. Startup logs include physical source reads, bytes and cache hits.
+
 - Editor startup compilation timings, five slowest scripts and an editor disk
   module cache for standard daScript libraries. All project/UE modules retain
   their authoring checks; saves retain dependency invalidation and the cache's

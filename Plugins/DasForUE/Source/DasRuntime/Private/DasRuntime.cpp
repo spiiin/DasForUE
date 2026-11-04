@@ -495,19 +495,8 @@ struct FSourceSnapshot
     // Size and modification time the bytes were read with: the watch-mode poll compares these first.
     int64 Size = -1;
     FDateTime Stamp, ReadAt;
-    static FSourceSnapshot Read(const FString& Path)
-    {
-        FSourceSnapshot Result;
-        Result.bExists = IFileManager::Get().FileExists(*Path) && FFileHelper::LoadFileToArray(Result.Bytes, *Path);
-        if (Result.bExists)
-        {
-            const FFileStatData Stat = IFileManager::Get().GetStatData(*Path);
-            Result.Size = Stat.FileSize;
-            Result.Stamp = Stat.ModificationTime;
-            Result.ReadAt = FDateTime::UtcNow();
-        }
-        return Result;
-    }
+    FSHAHash ContentHash{}; // Computed from bytes at read time, independent of timestamps.
+    static FSourceSnapshot Read(const FString& Path);
     // File times advance in coarse steps (about 15 ms on Windows): a same-size write soon after the snapshot can
     // keep size and time. Like git's racy entries, such a snapshot is compared by bytes until it settles.
     bool IsRacy() const { return bExists && ReadAt - Stamp < FTimespan::FromSeconds(2); }
@@ -515,13 +504,10 @@ struct FSourceSnapshot
     {
         return bExists ? Stat.bIsValid && Stat.FileSize == Size && Stat.ModificationTime == Stamp : !Stat.bIsValid;
     }
-    bool Matches(const FString& Path) const
-    {
-        const auto Current = Read(Path);
-        return bExists == Current.bExists && Bytes == Current.Bytes;
-    }
+    bool Matches(const FString& Path) const;
 };
 using FSourceSet = TMap<FString, FSourceSnapshot>;
+#include "DasEditorSourceBatch.inl"
 struct FDSLAsyncPhysicsState;
 TSharedPtr<IDasPreparedAsyncPhysicsVM> PreparePhysicsVMImpl(const FString&, UObject*, FString&, FSourceSet*);
 void AsyncPhysicsSetInput(int32, double, das::Context*);
@@ -768,6 +754,13 @@ FString DasTypeAdapterSupportManifest()
 {
     return BuildTypeAdapterSupportManifest();
 }
+FDasEditorSourceReadScope::FDasEditorSourceReadScope() : bActive(BeginEditorSourceReadBatch()) {}
+FDasEditorSourceReadScope::~FDasEditorSourceReadScope()
+{
+    if (bActive)
+        EndEditorSourceReadBatch();
+}
+
 void FDasRuntimeModule::StartupModule()
 {
     DasInstallScriptWriteTracker();

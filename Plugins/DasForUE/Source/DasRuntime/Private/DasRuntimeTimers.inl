@@ -331,6 +331,7 @@ const FString& NormalizeScriptPath(const FString& Path)
 void MarkScriptsChanged(const TArray<FString>& Files, const TArray<FString>& Directories, bool bAddedOrRemoved)
 {
     check(IsInGameThread());
+    InvalidateEditorSourceReadBatch();
     PolledStats.Reset();
     if (bAddedOrRemoved || !Directories.IsEmpty())
         IndexProjectScripts();
