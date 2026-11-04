@@ -463,3 +463,13 @@ template flags and descriptor round-trip, Blueprint recompilation, independent
 owner instances, template/default creation through DAS, explicit initialization,
 strong array retention and GC/context cleanup after release. No full PIE or
 packaged acceptance is implied.
+
+## Editor disk module cache
+
+Queue `test-suite <id> editor-module-cache repo=<worktree>` through the shared
+build agent. One focused scenario uses cold, warm and post-save-reopen commandlet processes: cold writes,
+then a fresh process proves disk module hits, matching authored/computed-default
+metadata and executable output. The warm phase also checks repeat preparation,
+saved dependency updates, an unreferenced invalid script, failed-save retention,
+source repair and damaged-stream fallback. The final fresh process checks that
+saving did not discard the cached standard-library prefix. It is not a full PIE/packaged gate.

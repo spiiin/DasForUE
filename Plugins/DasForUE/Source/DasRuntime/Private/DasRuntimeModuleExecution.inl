@@ -156,6 +156,9 @@ TSharedPtr<FCompiledProgram> AcquireCompiledProgram(const FString& Path, bool bA
         }
         else
         {
+            TGuardValue<TArray<TSharedPtr<FDasEditorModuleCache>>*> CacheOwners(ActiveEditorModuleCaches,
+                                                                                &Compiled->EditorModuleCaches);
+            TGuardValue<FString> CacheEnvironment(ActiveEditorModuleCacheEnvironment, Key.RightChop(Path.Len()));
             ++PersistentCompileCount;
             Compiled->Program = DSLCompile(Utf8Path.Get(), Access, Output, Compiled->Modules, das::CodeOfPolicies(),
                                            &Compiled->RestoreReferenceMetadata);
@@ -183,8 +186,11 @@ TSharedPtr<FCompiledProgram> AcquireCompiledProgram(const FString& Path, bool bA
 FDasProgramCacheStats FDasRuntimeModule::ProgramCacheStats() const
 {
     check(IsInGameThread());
-    return {PersistentCompileCount, PersistentCompileCacheHits, PersistentSimulationCount,
-            ResidentCompiledPrograms.Num(), PreparedProgramLoads};
+    return {PersistentCompileCount,    PersistentCompileCacheHits,
+            PersistentSimulationCount, ResidentCompiledPrograms.Num(),
+            PreparedProgramLoads,      DiskModuleHits,
+            DiskModuleReparses,        DiskModuleCacheWrites,
+            CompilerPassSeconds};
 }
 void FDasRuntimeModule::ClearProgramCache()
 {
@@ -318,8 +324,7 @@ FDasExecutionResult FDasRuntimeModule::RunCallback(const FString& Path, EDasCall
     // possession. Permit only that new controller's actual native startup phase,
     // never an arbitrary existing actor or a fabricated lifecycle callback.
     const auto* SpawnPawn = ActorSpawnDepth > 0 ? Cast<APawn>(ActorLifecycleTarget) : nullptr;
-    const auto* SpawnController = Cast<AAIController>(LifecycleComponent ? LifecycleComponent->GetOwner()
-                                                                       : Self.Get());
+    const auto* SpawnController = Cast<AAIController>(LifecycleComponent ? LifecycleComponent->GetOwner() : Self.Get());
     const bool DefaultControllerLifecycle =
         SpawnPawn && SpawnController && SpawnPawn->AIControllerClass &&
         SpawnController->GetClass() == SpawnPawn->AIControllerClass.Get() &&
@@ -396,17 +401,19 @@ FDasExecutionResult FDasRuntimeModule::RunCallback(const FString& Path, EDasCall
     if (Frame)
     {
         Expected.Inputs.Reset();
-        if (Frame->Num() > 16 || ((static_cast<uint8>(Signature) > 13 && Signature != EDasMethodSignature::Class &&
-                                   Signature != EDasMethodSignature::Delegate &&
-                                   Signature != EDasMethodSignature::Byte && Signature != EDasMethodSignature::Text && Signature != EDasMethodSignature::Int64) ||
-                                  Signature == EDasMethodSignature::Frame))
+        if (Frame->Num() > 16 ||
+            ((static_cast<uint8>(Signature) > 13 && Signature != EDasMethodSignature::Class &&
+              Signature != EDasMethodSignature::Delegate && Signature != EDasMethodSignature::Byte &&
+              Signature != EDasMethodSignature::Text && Signature != EDasMethodSignature::Int64) ||
+             Signature == EDasMethodSignature::Frame))
         {
             Result.Error = TEXT("Invalid scalar frame");
             return Result;
         }
         for (const auto& V : *Frame)
         {
-            if (V.Kind < 0 || (V.Kind > 13 && V.Kind != 15 && V.Kind != 16 && V.Kind != 17 && V.Kind != 18 && V.Kind != 19) ||
+            if (V.Kind < 0 ||
+                (V.Kind > 13 && V.Kind != 15 && V.Kind != 16 && V.Kind != 17 && V.Kind != 18 && V.Kind != 19) ||
                 V.Kind == 3 || V.Kind == 4)
             {
                 Result.Error = TEXT("Invalid scalar argument kind");
@@ -742,14 +749,19 @@ FDasExecutionResult FDasRuntimeModule::RunCallback(const FString& Path, EDasCall
                 else
                 {
                     Candidate->Function = FindRootScriptFunction(Candidate->Program, *Candidate->Context, "main");
-                    Candidate->Initializer = FindRootScriptFunction(Candidate->Program, *Candidate->Context, "__ue_initialize");
-                    Candidate->Construction = FindRootScriptFunction(Candidate->Program, *Candidate->Context, "__ue_construct");
-                    Candidate->BeginPlay = FindRootScriptFunction(Candidate->Program, *Candidate->Context, "begin_play");
+                    Candidate->Initializer =
+                        FindRootScriptFunction(Candidate->Program, *Candidate->Context, "__ue_initialize");
+                    Candidate->Construction =
+                        FindRootScriptFunction(Candidate->Program, *Candidate->Context, "__ue_construct");
+                    Candidate->BeginPlay =
+                        FindRootScriptFunction(Candidate->Program, *Candidate->Context, "begin_play");
                     Candidate->Tick = FindRootScriptFunction(Candidate->Program, *Candidate->Context, "tick");
                     Candidate->EndPlay = FindRootScriptFunction(Candidate->Program, *Candidate->Context, "end_play");
                     const FTCHARToUTF8 EntryUtf8(*EntryPoint);
-                    auto* Selected = Event == EDasCallback::Main ? FindRootScriptFunction(Candidate->Program, *Candidate->Context, EntryUtf8.Get())
-                                                                 : Candidate->Function;
+                    auto* Selected =
+                        Event == EDasCallback::Main
+                            ? FindRootScriptFunction(Candidate->Program, *Candidate->Context, EntryUtf8.Get())
+                            : Candidate->Function;
                     if ((Event == EDasCallback::Main && !Selected) ||
                         (Selected &&
                          !VerifyContract(Candidate->Program,
@@ -797,7 +809,8 @@ FDasExecutionResult FDasRuntimeModule::RunCallback(const FString& Path, EDasCall
                                 FocusNotificationContract,
                                 FocusNotificationContract || Session->FocusNotificationEntries.Contains(Required.Key));
                             const FTCHARToUTF8 RequiredUtf8(*Required.Key);
-                            auto* RequiredFunction = FindRootScriptFunction(Candidate->Program, *Candidate->Context, RequiredUtf8.Get());
+                            auto* RequiredFunction =
+                                FindRootScriptFunction(Candidate->Program, *Candidate->Context, RequiredUtf8.Get());
                             if (!RequiredFunction ||
                                 !VerifyContract(Candidate->Program, Required.Key, Required.Value,
                                                 Session->NativeInputEntries.Contains(Required.Key)))

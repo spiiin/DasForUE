@@ -154,7 +154,7 @@ auto DSLCompile(const char* File, const das::FileAccessPtr& Access, das::TextWri
             DSLActiveRefDeclarations.Append(References);
         };
     };
-    auto Program = das::compileDaScript(File, Access, Output, Group, Policies);
+    auto Program = CompileEditorCachedPass(File, Access, Output, Group, Policies, TEXT("collect"));
     DSLDiagnosticGenerated(Program);
     if (!Program || Program->failed() || Computed.Pending.IsEmpty())
     {
@@ -181,7 +181,7 @@ auto DSLCompile(const char* File, const das::FileAccessPtr& Access, das::TextWri
     DSLPropertySourceSignatures = PropertiesBefore;
     DSLSourceCatalogExpectedIds = CatalogBefore;
     Diagnostics.RebuiltGroup();
-    auto Resolved = das::compileDaScript(File, Access, Output, Group, Policies);
+    auto Resolved = CompileEditorCachedPass(File, Access, Output, Group, Policies, TEXT("resolved"));
     DSLDiagnosticGenerated(Resolved);
     if (Resolved && !Resolved->failed())
         CaptureReferenceMetadata();
@@ -275,7 +275,8 @@ struct FUEAuthoredRefAnnotation : das::StructureAnnotation
                 if (!Runtime.ScriptPath(File).Equals(Runtime.ScriptPath(Short), ESearchCase::IgnoreCase))
                     DSLFail(TEXT("Reference source does not match the indexed module filename: ") + File);
                 for (auto& A : Args)
-                    if (A.name == "script") A.sValue = DSLUtf8(Short);
+                    if (A.name == "script")
+                        A.sValue = DSLUtf8(Short);
             }
             return true;
         }
@@ -652,15 +653,18 @@ das::TypeDeclPtr DSLPropertyType(const FString& Kind, das::ModuleGroup& G, das::
     if (Kind == TEXT("struct"))
         return DSLHandleType(G, M, "UEStructValue");
     return new das::TypeDecl(
-        Kind == TEXT("int64") ? das::Type::tInt64 : (Kind == TEXT("int") || Kind == TEXT("byte"))
-         ? das::Type::tInt
-         : Kind == TEXT("float")
-                        ? das::Type::tFloat
-                        : Kind == TEXT("double")? das::Type::tDouble
-                                                : Kind == TEXT("bool")? das::Type::tBool
-                                                                      : Kind == TEXT("string")? das::Type::tString
-                                                                                              : das::Type::tVoid,
-                                                                                     At);
+        Kind == TEXT("int64")
+                     ? das::Type::tInt64
+                     : (Kind == TEXT("int") || Kind == TEXT("byte"))
+                        ? das::Type::tInt
+                        : Kind == TEXT("float")
+                                       ? das::Type::tFloat
+                                       : Kind == TEXT("double")
+                                                      ? das::Type::tDouble
+                                                      : Kind == TEXT("bool")? das::Type::tBool
+                                                                            : Kind == TEXT("string")? das::Type::tString
+                                                                                                    : das::Type::tVoid,
+                                                                                           At);
 }
 das::TypeDeclPtr DSLReflectedValueABI(const das::TypeDeclPtr& T, das::ModuleGroup& Group, das::Module* Module)
 {
@@ -872,7 +876,9 @@ bool DSLEmitProperty(das::Program* P, das::Module* M, const das::TypeDeclPtr& T,
     if (!Prop->bReadOnly && Prop->Type.Kind != TEXT("event"))
     {
         Add("`clone", Write(new das::ExprVar(At, "value")), true);
-        if (Prop->Type.Kind == TEXT("int64") || Prop->Type.Kind == TEXT("int") || Prop->Type.Kind == TEXT("float") || Prop->Type.Kind == TEXT("double"))
+        if (Prop->Type.Kind ==
+            TEXT("int64") || Prop->Type.Kind == TEXT("int") || Prop->Type.Kind == TEXT("float") || Prop->Type.Kind ==
+                                                                                                       TEXT("double"))
             for (const auto* Op : {"+", "-", "*", "/"})
                 Add(das::string("`") + Op + "=", Write(new das::ExprOp2(At, Op, Read(), new das::ExprVar(At, "value"))),
                     true);
@@ -1264,7 +1270,8 @@ bool DSLEmitReferenceMethod(das::Program* Program, das::Module* Module, const da
     FDasDeclaredMethod NativeMethod;
     FDSLMethodSourceSignature NativeDescriptor;
     if (Interface)
-        DSLInterfaceMethodDescriptor(Program, Module, ReceiverType, Name, At, Declaration, NativeMethod, NativeDescriptor);
+        DSLInterfaceMethodDescriptor(Program, Module, ReceiverType, Name, At, Declaration, NativeMethod,
+                                     NativeDescriptor);
     else if (Native)
         DSLNativeMethodDescriptor(Program, Module, ReceiverType, Name, At, Declaration, NativeMethod, NativeDescriptor);
     else
@@ -1298,7 +1305,8 @@ bool DSLEmitReferenceMethod(das::Program* Program, das::Module* Module, const da
     const auto* Descriptor = Native ? &NativeDescriptor : DSLMethodSourceSignatures.Find(SourceKey);
     if (!Descriptor || Descriptor->Parameters.size() != size_t(Method->Parameters.Num()))
         DSLFail(TEXT("Missing authored method source signature: ") + SourceKey);
-    if (Native && !Interface && DSLEmitRoutedMethod(Program, Module, ReceiverType, Name, At, Declaration.Id, *Method, *Descriptor))
+    if (Native && !Interface &&
+        DSLEmitRoutedMethod(Program, Module, ReceiverType, Name, At, Declaration.Id, *Method, *Descriptor))
         return true;
     auto* Fn = new das::Function();
     Fn->at = At;
@@ -1374,8 +1382,8 @@ bool DSLEmitReferenceMethod(das::Program* Program, das::Module* Module, const da
     {
         auto* Class = FindObject<UClass>(nullptr, *Declaration.Id);
         auto* Function = Class ? Class->FindFunctionByName(*Method->Name) : nullptr;
-        Block->list.push_back(DSLCall(At, "ue_expect_interface_signature",
-            {CallHandle(), Str(CallSignatureKey(Function))}));
+        Block->list.push_back(
+            DSLCall(At, "ue_expect_interface_signature", {CallHandle(), Str(CallSignatureKey(Function))}));
     }
     auto Read = [&](const FString& DeclaredKind, const FString& Path, const das::TypeDeclPtr& Type)
     {
@@ -1786,26 +1794,29 @@ struct FUEPropertyPass : das::PassMacro
                 {
                     const auto Split = E->name.rfind("::");
                     const auto Name = Split == das::string::npos ? E->name : E->name.substr(Split + 2);
-                    Program->library.foreach ([&](das::Module* Mod)
-                    {
-                        if (Mod != Current)
-                            Mod->functions.foreach ([&](const das::FunctionPtr& F)
-                            {
-                                if (F->generated && F->privateFunction && F->name == Name &&
-                                    !F->arguments.empty() && F->arguments[0]->name == "receiver" &&
-                                    F->arguments[0]->type->structType == E->arguments[0]->type->structType)
-                                    E->func = F;
-                            });
-                        return true;
-                    }, "*");
+                    Program->library.foreach (
+                        [&](das::Module* Mod)
+                        {
+                            if (Mod != Current)
+                                Mod->functions.foreach (
+                                    [&](const das::FunctionPtr& F)
+                                    {
+                                        if (F->generated && F->privateFunction && F->name == Name &&
+                                            !F->arguments.empty() && F->arguments[0]->name == "receiver" &&
+                                            F->arguments[0]->type->structType == E->arguments[0]->type->structType)
+                                            E->func = F;
+                                    });
+                            return true;
+                        },
+                        "*");
                 }
                 // Inherited helpers may already call a generated private member
                 // wrapper in their parent's module. Recreate it locally before
                 // rebinding the inferred call; no dependency on a sibling leaks.
                 auto* F = E->func;
-                if (!F || F->module == Current || !F->generated || !F->privateFunction ||
-                    F->arguments.empty() || F->arguments[0]->name != "receiver" ||
-                    !DSLTypedReference(F->arguments[0]->type) || F->name.find("__") == 0)
+                if (!F || F->module == Current || !F->generated || !F->privateFunction || F->arguments.empty() ||
+                    F->arguments[0]->name != "receiver" || !DSLTypedReference(F->arguments[0]->type) ||
+                    F->name.find("__") == 0)
                     return;
                 RebindCalls.push_back(E);
                 if (F->isCustomProperty && F->name.find(".`") == 0)

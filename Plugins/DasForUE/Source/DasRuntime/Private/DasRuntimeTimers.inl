@@ -14,6 +14,7 @@ struct FCompiledProgram
 {
     FSourceSet Sources; // Must outlive Access: its filesystem records dependencies here, never in a session.
     das::vector<das::FileInfoPtr> SerializedFileInfos;
+    TArray<TSharedPtr<FDasEditorModuleCache>> EditorModuleCaches; // Outlives Program and Modules.
     das::ModuleGroup Modules;
     das::FileAccessPtr Access;
     das::ProgramPtr Program;
@@ -331,7 +332,8 @@ void MarkScriptsChanged(const TArray<FString>& Files, const TArray<FString>& Dir
 {
     check(IsInGameThread());
     PolledStats.Reset();
-    if (bAddedOrRemoved || !Directories.IsEmpty()) IndexProjectScripts();
+    if (bAddedOrRemoved || !Directories.IsEmpty())
+        IndexProjectScripts();
     for (auto& Pair : KnownCompiledPrograms)
         if (auto Program = Pair.Value.Pin())
             Program->CheckedEpoch = 0;

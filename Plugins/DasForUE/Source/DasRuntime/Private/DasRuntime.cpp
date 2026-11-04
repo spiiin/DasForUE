@@ -531,6 +531,7 @@ bool AsyncPhysicsRunning(das::Context*);
 char* AsyncPhysicsError(das::Context*);
 FSourceSet* AuthoredReferenceSources = nullptr;
 
+#include "DasEditorModuleCache.inl"
 #include "DasRuntimeState.inl"
 #include "DasRuntimeSelfValues.inl"
 #include "DasBuiltinValueOps.inl"
@@ -992,6 +993,7 @@ void FDasRuntimeModule::ShutdownModule()
         EditorProgramAttempts.Empty();
         EditorGameplayActive = false;
         das::Module::Shutdown();
+        EditorSharedModuleFileInfos.clear();
         bInitialized = false;
     }
 }
@@ -1018,8 +1020,10 @@ FString FDasRuntimeModule::ScriptPath(const FString& Name) const
     int32 Slash;
     if (Name.FindChar(TEXT('/'), Slash) || Name.FindChar(TEXT('\\'), Slash))
     {
-        if (!FDasSourceCatalog::LocalFile(Name, TEXT("das"))) return {};
-        const FString Project = FPaths::ConvertRelativePathToFull(FPaths::ProjectContentDir() / TEXT("Das/Scripts") / Name);
+        if (!FDasSourceCatalog::LocalFile(Name, TEXT("das")))
+            return {};
+        const FString Project =
+            FPaths::ConvertRelativePathToFull(FPaths::ProjectContentDir() / TEXT("Das/Scripts") / Name);
         return IFileManager::Get().FileExists(*Project) ? Project : Root / TEXT("Scripts") / Name;
     }
     // A project script shadows the plugin script of the same name. The file check costs tens of microseconds,
@@ -1031,8 +1035,10 @@ FString FDasRuntimeModule::ScriptPath(const FString& Name) const
     if (const auto* Cached = bCache ? ScriptPathCache.Find(Name) : nullptr;
         Cached && Now - Cached->CheckedAt < CVarScriptChangePollSeconds.GetValueOnGameThread())
         return Cached->Path;
-    if (AmbiguousProjectScripts.Contains(Name)) return {};
-    if (const auto* Indexed = ProjectScriptPaths.Find(Name)) return *Indexed;
+    if (AmbiguousProjectScripts.Contains(Name))
+        return {};
+    if (const auto* Indexed = ProjectScriptPaths.Find(Name))
+        return *Indexed;
     const FString Project = FPaths::ConvertRelativePathToFull(FPaths::ProjectContentDir() / TEXT("Das/Scripts") / Name);
     FString Plugin = Root / TEXT("Scripts") / Name;
 #if !DAS_WITH_TEST_PROBES

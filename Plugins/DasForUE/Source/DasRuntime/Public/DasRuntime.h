@@ -13,6 +13,8 @@ struct FDasProgramCacheStats
     uint64 Compilations = 0, Hits = 0, Simulations = 0;
     int32 ResidentPrograms = 0;
     uint64 PreparedLoads = 0;
+    uint64 DiskModuleHits = 0, DiskModuleReparses = 0, DiskModuleCacheWrites = 0;
+    double CompilerPassSeconds = 0; // Inclusive of nested compiler passes. Use batch wall time for startup totals.
 };
 
 class USaveGame;

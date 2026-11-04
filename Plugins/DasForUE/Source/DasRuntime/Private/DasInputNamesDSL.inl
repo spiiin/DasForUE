@@ -8,6 +8,16 @@ struct FUEInputNameLint : das::PassMacro
     FUEInputNameLint() : PassMacro("ue_string_input_names") {}
     virtual bool apply(das::Program*, das::Module* M) override
     {
+        FString File = FPaths::ConvertRelativePathToFull(UTF8_TO_TCHAR(M->fileName.c_str()));
+        FString Library = FPaths::ConvertRelativePathToFull(UTF8_TO_TCHAR(das::getDasRoot().c_str())) / TEXT("daslib");
+        FPaths::NormalizeFilename(File);
+        FPaths::NormalizeFilename(Library);
+        // UE annotations/type macros consult loaded reflected definitions and record
+        // host-only compiler metadata. Reparse those modules even when bytes match.
+        // Pure stdlib records retain daScript's own dependency/policy/builtin checks.
+        auto* Foundation = das::Module::require("ue_foundation");
+        if (!FPaths::IsUnderDirectory(File, Library) || (Foundation && M->isVisibleDirectly(Foundation)))
+            M->registersAtCompile = true;
         struct FCheck : das::Visitor
         {
             virtual void preVisit(das::ExprCall* E) override

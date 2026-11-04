@@ -44,7 +44,8 @@ bool UpdateAutomaticCatalog(FString& Error)
 {
     bool Enabled = false;
     GConfig->GetBool(TEXT("DasForUE.SourceCatalog"), TEXT("AutoGenerate"), Enabled, GEngineIni);
-    return !Enabled || FDasSourceCatalog::UpdateDeclarationInventory(FPaths::ProjectContentDir() / TEXT("Das/Scripts"), Error);
+    return !Enabled ||
+           FDasSourceCatalog::UpdateDeclarationInventory(FPaths::ProjectContentDir() / TEXT("Das/Scripts"), Error);
 }
 void Notify(const FString& Text, bool bSuccess)
 {
@@ -100,7 +101,8 @@ void FDasAutoReimport::Start()
         { FModuleManager::LoadModuleChecked<FDasRuntimeModule>(TEXT("DasRuntime")).SetEditorGameplayActive(false); });
     MapOpenedHandle = FEditorDelegates::OnMapOpened.AddRaw(this, &FDasAutoReimport::OnMapOpened);
     FString CatalogError;
-    if (!UpdateAutomaticCatalog(CatalogError)) DasDiagnosticEditor::Report(CatalogError);
+    if (!UpdateAutomaticCatalog(CatalogError))
+        DasDiagnosticEditor::Report(CatalogError);
     // The startup map may already be open.
     OnMapOpened(FString(), false);
 }
@@ -362,7 +364,11 @@ void FDasAutoReimport::ReimportGAS(const TPair<FString, FString>& Import, bool b
 void FDasAutoReimport::ReimportStale()
 {
     FString CatalogError;
-    if (!UpdateAutomaticCatalog(CatalogError)) { DasDiagnosticEditor::Report(CatalogError); return; }
+    if (!UpdateAutomaticCatalog(CatalogError))
+    {
+        DasDiagnosticEditor::Report(CatalogError);
+        return;
+    }
     auto& Runtime = FModuleManager::LoadModuleChecked<FDasRuntimeModule>(TEXT("DasRuntime"));
     for (UBlueprint* Blueprint : Bound(nullptr))
     {
@@ -395,8 +401,10 @@ bool FDasAutoReimport::PrepareSavedPrograms(const TSet<FString>& Files, bool bHi
 }
 bool FDasAutoReimport::PrepareAllPrograms(FString& Error)
 {
+    const double BatchStarted = FPlatformTime::Seconds();
     Error.Reset();
-    if (!UpdateAutomaticCatalog(Error)) return false;
+    if (!UpdateAutomaticCatalog(Error))
+        return false;
     auto& Runtime = FModuleManager::LoadModuleChecked<FDasRuntimeModule>(TEXT("DasRuntime"));
     TArray<FString> Scripts;
     IFileManager::Get().FindFilesRecursive(Scripts, *(FPaths::ProjectContentDir() / TEXT("Das/Scripts")),
@@ -452,12 +460,21 @@ bool FDasAutoReimport::PrepareAllPrograms(FString& Error)
     if (!IsRunningCommandlet() && !GIsAutomationTesting)
         Progress.MakeDialogDelayed(1.f);
     const auto Before = Runtime.ProgramCacheStats();
+    struct FRootTiming
+    {
+        FString File;
+        double Milliseconds;
+    };
+    TArray<FRootTiming> Timings;
     int32 Failed = 0;
     for (const auto& Script : Scripts)
     {
         Progress.EnterProgressFrame(1.f, FText::FromString(FPaths::GetCleanFilename(Script)));
+        const double RootStarted = FPlatformTime::Seconds();
         FString Issue;
-        if (!Runtime.PrepareEditorPrograms({Script}, Issue))
+        const bool Prepared = Runtime.PrepareEditorPrograms({Script}, Issue);
+        Timings.Add({Script, (FPlatformTime::Seconds() - RootStarted) * 1000});
+        if (!Prepared)
         {
             if (!Error.IsEmpty())
                 Error += TEXT("\n");
@@ -465,9 +482,18 @@ bool FDasAutoReimport::PrepareAllPrograms(FString& Error)
             ++Failed;
         }
     }
-    UE_LOG(LogTemp, Display,
-           TEXT("DAS_EDITOR_COMPILE_ALL scripts=%d failed=%d source_compiles=%llu"), Scripts.Num(), Failed,
-                Runtime.ProgramCacheStats().Compilations - Before.Compilations);
+    const auto After = Runtime.ProgramCacheStats();
+    UE_LOG(
+        LogTemp, Display,
+        TEXT("DAS_EDITOR_COMPILE_ALL scripts=%d failed=%d source_compiles=%llu seconds=%.3f memory_hits=%llu disk_modules=%llu disk_reparsed=%llu disk_writes=%llu"),
+            Scripts.Num(), Failed, After.Compilations - Before.Compilations, FPlatformTime::Seconds() - BatchStarted,
+            After.Hits - Before.Hits, After.DiskModuleHits - Before.DiskModuleHits,
+            After.DiskModuleReparses - Before.DiskModuleReparses,
+            After.DiskModuleCacheWrites - Before.DiskModuleCacheWrites);
+    Timings.Sort([](const auto& A, const auto& B) { return A.Milliseconds > B.Milliseconds; });
+    for (int32 I = 0; I < FMath::Min(5, Timings.Num()); ++I)
+        UE_LOG(LogTemp, Display,
+               TEXT("DAS_EDITOR_COMPILE_SLOW ms=%.3f file=%s"), Timings[I].Milliseconds, *Timings[I].File);
     return Failed == 0;
 }
 bool FDasAutoReimport::PrepareForPlay(FString& Error)

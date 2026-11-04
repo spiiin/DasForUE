@@ -130,3 +130,41 @@ owner, last-working-code retention, compile/schema rejection by the PIE authoriz
 unused-script diagnostics and automatic compilation of newly saved files. This
 uses a synthetic game world and the authorizer implementation, not a rendered PIE
 session.
+
+## Editor module cache and timings
+
+The editor checks every project script and selected plugin module on startup and
+before PIE. Saving files still prepares affected programs through the existing
+watcher/dependency graph. The in-memory program cache retains its current rules.
+
+`das.EditorModuleCache=1` (default) also caches standard daScript library modules
+under `Saved/Das/ModuleCache/*.dasm`. The cache is private to the project/worktree
+and disposable. The wrapper ABI (including the compiler libraries), compiler
+mode, root path, computed-default pass and already-promoted shared modules
+identify each stream. Saves in a running editor cannot overwrite the full library
+prefix needed by the next editor process. daScript checks
+module source bytes, policies, builtin signatures and declared macro dependencies.
+Missing, stale or damaged streams recompile from source. A cache write failure
+leaves the compiled program usable.
+
+For this first integration, modules outside the configured `daslib` directory,
+and modules directly exposing UE foundation, always reparse. They consult loaded
+UE definitions and register compiler-only metadata; restoring their AST without
+replaying those effects could accept stale Blueprint contracts. Source locations used by promoted shared libraries are retained until the
+daScript environment shuts down; disk byte buffers are released after reading.
+The standard library cache can accelerate the first compile in a new editor process while
+preserving the full authoring checks. This is distinct from release `.dasp`
+preparation. It does not persist or share owner state.
+
+The default `DAS_EDITOR_COMPILE_ALL` log record includes wall-clock seconds,
+source compile calls, memory hits, disk-served modules, reparsed modules and disk
+writes. `DAS_EDITOR_COMPILE_SLOW` lists the five slowest roots. Set
+`das.CompilerTimings=1` for `DAS_COMPILE_PASS` details (collect/resolved pass,
+milliseconds and cache cutoff reason). Per-pass times include nested compilation;
+use batch wall time for total startup cost. Set `das.EditorModuleCache=0` to
+compare separate editor starts with source-only compilation; changing this flag
+does not discard the ordinary memory cache.
+
+The cache currently has a per-stream read limit of 256 MiB. Its project Saved
+folder can be removed while the editor is closed. Total-size eviction is a
+follow-up; old ABI-specific streams can accumulate.

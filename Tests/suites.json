@@ -6,6 +6,7 @@
       "log": "combined-editor-build",
       "name": "build"
     },
+    {"name":"editor-module-cache","kind":"script","script":"TestEditorModuleCache.ps1","requires":["build"]},
     {
       "name": "authored-int64",
       "kind": "script",

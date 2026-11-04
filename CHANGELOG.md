@@ -10,6 +10,14 @@ daScript 0.6.4 (pinned), Win64 Development. Start at the
 
 ## Unreleased — 2026-11-02
 
+### Added
+
+- Editor startup compilation timings, five slowest scripts and an editor disk
+  module cache for standard daScript libraries. All project/UE modules retain
+  their authoring checks; saves retain dependency invalidation and the cache's
+  cold-start library prefix. The focused check covers fresh processes, saved
+  dependencies, last-working-code retention and damaged streams.
+
 ### Fixed
 
 - Additive class migration accepts new callback adapters and metadata updates with
