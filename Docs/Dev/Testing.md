@@ -483,3 +483,16 @@ validation coverage, nested startup scopes, release of transient snapshots,
 same-size/same-mtime dependency edits, saves within an active pass, negative-cache
 invalidation on file creation and retention/repair after an invalid save.
 No full PIE or packaged checks are included.
+
+## Editor module-cache safety
+
+`editor-module-cache` also runs `DasForUE.Runtime.ModuleCacheSafety`, which rejects
+Structure/Variable nodes in a Function slot before the name is accessed and
+accepts a valid Function reference. Rebuild daScript with `BuildDependencies.ps1`
+first: this guard is in the compiler library, not only the Unreal wrapper. See
+[the failure analysis and validation limits](Validation/EditorModuleCacheSafety.md).
+
+The same module-cache scenario now imports UE adapters before stdlib and rejects
+hidden payload fallback or unnecessary warm stream rewrites. The native safety
+probe forces a writer error before a valid record and checks complete restoration
+of the later record, opaque marking and source-program validity.

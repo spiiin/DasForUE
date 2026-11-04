@@ -1,0 +1,38 @@
+{
+  "patches": [
+    {
+      "source": "src/builtin/module_builtin_ast_serialize.cpp",
+      "replacements": [
+        {
+          "before": "            if ( auto node = readNode<Function>(id) ) {\n                func = node;",
+          "after": "            if ( auto node = readNode<Function>(id) ) {\n                // Reject an invalid cache reference before treating another AST node's\n                // fields as a string (which can request terabytes in an embedded host).\n                SERIALIZER_VERIFYF(node->gc_magic == GC_MAGIC_FUNCTION,\n                    \"corrupt stream: node #%u is not a Function (kind %08x)\", id.index, node->gc_magic);\n                func = node;"
+        },
+        {
+          "before": "            if ( program ) program->failToCompile = true;\n            // scope guards",
+          "after": "            if ( !writing && program ) program->failToCompile = true;\n            // scope guards"
+        },
+        {
+          "before": "            if ( program ) program->failToCompile = true;\n        }\n        // per-record scratch",
+          "after": "            if ( !writing && program ) program->failToCompile = true;\n        }\n        // per-record scratch"
+        }
+      ]
+    },
+    {
+      "source": "src/ast/ast_parse.cpp",
+      "replacements": [
+        {
+          "before": "            auto & [fileName, fileHash, fileSize, program, thisModule, requireNames] = serializer_write->parsedModules[pi];",
+          "after": "            auto & [fileName, fileHash, fileSize, program, thisModule, requireNames] = serializer_write->parsedModules[pi];\n            // A write error belongs to this record, not to all later modules.\n            serializer_write->failed = false;"
+        },
+        {
+          "before": "            uint8_t flags = thisModule->registersAtCompile ? 1 : 0;\n            *serializer_write << flags;",
+          "after": "            // Fail closed: a record is reparse-only until its payload was fully written.\n            // Non-seekable storage keeps this bit and therefore never serves partial ASTs.\n            uint8_t flags = 1;\n            size_t flags_at = serializer_write->buffer->writingSize();\n            *serializer_write << flags;"
+        },
+        {
+          "before": "            payload_size = uint64_t(serializer_write->buffer->writingSize() - payload_start);",
+          "after": "            if (!serializer_write->failed && !thisModule->registersAtCompile) {\n                uint8_t ready = 0;\n                serializer_write->buffer->patch(flags_at, &ready, sizeof(ready));\n            }\n            payload_size = uint64_t(serializer_write->buffer->writingSize() - payload_start);"
+        }
+      ]
+    }
+  ]
+}

@@ -487,10 +487,11 @@ bool FDasAutoReimport::PrepareAllPrograms(FString& Error)
     const auto After = Runtime.ProgramCacheStats();
     UE_LOG(
         LogTemp, Display,
-        TEXT("DAS_EDITOR_COMPILE_ALL scripts=%d failed=%d source_compiles=%llu seconds=%.3f memory_hits=%llu disk_modules=%llu disk_reparsed=%llu disk_writes=%llu"),
+        TEXT("DAS_EDITOR_COMPILE_ALL scripts=%d failed=%d source_compiles=%llu seconds=%.3f memory_hits=%llu disk_modules=%llu disk_reparsed=%llu disk_rejected=%llu disk_writes=%llu"),
             Scripts.Num(), Failed, After.Compilations - Before.Compilations, FPlatformTime::Seconds() - BatchStarted,
             After.Hits - Before.Hits, After.DiskModuleHits - Before.DiskModuleHits,
             After.DiskModuleReparses - Before.DiskModuleReparses,
+            After.DiskModuleRejections - Before.DiskModuleRejections,
             After.DiskModuleCacheWrites - Before.DiskModuleCacheWrites);
     UE_LOG(
         LogTemp, Display,

@@ -10,6 +10,14 @@ daScript 0.6.4 (pinned), Win64 Development. Start at the
 
 ## Unreleased — 2026-11-02
 
+### Fixed
+
+- Isolate daScript module-cache write failures per record. Failed payloads stay
+  reparse-only; following stdlib modules are fully written and restored on warm
+  starts. Keep the invalid-Function guard and preserve source-program validity on
+  write errors. Dependency rebuild required; project cache re-enablement has its
+  own acceptance gate.
+
 ### Added
 
 - Editor preparation shares byte snapshots and content hashes for one startup,

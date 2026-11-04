@@ -193,3 +193,13 @@ dependency checks and invalidations for the startup loop. Filesystem path/stat
 lookups outside the source-snapshot layer are not included. Set
 `das.EditorSourceBatchCache=0` to compare repeated preparation without this cache.
 Compiled-program reuse and the disk module cache have their own independent settings.
+
+An observed warm-cache failure in an authored attribute hierarchy required a
+[compiler-library safety patch](../../Dev/Validation/EditorModuleCacheSafety.md).
+Build daScript with `Scripts/BuildDependencies.ps1` before using that fix. Invalid
+Function references are rejected and recompiled from source. The producer now
+isolates failed writes so later stdlib records remain usable. `rejected` in the
+per-pass log and `disk_rejected` in the startup summary distinguish read failures
+from intentional UE metadata reparses. Preserve any project-local cache workaround
+until that project's acceptance checks pass. The snapshot and resident-program
+caches are independent of this setting.

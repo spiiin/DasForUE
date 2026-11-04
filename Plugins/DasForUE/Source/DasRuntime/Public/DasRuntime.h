@@ -18,6 +18,7 @@ struct FDasProgramCacheStats
     uint64 SourcePhysicalReads = 0, SourceBytesRead = 0, SourceSnapshotHits = 0, SourceContentChecks = 0,
            SourceBatchInvalidations = 0;
     int32 SourceSnapshotsInBatch = 0;
+    uint64 DiskModuleRejections = 0; // Payload read failures, excluding intentionally reparsed records.
 };
 
 // Nestable game-thread scope. Snapshot storage is released by the outermost scope.

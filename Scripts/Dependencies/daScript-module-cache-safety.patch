@@ -1,0 +1,61 @@
+--- a/src/builtin/module_builtin_ast_serialize.cpp
++++ b/src/builtin/module_builtin_ast_serialize.cpp
+@@ -824,6 +824,10 @@
+             }
+         } else {
+             if ( auto node = readNode<Function>(id) ) {
++                // Reject an invalid cache reference before treating another AST node's
++                // fields as a string (which can request terabytes in an embedded host).
++                SERIALIZER_VERIFYF(node->gc_magic == GC_MAGIC_FUNCTION,
++                    "corrupt stream: node #%u is not a Function (kind %08x)", id.index, node->gc_magic);
+                 func = node;
+             } else {
+                 func = new Function();
+@@ -3309,7 +3313,7 @@
+             if ( !quietCache ) LOG(LogLevel::warning) << "das: serialize: program " << (writing ? "write" : "read") << " failed: " << r.what() << "\n";
+             failed = true;
+             seenNewModule = true;
+-            if ( program ) program->failToCompile = true;
++            if ( !writing && program ) program->failToCompile = true;
+             // scope guards in the impl repointed the active gc root during unwind;
+             // the caller replaces the (now gutted) program via replaceProgramKeepGcRootValid
+         } catch ( ... ) {
+@@ -3319,7 +3323,7 @@
+             if ( !quietCache ) LOG(LogLevel::warning) << "das: serialize: program " << (writing ? "write" : "read") << " failed: unknown exception\n";
+             failed = true;
+             seenNewModule = true;
+-            if ( program ) program->failToCompile = true;
++            if ( !writing && program ) program->failToCompile = true;
+         }
+         // per-record scratch must never survive into the next record: a failed or
+         // early-returned record leaves refs whose targets die with it (throwaway root,
+--- a/src/ast/ast_parse.cpp
++++ b/src/ast/ast_parse.cpp
+@@ -1783,10 +1783,15 @@
+         // writeback at its end must not repeat those records
+         for ( size_t pi = serializer_write->writtenModules; pi < serializer_write->parsedModules.size(); ++pi ) {
+             auto & [fileName, fileHash, fileSize, program, thisModule, requireNames] = serializer_write->parsedModules[pi];
++            // A write error belongs to this record, not to all later modules.
++            serializer_write->failed = false;
+             *serializer_write << fileHash;
+             *serializer_write << fileSize;
+             *serializer_write << const_cast<string &>(fileName);
+-            uint8_t flags = thisModule->registersAtCompile ? 1 : 0;
++            // Fail closed: a record is reparse-only until its payload was fully written.
++            // Non-seekable storage keeps this bit and therefore never serves partial ASTs.
++            uint8_t flags = 1;
++            size_t flags_at = serializer_write->buffer->writingSize();
+             *serializer_write << flags;
+             uint32_t depCount = uint32_t(program->moduleCacheDependencies.size());
+             *serializer_write << depCount;
+@@ -1821,6 +1826,10 @@
+                 program->thisModule.reset(thisModule);
+                 serializer_write->serializeProgram(program, libGroup);
+                 program->thisModule.release();
++            }
++            if (!serializer_write->failed && !thisModule->registersAtCompile) {
++                uint8_t ready = 0;
++                serializer_write->buffer->patch(flags_at, &ready, sizeof(ready));
+             }
+             payload_size = uint64_t(serializer_write->buffer->writingSize() - payload_start);
+             serializer_write->buffer->patch(len_at, &payload_size, sizeof(payload_size));

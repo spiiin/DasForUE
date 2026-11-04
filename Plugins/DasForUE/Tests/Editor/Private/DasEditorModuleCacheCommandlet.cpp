@@ -56,7 +56,13 @@ int32 UDasEditorModuleCacheCommandlet::Main(const FString& Params)
         return OK;
     };
     const FString Source =
-        TEXT("options gen2\nrequire daslib/algorithm\nrequire ue_dsl\nrequire ") + Dependency + TEXT(R"DAS(
+        TEXT("options gen2\nrequire ue_native_gameplay\nrequire daslib/algorithm\nrequire daslib/option\nrequire daslib/match\nrequire ue_dsl\nrequire ") + Dependency + TEXT(R"DAS(
+struct DiskSnapshot {
+    Value : int = 0
+}
+def disk_optional(value:int):Option<DiskSnapshot> {
+    return some(DiskSnapshot(Value=value))
+}
 [ue_class(Blueprintable)]
 class DiskCachedActor : Actor {
     @ue_property=(BlueprintReadWrite)
@@ -65,7 +71,7 @@ class DiskCachedActor : Actor {
     def Add(value:int):int { self.Score+=value; return self.Score }
 }
 [export]
-def main(input:int):int { return input+dependency_value() }
+def main(input:int):int { return input+(disk_optional(dependency_value()) ?? DiskSnapshot()).Value }
 )DAS");
     auto DepSource = [&](int32 Value)
     {
@@ -86,6 +92,9 @@ def main(input:int):int { return input+dependency_value() }
         return 1;
     const double Seconds = FPlatformTime::Seconds() - Started;
     const auto After = R.ProgramCacheStats();
+    if (!Check(After.DiskModuleRejections == Before.DiskModuleRejections,
+               TEXT("no hidden payload rejection during initial preparation")))
+        return 1;
     TStrongObjectPtr<UObject> Owner(NewObject<UDasScriptClassData>());
     ON_SCOPE_EXIT
     {
@@ -129,6 +138,9 @@ def main(input:int):int { return input+dependency_value() }
         if (!Check(Expected == Json, TEXT("fresh process DSL metadata matches cold compile")) ||
                    !Check(After.DiskModuleHits > Before.DiskModuleHits,
                           TEXT("fresh process served standard modules from disk")))
+            return 1;
+        if (!Check(After.DiskModuleCacheWrites == Before.DiskModuleCacheWrites,
+                   TEXT("unchanged warm stream used without rewriting or repair")))
             return 1;
         const uint64 Compiles = R.ProgramCacheStats().Compilations;
         if (!Check(R.PrepareEditorPrograms({Root}, Error), TEXT("repeat full preparation")) ||
@@ -182,10 +194,11 @@ def main(input:int):int { return input+dependency_value() }
     }
     UE_LOG(
         LogTemp, Display,
-        TEXT("DAS_EDITOR_MODULE_CACHE PASS phase=%s checks=%d seconds=%.6f disk_modules=%llu reparsed=%llu writes=%llu"),
+        TEXT("DAS_EDITOR_MODULE_CACHE PASS phase=%s checks=%d seconds=%.6f disk_modules=%llu reparsed=%llu rejected=%llu writes=%llu"),
             Cold ? TEXT("cold")
                  : (Reopen ? TEXT("reopen") : TEXT("warm")), Checks, Seconds,
                     After.DiskModuleHits - Before.DiskModuleHits, After.DiskModuleReparses - Before.DiskModuleReparses,
+                After.DiskModuleRejections - Before.DiskModuleRejections,
                     After.DiskModuleCacheWrites - Before.DiskModuleCacheWrites);
     return 0;
 }

@@ -20,6 +20,7 @@ if (!(Test-Path -LiteralPath $Source)) {
 }
 $Revision = & git -C $Source rev-parse HEAD
 if ($Revision -ne $Lock.dascript.commit) { throw 'daScript revision differs from dependencies.json; refusing to overwrite it' }
+& (Join-Path $PSScriptRoot 'ApplyDaScriptPatches.ps1') -Source $Source
 $Build = Join-Path $Repo 'Build\daScript'
 $Disabled = Select-String -LiteralPath (Join-Path $Source 'CMakeLists.txt') -Pattern '^option\((DAS_[A-Z0-9_]+_DISABLED)' |
     ForEach-Object { '-D' + $_.Matches[0].Groups[1].Value + '=ON' }

@@ -10,7 +10,7 @@ FString ActiveEditorModuleCacheEnvironment;
 // Their line infos survive ordinary program-cache eviction and are released only
 // after Module::Shutdown has destroyed those shared modules.
 das::vector<das::FileInfoPtr> EditorSharedModuleFileInfos;
-uint64 DiskModuleHits = 0, DiskModuleReparses = 0, DiskModuleCacheWrites = 0;
+uint64 DiskModuleHits = 0, DiskModuleReparses = 0, DiskModuleCacheWrites = 0, DiskModuleRejections = 0;
 double CompilerPassSeconds = 0;
 TAutoConsoleVariable<int32> CVarEditorModuleCache(TEXT("das.EditorModuleCache"), 1,
     TEXT("Validate and reuse standard daScript library modules from Saved/Das/ModuleCache in the editor. UE modules always reparse."));
@@ -55,6 +55,9 @@ das::ProgramPtr CompileEditorCachedPass(const char* File, const das::FileAccessP
         const int64 Size = IFileManager::Get().FileSize(*CachePath);
         // A corrupt oversized stream is a cache miss, never an unbounded allocation.
         const FString ReadPath = Size >= 0 && Size <= 256ll * 1024 * 1024 ? CachePath : FString();
+        if (CVarCompilerTimings.GetValueOnGameThread() != 0)
+            UE_LOG(LogDasRuntime, Display, TEXT("DAS_COMPILE_PASS_BEGIN file=%s pass=%s cache=%s bytes=%lld"),
+                   UTF8_TO_TCHAR(File), Pass, *ReadPath, Size);
         Owner->Cache.install(TCHAR_TO_UTF8(*ReadPath), TCHAR_TO_UTF8(*CachePath), true);
     }
     das::ProgramPtr Program;
@@ -62,6 +65,7 @@ das::ProgramPtr CompileEditorCachedPass(const char* File, const das::FileAccessP
     ON_SCOPE_EXIT
     {
         das::ModuleFileCache::Result Result;
+        uint64 Rejected = 0;
         if (Owner)
         {
             // A failed candidate may not replace the last good disk stream.
@@ -71,6 +75,8 @@ das::ProgramPtr CompileEditorCachedPass(const char* File, const das::FileAccessP
                 Owner->Cache.writeStorage.writePos = 0;
                 Owner->Cache.writeStorage.wrote = false;
             }
+            Rejected = Owner->Cache.reader ? Owner->Cache.reader->resumedCorrupt : 0;
+            DiskModuleRejections += Rejected;
             Result = Owner->Cache.finish();
             for (auto& Info : Owner->Cache.orphanedFileInfos)
                 EditorSharedModuleFileInfos.push_back(std::move(Info));
@@ -89,8 +95,8 @@ das::ProgramPtr CompileEditorCachedPass(const char* File, const das::FileAccessP
         CompilerPassSeconds += Elapsed;
         if (CVarCompilerTimings.GetValueOnGameThread() != 0)
             UE_LOG(LogDasRuntime, Display,
-                   TEXT("DAS_COMPILE_PASS file=%s pass=%s ms=%.3f disk_modules=%llu reparsed=%llu wrote=%d cutoff=%s"),
-                        UTF8_TO_TCHAR(File), Pass, Elapsed * 1000, Result.served, Result.resumed, Result.wrote,
+                   TEXT("DAS_COMPILE_PASS file=%s pass=%s ms=%.3f disk_modules=%llu reparsed=%llu rejected=%llu wrote=%d cutoff=%s"),
+                        UTF8_TO_TCHAR(File), Pass, Elapsed * 1000, Result.served, Result.resumed, Rejected, Result.wrote,
                         UTF8_TO_TCHAR(Result.cutoffReason.c_str()));
     };
     Program = das::compileDaScript(File, Access, Output, Group, Policies);

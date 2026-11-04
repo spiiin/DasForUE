@@ -200,7 +200,8 @@ FDasProgramCacheStats FDasRuntimeModule::ProgramCacheStats() const
             SourceSnapshotHits,
             SourceContentChecks,
             SourceBatchInvalidations,
-            EditorSourceReadBatch ? EditorSourceReadBatch->Snapshots.Num() : 0};
+            EditorSourceReadBatch ? EditorSourceReadBatch->Snapshots.Num() : 0,
+            DiskModuleRejections};
 }
 void FDasRuntimeModule::ClearProgramCache()
 {

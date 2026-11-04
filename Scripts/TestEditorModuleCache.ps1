@@ -3,8 +3,10 @@ $ErrorActionPreference='Stop'
 Import-Module "$PSScriptRoot/DasTest.psm1" -Force
 $Das=Get-DasContext -Engine $Engine
 if(!$SkipBuild){Invoke-DasBuild $Das}
-$Sources=@(Get-ChildItem "$($Das.Repo)/Plugins/DasForUE/Source","$($Das.Repo)/Plugins/DasForUE/Tests/Editor" -Recurse -File|ForEach-Object FullName)
+$Sources=@(Get-ChildItem "$($Das.Repo)/Plugins/DasForUE/Source","$($Das.Repo)/Plugins/DasForUE/Tests/Editor","$($Das.Repo)/Plugins/DasForUE/Tests/Runtime" -Recurse -File|ForEach-Object FullName)
+$Sources+=@('ThirdParty/daScript/lib/Release/libDaScript.lib','ThirdParty/daScript/lib/Release/libDaScript_runtime.lib','Scripts/ApplyDaScriptPatches.ps1','Scripts/Dependencies/daScript-module-cache-patches.json','Scripts/Dependencies/daScript-module-cache-safety.patch')|ForEach-Object{Join-Path $Das.Repo $_}
 $Before=Lock-SourceHashes -Paths $Sources
+Invoke-DasAutomation $Das -Test 'DasForUE.Runtime.ModuleCacheSafety' -Name 'module-cache-safety' | Out-Null
 $Probe=[guid]::NewGuid().ToString('N')
 try {
 Invoke-DasCommandlet $Das -Run DasEditorModuleCache -Name editor-cache-cold -Marker 'DAS_EDITOR_MODULE_CACHE PASS phase=cold' -Arguments @("-ProbeId=$Probe",'-Cold') -NoZen
