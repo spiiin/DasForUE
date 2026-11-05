@@ -1,4 +1,5 @@
 #include "WidgetBlueprint.h"
+#include "Animation/WidgetAnimation.h"
 #include "Blueprint/WidgetTree.h"
 #include "Components/Widget.h"
 #include "Editor.h"
@@ -28,6 +29,26 @@ static FAutoConsoleCommand DasUISetRoot(TEXT("Das.UI.SetRoot"),
                 BP->Modify();
                 Tree->Modify();
                 Tree->RootWidget = Root;
+                // Python NewObject bypasses the designer's OnVariableAdded hook.
+                // Register the completed tree before the compiler validates its GUIDs.
+                TSet<FName> VariableNames;
+                BP->ForEachSourceWidget([BP, &VariableNames](UWidget* Widget)
+                {
+                    VariableNames.Add(Widget->GetFName());
+                    if (!BP->WidgetVariableNameToGuidMap.Contains(Widget->GetFName()))
+                    {
+                        BP->OnVariableAdded(Widget->GetFName());
+                    }
+                });
+                for (const auto& Animation : BP->Animations)
+                {
+                    if (Animation) { VariableNames.Add(Animation->GetFName()); }
+                }
+                // Detached/replaced widgets are no longer generated variables.
+                for (auto It = BP->WidgetVariableNameToGuidMap.CreateIterator(); It; ++It)
+                {
+                    if (!VariableNames.Contains(It.Key())) { It.RemoveCurrent(); }
+                }
                 FBlueprintEditorUtils::MarkBlueprintAsStructurallyModified(BP);
                 BP->MarkPackageDirty();
                 UE_LOG(LogTemp, Display, TEXT("DAS_UI_SET_ROOT PASS %s %s"), *BP->GetPathName(), *Root->GetName());

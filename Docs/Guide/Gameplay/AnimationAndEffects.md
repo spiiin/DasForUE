@@ -4,6 +4,20 @@ Two managed modules cover the most common presentation tasks: `ue_animation` pla
 
 For the full generated Animation/Audio/Niagara function surface (for example `CalculateDirection`), see [Animation, Audio and Niagara API](../../Api/AnimationAudioNiagara.md).
 
+## AnimInstance and scoped reflected calls
+
+`ue_mesh_anim_instance(mesh)` returns a checked `AnimInstanceRef`. It can be invalid
+when the mesh has no initialized animation instance; check `ue_is_valid(instance)`
+before using it. The reference does not own the animation instance.
+
+For a dynamically generated Anim Blueprint method that has no typed wrapper,
+`with_ue_call(target.handle, method) $(call) { ... }` supplies a borrowed call frame.
+Set arguments with `ue_arg`, invoke with `ue_invoke_call`, and read results inside
+the block. The scope releases the frame on normal return, early block return and VM failure;
+it propagates a failed block's error message after cleanup. It does not destroy the target UObject.
+Do not retain the frame after the block. `ue_animation` exports this helper;
+other modules can require `ue_call_scope` directly.
+
 ## Montages
 
 Example: `Plugins/DasForUE/Content/Das/Scripts/dsl_montage_actor.das`.

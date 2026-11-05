@@ -2,6 +2,18 @@ options gen2
 module ue_animation public
 require ue_character_control public
 require ue_soft_references public
+require ue_call_scope public
+
+typedef AnimInstanceRef = UENativeObjectRef("/Script/Engine.AnimInstance")
+
+def ue_mesh_anim_instance(mesh : SkeletalMeshComponentRef) : AnimInstanceRef {
+    var instance : AnimInstanceRef
+    with_ue_call(mesh.handle, "GetAnimInstance") $(call) {
+        ue_invoke_call(call)
+        instance = ue_ref(type<AnimInstanceRef>, ue_result_object(call, "ReturnValue"))
+    }
+    return instance
+}
 
 [ue_native_object(path="/Script/Engine.AnimMontage")]
 struct AnimMontageRef { handle:UObjectHandle }

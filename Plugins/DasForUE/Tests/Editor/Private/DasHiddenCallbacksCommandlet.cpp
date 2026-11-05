@@ -208,9 +208,13 @@ int32 UDasHiddenCallbacksCommandlet::Main(const FString& Params)
     const auto First = Runtime.RunLifecycle(Path, EDasCallback::Tick, Actor, .016f);
     Write(Source.Replace(TEXT("return self.TimerHits} // RELOAD_MARKER"),
                               TEXT("return self.TimerHits+0} // RELOAD_MARKER")));
+    // Mirror the editor watcher: managed gameplay callbacks consume prepared
+    // revisions and never compile a changed source on the hot path.
+    Runtime.NotifyScriptsChanged({Path});
+    const bool ReloadPrepared = Runtime.PrepareEditorPrograms({Path}, Error);
     const auto Reload = Runtime.RunLifecycle(Path, EDasCallback::Tick, Actor, .016f);
-    Check(Reload.bSucceeded && Reload.ReloadError.IsEmpty() && Reload.Revision > First.Revision,
-          TEXT("named_hidden_callbacks_reload"), Reload.Error + Reload.ReloadError);
+    Check(ReloadPrepared && Reload.bSucceeded && Reload.ReloadError.IsEmpty() && Reload.Revision > First.Revision,
+          TEXT("named_hidden_callbacks_reload"), Error + Reload.Error + Reload.ReloadError);
     Step();
     Before = Value(TEXT("InputHits"));
     Inject();

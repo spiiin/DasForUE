@@ -1,5 +1,9 @@
 #include "DasDSLService.h"
 #include "DasDiagnostics.h"
+#include "DasCallbackFrames.h"
+#include "DasPropertyTypes.h"
+#include "Dom/JsonObject.h"
+#include "Serialization/JsonSerializer.h"
 #include "DasCharacter.h"
 #include "DasGenericBlueprints.h"
 #include "DasScriptClassData.h"
@@ -57,6 +61,63 @@
 #include "DasNumericGraphMigration.h"
 #include "DasBlueprintRollback.h"
 #include "Misc/SecureHash.h"
+// Removed BindEvents handlers no longer materialize their private argument tuples
+// while compiling the new source. Restore only canonical tuples from the saved
+// event contracts before validating the old authoring model during migration.
+static bool RestoreStoredDasCallbackFrames(UBlueprint* BP, FString& Error)
+{
+    if (!BP || !BP->GeneratedClass) { return true; }
+    const FString Wire = BP->GetOutermost()->GetMetaData().GetValue(BP, TEXT("DasDSLModel"));
+    TSharedPtr<FJsonObject> Json;
+    if (Wire.IsEmpty() || !FJsonSerializer::Deserialize(TJsonReaderFactory<>::Create(Wire), Json) || !Json)
+        return true; // Normal authoring validation reports malformed models.
+    const TArray<TSharedPtr<FJsonValue>>* Classes = nullptr;
+    if (!Json->TryGetArrayField(TEXT("classes"), Classes)) { return true; }
+    for (const auto& ClassValue : *Classes)
+    {
+        const auto Class = ClassValue->AsObject();
+        const TArray<TSharedPtr<FJsonValue>>* Callbacks = nullptr;
+        if (!Class || !Class->TryGetArrayField(TEXT("callbacks"), Callbacks)) { continue; }
+        for (const auto& Value : *Callbacks)
+        {
+            const auto Callback = Value->AsObject();
+            FString Kind, Path, Source, Event;
+            if (!Callback || !Callback->TryGetStringField(TEXT("kind"), Kind) || Kind != TEXT("event") ||
+                !Callback->TryGetStringField(TEXT("parameter_type_path"), Path) ||
+                !Path.StartsWith(TEXT("/Script/DasRuntime.DasCallbackFrame_")) || FindDasCallbackFrame(Path) ||
+                !Callback->TryGetStringField(TEXT("source"), Source) ||
+                !Callback->TryGetStringField(TEXT("event_name"), Event)) { continue; }
+            UClass* SourceClass = BP->GeneratedClass;
+            if (Source == TEXT("owner")) { SourceClass = AActor::StaticClass(); }
+            else if (Source != TEXT("self"))
+            {
+                const auto* Property = FindFProperty<FObjectPropertyBase>(BP->GeneratedClass, *Source);
+                if (!Property) { Error = TEXT("Cannot restore callback source: ") + Source; return false; }
+                auto* Object = Property->GetObjectPropertyValue_InContainer(BP->GeneratedClass->GetDefaultObject());
+                SourceClass = Object ? Object->GetClass() : Property->PropertyClass.Get();
+            }
+            const auto* EventProperty = FindFProperty<FMulticastDelegateProperty>(SourceClass, *Event);
+            auto* Signature = EventProperty ? EventProperty->SignatureFunction.Get() : nullptr;
+            if (!Signature) { Error = TEXT("Cannot restore callback event: ") + Event; return false; }
+            TArray<FDasDeclaredType> Fields;
+            for (TFieldIterator<FProperty> It(Signature); It; ++It)
+            {
+                if (!It->HasAnyPropertyFlags(CPF_Parm)) { continue; }
+                FDasDeclaredType Field;
+                if (It->HasAnyPropertyFlags(CPF_ReturnParm) || !DescribeDasProperty(*It, Field, Error)) { return false; }
+                Fields.Add(MoveTemp(Field));
+            }
+            auto* Frame = DasCallbackFrame(Fields, Error);
+            if (!Frame || Frame->GetPathName() != Path || !ValidateDasCallbackFrameSource(Signature, Frame, Error))
+            {
+                if (Error.IsEmpty()) { Error = TEXT("Stored callback signature differs from source: ") + Event; }
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
 #if WITH_DEV_AUTOMATION_TESTS && DAS_WITH_EDITOR_TESTS
 static bool GDasFailWidenAfterCompile = false;
 static int32 GDasFailStructuralStage = 0, GDasFailRenameStage = 0;
@@ -188,6 +249,7 @@ bool ApplyDeclaration(const FString& Script, const FString& Package, const FStri
         return false;
     }
     UBlueprint* BP = Cast<UBlueprint>(Existing);
+    if (!RestoreStoredDasCallbackFrames(BP, Error)) { return false; }
     if (Existing && !BP)
     {
         Error = TEXT("Asset exists and is not a Blueprint");
@@ -590,6 +652,11 @@ bool ApplyDeclaration(const FString& Script, const FString& Package, const FStri
                     return !PriorClass->Callbacks.ContainsByPredicate(
                         [&](const auto& Old) { return Old.Name == Callback.Name; });
                 });
+            // Widget views are implementation contracts, not reflected members.
+            // PreflightDasWidgetLayouts already validates the new contracts against
+            // assigned widget classes. Independent owners keep the same UE fields
+            // and methods, so they need snapshot/recompile rather than DSL migration.
+            Common.WidgetLayouts = PriorClass->WidgetLayouts;
             const auto Difference = FDasAuthoringModule::Compare(*PriorClass, Common);
             AdditiveMembers = !Difference.bStructural && !Difference.bDefaults &&
                               !Difference.bImplementation;

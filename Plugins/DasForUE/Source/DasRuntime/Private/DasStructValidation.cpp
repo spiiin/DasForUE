@@ -53,7 +53,7 @@ bool ValidateDasValueStruct(const FString& Path, FString& Error)
     if (!Type ||
         (!Path.StartsWith(TEXT("/Script/")) && !(Path.StartsWith(TEXT("/Game/")) && Type->IsA<UUserDefinedStruct>())))
     {
-        Error = TEXT("Expected loaded native or authored user struct path");
+        Error = FString::Printf(TEXT("Expected loaded native or authored user struct path: %s"), *Path);
         return false;
     }
     TSet<UScriptStruct*> Active;

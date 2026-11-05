@@ -253,6 +253,8 @@ def stale(input:int):int {ue_widget_set_text(view.Score,ue_text_invariant("stale
     const FString ProbePath = Runtime.ScriptPath(ProbeName);
     FFileHelper::SaveStringToFile(Probe, *ProbePath);
     Scratch.Add(ProbePath);
+    // Persistent calls consume prepared programs; they never compile on first use.
+    Check(Runtime.PrepareEditorPrograms({ProbePath}, Error), TEXT("runtime_widget_program_prepared"), Error);
     // Actor::ProcessEvent skips native UFUNCTIONs in a non-started commandlet World without this guard.
     FEditorScriptExecutionGuard AllowActorCalls;
     auto R = Runtime.RunNamedPersistent(ProbePath, TEXT("main"), 0, PC);
