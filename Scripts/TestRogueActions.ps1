@@ -1,4 +1,4 @@
-param([string]$Engine='C:\src\unreal\UnrealEngine', [string]$PortRoot='C:\src\ActionRoguelikeDas', [switch]$SkipBuild, [switch]$InputLifecycle, [switch]$Attack, [switch]$Attributes, [switch]$Combat, [switch]$Presentation, [switch]$Effects, [switch]$Overwhelm, [switch]$PointImpact, [switch]$AI, [switch]$AIPresentation, [switch]$Patrol, [switch]$Pickup, [switch]$Coins, [string]$Scenario, [switch]$Unattended)
+param([string]$Engine='C:\src\unreal\UnrealEngine', [string]$PortRoot='C:\src\ActionRoguelikeDas', [switch]$SkipBuild, [switch]$InputLifecycle, [switch]$Attack, [switch]$Attributes, [switch]$Combat, [switch]$Presentation, [switch]$Effects, [switch]$Overwhelm, [switch]$PointImpact, [switch]$AI, [switch]$AIPresentation, [switch]$Patrol, [switch]$Pickup, [switch]$Coins, [string]$Scenario, [switch]$Unattended, [switch]$Audio)
 $ErrorActionPreference='Stop'
 Import-Module (Join-Path $PSScriptRoot 'DasTest.psm1') -Force
 $Das=Get-DasContext -Engine $Engine
@@ -23,6 +23,8 @@ $Command="py __import__('runpy').run_path(r'$Bootstrap')"
 $Log=Join-Path $Das.Logs ('rogue-'+$Case+'.log')
 $Map=if($Case -eq 'director'){'/Game/DasRogue/Maps/DirectorTest'}elseif(($Patrol -or $Coins) -and (Test-Path -LiteralPath (Join-Path $PortRoot 'Content/DasRogue/Maps/PatrolTest.umap'))){'/Game/DasRogue/Maps/PatrolTest'}else{'/Game/DasRogue/Maps/ChestTest'}
 $Arguments=@(('"'+(Join-Path $PortRoot 'ActionRoguelikeDas.uproject')+'"'),$Map,'-Multiprocess','-NoZenAutoLaunch','-ddc=NoZenLocalFallback','-nosplash','-NoSound','-benchmark','-fps=60',('-abslog="'+$Log+'"'),('-ExecCmds="'+$Command+'"'))
+# Benchmark mode disables the audio engine even without -NoSound.
+if($Audio){$Arguments=@($Arguments|Where-Object {$_ -notin @('-NoSound','-benchmark','-fps=60')})}
 if($Unattended){$Arguments+='-unattended'}
 $StrictSetup=$Scenario -or $Attributes -or $Attack -or $Combat -or $InputLifecycle -or $Coins -or $Pickup -or $Patrol -or $AIPresentation -or $AI -or $Presentation -or $Effects -or $Overwhelm -or $PointImpact
 # Do not interpret the previous run's errors while the new editor is starting.

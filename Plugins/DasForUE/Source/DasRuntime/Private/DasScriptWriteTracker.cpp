@@ -4,6 +4,8 @@
 #include "GenericPlatform/GenericPlatformFile.h"
 #include "HAL/PlatformFileManager.h"
 #include "Misc/PathViews.h"
+#include "Misc/Paths.h"
+#include "Interfaces/IPluginManager.h"
 #include "Misc/ScopeLock.h"
 #include <atomic>
 
@@ -13,6 +15,26 @@ FCriticalSection QueueLock;
 std::atomic<bool> bQueued{false};
 TSet<FString> QueuedFiles, QueuedDirectories;
 bool bQueuedAddedOrRemoved = false;
+// Initialized before installing the IO layer, then read-only on worker threads.
+TArray<FString> ScriptDirectoryRoots;
+FString DirectoryPrefix(const TCHAR* Path)
+{
+    FString Full = FPaths::ConvertRelativePathToFull(Path);
+    FPaths::NormalizeDirectoryName(Full);
+    FPaths::CollapseRelativeDirectories(Full);
+    return Full + TEXT("/");
+}
+bool TouchesScriptDirectory(const TCHAR* Path)
+{
+    if (!Path || !*Path)
+        return false;
+    const FString Directory = DirectoryPrefix(Path);
+    for (const FString& Root : ScriptDirectoryRoots)
+        if (Directory.StartsWith(Root, ESearchCase::IgnoreCase) ||
+            Root.StartsWith(Directory, ESearchCase::IgnoreCase))
+            return true;
+    return false;
+}
 
 bool IsScript(const TCHAR* Path)
 {
@@ -27,6 +49,10 @@ bool MayHoldScripts(const TCHAR* Path)
 // File operations run on any thread (async IO, DDC, shader workers); the queue is drained on the game thread.
 void Queue(const TCHAR* Path, bool bDirectory, bool bAddedOrRemoved)
 {
+    // Shader/DDC/audio caches also delete directories through this platform
+    // layer. Those operations cannot change script require resolution.
+    if (bDirectory && !TouchesScriptDirectory(Path))
+        return;
     FScopeLock Lock(&QueueLock);
     (bDirectory ? QueuedDirectories : QueuedFiles).Add(Path);
     bQueuedAddedOrRemoved |= bAddedOrRemoved;
@@ -83,6 +109,13 @@ public:
     virtual bool Initialize(IPlatformFile* Inner, const TCHAR* CmdLine) override
     {
         Lower = Inner;
+        if (ScriptDirectoryRoots.IsEmpty())
+        {
+            ScriptDirectoryRoots.Add(DirectoryPrefix(*(FPaths::ProjectContentDir() / TEXT("Das/Scripts"))));
+            if (auto Plugin = IPluginManager::Get().FindPlugin(TEXT("DasForUE")))
+                for (const TCHAR* Folder : {TEXT("Das/Scripts"), TEXT("Das/Runtime")})
+                    ScriptDirectoryRoots.Add(DirectoryPrefix(*(Plugin->GetContentDir() / Folder)));
+        }
         return Lower != nullptr;
     }
     virtual IPlatformFile* GetLowerLevel() override { return Lower; }

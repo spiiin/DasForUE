@@ -49,33 +49,14 @@ def ue_world_audio_create(name : string = "Audio") : WorldAudioComponentRef {
 // Values are native FPrimitiveInstanceId keys, scoped to this component, not array indices.
 def ue_ism_add_instances(mesh : InstancedStaticMeshComponentRef; transforms : array<UETransform>;
     worldSpace : bool = true; updateNavigation : bool = false) : array<int> {
-    let call = ue_begin_static_call("/Script/DasRuntime.DasWorldComponentLibrary", "AddInstancesById", "")
-    ue_arg(call, "Mesh", mesh)
-    ue_arg_array(call, "Transforms", length(transforms))
-    for (index, value in range(length(transforms)), transforms) {
-        ue_arg(call, "Transforms.{index}", value)
-    }
-    ue_arg(call, "WorldSpace", worldSpace)
-    ue_arg(call, "UpdateNavigation", updateNavigation)
-    ue_invoke_call(call)
     var ids : array<int>
-    resize(ids, ue_result_array_size(call, "ReturnValue"))
-    for (index in range(length(ids))) { ids[index] = ue_result_int(call, "ReturnValue.{index}") }
-    ue_release_call(call)
+    __ue_ism_add_instances(mesh.handle, transforms, worldSpace, updateNavigation, ids)
     return <- ids
 }
 
 def ue_ism_remove_instances(mesh : InstancedStaticMeshComponentRef; ids : array<int>;
     updateNavigation : bool = false) : bool {
-    let call = ue_begin_static_call("/Script/DasRuntime.DasWorldComponentLibrary", "RemoveInstancesById", "")
-    ue_arg(call, "Mesh", mesh)
-    ue_arg_array(call, "Ids", length(ids))
-    for (index, value in range(length(ids)), ids) { ue_arg(call, "Ids.{index}", value) }
-    ue_arg(call, "UpdateNavigation", updateNavigation)
-    ue_invoke_call(call)
-    let removed = ue_result_bool(call, "ReturnValue")
-    ue_release_call(call)
-    return removed
+    return __ue_ism_remove_instances(mesh.handle, ids, updateNavigation)
 }
 
 def ue_ism_instance_index(mesh : InstancedStaticMeshComponentRef; id : int) : int {
@@ -86,9 +67,4 @@ def ue_ism_instance_index(mesh : InstancedStaticMeshComponentRef; id : int) : in
     let index = ue_result_int(call, "ReturnValue")
     ue_release_call(call)
     return index
-}
-
-// Native-only audio interface dispatch stays inside the generic wrapper.
-def ue_audio_trigger(audio : WorldAudioComponentRef; name : string) : void {
-    __ue_audio_trigger(audio.handle, ue_name_value(name))
 }

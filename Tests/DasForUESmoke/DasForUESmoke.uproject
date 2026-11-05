@@ -43,6 +43,10 @@
     {
       "Name": "ControlRig",
       "Enabled": true
+    },
+    {
+      "Name": "Metasound",
+      "Enabled": true
     }
   ],
   "DisableEnginePluginsByDefault": true

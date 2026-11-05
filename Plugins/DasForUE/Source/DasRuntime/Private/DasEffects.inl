@@ -131,7 +131,9 @@ bool ScriptEffectBurst(const FDasObjectHandle& SoundHandle, const FDasObjectHand
         UGameplayStatics::PlaySoundAtLocation(W, Sound, Transform.GetLocation(), Transform.Rotator(), Volume, Pitch);
         Played = true;
     }
-    if (System && System->IsReadyToRun())
+    // The component owns deferred activation/PSO readiness, as in native UE gameplay.
+    // Skipping an unready system here permanently loses its first one-shot effect.
+    if (System)
         Played |= UNiagaraFunctionLibrary::SpawnSystemAtLocation(
                       W, System, Transform.GetLocation(), Transform.Rotator(), Transform.GetScale3D()) != nullptr;
     return Played;

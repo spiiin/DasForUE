@@ -204,6 +204,11 @@
 				"name": "NavigationPathRef"
 			},
 			{
+				"path": "/Script/NavigationSystem.NavigationSystemV1",
+				"module": "ue_navigation",
+				"name": "NavigationSystemRef"
+			},
+			{
 				"path": "/Script/Niagara.NiagaraSystem",
 				"module": "ue_effects",
 				"name": "NiagaraSystemRef"
@@ -1251,6 +1256,23 @@
 				{
 					"name": "MOVE_Custom",
 					"value": 6
+				}
+			]
+		},
+		{
+			"path": "/Script/Engine.ENavDataGatheringModeConfig",
+			"entries": [
+				{
+					"name": "Invalid",
+					"value": 0
+				},
+				{
+					"name": "Instant",
+					"value": 1
+				},
+				{
+					"name": "Lazy",
+					"value": 2
 				}
 			]
 		},
@@ -107279,6 +107301,390 @@
 				{
 					"domain": "method",
 					"name": "ExecuteUbergraph",
+					"reason": "requires_adapter_or_nonpublic_policy"
+				}
+			]
+		},
+		{
+			"path": "/Script/NavigationSystem.NavigationSystemV1",
+			"fixture": false,
+			"fields": [
+				{
+					"kind": "struct",
+					"type_path": "/Script/DasRuntime.DasSoftClass_fa5bc1d00ba232895911fd4bbc0a4e5b",
+					"soft_reference":
+					{
+						"base": "/Script/NavigationSystem.CrowdManagerBase",
+						"class_ref": true
+					},
+					"name": "CrowdManagerClass",
+					"declaring_class": "/Script/NavigationSystem.NavigationSystemV1",
+					"readonly": true,
+					"access":
+					{
+						"native_getter": false,
+						"native_setter": false,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": ""
+					},
+					"signature": "CrowdManagerClass:SoftClassProperty:0:soft:/Script/NavigationSystem.CrowdManagerBase;"
+				},
+				{
+					"kind": "name",
+					"type_path": "",
+					"name": "DefaultAgentName",
+					"declaring_class": "/Script/NavigationSystem.NavigationSystemV1",
+					"readonly": true,
+					"access":
+					{
+						"native_getter": false,
+						"native_setter": false,
+						"getter_unsafe": false,
+						"setter_unsafe": false,
+						"getter": "",
+						"setter": ""
+					},
+					"signature": "DefaultAgentName:NameProperty:0;"
+				}
+			],
+			"methods": [
+				{
+					"name": "K2_ReplaceAreaInOctreeData",
+					"declaring_class": "/Script/NavigationSystem.NavigationSystemV1",
+					"signature": "v1;K2_ReplaceAreaInOctreeData;Object:ObjectProperty:130:/Script/CoreUObject.Object;OldArea:ClassProperty:128:meta:/Script/NavigationSystem.NavArea;NewArea:ClassProperty:128:meta:/Script/NavigationSystem.NavArea;ReturnValue:BoolProperty:1408;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "object",
+							"type_path": "/Script/CoreUObject.Object",
+							"name": "Object",
+							"direction": "in"
+						},
+						{
+							"kind": "class",
+							"type_path": "/Script/NavigationSystem.NavArea",
+							"name": "OldArea",
+							"direction": "in"
+						},
+						{
+							"kind": "class",
+							"type_path": "/Script/NavigationSystem.NavArea",
+							"name": "NewArea",
+							"direction": "in"
+						},
+						{
+							"kind": "bool",
+							"type_path": "",
+							"name": "ReturnValue",
+							"direction": "return"
+						}
+					]
+				},
+				{
+					"name": "OnNavigationBoundsUpdated",
+					"declaring_class": "/Script/NavigationSystem.NavigationSystemV1",
+					"signature": "v1;OnNavigationBoundsUpdated;NavVolume:ObjectProperty:128:/Script/NavigationSystem.NavMeshBoundsVolume;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "object",
+							"type_path": "/Script/NavigationSystem.NavMeshBoundsVolume",
+							"name": "NavVolume",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "RegisterNavigationInvoker",
+					"declaring_class": "/Script/NavigationSystem.NavigationSystemV1",
+					"signature": "v1;RegisterNavigationInvoker;Invoker:ObjectProperty:128:/Script/Engine.Actor;TileGenerationRadius:FloatProperty:128;TileRemovalRadius:FloatProperty:128;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "object",
+							"type_path": "/Script/Engine.Actor",
+							"name": "Invoker",
+							"direction": "in"
+						},
+						{
+							"kind": "float",
+							"type_path": "",
+							"name": "TileGenerationRadius",
+							"direction": "in",
+							"default_text": "3000.000000"
+						},
+						{
+							"kind": "float",
+							"type_path": "",
+							"name": "TileRemovalRadius",
+							"direction": "in",
+							"default_text": "5000.000000"
+						}
+					]
+				},
+				{
+					"name": "ResetMaxSimultaneousTileGenerationJobsCount",
+					"declaring_class": "/Script/NavigationSystem.NavigationSystemV1",
+					"signature": "v1;ResetMaxSimultaneousTileGenerationJobsCount;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": []
+				},
+				{
+					"name": "SetGeometryGatheringMode",
+					"declaring_class": "/Script/NavigationSystem.NavigationSystemV1",
+					"signature": "v1;SetGeometryGatheringMode;NewMode:EnumProperty:128:/Script/Engine.ENavDataGatheringModeConfig;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "enum",
+							"type_path": "/Script/Engine.ENavDataGatheringModeConfig",
+							"name": "NewMode",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "SetMaxSimultaneousTileGenerationJobsCount",
+					"declaring_class": "/Script/NavigationSystem.NavigationSystemV1",
+					"signature": "v1;SetMaxSimultaneousTileGenerationJobsCount;MaxNumberOfJobs:IntProperty:128;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "int",
+							"type_path": "",
+							"name": "MaxNumberOfJobs",
+							"direction": "in"
+						}
+					]
+				},
+				{
+					"name": "UnregisterNavigationInvoker",
+					"declaring_class": "/Script/NavigationSystem.NavigationSystemV1",
+					"signature": "v1;UnregisterNavigationInvoker;Invoker:ObjectProperty:128:/Script/Engine.Actor;",
+					"const": false,
+					"construction_unsafe": false,
+					"parameters": [
+						{
+							"kind": "object",
+							"type_path": "/Script/Engine.Actor",
+							"name": "Invoker",
+							"direction": "in"
+						}
+					]
+				}
+			],
+			"skipped": [
+				{
+					"domain": "field",
+					"name": "AbstractNavData",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "ActiveTilesUpdateInterval",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bAllowClientSideNavigation",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bAutoCreateNavigationData",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bDirtyNavDataPackageOnNavigationGenerationFinished",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bGenerateNavigationOnlyAroundNavigationInvokers",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bInitialBuildingLocked",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bShouldDiscardSubLevelNavData",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bSkipAgentHeightCheckWhenPickingNavData",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bSpawnNavDataInNavBoundsLevel",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bSupportRebuilding",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bTickWhilePaused",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "BuildBounds",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "bWaitForAsyncLoadingBeforeBuildingNavigationAutomatically",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "DataGatheringMode",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "DirtyAreaWarningSizeThreshold",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "GatheringNavModifiersWarningLimitTime",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "GeometryExportTriangleCountWarningThreshold",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "InvokersMaximumDistanceFromSeed",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "MainNavData",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "NavDataRegistrationQueue",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "NavDataSet",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "OnNavDataRegisteredEvent",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "OnNavigationGenerationFinishedDelegate",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "OperationMode",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "Repository",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "SupportedAgents",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "field",
+					"name": "SupportedAgentsMask",
+					"reason": "hidden_editor_or_deprecated"
+				},
+				{
+					"domain": "method",
+					"name": "ExecuteUbergraph",
+					"reason": "requires_adapter_or_nonpublic_policy"
+				},
+				{
+					"domain": "method",
+					"name": "FindPathToActorSynchronously",
+					"reason": "requires_adapter_or_nonpublic_policy"
+				},
+				{
+					"domain": "method",
+					"name": "FindPathToLocationSynchronously",
+					"reason": "requires_adapter_or_nonpublic_policy"
+				},
+				{
+					"domain": "method",
+					"name": "GetNavigationSystem",
+					"reason": "requires_adapter_or_nonpublic_policy"
+				},
+				{
+					"domain": "method",
+					"name": "GetPathCost",
+					"reason": "requires_adapter_or_nonpublic_policy"
+				},
+				{
+					"domain": "method",
+					"name": "GetPathLength",
+					"reason": "requires_adapter_or_nonpublic_policy"
+				},
+				{
+					"domain": "method",
+					"name": "IsNavigationBeingBuilt",
+					"reason": "requires_adapter_or_nonpublic_policy"
+				},
+				{
+					"domain": "method",
+					"name": "IsNavigationBeingBuiltOrLocked",
+					"reason": "requires_adapter_or_nonpublic_policy"
+				},
+				{
+					"domain": "method",
+					"name": "K2_GetRandomLocationInNavigableRadius",
+					"reason": "requires_adapter_or_nonpublic_policy"
+				},
+				{
+					"domain": "method",
+					"name": "K2_GetRandomPointInNavigableRadius",
+					"reason": "requires_adapter_or_nonpublic_policy"
+				},
+				{
+					"domain": "method",
+					"name": "K2_GetRandomReachablePointInRadius",
+					"reason": "requires_adapter_or_nonpublic_policy"
+				},
+				{
+					"domain": "method",
+					"name": "K2_ProjectPointToNavigation",
+					"reason": "requires_adapter_or_nonpublic_policy"
+				},
+				{
+					"domain": "method",
+					"name": "NavigationRaycast",
 					"reason": "requires_adapter_or_nonpublic_policy"
 				}
 			]

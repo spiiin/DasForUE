@@ -99,9 +99,11 @@ TSharedPtr<FCompiledProgram> AcquireCompiledProgram(const FString& Path, bool bA
         PreparationPass.Emplace();
     DrainScriptWrites();
     const FString Key = PersistentCompilerKey(Path);
+    FString CacheMiss = TEXT("no artifact for current compiler environment");
     if (auto* Weak = KnownCompiledPrograms.Find(Key))
         if (auto Cached = Weak->Pin(); Cached && !Cached->bSimulating)
         {
+            CacheMiss = TEXT("source snapshot changed");
             const int32 Mode = bPreparation ? 0 : CVarScriptChangeCheck.GetValueOnGameThread();
             const bool Full = Mode != 2 && (Mode == 0 || Cached->CheckedEpoch != ScriptSourceEpoch);
             // Reflected dependencies may have appeared since a failed editor preparation.
@@ -135,6 +137,10 @@ TSharedPtr<FCompiledProgram> AcquireCompiledProgram(const FString& Path, bool bA
                     Cached->RestoreReferenceMetadata();
                 return Cached;
             }
+            if (!bAllowSourceCompilation)
+                for (const auto& Source : Cached->Sources)
+                    if (!Source.Value.Matches(Source.Key))
+                        UE_LOG(LogDasRuntime, Display, TEXT("DAS_PREPARED_MISS changed_source=%s"), *Source.Key);
             ResidentCompiledPrograms.Remove(Cached);
         }
     auto Compiled = MakeShared<FCompiledProgram>();
@@ -158,7 +164,12 @@ TSharedPtr<FCompiledProgram> AcquireCompiledProgram(const FString& Path, bool bA
             Compiled->bPreparationMissing = true;
             Compiled->CompileError =
                 TEXT("Gameplay program is not prepared: ") + Path +
-                     TEXT(". Wait for saved scripts to finish compiling or prepare the script before use.");
+                     TEXT(". Wait for saved scripts to finish compiling or prepare the script before use. Cache: ") + CacheMiss;
+            for (const auto& Pair : KnownCompiledPrograms)
+                if (Pair.Key.StartsWith(Path + TEXT("|")))
+                    if (auto Other = Pair.Value.Pin())
+                        UE_LOG(LogDasRuntime, Display, TEXT("DAS_PREPARED_MISS same_key=%d simulating=%d program=%d error=%s environment=%s"),
+                            Pair.Key == Key, Other->bSimulating, bool(Other->Program), *Other->CompileError, *Pair.Key.RightChop(Path.Len()));
         }
         else
         {

@@ -1,3 +1,7 @@
+#include "DasContainerTypes.h"
+#include "NavigationSystem.h"
+#include "Components/InstancedStaticMeshComponent.h"
+#include "DasWorldComponentLibrary.h"
 #if DAS_WITH_TEST_PROBES
 #include "DasNativeHashProbeComponent.h"
 #endif

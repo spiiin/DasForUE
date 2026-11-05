@@ -224,6 +224,14 @@ def Native_GameplayEffectComponentRef_48d8f122_from(value:UObjectHandle):Native_
 struct Native_GameplayEffectUIDataRef_21cf1352 { handle:UObjectHandle }
 def Native_GameplayEffectUIDataRef_21cf1352_from(value:UObjectHandle):Native_GameplayEffectUIDataRef_21cf1352 { return Native_GameplayEffectUIDataRef_21cf1352(handle=ue_cast_nullable_object(value,"/Script/GameplayAbilities.GameplayEffectUIData")) }
 
+[ue_native_object(path="/Script/NavigationSystem.CrowdManagerBase")]
+struct Native_CrowdManagerBaseRef_2d8fbe98 { handle:UObjectHandle }
+def Native_CrowdManagerBaseRef_2d8fbe98_from(value:UObjectHandle):Native_CrowdManagerBaseRef_2d8fbe98 { return Native_CrowdManagerBaseRef_2d8fbe98(handle=ue_cast_nullable_object(value,"/Script/NavigationSystem.CrowdManagerBase")) }
+
+[ue_native_object(path="/Script/NavigationSystem.NavMeshBoundsVolume")]
+struct Native_NavMeshBoundsVolumeRef_c90f14df { handle:UObjectHandle }
+def Native_NavMeshBoundsVolumeRef_c90f14df_from(value:UObjectHandle):Native_NavMeshBoundsVolumeRef_c90f14df { return Native_NavMeshBoundsVolumeRef_c90f14df(handle=ue_cast_nullable_object(value,"/Script/NavigationSystem.NavMeshBoundsVolume")) }
+
 [ue_native_object(path="/Script/StaticMeshDescription.StaticMeshDescription")]
 struct Native_StaticMeshDescriptionRef_26792a74 { handle:UObjectHandle }
 def Native_StaticMeshDescriptionRef_26792a74_from(value:UObjectHandle):Native_StaticMeshDescriptionRef_26792a74 { return Native_StaticMeshDescriptionRef_26792a74(handle=ue_cast_nullable_object(value,"/Script/StaticMeshDescription.StaticMeshDescription")) }
@@ -255,6 +263,8 @@ def Native_WidgetNavigationRef_8de38c28_from(value:UObjectHandle):Native_WidgetN
 typedef NativeSoftClass_GameplayEffect_06e0d8b0 = $UESoftClass<Native_GameplayEffectRef_77c7fc7b>
 
 typedef NativeSoftClass_Actor_ed297b28 = $UESoftClass<C_Actor_adf65d5b>
+
+typedef NativeSoftClass_CrowdManagerBase_706d24e3 = $UESoftClass<Native_CrowdManagerBaseRef_2d8fbe98>
 
 typedef NativeSoftObject_Object_f325c329 = $UESoftObject<C_Object_55c3753a>
 
@@ -593,6 +603,13 @@ enum EMovementMode {
     MOVE_Swimming=4
     MOVE_Flying=5
     MOVE_Custom=6
+}
+
+[ue_native_enum(path="/Script/Engine.ENavDataGatheringModeConfig")]
+enum ENavDataGatheringModeConfig {
+    Invalid=0
+    Instant=1
+    Lazy=2
 }
 
 [ue_native_enum(path="/Script/Engine.ENavigationOptionFlag")]

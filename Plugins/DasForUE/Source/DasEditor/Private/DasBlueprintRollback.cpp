@@ -13,6 +13,7 @@
 #include "DasSoftReferences.h"
 #include "Engine/Blueprint.h"
 #include "Engine/DataAsset.h"
+#include "Engine/DataTable.h"
 #include "Engine/BlueprintGeneratedClass.h"
 #include "Engine/World.h"
 #include "Engine/SCS_Node.h"
@@ -252,13 +253,16 @@ bool FDasBlueprintRollback::GatherScope(UBlueprint* Root, TArray<UBlueprint*>& B
                     });
                 if (Data.Num() != 1 || (Data[0].AssetClassPath != UBlueprint::StaticClass()->GetClassPathName() &&
                                         Data[0].AssetClassPath != UWorld::StaticClass()->GetClassPathName() &&
+                                        // Row layout is unchanged during a class migration. Native
+                                        // reinstancing updates references in DataTable row storage.
+                                        Data[0].AssetClassPath != UDataTable::StaticClass()->GetClassPathName() &&
                                         // A DataAsset may refer to a migrated class without deriving from it.
                                         !InstanceAsset(Data[0], nullptr)))
                 {
                     FString Kinds;
                     for (const auto& Item : Data)
                         Kinds += TEXT(" ") + Item.AssetClassPath.ToString();
-                    Error = FString::Printf(TEXT("Structural migration supports Blueprint, map and DataAsset instance packages only: %s (%d exports:%s)"),
+                    Error = FString::Printf(TEXT("Structural migration supports Blueprint, map, DataTable and DataAsset instance packages only: %s (%d exports:%s)"),
                         *P.ToString(), Data.Num(), *Kinds);
                     return false;
                 }

@@ -55,6 +55,7 @@ __ue_actor_owner	@ue_foundation::__ue_actor_owner CIH<ue_foundation::UObjectHand
 __ue_actor_spawn	@ue_foundation::__ue_actor_spawn CH<ue_foundation::UEClassHandle> CIH<ue_foundation::UETransform> CIH<ue_foundation::UObjectHandle> CIs CIs CIs C_c	ue_foundation::UObjectHandle	4
 __ue_actor_spawn_instigated	@ue_foundation::__ue_actor_spawn_instigated CH<ue_foundation::UEClassHandle> CIH<ue_foundation::UETransform> CIH<ue_foundation::UObjectHandle> CIH<ue_foundation::UObjectHandle> CIs CIs CIs C_c	ue_foundation::UObjectHandle	4
 __ue_ai_active	@ue_foundation::__ue_ai_active CIs C_c	bool const	4
+__ue_ai_brain_pause	@ue_foundation::__ue_ai_brain_pause CIH<ue_foundation::UObjectHandle> Cb CIs C_c	bool const	4
 __ue_ai_cancel	@ue_foundation::__ue_ai_cancel CIs C_c	bool const	4
 __ue_ai_focus	@ue_foundation::__ue_ai_focus CIH<ue_foundation::UObjectHandle> CIH<ue_foundation::UObjectHandle> C_c	void	4
 __ue_ai_line_of_sight	@ue_foundation::__ue_ai_line_of_sight CIH<ue_foundation::UObjectHandle> CIH<ue_foundation::UObjectHandle> C_c	bool const	4
@@ -75,6 +76,28 @@ __ue_arg_native_delegate	@ue_foundation::__ue_arg_native_delegate CIH<ue_foundat
 __ue_arg_navigationevent	@ue_foundation::__ue_arg_navigationevent CIH<ue_foundation::UCallHandle> CIs CIH<ue_foundation::UENavigationEvent> C_c	void	4
 __ue_arg_paint_context	@ue_foundation::__ue_arg_paint_context CIH<ue_foundation::UCallHandle> CIs CIH<ue_foundation::UEPaintContext> C_c	void	4
 __ue_arg_pointerevent	@ue_foundation::__ue_arg_pointerevent CIH<ue_foundation::UCallHandle> CIs CIH<ue_foundation::UEPointerEvent> C_c	void	4
+__ue_array_pack_color	@ue_foundation::__ue_array_pack_color CIs CI1<H<ue_foundation::UEColor>>A C_c C_l	ue_foundation::UEStructValue	4
+__ue_array_pack_double	@ue_foundation::__ue_array_pack_double CIs CI1<d>A C_c C_l	ue_foundation::UEStructValue	4
+__ue_array_pack_float	@ue_foundation::__ue_array_pack_float CIs CI1<f>A C_c C_l	ue_foundation::UEStructValue	4
+__ue_array_pack_int	@ue_foundation::__ue_array_pack_int CIs CI1<i>A C_c C_l	ue_foundation::UEStructValue	4
+__ue_array_pack_int64	@ue_foundation::__ue_array_pack_int64 CIs CI1<i64>A C_c C_l	ue_foundation::UEStructValue	4
+__ue_array_pack_linearcolor	@ue_foundation::__ue_array_pack_linearcolor CIs CI1<H<ue_foundation::UELinearColor>>A C_c C_l	ue_foundation::UEStructValue	4
+__ue_array_pack_quat	@ue_foundation::__ue_array_pack_quat CIs CI1<H<ue_foundation::UEQuat>>A C_c C_l	ue_foundation::UEStructValue	4
+__ue_array_pack_rotator	@ue_foundation::__ue_array_pack_rotator CIs CI1<H<ue_foundation::UERotator>>A C_c C_l	ue_foundation::UEStructValue	4
+__ue_array_pack_transform	@ue_foundation::__ue_array_pack_transform CIs CI1<H<ue_foundation::UETransform>>A C_c C_l	ue_foundation::UEStructValue	4
+__ue_array_pack_vector	@ue_foundation::__ue_array_pack_vector CIs CI1<H<ue_foundation::UEVector>>A C_c C_l	ue_foundation::UEStructValue	4
+__ue_array_pack_vector2d	@ue_foundation::__ue_array_pack_vector2d CIs CI1<H<ue_foundation::UEVector2D>>A C_c C_l	ue_foundation::UEStructValue	4
+__ue_array_unpack_color	@ue_foundation::__ue_array_unpack_color CIH<ue_foundation::UEStructValue> CIs I1<H<ue_foundation::UEColor>>A C_c C_l	void	4
+__ue_array_unpack_double	@ue_foundation::__ue_array_unpack_double CIH<ue_foundation::UEStructValue> CIs I1<d>A C_c C_l	void	4
+__ue_array_unpack_float	@ue_foundation::__ue_array_unpack_float CIH<ue_foundation::UEStructValue> CIs I1<f>A C_c C_l	void	4
+__ue_array_unpack_int	@ue_foundation::__ue_array_unpack_int CIH<ue_foundation::UEStructValue> CIs I1<i>A C_c C_l	void	4
+__ue_array_unpack_int64	@ue_foundation::__ue_array_unpack_int64 CIH<ue_foundation::UEStructValue> CIs I1<i64>A C_c C_l	void	4
+__ue_array_unpack_linearcolor	@ue_foundation::__ue_array_unpack_linearcolor CIH<ue_foundation::UEStructValue> CIs I1<H<ue_foundation::UELinearColor>>A C_c C_l	void	4
+__ue_array_unpack_quat	@ue_foundation::__ue_array_unpack_quat CIH<ue_foundation::UEStructValue> CIs I1<H<ue_foundation::UEQuat>>A C_c C_l	void	4
+__ue_array_unpack_rotator	@ue_foundation::__ue_array_unpack_rotator CIH<ue_foundation::UEStructValue> CIs I1<H<ue_foundation::UERotator>>A C_c C_l	void	4
+__ue_array_unpack_transform	@ue_foundation::__ue_array_unpack_transform CIH<ue_foundation::UEStructValue> CIs I1<H<ue_foundation::UETransform>>A C_c C_l	void	4
+__ue_array_unpack_vector	@ue_foundation::__ue_array_unpack_vector CIH<ue_foundation::UEStructValue> CIs I1<H<ue_foundation::UEVector>>A C_c C_l	void	4
+__ue_array_unpack_vector2d	@ue_foundation::__ue_array_unpack_vector2d CIH<ue_foundation::UEStructValue> CIs I1<H<ue_foundation::UEVector2D>>A C_c C_l	void	4
 __ue_asset_load_async	@ue_foundation::__ue_asset_load_async CIs CIs CIs CIs C_c	void	4
 __ue_audio_trigger	@ue_foundation::__ue_audio_trigger CIH<ue_foundation::UObjectHandle> CH<ue_foundation::UENameValue> C_c	void	4
 __ue_authored_component_get	@ue_foundation::__ue_authored_component_get CIH<ue_foundation::UObjectHandle> CIs CIs C_c	ue_foundation::UObjectHandle	4
@@ -121,6 +144,7 @@ __ue_class_component_operation	@ue_foundation::__ue_class_component_operation CI
 __ue_class_default_object	@ue_foundation::__ue_class_default_object CIs CH<ue_foundation::UEClassHandle> CIs Cb C_c	ue_foundation::UObjectHandle	4
 __ue_class_loaded	@ue_foundation::__ue_class_loaded CIs CIs CIs C_c	ue_foundation::UEClassHandle	4
 __ue_collision_profile_name	@ue_foundation::__ue_collision_profile_name Ci64 C_c	ue_foundation::UENameValue	4
+__ue_controller_is_friendly	@ue_foundation::__ue_controller_is_friendly CIH<ue_foundation::UObjectHandle> CIH<ue_foundation::UObjectHandle> C_c	bool const	4
 __ue_controller_set_team	@ue_foundation::__ue_controller_set_team CIH<ue_foundation::UObjectHandle> Ci C_c	void	4
 __ue_curve_table_eval	@ue_foundation::__ue_curve_table_eval CIH<ue_foundation::UObjectHandle> CIs Cf Cf C_c	float const	4
 __ue_curve_table_has	@ue_foundation::__ue_curve_table_has CIH<ue_foundation::UObjectHandle> CIs C_c	bool const	4
@@ -155,6 +179,7 @@ __ue_enhanced_bind	@ue_foundation::__ue_enhanced_bind CIH<ue_foundation::UObject
 __ue_enhanced_has_context	@ue_foundation::__ue_enhanced_has_context CIH<ue_foundation::UObjectHandle> CIH<ue_foundation::UObjectHandle> C_c	bool const	4
 __ue_enhanced_remove_context	@ue_foundation::__ue_enhanced_remove_context CIH<ue_foundation::UObjectHandle> CIH<ue_foundation::UObjectHandle> C_c	bool const	4
 __ue_enhanced_unbind	@ue_foundation::__ue_enhanced_unbind CIH<ue_foundation::UObjectHandle> CIs C_c	bool const	4
+__ue_environment_query_abort	@ue_foundation::__ue_environment_query_abort CIH<ue_foundation::UObjectHandle> C_c	bool const	4
 __ue_find_by_type	@ue_foundation::__ue_find_by_type CIH<ue_foundation::UObjectHandle> CIs CIs Cb C_c	ue_foundation::UObjectHandle	4
 __ue_focus_cause	@ue_foundation::__ue_focus_cause CIH<ue_foundation::UEFocusEvent> C_c	string const	4
 __ue_focus_user	@ue_foundation::__ue_focus_user CIH<ue_foundation::UEFocusEvent> C_c	uint const	4
@@ -163,6 +188,8 @@ __ue_image_soft_error	@ue_foundation::__ue_image_soft_error CIH<ue_foundation::U
 __ue_image_soft_status	@ue_foundation::__ue_image_soft_status CIH<ue_foundation::UObjectHandle> C_c	string const	4
 __ue_input_kind	@ue_foundation::__ue_input_kind CIH<ue_foundation::InputActionValue> C_c	int const	4
 __ue_input_make	@ue_foundation::__ue_input_make Ci Cd Cd Cd C_c	ue_foundation::InputActionValue	4
+__ue_ism_add_instances	@ue_foundation::__ue_ism_add_instances CIH<ue_foundation::UObjectHandle> CI1<H<ue_foundation::UETransform>>A Cb Cb I1<i>A C_c C_l	void	4
+__ue_ism_remove_instances	@ue_foundation::__ue_ism_remove_instances CIH<ue_foundation::UObjectHandle> CI1<i>A Cb C_c	bool const	4
 __ue_library_scope	@ue_foundation::__ue_library_scope CIH<ue_foundation::UObjectHandle> Cb CI1<v>$ C_c	void	4
 __ue_map_get_token_object	@ue_foundation::__ue_map_get_token_object CH<ue_foundation::UEStructValue> Cs *	uint64 const	4
 __ue_map_get_token_struct	@ue_foundation::__ue_map_get_token_struct CH<ue_foundation::UEStructValue> Cs *	uint64 const	4
@@ -252,6 +279,9 @@ __ue_native_set_object	@ue_foundation::__ue_native_set_object CIH<ue_foundation:
 __ue_native_set_string	@ue_foundation::__ue_native_set_string CIH<ue_foundation::UObjectHandle> CIs CIs CIs C_c	void	4
 __ue_native_set_struct	@ue_foundation::__ue_native_set_struct CIH<ue_foundation::UObjectHandle> CIs CIs CIH<ue_foundation::UEStructValue> C_c	void	4
 __ue_native_set_text	@ue_foundation::__ue_native_set_text CIH<ue_foundation::UObjectHandle> CIs CIs CH<ue_foundation::UETextValue> C_c	void	4
+__ue_navigation_random_point	@ue_foundation::__ue_navigation_random_point CIH<ue_foundation::UObjectHandle> CIH<ue_foundation::UEVector> Cf IH<ue_foundation::UEVector> C_c	bool const	4
+__ue_navigation_random_points	@ue_foundation::__ue_navigation_random_points CIH<ue_foundation::UObjectHandle> CIH<ue_foundation::UEVector> Cf Ci I1<H<ue_foundation::UEVector>>A C_c C_l	void	4
+__ue_navigation_system	@ue_foundation::__ue_navigation_system C_c	ue_foundation::UObjectHandle	4
 __ue_object_key_check	@ue_foundation::__ue_object_key_check Cu64 CIs CIs C_c	uint64 const	4
 __ue_object_key_from_ref	@ue_foundation::__ue_object_key_from_ref CIH<ue_foundation::UObjectHandle> CIs CIs C_c	uint64 const	4
 __ue_object_key_reference	@ue_foundation::__ue_object_key_reference Cu64 CIs CIs C_c	ue_foundation::UObjectHandle	4
@@ -262,8 +292,11 @@ __ue_overlap_reference	@ue_foundation::__ue_overlap_reference CIH<ue_foundation:
 __ue_overlap_world	@ue_foundation::__ue_overlap_world CIH<ue_foundation::UEVector> Cd Ci CI1<H<ue_foundation::UObjectHandle>>A Cb I1<H<ue_foundation::UEOverlapResult>>A C_c C_l	void	4
 __ue_parent_lifecycle	@ue_foundation::__ue_parent_lifecycle CIs Ci Cf Ci C_c	void	4
 __ue_pawn_controller	@ue_foundation::__ue_pawn_controller CIH<ue_foundation::UObjectHandle> C_c	ue_foundation::UObjectHandle	4
+__ue_pawn_move_ignore_actor	@ue_foundation::__ue_pawn_move_ignore_actor CIH<ue_foundation::UObjectHandle> CIH<ue_foundation::UObjectHandle> Cb C_c	void	4
 __ue_pawn_possess	@ue_foundation::__ue_pawn_possess CIH<ue_foundation::UObjectHandle> CIH<ue_foundation::UObjectHandle> C_c	bool const	4
-__ue_perception_configure	@ue_foundation::__ue_perception_configure CIH<ue_foundation::UObjectHandle> Cf Cf Cf Cf Cf C_c	void	4
+__ue_perception_configure	@ue_foundation::__ue_perception_configure CIH<ue_foundation::UObjectHandle> Cf Cf Cf Cf Cf Cb Cb Cb C_c	void	4
+__ue_perception_configure_damage	@ue_foundation::__ue_perception_configure_damage CIH<ue_foundation::UObjectHandle> Cf C_c	void	4
+__ue_perception_report_damage	@ue_foundation::__ue_perception_report_damage CIH<ue_foundation::UObjectHandle> CIH<ue_foundation::UObjectHandle> Cf CIH<ue_foundation::UEVector> CIH<ue_foundation::UEVector> C_c	void	4
 __ue_player_controls_ready	@ue_foundation::__ue_player_controls_ready CIH<ue_foundation::UObjectHandle> C_c	bool const	4
 __ue_primary_cancel	@ue_foundation::__ue_primary_cancel CIs C_c	bool const	4
 __ue_primary_exists	@ue_foundation::__ue_primary_exists CIs CIs C_c	bool const	4

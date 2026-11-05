@@ -1357,6 +1357,8 @@ inline const FDasNativeGameplayField DasNativeGameplayFields[] = {
  {TEXT("/Script/EnhancedInput.InputMappingContext"),TEXT("RegistrationTrackingMode"),TEXT("enum"),TEXT("/Script/EnhancedInput.EMappingContextRegistrationTrackingMode"),TEXT("RegistrationTrackingMode:EnumProperty:0:/Script/EnhancedInput.EMappingContextRegistrationTrackingMode;"),TEXT("/Script/EnhancedInput.InputMappingContext"),true,false,false,false,false,TEXT(""),TEXT("")},
  {TEXT("/Script/NavigationSystem.NavigationPath"),TEXT("PathPoints"),TEXT("array"),TEXT(""),TEXT("PathPoints:ArrayProperty:0[PathPoints:StructProperty:0:/Script/CoreUObject.Vector{X:DoubleProperty:0;Y:DoubleProperty:0;Z:DoubleProperty:0;};];"),TEXT("/Script/NavigationSystem.NavigationPath"),true,false,false,false,false,TEXT(""),TEXT("")},
  {TEXT("/Script/NavigationSystem.NavigationPath"),TEXT("RecalculateOnInvalidation"),TEXT("enum"),TEXT("/Script/Engine.ENavigationOptionFlag"),TEXT("RecalculateOnInvalidation:EnumProperty:0:/Script/Engine.ENavigationOptionFlag;"),TEXT("/Script/NavigationSystem.NavigationPath"),true,false,false,false,false,TEXT(""),TEXT("")},
+ {TEXT("/Script/NavigationSystem.NavigationSystemV1"),TEXT("CrowdManagerClass"),TEXT("struct"),TEXT("/Script/DasRuntime.DasSoftClass_fa5bc1d00ba232895911fd4bbc0a4e5b"),TEXT("CrowdManagerClass:SoftClassProperty:0:soft:/Script/NavigationSystem.CrowdManagerBase;"),TEXT("/Script/NavigationSystem.NavigationSystemV1"),true,false,false,false,false,TEXT(""),TEXT("")},
+ {TEXT("/Script/NavigationSystem.NavigationSystemV1"),TEXT("DefaultAgentName"),TEXT("name"),TEXT(""),TEXT("DefaultAgentName:NameProperty:0;"),TEXT("/Script/NavigationSystem.NavigationSystemV1"),true,false,false,false,false,TEXT(""),TEXT("")},
  {TEXT("/Script/Niagara.NiagaraSystem"),TEXT("bCastShadow"),TEXT("bool"),TEXT(""),TEXT("bCastShadow:BoolProperty:0;"),TEXT("/Script/Niagara.NiagaraSystem"),true,false,false,false,false,TEXT(""),TEXT("")},
  {TEXT("/Script/Niagara.NiagaraSystem"),TEXT("bReceivesDecals"),TEXT("bool"),TEXT(""),TEXT("bReceivesDecals:BoolProperty:0;"),TEXT("/Script/Niagara.NiagaraSystem"),true,false,false,false,false,TEXT(""),TEXT("")},
  {TEXT("/Script/Niagara.NiagaraSystem"),TEXT("bRenderCustomDepth"),TEXT("bool"),TEXT(""),TEXT("bRenderCustomDepth:BoolProperty:0;"),TEXT("/Script/Niagara.NiagaraSystem"),true,false,false,false,false,TEXT(""),TEXT("")},
@@ -4628,6 +4630,13 @@ inline const FDasNativeGameplayMethod DasNativeGameplayMethods[] = {
  {TEXT("/Script/NavigationSystem.NavigationPath"),TEXT("IsPartial"),TEXT("v1;IsPartial;ReturnValue:BoolProperty:1408;"),false},
  {TEXT("/Script/NavigationSystem.NavigationPath"),TEXT("IsStringPulled"),TEXT("v1;IsStringPulled;ReturnValue:BoolProperty:1408;"),false},
  {TEXT("/Script/NavigationSystem.NavigationPath"),TEXT("IsValid"),TEXT("v1;IsValid;ReturnValue:BoolProperty:1408;"),false},
+ {TEXT("/Script/NavigationSystem.NavigationSystemV1"),TEXT("K2_ReplaceAreaInOctreeData"),TEXT("v1;K2_ReplaceAreaInOctreeData;Object:ObjectProperty:130:/Script/CoreUObject.Object;OldArea:ClassProperty:128:meta:/Script/NavigationSystem.NavArea;NewArea:ClassProperty:128:meta:/Script/NavigationSystem.NavArea;ReturnValue:BoolProperty:1408;"),false},
+ {TEXT("/Script/NavigationSystem.NavigationSystemV1"),TEXT("OnNavigationBoundsUpdated"),TEXT("v1;OnNavigationBoundsUpdated;NavVolume:ObjectProperty:128:/Script/NavigationSystem.NavMeshBoundsVolume;"),false},
+ {TEXT("/Script/NavigationSystem.NavigationSystemV1"),TEXT("RegisterNavigationInvoker"),TEXT("v1;RegisterNavigationInvoker;Invoker:ObjectProperty:128:/Script/Engine.Actor;TileGenerationRadius:FloatProperty:128;TileRemovalRadius:FloatProperty:128;"),false},
+ {TEXT("/Script/NavigationSystem.NavigationSystemV1"),TEXT("ResetMaxSimultaneousTileGenerationJobsCount"),TEXT("v1;ResetMaxSimultaneousTileGenerationJobsCount;"),false},
+ {TEXT("/Script/NavigationSystem.NavigationSystemV1"),TEXT("SetGeometryGatheringMode"),TEXT("v1;SetGeometryGatheringMode;NewMode:EnumProperty:128:/Script/Engine.ENavDataGatheringModeConfig;"),false},
+ {TEXT("/Script/NavigationSystem.NavigationSystemV1"),TEXT("SetMaxSimultaneousTileGenerationJobsCount"),TEXT("v1;SetMaxSimultaneousTileGenerationJobsCount;MaxNumberOfJobs:IntProperty:128;"),false},
+ {TEXT("/Script/NavigationSystem.NavigationSystemV1"),TEXT("UnregisterNavigationInvoker"),TEXT("v1;UnregisterNavigationInvoker;Invoker:ObjectProperty:128:/Script/Engine.Actor;"),false},
  {TEXT("/Script/UMG.Button"),TEXT("AddChild"),TEXT("v1;AddChild;Content:ObjectProperty:128:/Script/UMG.Widget;ReturnValue:ObjectProperty:1408:/Script/UMG.PanelSlot;"),false},
  {TEXT("/Script/UMG.Button"),TEXT("ClearChildren"),TEXT("v1;ClearChildren;"),false},
  {TEXT("/Script/UMG.Button"),TEXT("ForceLayoutPrepass"),TEXT("v1;ForceLayoutPrepass;"),false},
@@ -5794,6 +5803,8 @@ inline const FDasNativeGameplayDefault DasNativeGameplayDefaults[] = {
  {TEXT("/Script/Engine.TextRenderComponent"),TEXT("WakeRigidBody"),TEXT("BoneName"),TEXT("None")},
  {TEXT("/Script/Engine.TextRenderComponent"),TEXT("WasRecentlyRendered"),TEXT("Tolerance"),TEXT("0.200000")},
  {TEXT("/Script/NavigationSystem.NavigationPath"),TEXT("EnableDebugDrawing"),TEXT("PathColor"),TEXT("(R=1.000000,G=1.000000,B=1.000000,A=1.000000)")},
+ {TEXT("/Script/NavigationSystem.NavigationSystemV1"),TEXT("RegisterNavigationInvoker"),TEXT("TileGenerationRadius"),TEXT("3000.000000")},
+ {TEXT("/Script/NavigationSystem.NavigationSystemV1"),TEXT("RegisterNavigationInvoker"),TEXT("TileRemovalRadius"),TEXT("5000.000000")},
  {TEXT("/Script/UMG.Button"),TEXT("HasMouseCaptureByUser"),TEXT("PointerIndex"),TEXT("-1")},
  {TEXT("/Script/UMG.TextBlock"),TEXT("HasMouseCaptureByUser"),TEXT("PointerIndex"),TEXT("-1")},
  {TEXT("/Script/UMG.UserWidget"),TEXT("AddToPlayerScreen"),TEXT("ZOrder"),TEXT("0")},
@@ -5902,7 +5913,10 @@ inline const FDasNativeGameplayView DasNativeGameplayViews[] = {
  {TEXT("/Script/GameplayAbilities.GameplayEffect"),TEXT("ue_native_gameplay::Native_GameplayEffectRef_77c7fc7b")},
  {TEXT("/Script/GameplayAbilities.GameplayEffectComponent"),TEXT("ue_native_gameplay::Native_GameplayEffectComponentRef_48d8f122")},
  {TEXT("/Script/GameplayAbilities.GameplayEffectUIData"),TEXT("ue_native_gameplay::Native_GameplayEffectUIDataRef_21cf1352")},
+ {TEXT("/Script/NavigationSystem.CrowdManagerBase"),TEXT("ue_native_gameplay::Native_CrowdManagerBaseRef_2d8fbe98")},
+ {TEXT("/Script/NavigationSystem.NavMeshBoundsVolume"),TEXT("ue_native_gameplay::Native_NavMeshBoundsVolumeRef_c90f14df")},
  {TEXT("/Script/NavigationSystem.NavigationPath"),TEXT("ue_navigation::NavigationPathRef")},
+ {TEXT("/Script/NavigationSystem.NavigationSystemV1"),TEXT("ue_navigation::NavigationSystemRef")},
  {TEXT("/Script/Niagara.NiagaraSystem"),TEXT("ue_effects::NiagaraSystemRef")},
  {TEXT("/Script/PhysicsCore.PhysicalMaterial"),TEXT("ue_gameplay_services::PhysicalMaterialRef")},
  {TEXT("/Script/StaticMeshDescription.StaticMeshDescription"),TEXT("ue_native_gameplay::Native_StaticMeshDescriptionRef_26792a74")},
@@ -5919,6 +5933,7 @@ inline const FDasNativeGameplayView DasNativeGameplayViews[] = {
 struct FDasNativeGameplaySoftType { const TCHAR *Path,*Source; };
 inline const FDasNativeGameplaySoftType DasNativeGameplaySoftTypes[] = {
  {TEXT("/Script/DasRuntime.DasSoftClass_54171b28df3af163ef1a57a7ed50afe9"),TEXT("ue_native_gameplay::NativeSoftClass_GameplayEffect_06e0d8b0")},
+ {TEXT("/Script/DasRuntime.DasSoftClass_fa5bc1d00ba232895911fd4bbc0a4e5b"),TEXT("ue_native_gameplay::NativeSoftClass_CrowdManagerBase_706d24e3")},
 };
 struct FDasNativeGameplayEnum { const TCHAR *Path,*Source; };
 inline const FDasNativeGameplayEnum DasNativeGameplayEnums[] = {
@@ -5954,6 +5969,7 @@ inline const FDasNativeGameplayEnum DasNativeGameplayEnums[] = {
  {TEXT("/Script/Engine.EModulationDestination"),TEXT("ue_native_gameplay::EModulationDestination")},
  {TEXT("/Script/Engine.EModulationRouting"),TEXT("ue_native_gameplay::EModulationRouting")},
  {TEXT("/Script/Engine.EMovementMode"),TEXT("ue_native_gameplay::EMovementMode")},
+ {TEXT("/Script/Engine.ENavDataGatheringModeConfig"),TEXT("ue_native_gameplay::ENavDataGatheringModeConfig")},
  {TEXT("/Script/Engine.ENavigationOptionFlag"),TEXT("ue_native_gameplay::ENavigationOptionFlag")},
  {TEXT("/Script/Engine.ENetDormancy"),TEXT("ue_native_gameplay::ENetDormancy")},
  {TEXT("/Script/Engine.ENetRole"),TEXT("ue_native_gameplay::ENetRole")},

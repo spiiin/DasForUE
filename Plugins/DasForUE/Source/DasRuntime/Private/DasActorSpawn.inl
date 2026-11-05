@@ -27,6 +27,8 @@ FDasObjectHandle ActorSpawnInstigated(FDasClassHandle H, const FTransform& Trans
     if (Rule == TEXT("AlwaysSpawn"))
     {
     }
+    else if (Rule == TEXT("Undefined"))
+        Handling = ESpawnActorCollisionHandlingMethod::Undefined;
     else if (Rule == TEXT("AdjustIfPossibleButAlwaysSpawn"))
         Handling = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
     else if (Rule == TEXT("AdjustIfPossibleButDontSpawnIfColliding"))

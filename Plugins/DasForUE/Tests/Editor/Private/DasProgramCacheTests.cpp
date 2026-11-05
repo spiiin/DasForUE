@@ -8,6 +8,8 @@
 #include "Engine/World.h"
 #include "GameFramework/WorldSettings.h"
 #include "HAL/FileManager.h"
+#include "HAL/PlatformFileManager.h"
+#include "Misc/Paths.h"
 #include "HAL/IConsoleManager.h"
 #include "HAL/PlatformTime.h"
 #include "Kismet2/KismetEditorUtilities.h"
@@ -136,6 +138,18 @@ def main(input:int):int { counter+=input; return counter*100+length(values)*10+i
         TestEqual(TEXT("Global scalar and array initialized separately"), Read(A), 113);
         TestEqual(TEXT("One owner-specific subscription"), R.SubscriptionCount(A), 1);
     }
+    // Unrelated temporary-directory cleanup must not evict a prepared program.
+    // New owners need the compiler index even when another live owner pins the AST.
+    const FString ForeignDirectory = FPaths::ProjectSavedDir() / TEXT("Tests") / (TEXT("UnrelatedCache_") + Id);
+    IFileManager::Get().MakeDirectory(*ForeignDirectory, true);
+    const auto BeforeDirectoryCleanup = R.ProgramCacheStats();
+    TestTrue(TEXT("Remove unrelated empty cache directory"),
+        FPlatformFileManager::Get().GetPlatformFile().DeleteDirectory(*ForeignDirectory));
+    auto* AfterDirectoryCleanup = Spawn();
+    TestTrue(TEXT("Unrelated directory deletion preserves prepared gameplay for a new owner"),
+        AfterDirectoryCleanup && AfterDirectoryCleanup->LastDasError.IsEmpty());
+    TestEqual(TEXT("Unrelated directory deletion does not recompile"),
+        R.ProgramCacheStats().Compilations, BeforeDirectoryCleanup.Compilations);
     TestEqual(TEXT("First owner mutation"), Read(First, 2), 313);
     TestEqual(TEXT("Second owner is isolated"), Read(Actors[1]), 113);
     First->EmitDasSignal(5);

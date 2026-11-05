@@ -589,3 +589,58 @@ FDasNameValue StructMapNameKey(const FDasStructValue& H, const char* Path, int32
         Index, C);
     return MakeDSLName(ReadPropertyScalarValue(CastFieldChecked<FNameProperty>(F.Property), F.Memory, C), C);
 }
+
+// Plain array carriers have exactly the same element layout in DAS and native memory.
+// No object/name/string tokens are accepted by this codec.
+template <class T> FArrayProperty* PlainArrayProperty(const char* Path, das::Context* C)
+{
+    if (C != ActiveContext || !ActiveContext) C->throw_error("array snapshot requires active context");
+    auto* P = CastField<FArrayProperty>(DasContainerProperty(UTF8_TO_TCHAR(Path)));
+    bool Matches = false;
+    if (P)
+    {
+        if constexpr (std::is_same_v<T, int32>) Matches = !!CastField<FIntProperty>(P->Inner);
+        else if constexpr (std::is_same_v<T, int64>) Matches = !!CastField<FInt64Property>(P->Inner);
+        else if constexpr (std::is_same_v<T, float>) Matches = !!CastField<FFloatProperty>(P->Inner);
+        else if constexpr (std::is_same_v<T, double>) Matches = !!CastField<FDoubleProperty>(P->Inner);
+        else if (auto* S = CastField<FStructProperty>(P->Inner)) Matches = S->Struct == TBaseStructure<T>::Get();
+    }
+    if (!Matches || P->Inner->GetSize() != sizeof(T)) C->throw_error("plain array carrier element type mismatch");
+    return P;
+}
+template <class T> bool PlainArrayFinite(const T& V)
+{
+    if constexpr (std::is_floating_point_v<T>) return FMath::IsFinite(V);
+    else if constexpr (std::is_integral_v<T> || std::is_same_v<T, FColor>) return true;
+    else if constexpr (std::is_same_v<T, FTransform>) return V.IsValid();
+    else if constexpr (std::is_same_v<T, FLinearColor>)
+        return FMath::IsFinite(V.R) && FMath::IsFinite(V.G) && FMath::IsFinite(V.B) && FMath::IsFinite(V.A);
+    else return !V.ContainsNaN();
+}
+template <class T> FDasStructValue PackPlainArray(const char* Path, const das::TArray<T>& Input,
+                                                 das::Context* C, das::LineInfoArg* At)
+{
+    auto* P = PlainArrayProperty<T>(Path, C);
+    if (Input.size > 65536) C->throw_error("array size limit exceeded");
+    const auto* Data = reinterpret_cast<const T*>(Input.data);
+    for (uint32 I = 0; I < Input.size; ++I)
+        if (!PlainArrayFinite(Data[I])) C->throw_error("nonfinite plain array element");
+    FInstancedStruct Value;
+    Value.InitializeAs(FindObject<UScriptStruct>(nullptr, UTF8_TO_TCHAR(Path)));
+    FScriptArrayHelper Array(P, P->ContainerPtrToValuePtr<void>(Value.GetMutableMemory()));
+    Array.Resize(int32(Input.size));
+    if (Input.size) FMemory::Memcpy(Array.GetRawPtr(), Input.data, SIZE_T(Input.size) * sizeof(T));
+    return StoreStructValue(MoveTemp(Value), C, At);
+}
+template <class T> void UnpackPlainArray(const FDasStructValue& Handle, const char* Path, das::TArray<T>& Output,
+                                        das::Context* C, das::LineInfoArg* At)
+{
+    auto* P = PlainArrayProperty<T>(Path, C);
+    const auto& Value = ResolveStructValue(Handle, C);
+    if (Value.GetScriptStruct() != FindObject<UScriptStruct>(nullptr, UTF8_TO_TCHAR(Path)))
+        C->throw_error("plain array snapshot type mismatch");
+    FScriptArrayHelper Array(P, P->ContainerPtrToValuePtr<void>(Value.GetMemory()));
+    if (Array.Num() > 65536) C->throw_error("array size limit exceeded");
+    das::builtin_array_resize(Output, uint32(Array.Num()), sizeof(T), C, At);
+    if (Array.Num()) FMemory::Memcpy(Output.data, Array.GetRawPtr(), SIZE_T(Array.Num()) * sizeof(T));
+}

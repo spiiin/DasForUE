@@ -23,6 +23,6 @@ public class DasEditor : ModuleRules
         PrivateDefinitions.Add("DAS_WITH_EDITOR_TESTS=" + (EditorTests ? "1" : "0"));
         PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
         PublicDependencyModuleNames.AddRange(new[] { "Core", "DasRuntime" });
-        PrivateDependencyModuleNames.AddRange(new[] { "Core", "CoreUObject", "Engine", "GameplayTags", "GameplayAbilities", "DasRuntime", "Projects", "UnrealEd", "Json", "Kismet", "KismetCompiler", "BlueprintGraph", "AssetRegistry", "DirectoryWatcher", "EnhancedInput", "InputCore", "SlateCore", "Slate", "SourceCodeAccess", "MessageLog", "ApplicationCore", "UMG", "MovieScene", "UMGEditor", "Niagara", "AIModule", "NavigationSystem", "PhysicsCore", "Chaos", "AnimGraph", "AnimGraphRuntime" });
+        PrivateDependencyModuleNames.AddRange(new[] { "Core", "CoreUObject", "Engine", "GameplayTags", "GameplayAbilities", "DasRuntime", "Projects", "UnrealEd", "Json", "Kismet", "KismetCompiler", "BlueprintGraph", "AssetRegistry", "BSPUtils", "DirectoryWatcher", "EnhancedInput", "InputCore", "SlateCore", "Slate", "SourceCodeAccess", "MessageLog", "ApplicationCore", "UMG", "MovieScene", "UMGEditor", "Niagara", "AIModule", "NavigationSystem", "PhysicsCore", "Chaos", "AnimGraph", "AnimGraphRuntime" });
     }
 }

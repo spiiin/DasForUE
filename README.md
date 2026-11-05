@@ -23,6 +23,18 @@ and saving a script migrates its Blueprints, placed actors and data in place.
 
 [![Hot reload demo](https://img.youtube.com/vi/7lqbYKtIZ3c/hqdefault.jpg)](https://www.youtube.com/watch?v=7lqbYKtIZ3c)
 
+## Playable example: ActionRoguelikeDas
+
+[ActionRoguelikeDas](https://github.com/spiiin/ActionRoguelikeDas) ports the gameplay of
+[Tom Looman's ActionRoguelike](https://github.com/tomlooman/ActionRoguelike) to daScript:
+character controls, interaction, combat and abilities, AI, attributes, effects and UMG.
+The example includes resource-independent test maps and scripts for connecting separately
+acquired course assets locally. See its README for setup, attribution and resource terms.
+
+[![ActionRoguelikeDas gameplay video](https://img.youtube.com/vi/8hW55RqJcgQ/hqdefault.jpg)](https://www.youtube.com/watch?v=8hW55RqJcgQ)
+
+[Watch the gameplay video on YouTube](https://www.youtube.com/watch?v=8hW55RqJcgQ).
+
 ## A taste of the DSL
 
 An actor with editable properties, a lifecycle hook and a Blueprint-callable function:

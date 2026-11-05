@@ -498,6 +498,41 @@ void DSLEnsureStructHelpers(const das::TypeDeclPtr& InputType, const FString& Pa
         L->body = Body;
         return L;
     };
+    if (Container && Type->baseType == das::Type::tArray)
+    {
+        FString Plain;
+        const auto& Element = Type->firstType;
+        const FString Kind = DSLTypeName(Element);
+        for (const auto* Scalar : {TEXT("int"), TEXT("int64"), TEXT("float"), TEXT("double")})
+            if (Kind == Scalar) Plain = Scalar;
+        const FString Math = DSLMathPath(Element);
+        for (const auto* Name : {TEXT("Vector"), TEXT("Vector2D"), TEXT("Rotator"), TEXT("Quat"),
+                                TEXT("Transform"), TEXT("LinearColor"), TEXT("Color")})
+            if (Math == FString(TEXT("/Script/CoreUObject.")) + Name) Plain = FString(Name).ToLower();
+        if (!Plain.IsEmpty())
+        {
+            auto* Direct = new das::ExprBlock();
+            Direct->at = At;
+            Direct->list.push_back(new das::ExprReturn(At,
+                DSLCall(At, "__ue_array_pack_" + DSLUtf8(Plain),
+                    {new das::ExprConstString(At, DSLUtf8(Path)), new das::ExprVar(At, "value")})));
+            delete PackBody;
+            UnpackBody->list.push_back(DSLCall(At, "__ue_array_unpack_" + DSLUtf8(Plain),
+                {new das::ExprVar(At, "value"), new das::ExprConstString(At, DSLUtf8(Path)), new das::ExprVar(At, "result")}));
+            auto* Ret = new das::ExprReturn(At, new das::ExprVar(At, "result"));
+            Ret->moveSemantics = true;
+            UnpackBody->list.push_back(Ret);
+            auto Pack = DSLHelper(At, DSLUtf8(TEXT("__ue_pack_") + FMD5::HashAnsiString(*HelperKey)),
+                                  DSLCopyType(Type), DSLCopyType(Handle), nullptr);
+            Pack->body = Direct;
+            auto Unpack = DSLHelper(At, DSLUtf8(TEXT("__ue_unpack_") + FMD5::HashAnsiString(*HelperKey)),
+                                    DSLCopyType(Handle), DSLCopyType(Type), nullptr);
+            Unpack->body = UnpackBody;
+            Generated.push_back(Pack);
+            Generated.push_back(Unpack);
+            return;
+        }
+    }
     das::vector<das::Structure::FieldDeclaration> ContainerFields;
     if (Container)
     {
@@ -901,7 +936,32 @@ void DSLEnsureStructHelpers(const das::TypeDeclPtr& InputType, const FString& Pa
                 DSLCall(At, das::string("ue_struct_get_") + Suffix, {new das::ExprVar(At, "value"), Name()})));
         }
     }
-    PackBody->list.push_back(new das::ExprReturn(At, new das::ExprVar(At, "packed")));
+    if (Container)
+    {
+        // A carrier is an immutable snapshot once published. Build it in one scoped draft:
+        // with_* / array_resize mutate the draft, rather than copying its entire array per item.
+        auto* Edit = new das::ExprBlock();
+        Edit->at = At;
+        Edit->isClosure = true;
+        Edit->returnType = new das::TypeDecl(das::Type::tVoid, At);
+        auto* Draft = new das::Variable();
+        Draft->at = At;
+        Draft->name = "packed";
+        Draft->type = DSLCopyType(Handle);
+        Draft->type->ref = false;
+        Draft->type->constant = false;
+        Edit->arguments.push_back(Draft);
+        for (size_t I = 1; I < PackBody->list.size(); ++I)
+            Edit->list.push_back(PackBody->list[I]);
+        auto* Scoped = new das::ExprBlock();
+        Scoped->at = At;
+        Scoped->list.push_back(new das::ExprReturn(
+            At, DSLCall(At, "ue_struct_edit", {Packed, new das::ExprMakeBlock(At, Edit)})));
+        delete PackBody;
+        PackBody = Scoped;
+    }
+    else
+        PackBody->list.push_back(new das::ExprReturn(At, new das::ExprVar(At, "packed")));
     auto* Return = new das::ExprReturn(At, new das::ExprVar(At, "result"));
     Return->moveSemantics = true;
     UnpackBody->list.push_back(Return);

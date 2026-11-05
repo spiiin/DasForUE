@@ -942,6 +942,54 @@
       "kind": "script",
       "script": "TestRogueDirector.ps1",
       "comment": "DAS credit/weighted directors, native async EQS, shared capacity, failure refunds and lifetime cleanup in PIE."
+    },
+    {
+      "name": "rogue-environment-reference",
+      "kind": "script",
+      "script": "TestRogueEnvironmentReference.ps1",
+      "comment": "Read original Lever and ProjectileSpammer Blueprint graphs without saving their assets."
+    },
+    {
+      "name": "rogue-environment",
+      "kind": "script",
+      "script": "TestRogueEnvironment.ps1",
+      "comment": "Lever interface/native input, typed multicast wiring, native tick spammer, Arrow transform/instigator, collision defaults and cleanup in PIE."
+    },
+    {
+      "name": "rogue-world-reference",
+      "kind": "script",
+      "script": "TestRogueWorldReference.ps1",
+      "comment": "Read all original world-partition actor descriptors, layout and level wiring without saving source assets."
+    },
+    {
+      "name": "rogue-course-world",
+      "kind": "script",
+      "script": "TestRogueCourseWorld.ps1",
+      "comment": "Original course layout, native Landscape, DAS replacements and real level bindings/input in PIE."
+    },
+    {
+      "name": "rogue-coin-profile",
+      "kind": "script",
+      "script": "TestRogueCoinProfile.ps1",
+      "requires": [
+        "build"
+      ]
+    },
+    {
+      "name": "rogue-sprint-reference",
+      "kind": "script",
+      "script": "TestRogueSprintReference.ps1",
+      "requires": [
+        "build"
+      ]
+    },
+    {
+      "name": "rogue-course-effects",
+      "kind": "script",
+      "script": "TestRogueCourseEffects.ps1",
+      "requires": [
+        "build"
+      ]
     }
   ],
   "presets": {

@@ -789,6 +789,60 @@ public:
         AddUEExtern<DAS_BIND_FUN(ScriptTimerNextTickEnum)>(*this, Library, "ue_timer_next_tick",
                                                            das::SideEffects::modifyExternal, "ScriptTimerNextTickEnum");
         AddUEExtern<DAS_BIND_FUN(AudioTriggerParameter)>(*this, Library, "__ue_audio_trigger", das::SideEffects::modifyExternal, "AudioTriggerParameter");
+        AddUEExtern<DAS_BIND_FUN(NavigationSystemHandle), das::SimNode_ExtFuncCallAndCopyOrMove>(
+            *this, Library, "__ue_navigation_system", das::SideEffects::accessExternal, "NavigationSystemHandle");
+        AddUEExtern<DAS_BIND_FUN(NavigationRandomPoint)>(*this, Library, "__ue_navigation_random_point",
+            das::SideEffects::modifyExternal, "NavigationRandomPoint");
+        AddUEExtern<DAS_BIND_FUN(NavigationRandomPoints)>(*this, Library, "__ue_navigation_random_points",
+            das::SideEffects::modifyExternal, "NavigationRandomPoints")->needCallerStackFrame = true;
+        AddUEExtern<DAS_BIND_FUN(ISMAddInstances)>(*this, Library, "__ue_ism_add_instances",
+            das::SideEffects::modifyExternal, "ISMAddInstances")->needCallerStackFrame = true;
+        AddUEExtern<DAS_BIND_FUN(ISMRemoveInstances)>(*this, Library, "__ue_ism_remove_instances",
+            das::SideEffects::modifyExternal, "ISMRemoveInstances");
+        AddUEExtern<DAS_BIND_FUN(PackPlainArray<int32>), das::SimNode_ExtFuncCallAndCopyOrMove>(
+            *this, Library, "__ue_array_pack_int", das::SideEffects::modifyExternal, "PackPlainArray")->needCallerStackFrame = true;
+        AddUEExtern<DAS_BIND_FUN(UnpackPlainArray<int32>)>(*this, Library, "__ue_array_unpack_int",
+            das::SideEffects::modifyExternal, "UnpackPlainArray")->needCallerStackFrame = true;
+        AddUEExtern<DAS_BIND_FUN(PackPlainArray<int64>), das::SimNode_ExtFuncCallAndCopyOrMove>(
+            *this, Library, "__ue_array_pack_int64", das::SideEffects::modifyExternal, "PackPlainArray")->needCallerStackFrame = true;
+        AddUEExtern<DAS_BIND_FUN(UnpackPlainArray<int64>)>(*this, Library, "__ue_array_unpack_int64",
+            das::SideEffects::modifyExternal, "UnpackPlainArray")->needCallerStackFrame = true;
+        AddUEExtern<DAS_BIND_FUN(PackPlainArray<float>), das::SimNode_ExtFuncCallAndCopyOrMove>(
+            *this, Library, "__ue_array_pack_float", das::SideEffects::modifyExternal, "PackPlainArray")->needCallerStackFrame = true;
+        AddUEExtern<DAS_BIND_FUN(UnpackPlainArray<float>)>(*this, Library, "__ue_array_unpack_float",
+            das::SideEffects::modifyExternal, "UnpackPlainArray")->needCallerStackFrame = true;
+        AddUEExtern<DAS_BIND_FUN(PackPlainArray<double>), das::SimNode_ExtFuncCallAndCopyOrMove>(
+            *this, Library, "__ue_array_pack_double", das::SideEffects::modifyExternal, "PackPlainArray")->needCallerStackFrame = true;
+        AddUEExtern<DAS_BIND_FUN(UnpackPlainArray<double>)>(*this, Library, "__ue_array_unpack_double",
+            das::SideEffects::modifyExternal, "UnpackPlainArray")->needCallerStackFrame = true;
+        AddUEExtern<DAS_BIND_FUN(PackPlainArray<FVector>), das::SimNode_ExtFuncCallAndCopyOrMove>(
+            *this, Library, "__ue_array_pack_vector", das::SideEffects::modifyExternal, "PackPlainArray")->needCallerStackFrame = true;
+        AddUEExtern<DAS_BIND_FUN(UnpackPlainArray<FVector>)>(*this, Library, "__ue_array_unpack_vector",
+            das::SideEffects::modifyExternal, "UnpackPlainArray")->needCallerStackFrame = true;
+        AddUEExtern<DAS_BIND_FUN(PackPlainArray<FVector2D>), das::SimNode_ExtFuncCallAndCopyOrMove>(
+            *this, Library, "__ue_array_pack_vector2d", das::SideEffects::modifyExternal, "PackPlainArray")->needCallerStackFrame = true;
+        AddUEExtern<DAS_BIND_FUN(UnpackPlainArray<FVector2D>)>(*this, Library, "__ue_array_unpack_vector2d",
+            das::SideEffects::modifyExternal, "UnpackPlainArray")->needCallerStackFrame = true;
+        AddUEExtern<DAS_BIND_FUN(PackPlainArray<FRotator>), das::SimNode_ExtFuncCallAndCopyOrMove>(
+            *this, Library, "__ue_array_pack_rotator", das::SideEffects::modifyExternal, "PackPlainArray")->needCallerStackFrame = true;
+        AddUEExtern<DAS_BIND_FUN(UnpackPlainArray<FRotator>)>(*this, Library, "__ue_array_unpack_rotator",
+            das::SideEffects::modifyExternal, "UnpackPlainArray")->needCallerStackFrame = true;
+        AddUEExtern<DAS_BIND_FUN(PackPlainArray<FQuat>), das::SimNode_ExtFuncCallAndCopyOrMove>(
+            *this, Library, "__ue_array_pack_quat", das::SideEffects::modifyExternal, "PackPlainArray")->needCallerStackFrame = true;
+        AddUEExtern<DAS_BIND_FUN(UnpackPlainArray<FQuat>)>(*this, Library, "__ue_array_unpack_quat",
+            das::SideEffects::modifyExternal, "UnpackPlainArray")->needCallerStackFrame = true;
+        AddUEExtern<DAS_BIND_FUN(PackPlainArray<FTransform>), das::SimNode_ExtFuncCallAndCopyOrMove>(
+            *this, Library, "__ue_array_pack_transform", das::SideEffects::modifyExternal, "PackPlainArray")->needCallerStackFrame = true;
+        AddUEExtern<DAS_BIND_FUN(UnpackPlainArray<FTransform>)>(*this, Library, "__ue_array_unpack_transform",
+            das::SideEffects::modifyExternal, "UnpackPlainArray")->needCallerStackFrame = true;
+        AddUEExtern<DAS_BIND_FUN(PackPlainArray<FLinearColor>), das::SimNode_ExtFuncCallAndCopyOrMove>(
+            *this, Library, "__ue_array_pack_linearcolor", das::SideEffects::modifyExternal, "PackPlainArray")->needCallerStackFrame = true;
+        AddUEExtern<DAS_BIND_FUN(UnpackPlainArray<FLinearColor>)>(*this, Library, "__ue_array_unpack_linearcolor",
+            das::SideEffects::modifyExternal, "UnpackPlainArray")->needCallerStackFrame = true;
+        AddUEExtern<DAS_BIND_FUN(PackPlainArray<FColor>), das::SimNode_ExtFuncCallAndCopyOrMove>(
+            *this, Library, "__ue_array_pack_color", das::SideEffects::modifyExternal, "PackPlainArray")->needCallerStackFrame = true;
+        AddUEExtern<DAS_BIND_FUN(UnpackPlainArray<FColor>)>(*this, Library, "__ue_array_unpack_color",
+            das::SideEffects::modifyExternal, "UnpackPlainArray")->needCallerStackFrame = true;
         // Scalar timer payloads (DasScalarAccessors.inl).
 #define DAS_REGISTER_TIMER_SCALARS(Kind)                                                                               \
     AddUEExtern<DAS_BIND_FUN(ScriptTimerStartKind<Kind>)>(*this, Library, "ue_timer_start",                            \

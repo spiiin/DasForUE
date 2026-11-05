@@ -33,18 +33,18 @@ def ue_effect_burst(sound:SoundBaseRef; system:NiagaraSystemRef; transform:UETra
 }
 
 // Attached, auto-destroying cast presentation. Unreal owns the returned component.
-def ue_niagara_spawn_attached(system:NiagaraSystemRef; component:SceneComponentRef; socket:UENameValue):UObjectHandle {
+def ue_niagara_spawn_attached(system:NiagaraSystemRef; component:SceneComponentRef; socket:UENameValue; pooled:bool=false):UObjectHandle {
     let call=ue_begin_static_call("/Script/Niagara.NiagaraFunctionLibrary","SpawnSystemAttached", "")
     ue_arg_object(call,"systemtemplate",system.handle)
     ue_arg_object(call,"attachtocomponent",component.handle)
     __ue_method_arg_name(call,"attachpointname",socket)
     __ue_method_arg_vector(call,"location",ue_vector(0.0lf,0.0lf,0.0lf))
     __ue_method_arg_rotator(call,"rotation",ue_rotator(0.0lf,0.0lf,0.0lf))
-    ue_arg_enum(call,"locationtype","/Script/Engine.EAttachLocation","SnapToTarget")
-    ue_arg_bool(call,"bautodestroy",true)
+    ue_arg_enum(call,"locationtype","/Script/Engine.EAttachLocation",pooled ? "KeepRelativeOffset" : "SnapToTarget")
+    ue_arg_bool(call,"bautodestroy",!pooled)
     ue_arg_bool(call,"bautoactivate",true)
-    ue_arg_enum(call,"poolingmethod","/Script/Niagara.ENCPoolMethod","None")
-    ue_arg_bool(call,"bprecullcheck",true)
+    ue_arg_enum(call,"poolingmethod","/Script/Niagara.ENCPoolMethod",pooled ? "ManualRelease" : "None")
+    ue_arg_bool(call,"bprecullcheck",!pooled)
     ue_invoke_call(call)
     let result=ue_result_object(call,"returnvalue")
     ue_release_call(call)
@@ -88,4 +88,53 @@ def ue_audio_component_play(component:auto; sound:SoundBaseRef; start:float=0.0f
     ue_arg_float(play,"starttime",start)
     ue_invoke_call(play)
     ue_release_call(play)
+}
+
+// MetaSound triggers use the native audio parameter interface.
+def ue_audio_trigger(component : auto; name : string) : void {
+    __ue_audio_trigger(component.handle, ue_name_value(name))
+}
+
+// Auto-destroying audio; the caller can retain the component to send a release trigger.
+def ue_sound_spawn_attached(sound : SoundBaseRef; component : SceneComponentRef) : UObjectHandle {
+    let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "SpawnSoundAttached", "")
+    ue_arg(call, "Sound", sound)
+    ue_arg(call, "AttachToComponent", component)
+    ue_arg(call, "AttachPointName", ue_name_value("None"))
+    ue_arg(call, "Location", ue_vector(0.0lf, 0.0lf, 0.0lf))
+    ue_arg(call, "Rotation", ue_rotator(0.0lf, 0.0lf, 0.0lf))
+    ue_arg_enum(call, "LocationType", "/Script/Engine.EAttachLocation", "KeepRelativeOffset")
+    ue_arg(call, "bStopWhenAttachedToDestroyed", true)
+    ue_arg(call, "VolumeMultiplier", 1.0f)
+    ue_arg(call, "PitchMultiplier", 1.0f)
+    ue_arg(call, "StartTime", 0.0f)
+    ue_arg_object(call, "AttenuationSettings", default<UObjectHandle>)
+    ue_arg_object(call, "ConcurrencySettings", default<UObjectHandle>)
+    ue_arg(call, "bAutoDestroy", true)
+    ue_invoke_call(call)
+    let result = ue_result_object(call, "ReturnValue")
+    ue_release_call(call)
+    return result
+}
+
+def ue_sound_spawn_2d(sound : SoundBaseRef) : UObjectHandle {
+    let call = ue_begin_static_call("/Script/Engine.GameplayStatics", "SpawnSound2D", "WorldContextObject")
+    ue_arg(call, "Sound", sound)
+    ue_arg(call, "VolumeMultiplier", 1.0f)
+    ue_arg(call, "PitchMultiplier", 1.0f)
+    ue_arg(call, "StartTime", 0.0f)
+    ue_arg_object(call, "ConcurrencySettings", default<UObjectHandle>)
+    ue_arg(call, "bPersistAcrossLevelTransition", false)
+    ue_arg(call, "bAutoDestroy", true)
+    ue_invoke_call(call)
+    let result = ue_result_object(call, "ReturnValue")
+    ue_release_call(call)
+    return result
+}
+
+// Niagara inherits this engine operation; no generated Niagara API module is required.
+def ue_niagara_release_to_pool(component : auto) : void {
+    let call = ue_begin_call(component.handle, "ReleaseToPool")
+    ue_invoke_call(call)
+    ue_release_call(call)
 }

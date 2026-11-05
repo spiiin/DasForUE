@@ -171,6 +171,11 @@ bool FDasContainerTransportTest::RunTest(const FString&)
                                     TEXT("  self.Selected=kind\n clear(self.Kinds); push(self.Kinds,self.Selected)\n self.ByName[\"Primary\"]=kind\n") +
                                         TEXT("  var kinds := self.Kinds\n var byName := self.ByName\n") +
                                              TEXT("  return int(length(kinds)+length(byName))\n }\n") +
+        TEXT(" @ue_property=(BlueprintReadWrite)\n Numbers:array<int>\n") +
+        TEXT(" [ue_function(BlueprintCallable)]\n def PackArray():int {\n") +
+        TEXT("  var values:array<int>; resize(values,1000)\n") +
+        TEXT("  for (index in range(1000)) { values[index]=index }\n") +
+        TEXT("  self.Numbers:=values\n return self.Numbers[999]\n }\n") +
         TEXT(" [ue_function(BlueprintCallable)]\n def Echo(kind:ActionClass):ActionClass { return kind }\n}\n");
     if (!Write(File, Source))
         return false;
@@ -230,6 +235,17 @@ bool FDasContainerTransportTest::RunTest(const FString&)
     TestEqual(TEXT("Authored class returned through frame"),
         CastFieldChecked<FClassProperty>(Echo->GetReturnProperty())->GetObjectPropertyValue_InContainer(EchoFrame.GetStructMemory()),
         static_cast<UObject*>(Child->GeneratedClass.Get()));
+    auto* PackArray = Owner->FindFunction(TEXT("PackArray"));
+    if (!TestNotNull(TEXT("Bulk array packing function"), PackArray)) return false;
+    const uint64 ReclaimedBefore = Runtime.StructSnapshotsReclaimed(Owner);
+    FStructOnScope PackFrame(PackArray);
+    Owner->ProcessEvent(PackArray, PackFrame.GetStructMemory());
+    TestTrue(TEXT("Bulk packing runtime error: ") + Owner->LastDasError, Owner->LastDasError.IsEmpty());
+    TestEqual(TEXT("All 1000 packed values survive transport"),
+        CastFieldChecked<FIntProperty>(PackArray->GetReturnProperty())->GetPropertyValue_InContainer(PackFrame.GetStructMemory()), 999);
+    const uint64 Reclaimed = Runtime.StructSnapshotsReclaimed(Owner) - ReclaimedBefore;
+    TestTrue(TEXT("Packing a scalar array publishes a bounded number of snapshots"), Reclaimed <= 8);
+
     const FString Repo = FPaths::ConvertRelativePathToFull(FPaths::ProjectDir() / TEXT("../.."));
     FString Expected;
     FFileHelper::LoadFileToString(Expected, *(Repo / TEXT("Bindings/FoundationExterns.txt")));

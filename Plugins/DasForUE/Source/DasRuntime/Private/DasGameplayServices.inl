@@ -302,3 +302,73 @@ void GameplayWidgetInput(const FDasObjectHandle& H, bool Enabled, das::Context* 
     PC->SetInputMode(Mode);
     PC->bShowMouseCursor = true;
 }
+
+// Direct bulk adapters: validate once and transfer contiguous native math arrays.
+FDasObjectHandle NavigationSystemHandle(das::Context* C)
+{
+    auto* Nav = FNavigationSystem::GetCurrent<UNavigationSystemV1>(GameplayWorld(C));
+    return MakeObjectHandle(Nav, UNavigationSystemV1::StaticClass(), C);
+}
+UNavigationSystemV1* CheckedNavigation(const FDasObjectHandle& Handle, das::Context* C)
+{
+    auto* World = GameplayWorld(C);
+    if (!Handle.Token) return nullptr; // Missing navigation yields failed points, just like K2.
+    auto* Nav = Cast<UNavigationSystemV1>(ResolveObject(Handle, C));
+    if (!Nav || Nav->GetWorld() != World)
+        C->throw_error("navigation requires a same-world NavigationSystemV1");
+    return Nav;
+}
+bool NavigationRandomPoint(const FDasObjectHandle& Handle, const FVector& Origin, float Radius,
+                           FVector& Location, das::Context* C)
+{
+    auto* Nav = CheckedNavigation(Handle, C);
+    Location = Origin;
+    if (Origin.ContainsNaN() || !FMath::IsFinite(Radius) || Radius < 0)
+        C->throw_error("invalid navigation origin/radius");
+    FNavLocation Point;
+    if (!Nav || !Nav->GetRandomPointInNavigableRadius(Origin, Radius, Point)) return false;
+    Location = Point.Location;
+    return true;
+}
+void NavigationRandomPoints(const FDasObjectHandle& Handle, const FVector& Origin, float Radius, int32 Count,
+                            das::TArray<FVector>& Output, das::Context* C, das::LineInfoArg* At)
+{
+    auto* Nav = CheckedNavigation(Handle, C);
+    if (Origin.ContainsNaN() || !FMath::IsFinite(Radius) || Radius < 0 || Count < 0 || Count > 1000000)
+        C->throw_error("invalid navigation origin/radius/count");
+    das::builtin_array_resize(Output, uint32(Count), sizeof(FVector), C, At);
+    auto* Values = reinterpret_cast<FVector*>(Output.data);
+    for (int32 I = 0; I < Count; ++I)
+    {
+        FNavLocation Point;
+        Values[I] = Nav && Nav->GetRandomPointInNavigableRadius(Origin, Radius, Point) ? Point.Location : Origin;
+    }
+}
+void ISMAddInstances(const FDasObjectHandle& Handle, const das::TArray<FTransform>& Input,
+                     bool WorldSpace, bool UpdateNavigation, das::TArray<int32>& Output,
+                     das::Context* C, das::LineInfoArg* At)
+{
+    auto* World = GameplayWorld(C);
+    auto* Mesh = Cast<UInstancedStaticMeshComponent>(ResolveObject(Handle, C));
+    if (!Mesh || Mesh->GetWorld() != World || !Mesh->IsRegistered() || Input.size > 1000000)
+        C->throw_error("ISM batch requires a registered same-world mesh and at most 1000000 instances");
+    const auto* Values = reinterpret_cast<const FTransform*>(Input.data);
+    for (uint32 I = 0; I < Input.size; ++I)
+        if (!Values[I].IsValid()) C->throw_error("invalid instance transform");
+    // Allocate before mutating the component, so output allocation cannot leave untracked instances.
+    das::builtin_array_resize(Output, Input.size, sizeof(int32), C, At);
+    const auto Ids = Mesh->AddInstancesById(MakeArrayView(Values, int32(Input.size)), WorldSpace, UpdateNavigation);
+    auto* Result = reinterpret_cast<int32*>(Output.data);
+    for (int32 I = 0; I < Ids.Num(); ++I) Result[I] = Ids[I].GetAsIndex();
+}
+bool ISMRemoveInstances(const FDasObjectHandle& Handle, const das::TArray<int32>& Input,
+                        bool UpdateNavigation, das::Context* C)
+{
+    auto* World = GameplayWorld(C);
+    auto* Mesh = Cast<UInstancedStaticMeshComponent>(ResolveObject(Handle, C));
+    if (!Mesh || Mesh->GetWorld() != World || !Mesh->IsRegistered() || Input.size > 1000000)
+        C->throw_error("ISM removal requires a registered same-world mesh");
+    TArray<int32> Ids;
+    Ids.Append(reinterpret_cast<const int32*>(Input.data), int32(Input.size));
+    return UDasWorldComponentLibrary::RemoveInstancesById(Mesh, Ids, UpdateNavigation);
+}
