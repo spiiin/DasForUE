@@ -57,7 +57,12 @@ int32 UDasReflectionMacrosCommandlet::Main(const FString& Params)
     auto SaveCatalog = [&](const FDasSourceCatalog& Value)
     {
         FString Json, Issue;
-        return Value.ToJson(Json, Issue) && FFileHelper::SaveStringToFile(Json, *CatalogPath, FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM);
+        const bool Saved = Value.ToJson(Json, Issue) && FFileHelper::SaveStringToFile(Json, *CatalogPath, FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM);
+        // JSON writes do not go through the .das write tracker. Notify synchronous
+        // fixture edits before asking the compiler to resolve catalog identities.
+        if (Saved)
+            R.NotifyScriptsChanged({CatalogPath}, true);
+        return Saved;
     };
     if (!SaveCatalog(Catalog)) return 2;
     const FString ExplicitReference = TEXT("UEObjectRef(\"ue_inheritance_base.das\", \"BaseCounter\")");
@@ -135,6 +140,7 @@ int32 UDasReflectionMacrosCommandlet::Main(const FString& Params)
            TEXT("string literals"), TEXT("reference_macro_class_argument_type_rejected"));
     const FString NativeReference = TEXT("UENativeObjectRef(\"/Script/Engine.SkeletalMesh\")");
     IFileManager::Get().Delete(*CatalogPath, false, true);
+    R.NotifyScriptsChanged({CatalogPath}, true);
     Write(Source);
     Check(R.ValidateIntMethod(Path, Error, TEXT("main")), TEXT("native_object_macro_without_catalog_compiles"), Error);
     SaveCatalog(Catalog);
@@ -163,6 +169,7 @@ int32 UDasReflectionMacrosCommandlet::Main(const FString& Params)
     Reject(CatalogSource.Replace(*CatalogReference,TEXT("UEObjectRef(33)")),
            TEXT("string literals"), TEXT("catalog_reference_nonliteral_rejected"));
     IFileManager::Get().Delete(*CatalogPath, false, true);
+    R.NotifyScriptsChanged({CatalogPath}, true);
     Reject(CatalogSource, TEXT("Missing/oversized source catalog"), TEXT("catalog_reference_missing_catalog_rejected"));
     FDasSourceCatalog Stale = Catalog;
     Stale.Entries[0].Id = TEXT("wrong.BaseCounter");

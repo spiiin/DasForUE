@@ -19,6 +19,7 @@ struct FDasProgramCacheStats
            SourceBatchInvalidations = 0;
     int32 SourceSnapshotsInBatch = 0;
     uint64 DiskModuleRejections = 0; // Payload read failures, excluding intentionally reparsed records.
+    uint64 SharedModuleHits = 0;
 };
 
 // Nestable game-thread scope. Snapshot storage is released by the outermost scope.
@@ -202,6 +203,7 @@ public:
     bool PrepareEditorPrograms(const TArray<FString>& Scripts, FString& Error);
     bool PrepareEditorChanges(const TArray<FString>& Files, bool bHierarchyChanged, FString& Error);
     TArray<FString> ConfiguredProgramScripts(UWorld* World) const;
+    TSet<FString> ExcludedEditorScripts(UWorld* World) const;
     void SetEditorGameplayActive(bool Active);
     bool ExportPreparedProgram(const FString& Script, FString& Error);
     void ClearProgramCache();

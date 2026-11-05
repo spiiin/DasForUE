@@ -332,7 +332,7 @@ FDasExecutionResult FDasRuntimeModule::RunFile(const FString& Path, int32 Input,
     try
     {
         das::TextWriter Output;
-        das::ModuleGroup Modules;
+        FDasCompilerModuleGroup Modules;
         auto Access = das::make_smart<FUnrealFileAccess>();
         Access->addFileSystem(new FUnrealFileSystem(), true, false);
         const FTCHARToUTF8 Utf8Path(*Path);
@@ -916,7 +916,7 @@ bool FDasRuntimeModule::ReadGASScript(const FString& Path, FDasGASDeclarations& 
     try
     {
         das::TextWriter Output;
-        das::ModuleGroup Group;
+        FDasCompilerModuleGroup Group;
         auto Access = das::make_smart<FUnrealFileAccess>();
         Access->addFileSystem(new FUnrealFileSystem(), true, false);
         const FTCHARToUTF8 File(*Path);

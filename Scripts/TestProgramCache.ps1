@@ -6,7 +6,7 @@ if(!$SkipBuild){Invoke-DasBuild $Das}
 $Sources=@(Get-ChildItem "$($Das.Repo)/Plugins/DasForUE/Source","$($Das.Repo)/Plugins/DasForUE/Tests/Editor" -Recurse -File|ForEach-Object FullName)
 $Before=Lock-SourceHashes -Paths $Sources
 Invoke-DasAutomation $Das -Test 'DasForUE.Runtime.PreparedPrograms' -Name 'prepared-programs' -Extra @('-ddc=NoZenLocalFallback','-NoZenAutoLaunch')
-Invoke-DasAutomation $Das -Test 'DasForUE.Runtime.ProgramCache' -Name 'program-cache' -Extra @('-ddc=NoZenLocalFallback','-NoZenAutoLaunch')
+Invoke-DasAutomation $Das -Test 'DasForUE.Runtime.ProgramCache' -Name 'program-cache' -Count 3 -Extra @('-ddc=NoZenLocalFallback','-NoZenAutoLaunch')
 # A fresh process must read the artifact without relying on modules left by its compiler.
 $Fixture="prepared_fresh_$([guid]::NewGuid().ToString('N')).das"
 $FixtureDirectory=Join-Path (Split-Path $Das.Project) 'Content/Das/Scripts'

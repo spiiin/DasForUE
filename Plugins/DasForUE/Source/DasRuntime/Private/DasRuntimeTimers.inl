@@ -15,7 +15,7 @@ struct FCompiledProgram
     FSourceSet Sources; // Must outlive Access: its filesystem records dependencies here, never in a session.
     das::vector<das::FileInfoPtr> SerializedFileInfos;
     TArray<TSharedPtr<FDasEditorModuleCache>> EditorModuleCaches; // Outlives Program and Modules.
-    das::ModuleGroup Modules;
+    FDasCompilerModuleGroup Modules;
     das::FileAccessPtr Access;
     das::ProgramPtr Program;
     FString CompileError;
@@ -25,6 +25,8 @@ struct FCompiledProgram
     bool bSimulating = false;
     bool bPreparationMissing = false;
 };
+#include "DasEditorSharedModules.inl"
+
 TMap<FString, TWeakPtr<FCompiledProgram>> KnownCompiledPrograms;
 TArray<TSharedPtr<FCompiledProgram>> ResidentCompiledPrograms;
 // Keep failed attempts too; live contexts own the last working version independently.
@@ -58,7 +60,7 @@ struct FCompiledContext
     TSharedPtr<FDSLAsyncPhysicsState> Physics;
     bool bPhysicsOwner = false, bPhysicsForeignSession = false;
     TSharedPtr<FCompiledProgram> Compiler;
-    das::ModuleGroup& Modules;
+    FDasCompilerModuleGroup& Modules;
     das::ProgramPtr& Program;
     das::FileAccessPtr& Access;
     FCompiledContext() : FCompiledContext(MakeShared<FCompiledProgram>()) {}

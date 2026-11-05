@@ -1061,7 +1061,7 @@ bool FDasRuntimeModule::ReadAuthoredInterfaces(const FString& Path, FDasAuthorin
     {
         TGuardValue<bool> CollectOnly(CollectTypesOnly, true);
         das::TextWriter Text;
-        das::ModuleGroup Group;
+        FDasCompilerModuleGroup Group;
         auto Access = das::make_smart<FUnrealFileAccess>();
         Access->addFileSystem(new FUnrealFileSystem(), true, false);
         const FTCHARToUTF8 File(*Path);
@@ -1119,7 +1119,7 @@ bool FDasRuntimeModule::ReadReflectedTypes(const FString& Path, FDasReflectedTyp
     {
         TGuardValue<bool> CollectOnly(CollectTypesOnly, true);
         das::TextWriter Text;
-        das::ModuleGroup Group;
+        FDasCompilerModuleGroup Group;
         auto Access = das::make_smart<FUnrealFileAccess>();
         Access->addFileSystem(new FUnrealFileSystem(), true, false);
         const FTCHARToUTF8 File(*Path);

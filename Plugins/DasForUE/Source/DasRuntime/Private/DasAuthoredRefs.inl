@@ -114,7 +114,7 @@ struct FDSLDeclarationCompileScope
     }
 };
 void EnsureDasNativeModules(); // DasNativeBinds.inl
-auto DSLCompile(const char* File, const das::FileAccessPtr& Access, das::TextWriter& Output, das::ModuleGroup& Group,
+auto DSLCompile(const char* File, const das::FileAccessPtr& Access, das::TextWriter& Output, FDasCompilerModuleGroup& Group,
                 const das::CodeOfPolicies& Policies = das::CodeOfPolicies(),
                 TFunction<void()>* RestoreReferenceMetadata = nullptr)
 {
@@ -154,6 +154,7 @@ auto DSLCompile(const char* File, const das::FileAccessPtr& Access, das::TextWri
             DSLActiveRefDeclarations.Append(References);
         };
     };
+    SeedSharedEditorModules(Group);
     auto Program = CompileEditorCachedPass(File, Access, Output, Group, Policies, TEXT("collect"));
     DSLDiagnosticGenerated(Program);
     if (!Program || Program->failed() || Computed.Pending.IsEmpty())
@@ -174,13 +175,14 @@ auto DSLCompile(const char* File, const das::FileAccessPtr& Access, das::TextWri
     Computed.PendingReferences.Reset();
     Computed.PendingNativeExpressions.Reset();
     Program = nullptr;
-    Group.~ModuleGroup();
-    new (&Group) das::ModuleGroup();
+    Group.~FDasCompilerModuleGroup();
+    new (&Group) FDasCompilerModuleGroup();
     DSLActiveRefDeclarations = ReferenceBefore;
     DSLMethodSourceSignatures = MethodsBefore;
     DSLPropertySourceSignatures = PropertiesBefore;
     DSLSourceCatalogExpectedIds = CatalogBefore;
     Diagnostics.RebuiltGroup();
+    SeedSharedEditorModules(Group);
     auto Resolved = CompileEditorCachedPass(File, Access, Output, Group, Policies, TEXT("resolved"));
     DSLDiagnosticGenerated(Resolved);
     if (Resolved && !Resolved->failed())

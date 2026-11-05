@@ -198,6 +198,7 @@ TArray<UBlueprint*> FDasAutoReimport::Bound(const TSet<FString>* Files) const
     auto& Runtime = FModuleManager::LoadModuleChecked<FDasRuntimeModule>(TEXT("DasRuntime"));
     // Only loaded Blueprints: those of the open level and editors. Others still run their last applied
     // declaration and report the mismatch when they play.
+    const auto Excluded = Runtime.ExcludedEditorScripts(GEditor ? GEditor->GetEditorWorldContext(false).World() : nullptr);
     TArray<UBlueprint*> Result;
     for (TObjectIterator<UBlueprint> It; It; ++It)
     {
@@ -205,7 +206,7 @@ TArray<UBlueprint*> FDasAutoReimport::Bound(const TSet<FString>* Files) const
         if (!Blueprint->GeneratedClass || Blueprint->HasAnyFlags(RF_ClassDefaultObject | RF_Transient))
             continue;
         const FString Source = Blueprint->GetOutermost()->GetMetaData().GetValue(Blueprint, TEXT("DasDSLSource"));
-        if (Source.IsEmpty())
+        if (Source.IsEmpty() || (!Files && Excluded.Contains(FullPath(FPaths::IsRelative(Source) ? Runtime.ScriptPath(Source) : Source))))
             continue;
         bool Match =
             !Files || Files->Contains(FullPath(FPaths::IsRelative(Source) ? Runtime.ScriptPath(Source) : Source));
@@ -454,6 +455,8 @@ bool FDasAutoReimport::PrepareAllPrograms(FString& Error)
                   !Manifest(FPaths::ProjectConfigDir() / TEXT("DasPluginScripts.txt"), false))
         return false;
     UWorld* EditorWorld = GEditor ? GEditor->GetEditorWorldContext(false).World() : nullptr;
+    const auto Excluded = Runtime.ExcludedEditorScripts(EditorWorld);
+    Scripts.RemoveAll([&](const FString& Script) { return Excluded.Contains(Script); });
     for (const auto& Script : Runtime.ConfiguredProgramScripts(EditorWorld))
         Scripts.AddUnique(FullPath(FPaths::IsRelative(Script) ? Runtime.ScriptPath(Script) : Script));
     Scripts.Sort();
@@ -487,12 +490,12 @@ bool FDasAutoReimport::PrepareAllPrograms(FString& Error)
     const auto After = Runtime.ProgramCacheStats();
     UE_LOG(
         LogTemp, Display,
-        TEXT("DAS_EDITOR_COMPILE_ALL scripts=%d failed=%d source_compiles=%llu seconds=%.3f memory_hits=%llu disk_modules=%llu disk_reparsed=%llu disk_rejected=%llu disk_writes=%llu"),
+        TEXT("DAS_EDITOR_COMPILE_ALL scripts=%d failed=%d source_compiles=%llu seconds=%.3f memory_hits=%llu disk_modules=%llu disk_reparsed=%llu disk_rejected=%llu disk_writes=%llu shared_modules=%llu"),
             Scripts.Num(), Failed, After.Compilations - Before.Compilations, FPlatformTime::Seconds() - BatchStarted,
             After.Hits - Before.Hits, After.DiskModuleHits - Before.DiskModuleHits,
             After.DiskModuleReparses - Before.DiskModuleReparses,
             After.DiskModuleRejections - Before.DiskModuleRejections,
-            After.DiskModuleCacheWrites - Before.DiskModuleCacheWrites);
+            After.DiskModuleCacheWrites - Before.DiskModuleCacheWrites, After.SharedModuleHits - Before.SharedModuleHits);
     UE_LOG(
         LogTemp, Display,
         TEXT("DAS_EDITOR_SOURCE_READS reads=%llu bytes=%llu snapshot_hits=%llu dependency_checks=%llu invalidations=%llu"),

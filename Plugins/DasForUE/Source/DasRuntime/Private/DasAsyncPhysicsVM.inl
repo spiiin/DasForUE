@@ -23,7 +23,7 @@ struct FPhysicsVMMailbox
 struct FIsolatedPhysicsVM
 {
     // The bridge exclusively owns this state, including the prepared interpreter.
-    das::ModuleGroup Modules;
+    FDasCompilerModuleGroup Modules;
     das::FileAccessPtr Access;
     das::ProgramPtr Program;
     TUniquePtr<das::Context> Context;

@@ -1,3 +1,5 @@
+void ResetSharedCompilerModules();
+
 // Preparation is a synchronous game-thread pass. Share immutable byte snapshots
 // across roots for this pass only; each compiled program still owns its dependencies.
 TAutoConsoleVariable<int32> CVarEditorSourceBatchCache(
@@ -25,12 +27,16 @@ void EndEditorSourceReadBatch()
     check(IsInGameThread());
     check(EditorSourceReadDepth > 0);
     if (--EditorSourceReadDepth == 0)
+    {
+        ResetSharedCompilerModules();
         EditorSourceReadBatch.Reset();
+    }
 }
 void InvalidateEditorSourceReadBatch()
 {
     if (EditorSourceReadBatch)
     {
+        ResetSharedCompilerModules();
         EditorSourceReadBatch->Snapshots.Reset();
         ++SourceBatchInvalidations;
     }

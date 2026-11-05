@@ -9,7 +9,7 @@ bool GenerateDasUEAotProbe(const FString& Output, FString& Error, const FString&
     try
     {
         das::TextWriter Log;
-        das::ModuleGroup Modules;
+        FDasCompilerModuleGroup Modules;
         auto Access = das::make_smart<FUnrealFileAccess>();
         Access->addFileSystem(new FUnrealFileSystem(), true, false);
         auto& Runtime = FModuleManager::GetModuleChecked<FDasRuntimeModule>(TEXT("DasRuntime"));
@@ -33,7 +33,7 @@ bool GenerateDasUEAotProbe(const FString& Output, FString& Error, const FString&
         // Current daScript emits C++ through daslib/aot_cpp; the old native
         // Program::aotCpp entry point is no longer linked in the pinned runtime.
         das::TextWriter EmitterLog;
-        das::ModuleGroup EmitterModules;
+        FDasCompilerModuleGroup EmitterModules;
         FTCHARToUTF8 Driver(*Runtime.ScriptPath(TEXT("ue_aot_emit.das")));
         auto Emitter = DSLCompile(Driver.Get(), Access, EmitterLog, EmitterModules);
         if (!Emitter || Emitter->failed())

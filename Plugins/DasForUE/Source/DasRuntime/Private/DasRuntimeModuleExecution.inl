@@ -92,6 +92,11 @@ void RetainCompiledProgram(const TSharedPtr<FCompiledProgram>& Program)
 TSharedPtr<FCompiledProgram> AcquireCompiledProgram(const FString& Path, bool bAllowSourceCompilation,
                                                     bool bPreparation)
 {
+    // An authoring request can recursively compile several referenced classes.
+    // Nested requests share helpers until the outermost preparation returns.
+    TOptional<FDasEditorSourceReadScope> PreparationPass;
+    if (bPreparation)
+        PreparationPass.Emplace();
     DrainScriptWrites();
     const FString Key = PersistentCompilerKey(Path);
     if (auto* Weak = KnownCompiledPrograms.Find(Key))
@@ -125,6 +130,7 @@ TSharedPtr<FCompiledProgram> AcquireCompiledProgram(const FString& Path, bool bA
                     Cached->CheckedAt = FPlatformTime::Seconds();
                 ++PersistentCompileCacheHits;
                 RetainCompiledProgram(Cached);
+                PublishSharedEditorModules(Cached, Key.RightChop(Path.Len()));
                 if (DSLDeclarationCompileDepth > 0 && Cached->RestoreReferenceMetadata)
                     Cached->RestoreReferenceMetadata();
                 return Cached;
@@ -170,6 +176,7 @@ TSharedPtr<FCompiledProgram> AcquireCompiledProgram(const FString& Path, bool bA
     {
         Compiled->CompileError = UTF8_TO_TCHAR(E.what());
     }
+    PublishSharedEditorModules(Compiled, Key.RightChop(Path.Len()));
     Compiled->CheckedEpoch = ScriptSourceEpoch;
     Compiled->CheckedAt = FPlatformTime::Seconds();
     if (!Compiled->bPreparationMissing)
@@ -201,11 +208,13 @@ FDasProgramCacheStats FDasRuntimeModule::ProgramCacheStats() const
             SourceContentChecks,
             SourceBatchInvalidations,
             EditorSourceReadBatch ? EditorSourceReadBatch->Snapshots.Num() : 0,
-            DiskModuleRejections};
+            DiskModuleRejections,
+            SharedEditorModuleHits};
 }
 void FDasRuntimeModule::ClearProgramCache()
 {
     check(IsInGameThread());
+    ResetSharedCompilerModules();
     ClearCompiledPrograms(); // Existing contexts keep their compiler artifact and all state.
     EditorProgramAttempts.Empty();
 }

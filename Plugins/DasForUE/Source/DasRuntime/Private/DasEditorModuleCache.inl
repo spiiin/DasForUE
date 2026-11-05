@@ -1,3 +1,40 @@
+// Shared compiler modules stay local to one synchronous editor preparation batch.
+// They remain ordinary (non-builtin) modules, so later saves get a new graph.
+struct FCompiledProgram;
+struct FDasCompilerModuleGroup : das::ModuleGroup
+{
+    TSet<das::Module*> BorrowedModules;
+    TArray<TSharedPtr<FCompiledProgram>> BorrowedOwners;
+
+    ~FDasCompilerModuleGroup() override
+    {
+        auto& Entries = getModules();
+        Entries.erase(std::remove_if(Entries.begin(), Entries.end(),
+                                     [&](das::Module* M) { return BorrowedModules.Contains(M); }), Entries.end());
+        // Destroy our own AST while imported modules and their FileInfos are still pinned.
+        reset();
+    }
+
+    void Borrow(das::Module* Module, const TSharedPtr<FCompiledProgram>& Owner)
+    {
+        TSet<das::Module*> Before;
+        for (auto* M : getModules())
+            Before.Add(M);
+        auto* PreviousRoot = thisModule;
+        addModule(Module); // Includes its transitive dependencies.
+        thisModule = PreviousRoot;
+        for (auto* M : getModules())
+            if (!M->builtIn && !Before.Contains(M))
+                BorrowedModules.Add(M);
+        BorrowedOwners.AddUnique(Owner);
+    }
+};
+uint64 SharedEditorModuleHits = 0;
+TAutoConsoleVariable<int32> CVarEditorSharedModules(TEXT("das.EditorSharedModules"), 1,
+    TEXT("Reuse stable plugin UE helper modules within an editor preparation batch; authored declarations always compile separately."));
+void SeedSharedEditorModules(FDasCompilerModuleGroup& Group);
+void ResetSharedCompilerModules();
+
 // Editor-only acceleration. UE-dependent modules reparse through the global lint policy below.
 // ModuleFileCache owns deserialized source locations and must outlive the AST/ModuleGroup.
 struct FDasEditorModuleCache

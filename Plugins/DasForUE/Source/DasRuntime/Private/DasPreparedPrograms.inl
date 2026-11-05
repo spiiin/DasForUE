@@ -261,6 +261,7 @@ bool FDasRuntimeModule::ExportPreparedProgram(const FString& Script, FString& Er
 bool FDasRuntimeModule::PreparePrograms(UWorld* World, const TArray<FString>& Scripts, FString& Error)
 {
     check(IsInGameThread());
+    FDasEditorSourceReadScope SourcePass;
     Error.Reset();
     if (!IsValid(World) || World->HasBegunPlay())
     {
@@ -300,6 +301,30 @@ TArray<FString> FDasRuntimeModule::ConfiguredProgramScripts(UWorld* World) const
     for (const auto& Script : MapScripts)
         Scripts.AddUnique(Script);
     return Scripts;
+}
+
+TSet<FString> FDasRuntimeModule::ExcludedEditorScripts(UWorld* World) const
+{
+    TArray<FString> Directories;
+    GConfig->GetArray(TEXT("DasForUE.EditorPreparation"), TEXT("ExcludedDirectories"), Directories, GGameIni);
+    const FString ScriptRoot = FPaths::ConvertRelativePathToFull(FPaths::ProjectContentDir() / TEXT("Das/Scripts"));
+    TSet<FString> Excluded;
+    for (const auto& Directory : Directories)
+    {
+        FString Full = FPaths::ConvertRelativePathToFull(ScriptRoot / Directory);
+        FPaths::NormalizeDirectoryName(Full);
+        if (!FPaths::IsRelative(Directory) || !FPaths::CollapseRelativeDirectories(Full) ||
+            !FPaths::IsUnderDirectory(Full, ScriptRoot))
+            continue;
+        TArray<FString> Files;
+        IFileManager::Get().FindFilesRecursive(Files, *Full, TEXT("*.das"), true, false);
+        for (const auto& File : Files)
+            Excluded.Add(NormalizeScriptPath(File));
+    }
+    // Explicitly configured gameplay/test roots take precedence over directory exclusions.
+    for (const auto& Script : ConfiguredProgramScripts(World))
+        Excluded.Remove(NormalizeScriptPath(FPaths::IsRelative(Script) ? ScriptPath(Script) : Script));
+    return Excluded;
 }
 
 namespace
@@ -383,5 +408,15 @@ bool FDasRuntimeModule::PrepareEditorChanges(const TArray<FString>& Files, bool 
         if (!Covered.Contains(File) && FPaths::GetExtension(File).Equals(TEXT("das"), ESearchCase::IgnoreCase) &&
                                                                          IFileManager::Get().FileExists(*File))
             Roots.Add(File);
+    UWorld* World = nullptr;
+    if (GEngine)
+        for (const auto& Context : GEngine->GetWorldContexts())
+            if (Context.WorldType == EWorldType::Editor)
+            {
+                World = Context.World();
+                break;
+            }
+    for (const auto& Script : ExcludedEditorScripts(World))
+        Roots.Remove(Script);
     return PrepareEditorPrograms(Roots.Array(), Error);
 }
